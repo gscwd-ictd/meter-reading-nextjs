@@ -12,7 +12,7 @@ import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { useZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
+import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
 
 type Props = {
   zonebooks: Zonebook[];
@@ -35,7 +35,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
 
-  const zoneBookSorter = (zonebooks: Zonebook[]) => useZonebookSorter(zonebooks);
+  const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookSorter(zonebooks);
   const zones = useMemo(() => {
     const allZones = filteredZonebooks.map((zb) => zb.zone);
     return Array.from(new Set(allZones));
