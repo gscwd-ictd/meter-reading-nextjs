@@ -21,7 +21,7 @@ import { useDebounce } from "@mr/hooks/use-debounce";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { useZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
+import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
 
 export const SearchPersonnelCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -114,7 +114,7 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
                         tempZonebooks.concat(meterReaderZonebooks);
 
                         setSelectedEmployee(undefined);
-                        setZonebooks(useZonebookSorter(tempZonebooks));
+                        setZonebooks(ZonebookSorter(tempZonebooks));
                         setMeterReaderZonebooks([]);
                       } else {
                         setSelectedEmployee(employee);
