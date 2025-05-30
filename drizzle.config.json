@@ -5,9 +5,9 @@
   "dbCredentials": {
     "host": "localhost",
     "port": 5432,
-    "user": "admin",
-    "password": "my_password",
-    "database": "authn",
+    "user": "postgres",
+    "password": "postgres",
+    "database": "meter_reading_db",
     "ssl": false
   }
 }
