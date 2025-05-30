@@ -2,8 +2,8 @@ import { z, ZodError } from "zod";
 
 const EnvSchema = z.object({
   // Add environment variables here...
+  APP_HOST: z.string(),
   NEXT_PUBLIC_HOST: z.string().url(),
-  APP_HOST: z.string().url(),
 
   DB_HOST: z.string(),
   DB_PORT: z.coerce.number(),
