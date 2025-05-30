@@ -21,21 +21,13 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  EllipsisIcon,
   LogsIcon,
-  SeparatorVerticalIcon,
-  UsersRoundIcon,
+  SquarePenIcon,
+  SquareSplitHorizontalIcon,
 } from "lucide-react";
 import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { Badge } from "@mr/components/ui/Badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@mr/components/ui/DropdownMenu";
 import { toast } from "sonner";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
@@ -57,6 +49,7 @@ export default function Scheduler() {
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setScheduleEntryDialogIsOpen = useSchedulesStore((state) => state.setScheduleEntryDialogIsOpen);
+  const [activeContext, setActiveContext] = useState<number | null>(null);
 
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
   const scheduleMeterReaders = useScheduleMeterReaders(schedule, meterReaders);
@@ -216,14 +209,22 @@ export default function Scheduler() {
               );
 
               return (
-                <ContextMenu key={idx}>
+                <ContextMenu
+                  key={idx}
+                  onOpenChange={(open) => {
+                    if (!open && idx === activeContext) {
+                      setActiveContext(null);
+                    }
+                  }}
+                >
                   <ContextMenuTrigger asChild>
                     <button
+                      onContextMenu={() => setActiveContext(idx)}
                       onClick={() => {
                         setScheduleEntryDialogIsOpen(true);
                         setSelectedScheduleEntry(entry);
                       }}
-                      className="group relative grid h-full grid-rows-5 gap-0 overflow-hidden border-t border-l p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.1] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 [&:nth-child(-n+7)]:border-t-0 [&:nth-child(7n+1)]:border-l-0"
+                      className={`group relative grid h-full ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95" : ""} grid-rows-5 gap-0 overflow-hidden border-t border-l p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.05] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 [&:nth-child(-n+7)]:border-t-0 [&:nth-child(7n+1)]:border-l-0`}
                     >
                       {/* Date Number */}
                       <div
@@ -318,7 +319,11 @@ export default function Scheduler() {
                     </button>
                   </ContextMenuTrigger>
 
-                  <ContextMenuContent className="ring-primary z-[100] w-full rounded border-black bg-white ring">
+                  <ContextMenuContent
+                    className="z-[31] w-full rounded bg-white"
+                    avoidCollisions
+                    alignOffset={10}
+                  >
                     <ContextMenuItem
                       className="hover:cursor-pointer"
                       onClick={() => {
@@ -354,8 +359,13 @@ export default function Scheduler() {
                         }
                       }}
                     >
-                      <SeparatorVerticalIcon className="text-primary" />
-                      <span>Split Dates</span>
+                      <SquareSplitHorizontalIcon className="text-primary size-5" />
+                      <span className="text-sm">Split Dates</span>
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem>
+                      <SquarePenIcon className="text-primary size-5" />
+                      <span className="text-sm">Modify Dates</span>
                     </ContextMenuItem>
                     <ContextMenuSeparator />
                   </ContextMenuContent>
