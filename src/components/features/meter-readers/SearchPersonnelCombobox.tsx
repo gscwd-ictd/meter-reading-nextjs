@@ -20,6 +20,8 @@ import { Employee } from "@mr/lib/types/personnel";
 import { useDebounce } from "@mr/hooks/use-debounce";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
+import { useZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
 
 export const SearchPersonnelCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -29,6 +31,10 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
   const setSelectedEmployee = useMeterReadersStore((state) => state.setSelectedEmployee);
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
+  const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
+  const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
+  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const setZonebooks = useZonebookStore((state) => state.setZonebooks);
 
   const {
     data: employees,
@@ -104,7 +110,12 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
                     value={employee.name}
                     onSelect={(currentValue) => {
                       if (employee.companyId === selectedEmployee?.companyId) {
+                        const tempZonebooks = [...zonebooks];
+                        tempZonebooks.concat(meterReaderZonebooks);
+
                         setSelectedEmployee(undefined);
+                        setZonebooks(useZonebookSorter(tempZonebooks));
+                        setMeterReaderZonebooks([]);
                       } else {
                         setSelectedEmployee(employee);
                       }

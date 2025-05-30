@@ -240,12 +240,6 @@ const defaultValues: Pick<ZonebookStore, "zonebooks"> = {
       zonebook: "27-3",
       area: "",
     },
-    {
-      zone: "32",
-      book: "3",
-      zonebook: "",
-      area: "",
-    },
   ],
 };
 
