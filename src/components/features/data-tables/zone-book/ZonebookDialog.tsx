@@ -36,7 +36,7 @@ export const ZonebookDialog: FunctionComponent = () => {
 
       setHasSetBooks(true);
     }
-  }, [zonebookDialogIsOpen, selectedMeterReader, hasSetBooks, selectedScheduleEntry]);
+  }, [zonebookDialogIsOpen, selectedMeterReader, hasSetBooks, selectedScheduleEntry, setSelectedMeterReader]);
 
   const addNewZonebooksToMeterReader = (zonebook: Zonebook) => {
     const newMeterReaderZonebooks = [...selectedMeterReader!.zonebooks];
