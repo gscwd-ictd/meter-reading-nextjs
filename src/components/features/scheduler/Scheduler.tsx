@@ -27,6 +27,8 @@ export const Scheduler: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
+
+  //!!!!! remove
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
