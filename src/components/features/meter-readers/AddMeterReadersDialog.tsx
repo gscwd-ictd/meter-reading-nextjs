@@ -4,6 +4,7 @@
 import { Button } from "@mr/components/ui/Button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -80,7 +81,6 @@ export const AddMeterReadersDialog: FunctionComponent = () => {
         setAddMeterReadersDialogIsOpen(!addMeterReadersDialogIsOpen);
         setMeterReaderZonebooks([]);
       }}
-      modal
     >
       <DialogTrigger asChild>
         <Button variant="default">
@@ -89,7 +89,7 @@ export const AddMeterReadersDialog: FunctionComponent = () => {
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="w-[42rem] max-w-full"
+        className="h-full max-w-full overflow-y-auto sm:h-full md:h-full lg:h-auto"
         onInteractOutside={(e) => {
           if (zonebookSelectorIsOpen) e.preventDefault();
         }}
@@ -98,6 +98,7 @@ export const AddMeterReadersDialog: FunctionComponent = () => {
           <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold">
             <Users2Icon className="size-5" /> Personnel
           </DialogTitle>
+
           <DialogDescription className="text-gray-500">Add new meter reader</DialogDescription>
         </DialogHeader>
         <div className="">
