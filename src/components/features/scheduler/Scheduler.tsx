@@ -43,15 +43,26 @@ import { ContextMenuContent } from "@radix-ui/react-context-menu";
 
 export default function Scheduler() {
   const [datesToSplit, setDatesToSplit] = useState<Date[]>([]);
+
   const schedule = useSchedulesStore((state) => state.schedule);
   const setSchedule = useSchedulesStore((state) => state.setSchedule);
+
+  //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
+
+  //!!!!! remove
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
+
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
+
+  //! remove
   const setScheduleEntryDialogIsOpen = useSchedulesStore((state) => state.setScheduleEntryDialogIsOpen);
+
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
+
+  //! remove
   const scheduleMeterReaders = useScheduleMeterReaders(schedule, meterReaders);
 
   // console.log(schedule);
