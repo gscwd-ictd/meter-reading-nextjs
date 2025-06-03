@@ -53,7 +53,7 @@ export default function Scheduler() {
 
   return (
     <>
-      <div className="flex h-full flex-col">
+      <div className="m-5 flex h-full flex-col rounded border">
         <header className="flex items-center justify-between p-4">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">

@@ -66,7 +66,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
           >
             {formatDate(entry.readingDate, "dd")}
           </div>
-
           {/* Meter Readers */}
           <div className="col-span-1 flex justify-center">
             {entry.meterReaders && entry.meterReaders.length > 0 && (
@@ -81,7 +80,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
               />
             )}
           </div>
-
           <div className="absolute top-0 right-1">
             {hasSchedule && (
               <div className="flex items-center justify-center">
@@ -90,7 +88,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
               </div>
             )}
           </div>
-
           {/* Due Date */}
           {Array.isArray(entry.dueDate) ? (
             <div className="flex items-center justify-center">
@@ -111,7 +108,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
               </Badge>
             </div>
           ) : null}
-
           {/* Disconnection Date */}
           {Array.isArray(entry.disconnectionDate) ? (
             <div className="flex items-center justify-center">
@@ -134,7 +130,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
               </Badge>
             </div>
           ) : null}
-
           {/* Rest Day Indicator */}
           {(dateIsSunday || dateIsSaturday) &&
             isWithinMonth &&
