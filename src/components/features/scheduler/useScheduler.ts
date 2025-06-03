@@ -42,6 +42,11 @@ type DisconnectionDate = {
 
 export type Scheduler = ReturnType<typeof useScheduler>;
 
+type Test = {
+  schedule?: MeterReadingEntry[];
+  datesToSplit: Date[];
+};
+
 export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date) => {
   const [currentDate, setCurrentDate] = useState(date ?? new Date());
   const [currentMonthYear, setCurrentMonthYear] = useState(format(currentDate, "MM/yyyy"));
@@ -387,6 +392,15 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
     [calculateSchedule, removeDuplicateDates],
   );
 
+  const assignMeterReaders = (schedule: MeterReadingEntry[]) => {
+    // if (!schedule) {
+    //   //const schedule = splitDates(datesToSplit);
+    //   //return schedule;
+    // } else {
+    //   //
+    // }
+  };
+
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
     setCurrentMonthYear(format(subMonths(currentDate, 1), "MM/yyyy"));
@@ -406,6 +420,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
     calculateSchedule,
     addSundayReadings,
     removeSundayReadings,
+    assignMeterReaders,
     splitDates,
     formatDate,
     goToPreviousMonth,
