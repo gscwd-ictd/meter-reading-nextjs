@@ -30,13 +30,13 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
       setSelectedMeterReader({
         ...selectedMeterReader,
         zonebooks: selectedScheduleEntry.meterReaders.find(
-          (mr) => mr.companyId === selectedMeterReader?.companyId
+          (mr) => mr.companyId === selectedMeterReader?.companyId,
         )!.zonebooks,
       });
 
       setHasSetBooks(true);
     }
-  }, [zonebookDialogIsOpen, selectedMeterReader, hasSetBooks]);
+  }, [zonebookDialogIsOpen, selectedMeterReader, hasSetBooks, selectedScheduleEntry, setSelectedMeterReader]);
 
   const addNewZonebooksToMeterReader = (zonebook: Zonebook) => {
     const newMeterReaderZonebooks = [...selectedMeterReader!.zonebooks];
@@ -102,7 +102,7 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
                     <button
                       onClick={() => {
                         const newMeterReaderZonebooks = selectedMeterReader.zonebooks.filter(
-                          (zb) => zb.zonebook !== entry.zonebook
+                          (zb) => zb.zonebook !== entry.zonebook,
                         );
 
                         setMeterReaderZonebooks(newMeterReaderZonebooks);
@@ -118,7 +118,7 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
                 </TableRow>
               ))
             ) : (
-              <TableRow className="w-full justify-center flex border">
+              <TableRow className="flex w-full justify-center border">
                 <TableCell colSpan={4}>No zonebooks found</TableCell>
               </TableRow>
             )}
@@ -127,7 +127,7 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
 
         <Button
           variant="secondary"
-          className="bg-green-500 hover:bg-green-600 text-white"
+          className="bg-green-500 text-white hover:bg-green-600"
           disabled={selectedMeterReader?.zonebooks.length === 0 ? true : false}
           onClick={() => {
             if (selectedScheduleEntry && selectedMeterReader) {

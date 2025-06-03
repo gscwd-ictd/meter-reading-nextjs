@@ -32,7 +32,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent = () => {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Populate this month's schedule with meter readers?</AlertDialogTitle>
+          <AlertDialogTitle>Populate this month&apos;s schedule with meter readers?</AlertDialogTitle>
           <AlertDialogDescription>
             This will populate all meter readers with their respective rest days and default zonebooks for
             this month.
