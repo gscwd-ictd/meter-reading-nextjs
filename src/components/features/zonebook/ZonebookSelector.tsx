@@ -13,6 +13,7 @@ import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@mr/components/ui/Dialog";
 
 type Props = {
   zonebooks: Zonebook[];
@@ -82,7 +83,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
 
   return (
     <div className="flex w-full flex-col">
-      <Popover
+      <Dialog
         open={zonebookSelectorIsOpen}
         onOpenChange={() => {
           setZonebookSelectorIsOpen(!zonebookSelectorIsOpen);
@@ -90,8 +91,9 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
           setSelectedZone("");
           setSelectedZonebook(null);
         }}
+        modal
       >
-        <PopoverTrigger asChild className="group">
+        <DialogTrigger asChild>
           <div role="button" className="text-primary flex items-center gap-1">
             <Label
               htmlFor="zonebooks"
@@ -101,16 +103,12 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
             </Label>
             <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
           </div>
-        </PopoverTrigger>
-        <PopoverContent
-          className="m-2 flex w-[600px] flex-col gap-10"
-          align="start"
-          side="bottom"
-          sideOffset={8}
-          alignOffset={10}
-          avoidCollisions
-        >
-          <Command className="flex flex-col gap-2">
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select zonebook(s) to assign</DialogTitle>
+          </DialogHeader>
+          <Command className="flex h-full flex-col gap-2 overflow-y-auto">
             <div className="grid w-full grid-cols-3 items-end gap-2">
               {/* Zone Combobox */}
               <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
@@ -244,7 +242,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                       key={zb.zonebook}
                       value={selectedZonebook?.zonebook}
                       onSelect={() => handleZonebookSelect(zb)}
-                      className="grid w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
+                      className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
                     >
                       <MapPinIcon className="text-primary size-5" />
                       <span className="font-medium text-gray-600">{zb.zonebook}</span>
@@ -259,7 +257,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                           key={idx}
                           value={selectedZonebook?.zonebook}
                           onSelect={() => handleZonebookSelect(zb)}
-                          className="grid w-full grid-cols-12 items-center gap-0"
+                          className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
                         >
                           <MapPinIcon className="text-primary size-5" />
                           <span className="font-medium text-gray-600">{zb.zonebook}</span>
@@ -272,7 +270,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                         .map((zb) => (
                           <CommandItem
                             key={zb.zonebook}
-                            className="grid w-full grid-cols-12 items-center gap-0"
+                            className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
                           >
                             <MapPinCheckIcon className="size-5 text-green-600" />
                             <span className="font-medium text-gray-600">{zb.zonebook}</span>
@@ -282,7 +280,6 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                     : ""}
             </CommandGroup>
           </Command>
-
           <div className="flex flex-col gap-1">
             <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
             <div className="h-[16rem] overflow-auto rounded border p-0">
@@ -337,10 +334,8 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
               </Table>
             </div>
           </div>
-
-          {/* <Button size="lg">Apply</Button> */}
-        </PopoverContent>
-      </Popover>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

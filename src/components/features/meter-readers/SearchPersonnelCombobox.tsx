@@ -87,16 +87,16 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
             </span>
           ) : (
             <span className="flex items-center gap-2 text-sm">
-              <UserRoundSearchIcon className="text-primary size-6" />
-              <span className="text-sm text-gray-700">Search Employee...</span>
+              <UserRoundSearchIcon className="text-primary size-5" />
+              <span className="text-primary text-sm">Search Employee...</span>
             </span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full" onWheel={(e) => e.stopPropagation()}>
         {!employees && (isLoading || isPending) ? (
-          <div className="flex w-full justify-center">
-            <LoadingSpinner />
+          <div className="text-primary flex w-full justify-center gap-2 font-medium">
+            <LoadingSpinner /> Loading...
           </div>
         ) : (
           <Command>

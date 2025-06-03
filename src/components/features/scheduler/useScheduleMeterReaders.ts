@@ -33,9 +33,7 @@ export const useScheduleMeterReaders = (schedules: MeterReadingEntry[], meterRea
 
       const readingRestDay = getDayName(schedule.readingDate);
 
-      const availableReaders = meterReaders
-        .filter((reader) => reader.restDay !== readingRestDay)
-        .map((reader) => ({ ...reader })); //! Improve this
+      const availableReaders = meterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
       return { ...schedule, meterReaders: availableReaders };
     });
