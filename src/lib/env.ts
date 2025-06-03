@@ -3,9 +3,6 @@ import { z, ZodError } from "zod";
 const EnvSchema = z.object({
   // Add environment variables here...
   NEXT_PUBLIC_HOST: z.string().url(),
-  NEXT_PUBLIC_HRMS_BE: z.string().url(),
-  NEXT_PUBLIC_HRMS_IMAGES_SERVER: z.string().url(),
-
   DB_HOST: z.string(),
   DB_PORT: z.coerce.number(),
   DB_USER: z.string(),

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 "use client";
 
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";

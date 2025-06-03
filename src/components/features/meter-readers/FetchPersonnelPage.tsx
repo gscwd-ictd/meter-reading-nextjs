@@ -50,7 +50,7 @@ export function usePaginatedEmployees(isDropdownOpen: boolean) {
 
       setTotalPages(meta.totalPages);
     }
-  }, [query.data]);
+  }, [query, employees, setEmployees]);
 
   // Optional: reset if dropdown is closed
   //   useEffect(() => {
@@ -64,7 +64,7 @@ export function usePaginatedEmployees(isDropdownOpen: boolean) {
     if (isDropdownOpen && employees.length === 0 && page === 1) {
       query.refetch();
     }
-  }, [isDropdownOpen, employees.length, page]);
+  }, [isDropdownOpen, employees.length, page, query]);
 
   return {
     employees,

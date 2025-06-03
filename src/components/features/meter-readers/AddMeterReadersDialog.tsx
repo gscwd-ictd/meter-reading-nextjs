@@ -4,7 +4,6 @@
 import { Button } from "@mr/components/ui/Button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -72,7 +71,7 @@ export const AddMeterReadersDialog: FunctionComponent = () => {
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (addMeterReadersDialogIsOpen) setSelectedEmployee(undefined);
-  }, [addMeterReadersDialogIsOpen]);
+  }, [addMeterReadersDialogIsOpen, setSelectedEmployee]);
 
   return (
     <Dialog
