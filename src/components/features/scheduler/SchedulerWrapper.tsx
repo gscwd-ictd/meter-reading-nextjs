@@ -12,11 +12,11 @@ export default function SchedulerWrapper() {
   return (
     <div>
       <div className="flex justify-end">
-        <ScheduleEntryDialog />
+        {/* <ScheduleEntryDialog /> */}
         <ZonebookDialog />
         <SubmitScheduleSuccessDialog />
       </div>
-      <div className="m-5 border rounded">
+      <div className="m-5 rounded border">
         <Scheduler />
       </div>
     </div>
