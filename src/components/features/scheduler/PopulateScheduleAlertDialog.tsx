@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import {
@@ -14,13 +15,22 @@ import {
 import { Button } from "@mr/components/ui/Button";
 import { CalendarPlus } from "lucide-react";
 import { FunctionComponent } from "react";
-import { useScheduleMeterReaders } from "./useScheduleMeterReaders";
+import { MeterReadingSchedule } from "@mr/lib/types/schedule";
+import { Scheduler } from "./useScheduler";
 
-export const PopulateScheduleAlertDialog: FunctionComponent = () => {
-  const schedule = useSchedulesStore((state) => state.schedule);
+type PopulateScheduleAlertDialogProps = {
+  schedule: MeterReadingSchedule[];
+  scheduler: Scheduler;
+};
+
+export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDialogProps> = ({
+  schedule,
+  scheduler,
+}) => {
+  // const schedule = useSchedulesStore((state) => state.schedule);
   const setSchedule = useSchedulesStore((state) => state.setSchedule);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
-  const { assignReadersToSchedules } = useScheduleMeterReaders(schedule, meterReaders);
+  // const { assignReadersToSchedules } = useScheduleMeterReaders(schedule, meterReaders);
 
   return (
     <AlertDialog>
@@ -42,7 +52,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent = () => {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              setSchedule(assignReadersToSchedules());
+              // setSchedule(scheduler.assignMeterReaders(schedule, []));
+              setSchedule([]);
             }}
           >
             Continue

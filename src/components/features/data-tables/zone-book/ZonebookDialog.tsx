@@ -38,10 +38,10 @@ export const ZonebookDialog: FunctionComponent = () => {
     }
   }, [zonebookDialogIsOpen, selectedMeterReader, hasSetBooks, selectedScheduleEntry, setSelectedMeterReader]);
 
-  const addNewZonebooksToMeterReader = (zonebook: Zonebook) => {
+  const addNewZonebooksToMeterReader = (zoneBook: Zonebook) => {
     const newMeterReaderZonebooks = [...selectedMeterReader!.zonebooks];
 
-    newMeterReaderZonebooks.push(zonebook);
+    newMeterReaderZonebooks.push(zoneBook);
 
     if (selectedMeterReader !== null) {
       setSelectedMeterReader({
@@ -76,7 +76,7 @@ export const ZonebookDialog: FunctionComponent = () => {
           onClick={() => addNewZonebooksToMeterReader(selectedZonebook!)}
           disabled={selectedZonebook !== null ? false : true}
         >
-          Add this zonebook to list
+          Add this zoneBook to list
         </Button>
 
         <Table>
@@ -93,8 +93,8 @@ export const ZonebookDialog: FunctionComponent = () => {
           <TableBody>
             {selectedMeterReader && selectedMeterReader.zonebooks.length > 0 ? (
               selectedMeterReader.zonebooks.map((entry) => (
-                <TableRow key={entry.zonebook}>
-                  <TableCell>{entry.zonebook}</TableCell>
+                <TableRow key={entry.zoneBook}>
+                  <TableCell>{entry.zoneBook}</TableCell>
                   <TableCell>{entry.zone}</TableCell>
                   <TableCell>{entry.book}</TableCell>
                   <TableCell>{entry.area}</TableCell>
@@ -102,7 +102,7 @@ export const ZonebookDialog: FunctionComponent = () => {
                     <button
                       onClick={() => {
                         const newMeterReaderZonebooks = selectedMeterReader.zonebooks.filter(
-                          (zb) => zb.zonebook !== entry.zonebook,
+                          (zb) => zb.zoneBook !== entry.zoneBook,
                         );
 
                         setMeterReaderZonebooks(newMeterReaderZonebooks);

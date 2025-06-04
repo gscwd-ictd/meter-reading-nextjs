@@ -16,10 +16,10 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
   useEffect(() => {
     const cols: ColumnDef<Zonebook>[] = [
       {
-        accessorKey: "zonebook",
+        accessorKey: "zoneBook",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Book" />,
         enableColumnFilter: false,
-        cell: ({ row }) => <span>{row.original.zonebook}</span>,
+        cell: ({ row }) => <span>{row.original.zoneBook}</span>,
       },
       {
         accessorKey: "zone",

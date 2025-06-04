@@ -6,15 +6,15 @@ import { MeterReadingEntry } from "@mr/lib/types/schedule";
 export type ScheduleMeterReaders = ReturnType<typeof useScheduleMeterReaders>;
 
 export const useScheduleMeterReaders = (schedules: MeterReadingEntry[], meterReaders: MeterReader[]) => {
-  const allReadingDates = useCallback((): Date[] => {
-    const schedDates: Date[] = [];
+  // const allReadingDates = useCallback((): Date[] => {
+  //   const schedDates: Date[] = [];
 
-    schedules.filter((sched) => {
-      if (sched.readingDate !== undefined) return schedDates.push(sched.readingDate);
-    });
+  //   schedules.filter((sched) => {
+  //     if (sched.readingDate !== undefined) return schedDates.push(sched.readingDate);
+  //   });
 
-    return schedDates;
-  }, [schedules]);
+  //   return schedDates;
+  // }, [schedules]);
 
   // get map day number to restDay type
   const getDayName = (date: Date): "sunday" | "saturday" | undefined => {
@@ -39,5 +39,5 @@ export const useScheduleMeterReaders = (schedules: MeterReadingEntry[], meterRea
     });
   }, [meterReaders, schedules]);
 
-  return { allReadingDates, assignReadersToSchedules };
+  return { assignReadersToSchedules };
 };

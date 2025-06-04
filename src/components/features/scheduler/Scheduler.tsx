@@ -13,10 +13,9 @@ import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 
 export default function Scheduler() {
-  const [datesToSplit, setDatesToSplit] = useState<Date[]>([]);
+  // const schedule = useSchedulesStore((state) => state.schedule);
 
   const schedule = useSchedulesStore((state) => state.schedule);
-
   const setSchedule = useSchedulesStore((state) => state.setSchedule);
 
   //!!!!! remove
@@ -27,18 +26,23 @@ export default function Scheduler() {
 
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
+  const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+
   const scheduler = useScheduler(holidays, []);
 
+  const initialSchedule = scheduler.calculateSchedule();
+
   // add sunday readings
-  scheduler.addSundayReadings(schedule!);
+  scheduler.addSundayReadings(initialSchedule);
 
   useEffect(() => {
     if (!calendarIsSet) {
-      setSchedule(scheduler.calculateSchedule());
+      setSchedule(initialSchedule);
+      // setSchedule(scheduler.splitDates([]))
       setCalendarIsSet(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheduler.currentDate, calendarIsSet]);
+  }, [setSchedule, setCalendarIsSet, calendarIsSet, initialSchedule]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);
@@ -115,14 +119,14 @@ export default function Scheduler() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    console.log(schedule);
+                    console.log(initialSchedule);
                   }}
                 >
                   <LogsIcon />
                   Log Current Schedule
                 </Button>
 
-                <PopulateScheduleAlertDialog />
+                <PopulateScheduleAlertDialog schedule={initialSchedule} scheduler={scheduler} />
                 <CalendarSettingDropdown scheduler={scheduler} />
               </div>
             </section>
@@ -152,9 +156,7 @@ export default function Scheduler() {
                     setActiveContext={setActiveContext}
                     idx={idx}
                     key={idx}
-                    datesToSplit={datesToSplit}
                     scheduler={scheduler}
-                    setDatesToSplit={setDatesToSplit}
                   />
                 );
               })}

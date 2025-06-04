@@ -34,23 +34,23 @@ export const ZonebookCombobox: FunctionComponent = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between flex">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="flex justify-between">
           {selectedZonebook && selectedZonebook !== null
-            ? zonebooks.find((zb) => zb.zonebook === selectedZonebook.zonebook)?.zonebook
-            : "Search zonebook"}
+            ? zonebooks.find((zb) => zb.zoneBook === selectedZonebook.zoneBook)?.zoneBook
+            : "Search zoneBook"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px]" onWheel={(e) => e.stopPropagation()}>
         <Command>
-          <CommandInput placeholder="Search for a zonebook..." />
+          <CommandInput placeholder="Search for a zoneBook..." />
           <CommandList>
             <CommandEmpty>No zonebooks found.</CommandEmpty>
             <CommandGroup>
               {zonebooksPool &&
                 zonebooksPool.map((zb) => (
                   <CommandItem
-                    key={zb.zonebook}
-                    value={zb.zonebook}
+                    key={zb.zoneBook}
+                    value={zb.zoneBook}
                     onSelect={(currentValue) => {
                       setSearchZonebook(currentValue === searchZonebook ? "" : currentValue);
                       setSelectedZonebook(zb);
@@ -58,7 +58,7 @@ export const ZonebookCombobox: FunctionComponent = () => {
                     }}
                   >
                     <div className="grid grid-cols-2">
-                      <span>{zb.zonebook}</span>
+                      <span>{zb.zoneBook}</span>
                       <span>{zb.area}</span>
                     </div>
                   </CommandItem>

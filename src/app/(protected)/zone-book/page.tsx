@@ -10,7 +10,7 @@ import {
 
 export default function ZoneBookpage() {
   return (
-    <div className="h-full flex flex-col p-5">
+    <div className="flex h-full flex-col p-5">
       <div className="">
         <Breadcrumb>
           <BreadcrumbList>
@@ -25,8 +25,8 @@ export default function ZoneBookpage() {
         </Breadcrumb>
       </div>
 
-      <h3 className="font-bold text-xl mt-5">Zone & Book</h3>
-      <div className="font-medium text-base text-gray-400">List of Zones & Books</div>
+      <h3 className="mt-5 text-xl font-bold">Zone & Book</h3>
+      <div className="text-base font-medium text-gray-400">List of Zones & Books</div>
       <ZonebookTableComponent />
     </div>
   );
