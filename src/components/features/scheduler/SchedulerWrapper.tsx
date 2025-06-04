@@ -19,7 +19,6 @@ export default function SchedulerWrapper() {
   return (
     <div>
       <div className="flex justify-end">
-        {/* <ScheduleEntryDialog /> */}
         <ZonebookDialog />
         <SubmitScheduleSuccessDialog />
       </div>

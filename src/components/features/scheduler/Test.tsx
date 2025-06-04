@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { FunctionComponent, useState } from "react";
@@ -12,7 +13,7 @@ export const Test: FunctionComponent = () => {
   // fetch from db
   // case 1: no schedule from db
   const schedule = scheduler.splitDates(datesToSplit);
-  const withMeterReader = scheduler.assignMeterReaders(schedule); // -> save to db
+  const withMeterReader = scheduler.assignMeterReaders(schedule, []); // -> save to db
 
   //const schedule = scheduler.assignMeterReaders({ schedule: undefined, datesToSplit });
 

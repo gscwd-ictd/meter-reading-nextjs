@@ -40,9 +40,9 @@ export const useMeterReaderColumns = (data: MeterReader[] | undefined) => {
         accessorKey: "zonebooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone-Book" />,
         cell: ({ row }) =>
-          row.original.zonebooks.map((zonebook, idx) => (
-            <span key={zonebook.zonebook} className="w-full truncate">
-              {zonebook.zonebook}
+          row.original.zonebooks.map((zoneBook, idx) => (
+            <span key={zoneBook.zoneBook} className="w-full truncate">
+              {zoneBook.zoneBook}
               {idx < row.original.zonebooks.length - 1 && ", "}
             </span>
           )),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
@@ -13,21 +13,29 @@ import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@mr/components/ui/Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@mr/components/ui/Dialog";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type Props = {
-  zonebooks: Zonebook[];
+  isLoading: boolean;
   onSelectionChange?: (zone: string, book: string) => void;
 };
 
-export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props) {
+export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props) {
   const [selectedZone, setSelectedZone] = useState<string>("");
   const [selectedBook, setSelectedBook] = useState<string>("");
-  const [filteredZonebooks, setFilteredZonebooks] = useState<Zonebook[]>([]);
-  const [hasSetInitialPool, setHasSetInitialPool] = useState<boolean>(false);
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
 
+  const filteredZonebooks = useZonebookStore((state) => state.filteredZonebooks);
+  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
 
@@ -37,6 +45,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
 
   const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookSorter(zonebooks);
+
   const zones = useMemo(() => {
     const allZones = filteredZonebooks.map((zb) => zb.zone);
     return Array.from(new Set(allZones));
@@ -63,23 +72,16 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
     onSelectionChange?.(selectedZone, book);
   };
 
-  const handleZonebookSelect = (zonebook: Zonebook) => {
-    onSelectionChange?.(zonebook.zone, zonebook.book);
-    setSelectedZonebook(zonebook);
-    setSelectedZone(zonebook.zone);
-    setSelectedBook(zonebook.book);
+  const handleZonebookSelect = (zoneBook: Zonebook) => {
+    onSelectionChange?.(zoneBook.zone, zoneBook.book);
+    setSelectedZonebook(zoneBook);
+    setSelectedZone(zoneBook.zone);
+    setSelectedBook(zoneBook.book);
   };
 
   const getNewFilteredZonebooks = async (selectedZonebook: Zonebook): Promise<Zonebook[]> => {
     return filteredZonebooks.filter((zb) => zb !== selectedZonebook);
   };
-
-  useEffect(() => {
-    if (!hasSetInitialPool) {
-      setFilteredZonebooks(zoneBookSorter(zonebooks));
-      setHasSetInitialPool(true);
-    }
-  }, [zonebooks, hasSetInitialPool]);
 
   return (
     <div className="flex w-full flex-col">
@@ -104,10 +106,14 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
             <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
           </div>
         </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Select zonebook(s) to assign</DialogTitle>
+        <DialogContent className="overflow-y-auto">
+          <DialogHeader className="gap-0">
+            <DialogTitle>Assign zonebook</DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Select a zonebook and press add to assign
+            </DialogDescription>
           </DialogHeader>
+
           <Command className="flex h-full flex-col gap-2 overflow-y-auto">
             <div className="grid w-full grid-cols-3 items-end gap-2">
               {/* Zone Combobox */}
@@ -231,54 +237,64 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
               </Button>
             </div>
 
-            <CommandEmpty>No zone found.</CommandEmpty>
-            <CommandGroup
-              className="h-[8rem] overflow-auto rounded border"
-              onWheel={(e) => e.stopPropagation()}
-            >
-              {!selectedZone && filteredZonebooks
-                ? filteredZonebooks.map((zb) => (
+            {/* <CommandEmpty>No zone found.</CommandEmpty> */}
+            {isLoading ? (
+              <div className="text-primary flex h-full w-full items-center justify-center">
+                <LoadingSpinner /> Loading zonebooks...
+              </div>
+            ) : (
+              <CommandGroup
+                className="h-[8rem] overflow-auto rounded border"
+                onWheel={(e) => e.stopPropagation()}
+              >
+                {!selectedZone && !selectedBook && !filteredZonebooks && isLoading ? (
+                  <div>
+                    <LoadingSpinner />
+                  </div>
+                ) : !selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
+                  filteredZonebooks.map((zb) => (
                     <CommandItem
-                      key={zb.zonebook}
-                      value={selectedZonebook?.zonebook}
+                      key={zb.zoneBook}
+                      value={selectedZonebook?.zoneBook}
                       onSelect={() => handleZonebookSelect(zb)}
                       className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
                     >
                       <MapPinIcon className="text-primary size-5" />
-                      <span className="font-medium text-gray-600">{zb.zonebook}</span>
+                      <span className="font-medium text-gray-600">{zb.zoneBook}</span>
                       <span className="col-span-10 font-medium text-black">{zb.area}</span>
                     </CommandItem>
                   ))
-                : selectedZone && !selectedBook && filteredZonebooks
-                  ? filteredZonebooks
-                      .filter((zb) => zb.zone === selectedZone)
-                      .map((zb, idx) => (
-                        <CommandItem
-                          key={idx}
-                          value={selectedZonebook?.zonebook}
-                          onSelect={() => handleZonebookSelect(zb)}
-                          className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
-                        >
-                          <MapPinIcon className="text-primary size-5" />
-                          <span className="font-medium text-gray-600">{zb.zonebook}</span>
-                          <span className="col-span-10 font-medium text-black">{zb.area}</span>
-                        </CommandItem>
-                      ))
-                  : selectedZone && selectedBook && filteredZonebooks
-                    ? filteredZonebooks
-                        .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
-                        .map((zb) => (
-                          <CommandItem
-                            key={zb.zonebook}
-                            className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
-                          >
-                            <MapPinCheckIcon className="size-5 text-green-600" />
-                            <span className="font-medium text-gray-600">{zb.zonebook}</span>
-                            <span className="col-span-10 font-medium text-black">{zb.area}</span>
-                          </CommandItem>
-                        ))
-                    : ""}
-            </CommandGroup>
+                ) : selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
+                  filteredZonebooks
+                    .filter((zb) => zb.zone === selectedZone)
+                    .map((zb, idx) => (
+                      <CommandItem
+                        key={idx}
+                        value={selectedZonebook?.zoneBook}
+                        onSelect={() => handleZonebookSelect(zb)}
+                        className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
+                      >
+                        <MapPinIcon className="text-primary size-5" />
+                        <span className="font-medium text-gray-600">{zb.zoneBook}</span>
+                        <span className="col-span-10 font-medium text-black">{zb.area}</span>
+                      </CommandItem>
+                    ))
+                ) : selectedZone && selectedBook && filteredZonebooks && !isLoading ? (
+                  filteredZonebooks
+                    .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
+                    .map((zb) => (
+                      <CommandItem
+                        key={zb.zoneBook}
+                        className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
+                      >
+                        <MapPinCheckIcon className="size-5 text-green-600" />
+                        <span className="font-medium text-gray-600">{zb.zoneBook}</span>
+                        <span className="col-span-10 font-medium text-black">{zb.area}</span>
+                      </CommandItem>
+                    ))
+                ) : null}
+              </CommandGroup>
+            )}
           </Command>
           <div className="flex flex-col gap-1">
             <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
@@ -298,11 +314,11 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                 <TableBody>
                   {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
                     meterReaderZonebooks.map((entry) => (
-                      <TableRow key={entry.zonebook} className="">
+                      <TableRow key={entry.zoneBook} className="">
                         <TableCell>
                           <MapPinCheckIcon className="size-5 text-green-600" />
                         </TableCell>
-                        <TableCell>{entry.zonebook}</TableCell>
+                        <TableCell>{entry.zoneBook}</TableCell>
                         <TableCell>{entry.zone}</TableCell>
                         <TableCell>{entry.book}</TableCell>
                         <TableCell>{entry.area}</TableCell>
@@ -310,7 +326,7 @@ export default function ZoneBookSelector({ zonebooks, onSelectionChange }: Props
                           <button
                             onClick={() => {
                               const newMeterReaderZonebooks = meterReaderZonebooks.filter(
-                                (zb) => zb.zonebook !== entry.zonebook,
+                                (zb) => zb.zoneBook !== entry.zoneBook,
                               );
                               setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
 

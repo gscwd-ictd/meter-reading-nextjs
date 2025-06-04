@@ -6,11 +6,37 @@ import { Tabs, TabsContent } from "@mr/components/ui/Tabs";
 import { SelectRestDayCombobox } from "./SelectRestDayCombobox";
 import ZoneBookSelector from "../zonebook/ZonebookSelector";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { FunctionComponent, useEffect, useState } from "react";
 
-export const MeterReaderTabs = () => {
+export const MeterReaderTabs: FunctionComponent = () => {
+  const [hasSetInitialZonebookPool, setHasSetInitialZonebookPool] = useState<boolean>(false);
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
-  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
+  const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["get-all-zonebooks"],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
+        return res.data;
+      } catch (error) {
+        return error;
+      }
+    },
+    enabled: !hasSetInitialZonebookPool,
+  });
+
+  // this useEffect should only run once and only when
+  useEffect(() => {
+    if (data && !hasSetInitialZonebookPool) {
+      setFilteredZonebooks(data);
+      setHasSetInitialZonebookPool(true);
+    }
+  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks]);
 
   return (
     <Tabs defaultValue="info" className="w-full">
@@ -69,19 +95,15 @@ export const MeterReaderTabs = () => {
 
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col items-start gap-0">
-              <ZoneBookSelector
-                zonebooks={zonebooks}
-                onSelectionChange={(zone, book) => {
-                  console.log("Selected: ", { zone, book });
-                }}
-              />
+              <ZoneBookSelector isLoading={isLoading} />
               <Input
                 id="meterReaderZonebooks"
-                className="w-full truncate"
+                className="w-full cursor-default truncate hover:cursor-pointer"
                 readOnly
+                onClick={() => setZonebookSelectorIsOpen(true)}
                 value={
                   meterReaderZonebooks !== undefined
-                    ? meterReaderZonebooks.map((mrzb) => mrzb.zonebook)
+                    ? meterReaderZonebooks.map((mrzb) => mrzb.zoneBook)
                     : "Empty"
                 }
               />

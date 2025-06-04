@@ -20,6 +20,8 @@ type SchedulesStore = {
   setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
   submitSuccessDialogIsOpen: boolean;
   setSubmitSuccessDialogIsOpen: (submitSuccessDialogIsOpen: boolean) => void;
+  datesToSplit: Date[];
+  setDatesToSplit: (datesToSplit: Date[]) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -39,4 +41,6 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setSelectedZonebook: (selectedZonebook) => set({ selectedZonebook }),
   submitSuccessDialogIsOpen: false,
   setSubmitSuccessDialogIsOpen: (submitSuccessDialogIsOpen) => set({ submitSuccessDialogIsOpen }),
+  datesToSplit: [],
+  setDatesToSplit: (datesToSplit) => set({ datesToSplit }),
 }));

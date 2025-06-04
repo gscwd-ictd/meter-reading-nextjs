@@ -19,9 +19,7 @@ type ScheduleEntryContextMenuProps = {
   entry: MeterReadingEntry;
   activeContext: number | null;
   currentDate: Date;
-  datesToSplit: Date[];
   setActiveContext: Dispatch<SetStateAction<number | null>>;
-  setDatesToSplit: Dispatch<SetStateAction<Date[]>>;
   scheduler: Scheduler;
 };
 
@@ -31,8 +29,6 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
   setActiveContext,
   currentDate,
   entry,
-  datesToSplit,
-  setDatesToSplit,
   scheduler,
 }) => {
   const isWithinMonth = isSameMonth(entry.readingDate, startOfMonth(currentDate));
@@ -44,6 +40,9 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
 
   const schedule = useSchedulesStore((state) => state.schedule);
   const setSchedule = useSchedulesStore((state) => state.setSchedule);
+
+  const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
+  const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
 
   return (
     <ContextMenu
