@@ -13,36 +13,32 @@ import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 
 export default function Scheduler() {
-  // const schedule = useSchedulesStore((state) => state.schedule);
-
-  const schedule = useSchedulesStore((state) => state.schedule);
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
 
   //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
-
   //!!!!! remove
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
-
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+  const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
 
   const scheduler = useScheduler(holidays, []);
 
-  const initialSchedule = scheduler.calculateSchedule();
-
   // add sunday readings
-  scheduler.addSundayReadings(initialSchedule);
+  scheduler.addSundayReadings(currentSchedule);
 
   useEffect(() => {
     if (!calendarIsSet) {
-      setSchedule(initialSchedule);
-      // setSchedule(scheduler.splitDates([]))
+      setCurrentSchedule(scheduler.splitDates(datesToSplit));
+      // console.log(scheduler.calculateSchedule());
+
       setCalendarIsSet(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setSchedule, setCalendarIsSet, calendarIsSet, initialSchedule]);
+  }, [scheduler.currentDate, setCurrentSchedule, setCalendarIsSet, calendarIsSet]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);
@@ -119,14 +115,14 @@ export default function Scheduler() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    console.log(initialSchedule);
+                    console.log(currentSchedule);
                   }}
                 >
                   <LogsIcon />
                   Log Current Schedule
                 </Button>
 
-                <PopulateScheduleAlertDialog schedule={initialSchedule} scheduler={scheduler} />
+                <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
                 <CalendarSettingDropdown scheduler={scheduler} />
               </div>
             </section>
@@ -146,8 +142,8 @@ export default function Scheduler() {
           </section>
 
           <section className="flex-1" style={gridStyle}>
-            {schedule &&
-              schedule.map((entry, idx) => {
+            {currentSchedule &&
+              currentSchedule.map((entry, idx) => {
                 return (
                   <ScheduleEntryContextMenu
                     activeContext={activeContext}

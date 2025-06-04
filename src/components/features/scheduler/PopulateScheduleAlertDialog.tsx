@@ -28,7 +28,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   scheduler,
 }) => {
   // const schedule = useSchedulesStore((state) => state.schedule);
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
   // const { assignReadersToSchedules } = useScheduleMeterReaders(schedule, meterReaders);
 
@@ -52,8 +52,9 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              // setSchedule(scheduler.assignMeterReaders(schedule, []));
-              setSchedule([]);
+              // scheduler.assignMeterReaders(schedule, meterReaders);
+              // console.log(scheduler.assignMeterReaders(schedule, meterReaders));
+              setCurrentSchedule(scheduler.assignMeterReaders(schedule, meterReaders));
             }}
           >
             Continue

@@ -43,8 +43,8 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   entry,
 }) => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
-  const schedule = useSchedulesStore((state) => state.schedule);
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
 
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
@@ -158,14 +158,14 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         <DialogFooter>
           <Button
             onClick={() => {
-              const updatedSchedule = schedule.map((entry) => {
+              const updatedCurrentSchedule = currentSchedule.map((entry) => {
                 if (entry.readingDate === selectedScheduleEntry?.readingDate) {
                   return { ...entry, meterReaders: selectedScheduleEntry.meterReaders };
                 }
                 return entry;
               });
 
-              setSchedule(updatedSchedule);
+              setCurrentSchedule(updatedCurrentSchedule);
               setScheduleEntryDialogIsOpen(false);
             }}
           >

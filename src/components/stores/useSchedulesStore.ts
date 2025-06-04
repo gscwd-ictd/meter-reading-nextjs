@@ -4,8 +4,8 @@ import { Zonebook } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
 type SchedulesStore = {
-  schedule: MeterReadingEntry[];
-  setSchedule: (schedule: MeterReadingEntry[]) => void;
+  currentSchedule: MeterReadingEntry[];
+  setCurrentSchedule: (currentSchedule: MeterReadingEntry[]) => void;
   calendarIsSet: boolean;
   setCalendarIsSet: (calendarIsSet: boolean) => void;
   selectedScheduleEntry: MeterReadingEntry | null;
@@ -25,8 +25,8 @@ type SchedulesStore = {
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
-  schedule: [],
-  setSchedule: (schedule) => set({ schedule }),
+  currentSchedule: [],
+  setCurrentSchedule: (currentSchedule) => set({ currentSchedule }),
   calendarIsSet: false,
   setCalendarIsSet: (calendarIsSet) => set({ calendarIsSet }),
   selectedScheduleEntry: null,
