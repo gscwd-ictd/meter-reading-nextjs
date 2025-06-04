@@ -17,7 +17,8 @@ type CalendarSettingDropdownProps = {
 };
 
 export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setSubmitSuccessDialogIsOpen = useSchedulesStore((state) => state.setSubmitSuccessDialogIsOpen);
 
   return (
@@ -29,9 +30,10 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
         <DropdownMenuItem
-          className="cursor-pointer flex justify-start"
+          className="flex cursor-pointer justify-start"
           onClick={() => {
-            setSchedule(scheduler.calculateSchedule());
+            setCurrentSchedule(scheduler.calculateSchedule());
+            setDatesToSplit([]);
             toast.success("Success", {
               description: "Successfully reset the calendar for this month!",
               position: "top-right",
@@ -43,7 +45,7 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="cursor-pointer flex justify-start"
+          className="flex cursor-pointer justify-start"
           onClick={() => {
             setSubmitSuccessDialogIsOpen(true);
             toast.success("Success", {

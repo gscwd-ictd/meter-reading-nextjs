@@ -38,8 +38,8 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
     (mr) => Array.isArray(mr.zonebooks) && mr.zonebooks.length > 0,
   );
 
-  const schedule = useSchedulesStore((state) => state.schedule);
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
 
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
@@ -70,49 +70,59 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
       </ContextMenuTrigger>
 
       <ContextMenuContent className="z-[31] w-full rounded bg-white" avoidCollisions alignOffset={10}>
-        <ContextMenuItem
-          className="hover:cursor-pointer"
-          onClick={() => {
-            if (
-              getDate(schedule[idx].readingDate) > 1 &&
-              entry.dueDate !== undefined &&
-              entry.disconnectionDate !== undefined &&
-              !Array.isArray(schedule[idx - 1]?.dueDate) &&
-              !Array.isArray(schedule[idx + 1]?.dueDate)
-            ) {
-              const newSplitDates = [...datesToSplit];
-              newSplitDates.push(entry.readingDate);
-              setDatesToSplit(newSplitDates);
-              setSchedule(scheduler.splitDates(newSplitDates));
-            } else if (
-              getDate(schedule[idx].readingDate) === 1 &&
-              entry.dueDate !== undefined &&
-              entry.disconnectionDate !== undefined &&
-              !Array.isArray(schedule[idx + 1]?.dueDate)
-            ) {
-              toast.error("Error", {
-                description: "Cannot split dates on the beginning of the month!",
-                position: "top-right",
-                duration: 1500,
-              });
-            } else {
-              toast.error("Error", {
-                description: "Cannot split entry, multiple same-day reading dates are not allowed!",
-                position: "top-right",
-                duration: 1500,
-              });
-            }
-          }}
-        >
-          <SquareSplitHorizontalIcon className="text-primary size-5" />
-          <span className="text-sm">Split Dates</span>
-        </ContextMenuItem>
-        <ContextMenuSeparator />
+        {!dateIsSunday && (
+          <ContextMenuItem
+            className="hover:cursor-pointer"
+            onClick={() => {
+              if (
+                getDate(currentSchedule[idx].readingDate) > 1 &&
+                entry.dueDate !== undefined &&
+                entry.disconnectionDate !== undefined &&
+                !Array.isArray(currentSchedule[idx - 1]?.dueDate) &&
+                !Array.isArray(currentSchedule[idx + 1]?.dueDate)
+              ) {
+                const newSplitDates = [...datesToSplit];
+                newSplitDates.push(entry.readingDate);
+                setDatesToSplit(newSplitDates);
+
+                const newSchedule = scheduler.splitDates(newSplitDates).map((entry) => {
+                  const match = currentSchedule.find(
+                    (currentEntry) => currentEntry.readingDate.getDay() === entry.readingDate.getDay(),
+                  );
+
+                  return { ...entry, meterReaders: !entry.dueDate ? [] : match?.meterReaders };
+                });
+
+                setCurrentSchedule(newSchedule);
+              } else if (
+                getDate(currentSchedule[idx].readingDate) === 1 &&
+                entry.dueDate !== undefined &&
+                entry.disconnectionDate !== undefined &&
+                !Array.isArray(currentSchedule[idx + 1]?.dueDate)
+              ) {
+                toast.error("Error", {
+                  description: "Cannot split dates on the beginning of the month!",
+                  position: "top-right",
+                  duration: 1500,
+                });
+              } else {
+                toast.error("Error", {
+                  description: "Cannot split entry, multiple same-day reading dates are not allowed!",
+                  position: "top-right",
+                  duration: 1500,
+                });
+              }
+            }}
+          >
+            <SquareSplitHorizontalIcon className="text-primary size-5" />
+            <span className="text-sm">Split Dates</span>
+          </ContextMenuItem>
+        )}
+        {!dateIsSunday && <ContextMenuSeparator />}
         <ContextMenuItem>
           <SquarePenIcon className="text-primary size-5" />
           <span className="text-sm">Modify Dates</span>
         </ContextMenuItem>
-        <ContextMenuSeparator />
       </ContextMenuContent>
     </ContextMenu>
   );

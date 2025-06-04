@@ -1,6 +1,7 @@
 "use client";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { MeterReader } from "@mr/lib/types/personnel";
-import { MeterReadingSchedule } from "@mr/lib/types/schedule";
+import { MeterReadingEntry, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import {
   addDays,
   addMonths,
@@ -45,14 +46,11 @@ type DisconnectionDate = {
 
 export type Scheduler = ReturnType<typeof useScheduler>;
 
-// type Test = {
-//   schedule?: MeterReadingSchedule[];
-//   datesToSplit: Date[];
-// };
-
 export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date) => {
   const [currentDate, setCurrentDate] = useState(date ?? new Date());
   const [currentMonthYear, setCurrentMonthYear] = useState(format(currentDate, "MM/yyyy"));
+
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
 
   useEffect(() => {
     if (date !== undefined && date.getTime() !== currentDate.getTime()) {
@@ -400,23 +398,26 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
       });
       return split;
     },
-    [calculateSchedule, removeDuplicateDates],
+    [calculateSchedule, removeDuplicateDates, currentSchedule],
   );
 
-  const assignMeterReaders = useCallback((schedule: MeterReadingSchedule[], meterReaders: MeterReader[]) => {
-    return schedule.map((entry) => {
-      // Guard: If readingDate is missing or invalid, skip assigning readers
-      if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
-        return { ...schedule, meterReaders: [] }; // no meterReaders field
-      }
+  const assignMeterReaders = useCallback(
+    (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntry[] => {
+      return schedule.map((entry) => {
+        // Guard: If readingDate is missing or invalid, skip assigning readers
+        if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
+          return { ...entry, meterReaders: [] }; // no meterReaders field
+        }
 
-      const readingRestDay = getDayName(entry.readingDate);
+        const readingRestDay = getDayName(entry.readingDate);
 
-      const availableReaders = meterReaders.filter((reader) => reader.restDay !== readingRestDay);
+        const availableReaders = meterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
-      return { ...entry, meterReaders: availableReaders };
-    });
-  }, []);
+        return { ...entry, meterReaders: availableReaders };
+      });
+    },
+    [splitDates],
+  );
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
@@ -439,6 +440,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
     removeSundayReadings,
     assignMeterReaders,
     splitDates,
+
     formatDate,
     goToPreviousMonth,
     goToNextMonth,
