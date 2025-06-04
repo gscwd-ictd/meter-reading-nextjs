@@ -85,12 +85,13 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
                 newSplitDates.push(entry.readingDate);
                 setDatesToSplit(newSplitDates);
 
+                // merge the calculated schedules and the current schedule
                 const newSchedule = scheduler.splitDates(newSplitDates).map((entry) => {
                   const match = currentSchedule.find(
-                    (currentEntry) => currentEntry.readingDate.getDay() === entry.readingDate.getDay(),
+                    (currentEntry) => currentEntry.readingDate.getTime() === entry.readingDate.getTime(),
                   );
 
-                  return { ...entry, meterReaders: !entry.dueDate ? [] : match?.meterReaders };
+                  return { ...entry, meterReaders: match?.meterReaders || [] };
                 });
 
                 setCurrentSchedule(newSchedule);

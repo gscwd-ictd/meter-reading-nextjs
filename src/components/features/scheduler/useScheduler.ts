@@ -305,6 +305,8 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
           };
     });
 
+    // addSundayReadings(schedule);
+
     return schedule;
   }, [calculateDisconnectionDates, calculateDueDates, getCalendarDays]);
 
@@ -391,11 +393,12 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
         split = [...result];
       }
 
-      toast.success("Success", {
-        description: "Successfully splitted the dates!",
-        position: "top-right",
-        duration: 1500,
-      });
+      if (selectedDates.length > 1)
+        toast.success("Success", {
+          description: "Successfully splitted the dates!",
+          position: "top-right",
+          duration: 1500,
+        });
       return split;
     },
     [calculateSchedule, removeDuplicateDates, currentSchedule],

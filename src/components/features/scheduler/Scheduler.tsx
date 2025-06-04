@@ -27,13 +27,11 @@ export default function Scheduler() {
 
   const scheduler = useScheduler(holidays, []);
 
-  // add sunday readings
   scheduler.addSundayReadings(currentSchedule);
 
   useEffect(() => {
     if (!calendarIsSet) {
       setCurrentSchedule(scheduler.splitDates(datesToSplit));
-      // console.log(scheduler.calculateSchedule());
 
       setCalendarIsSet(true);
     }
