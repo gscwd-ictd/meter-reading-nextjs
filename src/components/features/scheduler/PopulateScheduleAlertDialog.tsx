@@ -17,6 +17,7 @@ import { CalendarPlus } from "lucide-react";
 import { FunctionComponent } from "react";
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
+import { toast } from "sonner";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -27,10 +28,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   schedule,
   scheduler,
 }) => {
-  // const schedule = useSchedulesStore((state) => state.schedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
-  // const { assignReadersToSchedules } = useScheduleMeterReaders(schedule, meterReaders);
 
   return (
     <AlertDialog>
@@ -52,9 +51,12 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              // scheduler.assignMeterReaders(schedule, meterReaders);
-              // console.log(scheduler.assignMeterReaders(schedule, meterReaders));
               setCurrentSchedule(scheduler.assignMeterReaders(schedule, meterReaders));
+              toast.success("Success", {
+                description: "Successfully populated all the meter readers for this month!",
+                position: "top-right",
+                duration: 1500,
+              });
             }}
           >
             Continue
