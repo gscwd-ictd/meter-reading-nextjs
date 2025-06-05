@@ -219,9 +219,9 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
     let startOfReadingDate = monthStart;
 
     //* Use this instead, if starting date requires to skip holidays as well.
-    // while (isHoliday(startOfReadingDate) || isSunday(startOfReadingDate)) {
-    //   startOfReadingDate = adjustForHolidayOrWeekend(startOfReadingDate);
-    // }
+    while (isHoliday(startOfReadingDate) || isSunday(startOfReadingDate)) {
+      startOfReadingDate = adjustForHolidayOrWeekend(startOfReadingDate);
+    }
 
     if (isSunday(startOfReadingDate)) {
       startOfReadingDate = nextMonday(startOfReadingDate);
@@ -244,7 +244,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
 
     dueDate = addDays(readingDate, 15);
 
-    while (isSameMonth(readingDate, monthStart) && readingCount < 22) {
+    while (isSameMonth(readingDate, monthStart) && readingCount < 23) {
       dueDate = adjustForHolidayOrWeekend(dueDate);
 
       if (isSunday(readingDate)) {

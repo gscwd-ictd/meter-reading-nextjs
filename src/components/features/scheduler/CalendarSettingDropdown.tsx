@@ -6,11 +6,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
-import { Ellipsis, RotateCcwIcon, SendHorizonalIcon } from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import { FunctionComponent } from "react";
 import { Scheduler } from "./useScheduler";
-import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
-import { toast } from "sonner";
 import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
 import { SubmitScheduleAlertDialog } from "./SubmitScheduleAlertDialog";
 
@@ -19,10 +17,6 @@ type CalendarSettingDropdownProps = {
 };
 
 export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
-  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
-  const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
-  const setSubmitSuccessDialogIsOpen = useSchedulesStore((state) => state.setSubmitSuccessDialogIsOpen);
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
