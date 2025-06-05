@@ -15,8 +15,8 @@ export const SubmitScheduleSuccessDialog = () => {
         </DialogHeader>
         <div className="flex gap-2">
           <ThumbsUpIcon className="size-10 shrink-0" />
-          <span className=" text-lg text-gray-500 tracking-tight">
-            Your response has been successfully submitted. Thank you!
+          <span className="text-lg tracking-tight text-gray-500">
+            The schedule has been successfully submitted. Thank you!
           </span>
         </div>
         <DialogFooter>

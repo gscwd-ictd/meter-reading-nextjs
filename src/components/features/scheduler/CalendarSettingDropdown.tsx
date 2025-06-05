@@ -11,6 +11,8 @@ import { FunctionComponent } from "react";
 import { Scheduler } from "./useScheduler";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { toast } from "sonner";
+import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
+import { SubmitScheduleAlertDialog } from "./SubmitScheduleAlertDialog";
 
 type CalendarSettingDropdownProps = {
   scheduler: Scheduler;
@@ -29,33 +31,12 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
-        <DropdownMenuItem
-          className="flex cursor-pointer justify-start"
-          onClick={() => {
-            setCurrentSchedule(scheduler.calculateSchedule());
-            setDatesToSplit([]);
-            toast.success("Success", {
-              description: "Successfully reset the calendar for this month!",
-              position: "top-right",
-              duration: 1500,
-            });
-          }}
-        >
-          <RotateCcwIcon className="text-green-500" /> <span>Reset</span>
+        <DropdownMenuItem asChild>
+          <ResetScheduleAlertDialog scheduler={scheduler} />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="flex cursor-pointer justify-start"
-          onClick={() => {
-            setSubmitSuccessDialogIsOpen(true);
-            toast.success("Success", {
-              description: "Successfully submitted this month's schedule!",
-              position: "top-right",
-              duration: 1500,
-            });
-          }}
-        >
-          <SendHorizonalIcon className="text-primary" /> <span>Submit schedule</span>
+        <DropdownMenuItem asChild>
+          <SubmitScheduleAlertDialog />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

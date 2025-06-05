@@ -5,18 +5,26 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
-import { MoreHorizontal, MoreVertical } from "lucide-react";
-import { FunctionComponent } from "react";
+import { DeleteIcon, MoreHorizontal, MoreVertical } from "lucide-react";
+import { FunctionComponent, useState } from "react";
+import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
+import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
+import { MeterReader } from "@mr/lib/types/personnel";
 
 type MeterReaderEntryRowActionsProps = {
-  companyId: string;
+  meterReader: MeterReader;
 };
 
 export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowActionsProps> = ({
-  companyId,
+  meterReader,
 }) => {
+  const [editMeterReaderDialogIsOpen, setEditMeterReaderDialogIsOpen] = useState<boolean>(false);
+
+  const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,9 +38,30 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem onClick={() => console.log(companyId)} className="cursor-pointer">
-          Update personnel
+      <DropdownMenuContent align="end" className="w-[200px]">
+        <DropdownMenuItem
+          onClick={() => {
+            setSelectedMeterReader(meterReader);
+          }}
+          className="cursor-pointer"
+          asChild
+        >
+          {/* Update personnel */}
+          <EditMeterReaderDialog
+            editMeterReaderDialogIsOpen={editMeterReaderDialogIsOpen}
+            setEditMeterReaderDialogIsOpen={setEditMeterReaderDialogIsOpen}
+            selectedMeterReader={meterReader}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <button
+            className="flex w-full items-center justify-start gap-2 text-sm hover:cursor-pointer"
+            onClick={() => console.log(meterReader)}
+          >
+            <DeleteIcon className="size-4" />
+            Delete Personnel
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -18,12 +18,6 @@ type MeterReadersStore = {
   selectedEmployee: Employee | undefined;
   setSelectedEmployee: (selectedEmployee: Employee | undefined) => void;
 
-  addMeterReadersDialogIsOpen: boolean;
-  setAddMeterReadersDialogIsOpen: (addMeterReadersDialogIsOpen: boolean) => void;
-
-  editMeterReadersDialogIsOpen: boolean;
-  setEditMeterReadersDialogIsOpen: (editPersonnelDialogIsOpen: boolean) => void;
-
   queryPersonnel: string;
   setQueryPersonnel: (queryPersonnel: string) => void;
 };
@@ -34,12 +28,6 @@ export const useMeterReadersStore = create<MeterReadersStore>((set) => ({
 
   selectedMeterReader: undefined,
   setSelectedMeterReader: (selectedMeterReader) => set({ selectedMeterReader }),
-
-  addMeterReadersDialogIsOpen: false,
-  setAddMeterReadersDialogIsOpen: (addMeterReadersDialogIsOpen) => set({ addMeterReadersDialogIsOpen }),
-
-  editMeterReadersDialogIsOpen: false,
-  setEditMeterReadersDialogIsOpen: (editMeterReadersDialogIsOpen) => set({ editMeterReadersDialogIsOpen }),
 
   employees: [],
   setEmployees: (employees) => set({ employees }),
