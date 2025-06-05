@@ -14,7 +14,7 @@ import {
 } from "@mr/components/ui/AlertDialog";
 
 import { RotateCcwIcon } from "lucide-react";
-import { FunctionComponent } from "react";
+import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 
@@ -27,6 +27,9 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+  const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
+    (state) => state.setCalendarScheduleDropdownIsOpen,
+  );
 
   return (
     <AlertDialog>
@@ -51,6 +54,8 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
                 position: "top-right",
                 duration: 1500,
               });
+
+              setCalendarScheduleDropdownIsOpen(false);
             }}
           >
             Continue

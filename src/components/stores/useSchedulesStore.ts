@@ -22,6 +22,8 @@ type SchedulesStore = {
   setSubmitSuccessDialogIsOpen: (submitSuccessDialogIsOpen: boolean) => void;
   datesToSplit: Date[];
   setDatesToSplit: (datesToSplit: Date[]) => void;
+  calendarScheduleDropdownIsOpen: boolean;
+  setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen: boolean) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -43,4 +45,7 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setSubmitSuccessDialogIsOpen: (submitSuccessDialogIsOpen) => set({ submitSuccessDialogIsOpen }),
   datesToSplit: [],
   setDatesToSplit: (datesToSplit) => set({ datesToSplit }),
+  calendarScheduleDropdownIsOpen: false,
+  setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen) =>
+    set({ calendarScheduleDropdownIsOpen }),
 }));

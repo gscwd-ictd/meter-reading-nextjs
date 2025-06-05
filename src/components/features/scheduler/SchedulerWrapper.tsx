@@ -3,8 +3,8 @@
 
 import dynamic from "next/dynamic";
 import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
-import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
 
 const Scheduler = dynamic(() => import("@mr/components/features/scheduler/Scheduler"), {
   ssr: false,
@@ -18,9 +18,9 @@ const Scheduler = dynamic(() => import("@mr/components/features/scheduler/Schedu
 export default function SchedulerWrapper() {
   return (
     <div>
+      <SubmitScheduleSuccessDialog />
       <div className="flex justify-end">
         <ZonebookDialog />
-        <SubmitScheduleSuccessDialog />
       </div>
 
       <Scheduler />

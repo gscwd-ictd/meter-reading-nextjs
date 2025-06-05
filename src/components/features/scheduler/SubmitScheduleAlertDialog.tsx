@@ -12,15 +12,27 @@ import {
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { SendHorizonalIcon } from "lucide-react";
-import { FunctionComponent } from "react";
-import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { FunctionComponent, useState } from "react";
+
 import { Button } from "@mr/components/ui/Button";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { toast } from "sonner";
 
 export const SubmitScheduleAlertDialog: FunctionComponent = () => {
+  const [submitScheduleAlertDialogIsOpen, setSubmitScheduleAlertDialogIsOpen] = useState<boolean>(false);
+  const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
+    (state) => state.setCalendarScheduleDropdownIsOpen,
+  );
+
   const setSubmitSuccessDialogIsOpen = useSchedulesStore((state) => state.setSubmitSuccessDialogIsOpen);
 
   return (
-    <AlertDialog>
+    <AlertDialog
+      open={submitScheduleAlertDialogIsOpen}
+      onOpenChange={() => {
+        setSubmitScheduleAlertDialogIsOpen(!submitScheduleAlertDialogIsOpen);
+      }}
+    >
       <AlertDialogTrigger className="flex w-full gap-2 px-2 py-1 text-sm">
         <SendHorizonalIcon className="text-primary size-5" /> <span>Submit schedule</span>
       </AlertDialogTrigger>
@@ -35,7 +47,12 @@ export const SubmitScheduleAlertDialog: FunctionComponent = () => {
             <Button
               size="lg"
               onClick={() => {
+                setCalendarScheduleDropdownIsOpen(false);
                 setSubmitSuccessDialogIsOpen(true);
+                toast.success("Success", {
+                  description: "Successfully submitted the schedule for this month!",
+                  position: "top-right",
+                });
               }}
             >
               Submit
