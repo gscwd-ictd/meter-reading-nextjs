@@ -6,6 +6,7 @@ import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -149,23 +150,48 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       </DialogTrigger>
       <DialogContent className="max-h-[90%] w-[100vw] min-w-[75%] overflow-auto">
         <DialogHeader>
-          <DialogTitle className="flex justify-between">
-            <span>
+          <DialogTitle className="flex gap-2">
+            <div>
               {selectedScheduleEntry
                 ? format(selectedScheduleEntry?.readingDate!, "EEE MMM dd, yyyy ")
                 : null}
-            </span>
-            <span>
-              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.dueDate)
-                ? ""
-                : selectedScheduleEntry &&
-                    selectedScheduleEntry.dueDate &&
-                    isValid(selectedScheduleEntry?.dueDate) &&
-                    !Array.isArray(selectedScheduleEntry.dueDate)
-                  ? formatDate(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-                  : null}
-            </span>
+            </div>
           </DialogTitle>
+          <DialogDescription>
+            <div className="flex items-center gap-2 tracking-tight text-blue-600">
+              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.dueDate) ? (
+                <div className="flex gap-2">
+                  {selectedScheduleEntry.dueDate.map((day, idx) => {
+                    if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
+                    return formatDate(day, "MMM dd, yyyy");
+                  })}
+                </div>
+              ) : selectedScheduleEntry &&
+                selectedScheduleEntry.dueDate &&
+                isValid(selectedScheduleEntry?.dueDate) &&
+                !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                formatDate(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+              ) : null}
+              <span>Due</span>
+            </div>
+
+            <div className="flex items-center gap-2 tracking-tight text-red-600">
+              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                <div className="flex gap-2">
+                  {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
+                    if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
+                    return formatDate(day, "MMM dd, yyyy");
+                  })}
+                </div>
+              ) : selectedScheduleEntry &&
+                selectedScheduleEntry.disconnectionDate &&
+                isValid(selectedScheduleEntry?.disconnectionDate) &&
+                !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                formatDate(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+              ) : null}
+              <span>Disconnection</span>
+            </div>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="relative">
