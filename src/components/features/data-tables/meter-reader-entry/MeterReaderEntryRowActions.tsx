@@ -13,6 +13,7 @@ import { FunctionComponent, useState } from "react";
 import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { MeterReader } from "@mr/lib/types/personnel";
+import { DeleteMeterReaderDialog } from "../../meter-readers/DeleteMeterReaderDialog";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReader;
@@ -55,13 +56,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <button
-            className="flex w-full items-center justify-start gap-2 text-sm hover:cursor-pointer"
-            onClick={() => console.log(meterReader)}
-          >
-            <DeleteIcon className="size-4" />
-            Delete Personnel
-          </button>
+          <DeleteMeterReaderDialog selectedMeterReader={meterReader} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -18,6 +18,7 @@ import { MeterReaderTabs } from "./MeterReaderTabs";
 import { Employee, MeterReader } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
+import { EditMeterReaderTabs } from "./EditMeterReaderTabs";
 
 type EditMeterReaderDialogProps = {
   editMeterReaderDialogIsOpen: boolean;
@@ -31,48 +32,46 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   selectedMeterReader,
 }) => {
   const setSelectedEmployee = useMeterReadersStore((state) => state.setSelectedEmployee);
-
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
-
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
   const setMeterReaders = useMeterReadersStore((state) => state.setMeterReaders);
-  // const selectedMeterReader = useMeterReadersStore((state) => state.selectedMeterReader);
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
-  const employees = useMeterReadersStore((state) => state.employees);
-  const setEmployees = useMeterReadersStore((state) => state.setEmployees);
   const selectedRestDay = useMeterReadersStore((state) => state.selectedRestDay);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
-
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
 
   const submitPersonnel = () => {
     if (selectedRestDay !== undefined) {
-      const newMeterReaders = [...meterReaders];
-      newMeterReaders?.push({
-        ...selectedEmployee,
-        name: selectedEmployee?.name!,
-        mobileNumber: selectedEmployee?.mobileNumber!,
-        positionTitle: selectedEmployee?.positionTitle!,
-        companyId: selectedEmployee?.companyId!,
-        employeeId: selectedEmployee?.employeeId!,
-        photoUrl: selectedEmployee?.photoUrl!,
+      setSelectedMeterReader({
+        ...selectedMeterReader,
+        name: selectedMeterReader?.name!,
+        mobileNumber: selectedMeterReader?.mobileNumber!,
+        positionTitle: selectedMeterReader?.positionTitle!,
+        companyId: selectedMeterReader?.companyId!,
+        employeeId: selectedMeterReader?.employeeId!,
+        photoUrl: selectedMeterReader?.photoUrl!,
         restDay: selectedRestDay,
         zonebooks: meterReaderZonebooks,
-        assignment: selectedEmployee?.assignment!,
+        assignment: selectedMeterReader?.assignment!,
       });
 
-      const newEmployees = [...employees];
-
-      setEmployees(newEmployees);
-      setMeterReaders(newMeterReaders);
+      setMeterReaders(
+        meterReaders.map((meterReader) => {
+          if (meterReader.employeeId) {
+            return { ...meterReader, restDay: selectedRestDay, zonebooks: meterReaderZonebooks };
+          }
+          return meterReader;
+        }),
+      );
       setEditMeterReaderDialogIsOpen(false);
       setSelectedRestDay(undefined);
+      setSelectedMeterReader(undefined);
       setMeterReaderZonebooks([]);
 
       toast.success("Success", {
-        description: "You have successfully added a meter reader!",
+        description: "You have successfully updated this meter reader!",
         position: "top-right",
       });
     } else toast.error("No rest day", { description: "Please select a rest day", position: "top-right" });
@@ -83,20 +82,22 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     if (editMeterReaderDialogIsOpen) {
       //! Temporary only, use find but replace it later with /findbyid
       const tempSelectedMeterReader = meterReaders.find(
-        (meterReader) => meterReader.companyId === selectedMeterReader?.companyId,
+        (meterReader) => meterReader.employeeId === selectedMeterReader?.employeeId,
       );
-
-      console.log(selectedMeterReader);
 
       setSelectedMeterReader(tempSelectedMeterReader);
 
       setMeterReaderZonebooks(tempSelectedMeterReader?.zonebooks!);
-    }
-  }, [setEditMeterReaderDialogIsOpen, setSelectedEmployee, editMeterReaderDialogIsOpen, selectedMeterReader]);
 
-  useEffect(() => {
-    if (editMeterReaderDialogIsOpen) console.log("From Edit : ", selectedMeterReader);
-  }, [selectedMeterReader, editMeterReaderDialogIsOpen]);
+      setSelectedRestDay(tempSelectedMeterReader?.restDay);
+    }
+  }, [
+    setEditMeterReaderDialogIsOpen,
+    setSelectedEmployee,
+    editMeterReaderDialogIsOpen,
+    selectedMeterReader,
+    meterReaders,
+  ]);
 
   return (
     <Dialog
@@ -104,12 +105,13 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       onOpenChange={() => {
         setEditMeterReaderDialogIsOpen(!editMeterReaderDialogIsOpen);
         setMeterReaderZonebooks([]);
+        setSelectedMeterReader(undefined);
       }}
     >
       <DialogTrigger asChild>
         <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-amber-400">
           <SquarePenIcon className="size-4" />
-          Update personnel
+          Update Meter Reader
         </button>
       </DialogTrigger>
       <DialogContent
@@ -123,11 +125,13 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             <Users2Icon className="size-5" /> Personnel
           </DialogTitle>
 
-          <DialogDescription className="text-gray-500">Add new meter reader</DialogDescription>
+          <DialogDescription className="text-gray-500">Edit meter reader</DialogDescription>
         </DialogHeader>
-        <div className="">
-          <MeterReaderTabs />
-        </div>
+        {selectedMeterReader && (
+          <div className="">
+            <EditMeterReaderTabs />
+          </div>
+        )}
 
         <DialogFooter className="grid grid-cols-2">
           <Button
@@ -142,7 +146,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
           </Button>
 
           <Button size="lg" disabled={!selectedEmployee ? true : false} onClick={submitPersonnel}>
-            Add
+            Update
           </Button>
         </DialogFooter>
       </DialogContent>
