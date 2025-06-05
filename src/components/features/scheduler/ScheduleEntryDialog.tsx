@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
-import { compareAsc, format, formatDate } from "date-fns";
+import { compareAsc, format, formatDate, isValid } from "date-fns";
 import { Dispatch, FunctionComponent, SetStateAction, useState } from "react";
 import { MeterReaderDataTable } from "../data-tables/meter-readers/MeterReaderDataTable";
 import { Button } from "@mr/components/ui/Button";
@@ -58,7 +58,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             setScheduleEntryDialogIsOpen(true);
             setSelectedScheduleEntry(entry);
           }}
-          className={`group relative grid h-full ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95" : ""} grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.05] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95`}
+          className={`group relative grid h-full ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.05] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800`}
         >
           {/* Date Number */}
           <div
@@ -93,8 +93,8 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
           {/* Due Date */}
           {Array.isArray(entry.dueDate) ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200">
-                <span className="text-blue-600">
+              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+                <span className="text-blue-600 dark:text-blue-600">
                   {entry.dueDate.sort(compareAsc).map((day, idx) => (
                     <span className="overflow-auto font-bold" key={idx}>
                       {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
@@ -105,16 +105,18 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             </div>
           ) : entry.dueDate ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200">
-                <span className="font-bold text-blue-600">{formatDate(entry.dueDate, "MMM dd")}</span>
+              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+                <span className="font-bold text-blue-600 dark:text-blue-600">
+                  {formatDate(entry.dueDate, "MMM dd")}
+                </span>
               </Badge>
             </div>
           ) : null}
           {/* Disconnection Date */}
           {Array.isArray(entry.disconnectionDate) ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100">
-                <div className="text-red-600">
+              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+                <div className="text-red-600 dark:text-rose-600">
                   {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
                     <span className="font-bold" key={idx}>
                       {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
@@ -125,8 +127,8 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             </div>
           ) : entry.disconnectionDate ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100">
-                <span className="font-bold text-red-600">
+              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+                <span className="font-bold text-red-600 dark:text-rose-600">
                   {formatDate(entry.disconnectionDate, "MMM dd")}
                 </span>
               </Badge>
@@ -138,23 +140,39 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             entry.dueDate &&
             entry.meterReaders?.length === 0 && (
               <div className="flex items-center justify-center">
-                <Badge className="w-full gap-0 rounded-none bg-gray-100 text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs">
+                <Badge className="w-full gap-0 rounded-none bg-gray-100 text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
                   Applicable Rest Day
                 </Badge>
               </div>
             )}
         </button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90%] min-w-[50%] sm:w-full lg:min-w-[50%]">
+      <DialogContent className="max-h-[90%] w-[100vw] min-w-[75%] overflow-auto">
         <DialogHeader>
-          <DialogTitle>
-            {selectedScheduleEntry ? format(selectedScheduleEntry?.readingDate!, "EEE MMM dd, yyyy ") : null}
+          <DialogTitle className="flex justify-between">
+            <span>
+              {selectedScheduleEntry
+                ? format(selectedScheduleEntry?.readingDate!, "EEE MMM dd, yyyy ")
+                : null}
+            </span>
+            <span>
+              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.dueDate)
+                ? ""
+                : selectedScheduleEntry &&
+                    selectedScheduleEntry.dueDate &&
+                    isValid(selectedScheduleEntry?.dueDate) &&
+                    !Array.isArray(selectedScheduleEntry.dueDate)
+                  ? formatDate(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                  : null}
+            </span>
           </DialogTitle>
         </DialogHeader>
 
-        <MeterReaderDataTable
-          meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
-        />
+        <div className="relative">
+          <MeterReaderDataTable
+            meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
+          />
+        </div>
         <DialogFooter>
           <Button
             onClick={() => {

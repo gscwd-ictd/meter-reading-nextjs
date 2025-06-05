@@ -110,16 +110,6 @@ export default function Scheduler() {
           <section className="flex items-center gap-0">
             <section className="flex items-center gap-4">
               <div className="space-x-2">
-                {/* <Button
-                  variant="outline"
-                  onClick={() => {
-                    console.log(currentSchedule);
-                  }}
-                >
-                  <LogsIcon />
-                  Log Current Schedule
-                </Button> */}
-
                 <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
                 <CalendarSettingDropdown scheduler={scheduler} />
               </div>

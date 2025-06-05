@@ -41,8 +41,8 @@ export const MeterReaderRowActions: FunctionComponent<PersonnelRowActionsProps> 
       <div className="flex grid-cols-2 gap-2">
         <div className="col-span-1">
           <Button className="w-full px-2" size="sm" onClick={() => assignZonebook(meterReader)}>
-            <MapPinnedIcon className="size-2 sm:size-2 lg:size-4" />
-            <span className="text-xs"> Zonebooks</span>
+            <MapPinnedIcon className="size-2 sm:size-4 lg:size-4 dark:text-white" />
+            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Zonebooks</span>
           </Button>
         </div>
         <div className="col-span-1">
@@ -52,20 +52,10 @@ export const MeterReaderRowActions: FunctionComponent<PersonnelRowActionsProps> 
             size="sm"
             onClick={() => removeMeterReader(meterReader.companyId)}
           >
-            <CircleXIcon className="size-2 fill-red-600 text-white sm:size-2 lg:size-4" />
-            <span className="text-xs">Remove</span>
+            <CircleXIcon className="size-2 fill-red-600 text-white sm:size-4 lg:size-4" />
+            <span className="hidden text-xs sm:hidden md:hidden lg:block">Remove</span>
           </Button>
         </div>
-        {/* <div className="col-span-1">
-          <Button
-            variant="outline"
-            className="w-full px-2"
-            size="sm"
-            onClick={() => console.log(selectedScheduleEntry)}
-          >
-            <XIcon className="size-2 sm:size-2 lg:size-4" /> <span className="text-xs">Log Meter Reader</span>
-          </Button>
-        </div> */}
       </div>
     </>
   );

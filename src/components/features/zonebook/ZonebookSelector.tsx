@@ -234,6 +234,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                   setSelectedZone("");
                   setSelectedZonebook(null);
                 }}
+                className="dark:text-white dark:disabled:text-black"
               >
                 Add
               </Button>
@@ -288,8 +289,10 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                     .map((zb, idx) => (
                       <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
                         <MapPinCheckIcon className="size-5 text-green-600" />
-                        <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                        <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                        <span className="col-span-2 font-medium text-gray-600 dark:text-white">
+                          {zb.zoneBook}
+                        </span>
+                        <span className="col-span-9 font-medium text-black dark:text-white">{zb.area}</span>
                       </CommandItem>
                     ))
                 ) : null}
