@@ -88,7 +88,7 @@ export function DataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="static w-full space-y-1 overflow-auto">
+    <div className="static w-full space-y-4 overflow-auto">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
         <div className="grid items-start gap-2 sm:grid sm:grid-cols-1 sm:grid-rows-2 md:grid md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
           {enableGlobalFilter && (
@@ -104,68 +104,66 @@ export function DataTable<T>({
         </div>
       </ColumnVisibilityToggleContext.Provider>
 
-      <div>
-        <div className="rounded-md border px-2">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
+      <div className="rounded-md border px-2">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
 
-            <TableBody>
-              {!loading ? (
-                table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="max-w-[30rem] truncate">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      <div className="flex w-full items-center justify-center gap-2">
-                        <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
-                        <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
-                          No Results
-                        </span>
-                      </div>
-                    </TableCell>
+          <TableBody>
+            {!loading ? (
+              table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="max-w-[30rem] truncate">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                )
+                ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
                     <div className="flex w-full items-center justify-center gap-2">
-                      <LoadingSpinner /> <span className="text-lg">Loading data...</span>
+                      <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                      <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                        No Results
+                      </span>
                     </div>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {enablePagination && (
-          <div className="pt-4 pb-10">
-            <DataTablePagination table={table} />
-          </div>
-        )}
+              )
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <LoadingSpinner /> <span className="text-lg">Loading data...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
+
+      {enablePagination && (
+        <div className="pt-4 pb-10">
+          <DataTablePagination table={table} />
+        </div>
+      )}
     </div>
   );
 }
