@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import {

@@ -1,5 +1,5 @@
 "use client";
-import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+
 import { MeterReader } from "@mr/lib/types/personnel";
 import { MeterReadingEntry, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import {
@@ -49,8 +49,6 @@ export type Scheduler = ReturnType<typeof useScheduler>;
 export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date) => {
   const [currentDate, setCurrentDate] = useState(date ?? new Date());
   const [currentMonthYear, setCurrentMonthYear] = useState(format(currentDate, "MM/yyyy"));
-
-  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
 
   useEffect(() => {
     if (date !== undefined && date.getTime() !== currentDate.getTime()) {
@@ -232,7 +230,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
     }
 
     return { monthStart, startOfReadingDate };
-  }, [currentDate, isRestDay]);
+  }, [currentDate, isRestDay, adjustForHolidayOrWeekend, isHoliday]);
 
   const calculateDueDates = useCallback((): DueDate[] => {
     const { monthStart, startOfReadingDate } = getStartingReadingDate();
@@ -401,7 +399,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
         });
       return split;
     },
-    [calculateSchedule, removeDuplicateDates, currentSchedule],
+    [calculateSchedule, removeDuplicateDates],
   );
 
   const assignMeterReaders = useCallback(
@@ -419,7 +417,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
         return { ...entry, meterReaders: availableReaders };
       });
     },
-    [splitDates],
+    [],
   );
 
   const goToPreviousMonth = () => {

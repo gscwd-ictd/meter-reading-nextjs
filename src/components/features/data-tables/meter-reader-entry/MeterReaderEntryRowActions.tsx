@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
-import { DeleteIcon, MoreHorizontal, MoreVertical } from "lucide-react";
+import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { FunctionComponent, useState } from "react";
 import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
