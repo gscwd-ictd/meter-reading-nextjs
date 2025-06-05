@@ -14,7 +14,6 @@ import {
 import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { SquarePenIcon, Users2Icon } from "lucide-react";
-import { MeterReaderTabs } from "./MeterReaderTabs";
 import { Employee, MeterReader } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
@@ -97,6 +96,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     editMeterReaderDialogIsOpen,
     selectedMeterReader,
     meterReaders,
+    setMeterReaderZonebooks,
+    setSelectedMeterReader,
+    setSelectedRestDay,
   ]);
 
   return (

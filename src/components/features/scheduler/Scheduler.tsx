@@ -5,7 +5,7 @@ import { useScheduler } from "./useScheduler";
 import { holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
-import { ChevronLeft, ChevronRight, LogsIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";

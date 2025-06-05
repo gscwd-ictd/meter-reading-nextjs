@@ -5,7 +5,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { Button } from "@mr/components/ui/Button";
 
@@ -34,7 +33,6 @@ export const SubmitScheduleSuccessDialog: FunctionComponent = () => {
             size="lg"
             onClick={() => {
               setSubmitSuccessDialogIsOpen(false);
-              // setCalendarSettingDropdownIsOpen(false);
             }}
           >
             <span className="text-lg">Got it, thanks!</span>
