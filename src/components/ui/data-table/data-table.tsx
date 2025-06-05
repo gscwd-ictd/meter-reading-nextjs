@@ -88,18 +88,16 @@ export function DataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="space-y-4">
+    <div className="static w-full space-y-1 overflow-auto">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
-        <div className="flex items-center gap-2">
+        <div className="grid items-start gap-2 sm:grid sm:grid-cols-1 sm:grid-rows-2 md:grid md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
           {enableGlobalFilter && (
-            <div className="relative flex w-96 items-center">
-              <Input
-                placeholder="Search from table..."
-                value={debounceValue ?? ""}
-                onChange={(event) => setDebounceValue(event.target.value)}
-                className="min-w-96"
-              />
-            </div>
+            <Input
+              placeholder="Search from table..."
+              value={debounceValue ?? ""}
+              onChange={(event) => setDebounceValue(event.target.value)}
+              className="lg:w-[25%]"
+            />
           )}
 
           <DataTableToolbar table={table} />

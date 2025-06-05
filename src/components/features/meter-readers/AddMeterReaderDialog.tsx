@@ -90,7 +90,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       modal
     >
       <DialogTrigger asChild>
-        <Button variant="default">
+        <Button variant="default" className="dark:text-white">
           <PlusCircleIcon />
           Add personnel
         </Button>

@@ -69,7 +69,11 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
         </div>
       </ContextMenuTrigger>
 
-      <ContextMenuContent className="z-[31] w-full rounded bg-white" avoidCollisions alignOffset={10}>
+      <ContextMenuContent
+        className="z-[31] w-full rounded bg-white dark:bg-slate-800 dark:ring dark:ring-white"
+        avoidCollisions
+        alignOffset={10}
+      >
         {!dateIsSunday && (
           <ContextMenuItem
             className="hover:cursor-pointer"

@@ -34,7 +34,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button disabled={meterReaders.length < 1 ? true : false}>
+        <Button disabled={meterReaders.length < 1 ? true : false} className="dark:text-white">
           <CalendarPlus />
           Populate schedule
         </Button>
@@ -50,6 +50,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            className="dark:text-white"
             onClick={() => {
               setCurrentSchedule(scheduler.assignMeterReaders(schedule, meterReaders));
               toast.success("Success", {

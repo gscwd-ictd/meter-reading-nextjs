@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NextJS Boilerplate",
+  title: "MetocaR Application",
 };
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
