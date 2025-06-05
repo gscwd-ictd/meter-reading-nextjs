@@ -19,13 +19,13 @@ export default function ZoneBookpage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Personnel</BreadcrumbPage>
+              <BreadcrumbPage>Zone & Books</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      <h3 className="mt-5 text-xl font-bold">Zone & Book</h3>
+      <h3 className="mt-5 text-xl font-bold">Zone & Books</h3>
       <div className="text-base font-medium text-gray-400">List of Zones & Books</div>
       <ZonebookTableComponent />
     </div>

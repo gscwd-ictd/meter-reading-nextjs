@@ -47,8 +47,10 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookSorter(zonebooks);
 
   const zones = useMemo(() => {
-    const allZones = filteredZonebooks.map((zb) => zb.zone);
-    return Array.from(new Set(allZones));
+    if (filteredZonebooks && filteredZonebooks.length > 0) {
+      const allZones = filteredZonebooks.map((zb) => zb.zone);
+      return Array.from(new Set(allZones));
+    }
   }, [filteredZonebooks]);
 
   const booksForZone = useMemo(() => {
@@ -140,7 +142,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                       className="h-auto max-h-[12rem] overflow-auto"
                       onWheel={(e) => e.stopPropagation()}
                     >
-                      {zones.map((zone) => (
+                      {zones?.map((zone) => (
                         <CommandItem
                           key={zone}
                           value={zone}
@@ -252,16 +254,17 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                     <LoadingSpinner />
                   </div>
                 ) : !selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
-                  filteredZonebooks.map((zb) => (
+                  filteredZonebooks.length > 0 &&
+                  filteredZonebooks.map((zb, idx) => (
                     <CommandItem
-                      key={zb.zoneBook}
+                      key={idx}
                       value={selectedZonebook?.zoneBook}
                       onSelect={() => handleZonebookSelect(zb)}
                       className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
                     >
                       <MapPinIcon className="text-primary size-5" />
-                      <span className="font-medium text-gray-600">{zb.zoneBook}</span>
-                      <span className="col-span-10 font-medium text-black">{zb.area}</span>
+                      <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
+                      <span className="col-span-9 font-medium text-black">{zb.area}</span>
                     </CommandItem>
                   ))
                 ) : selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
@@ -275,21 +278,18 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                         className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
                       >
                         <MapPinIcon className="text-primary size-5" />
-                        <span className="font-medium text-gray-600">{zb.zoneBook}</span>
-                        <span className="col-span-10 font-medium text-black">{zb.area}</span>
+                        <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
+                        <span className="col-span-9 font-medium text-black">{zb.area}</span>
                       </CommandItem>
                     ))
                 ) : selectedZone && selectedBook && filteredZonebooks && !isLoading ? (
                   filteredZonebooks
                     .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
-                    .map((zb) => (
-                      <CommandItem
-                        key={zb.zoneBook}
-                        className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
-                      >
+                    .map((zb, idx) => (
+                      <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
                         <MapPinCheckIcon className="size-5 text-green-600" />
-                        <span className="font-medium text-gray-600">{zb.zoneBook}</span>
-                        <span className="col-span-10 font-medium text-black">{zb.area}</span>
+                        <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
+                        <span className="col-span-9 font-medium text-black">{zb.area}</span>
                       </CommandItem>
                     ))
                 ) : null}

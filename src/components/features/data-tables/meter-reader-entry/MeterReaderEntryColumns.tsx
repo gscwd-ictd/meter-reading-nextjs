@@ -77,7 +77,7 @@ export const useMeterReaderEntryColumns = (data: PersonnelColumn[] | undefined) 
       {
         id: "actions",
         header: "Actions",
-        cell: ({ row }) => <MeterReaderEntryRowActions companyId={row.original.companyId} />,
+        cell: ({ row }) => <MeterReaderEntryRowActions meterReader={row.original} />,
       },
     ];
 

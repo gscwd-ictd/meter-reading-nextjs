@@ -245,7 +245,7 @@ type ZonebookStore = {
 //   ],
 // };
 
-export const useZonebookStore = create<ZonebookStore>((set) => ({
+export const useZonebookStore = create<ZonebookStore>((set, get) => ({
   // zonebooks: defaultValues.zonebooks.sort((a, b) => {
   //   const getLeadingNumber = (str: string) => {
   //     const match = str.match(/^(\d+)-/);
