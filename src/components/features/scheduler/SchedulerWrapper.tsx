@@ -5,6 +5,9 @@ import dynamic from "next/dynamic";
 import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
+import { holidays } from "./holidays";
+import { useSearchParams } from "next/navigation";
+import { format } from "date-fns";
 
 const Scheduler = dynamic(() => import("@mr/components/features/scheduler/Scheduler"), {
   ssr: false,
@@ -16,6 +19,10 @@ const Scheduler = dynamic(() => import("@mr/components/features/scheduler/Schedu
 });
 
 export default function SchedulerWrapper() {
+  const searchParams = useSearchParams();
+  const monthYear = searchParams.get("date");
+
+  //! fetch the holidays and pass it as a prop to the scheduler
   return (
     <div>
       <SubmitScheduleSuccessDialog />
@@ -23,7 +30,7 @@ export default function SchedulerWrapper() {
         <ZonebookDialog />
       </div>
 
-      <Scheduler />
+      <Scheduler holidays={holidays} monthYear={monthYear ?? format(new Date(), "MM-yyyy")} />
     </div>
   );
 }

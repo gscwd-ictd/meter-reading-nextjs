@@ -1,3 +1,5 @@
+export type Holidays = typeof holidays;
+
 export const holidays = [
   {
     id: "37e628bf-1c01-4030-85a7-3afd20c88ca1",

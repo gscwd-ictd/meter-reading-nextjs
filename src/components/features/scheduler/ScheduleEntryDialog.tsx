@@ -158,14 +158,14 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             </div>
           </DialogTitle>
           <DialogDescription>
-            <div className="flex items-center gap-2 tracking-tight text-blue-600">
+            <span className="flex items-center gap-2 tracking-tight text-blue-600">
               {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.dueDate) ? (
-                <div className="flex gap-2">
+                <span className="flex gap-2">
                   {selectedScheduleEntry.dueDate.map((day, idx) => {
                     if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
                     return formatDate(day, "MMM dd, yyyy");
                   })}
-                </div>
+                </span>
               ) : selectedScheduleEntry &&
                 selectedScheduleEntry.dueDate &&
                 isValid(selectedScheduleEntry?.dueDate) &&
@@ -173,16 +173,16 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 formatDate(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
               ) : null}
               <span>Due</span>
-            </div>
+            </span>
 
-            <div className="flex items-center gap-2 tracking-tight text-red-600">
+            <span className="flex items-center gap-2 tracking-tight text-red-600">
               {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                <div className="flex gap-2">
+                <span className="flex gap-2">
                   {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
                     if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
                     return formatDate(day, "MMM dd, yyyy");
                   })}
-                </div>
+                </span>
               ) : selectedScheduleEntry &&
                 selectedScheduleEntry.disconnectionDate &&
                 isValid(selectedScheduleEntry?.disconnectionDate) &&
@@ -190,7 +190,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 formatDate(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
               ) : null}
               <span>Disconnection</span>
-            </div>
+            </span>
           </DialogDescription>
         </DialogHeader>
 

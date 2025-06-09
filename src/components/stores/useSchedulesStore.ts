@@ -24,6 +24,8 @@ type SchedulesStore = {
   setDatesToSplit: (datesToSplit: Date[]) => void;
   calendarScheduleDropdownIsOpen: boolean;
   setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen: boolean) => void;
+  hasSchedule: boolean;
+  setHasSchedule: (hasSchedule: boolean) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -48,4 +50,6 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   calendarScheduleDropdownIsOpen: false,
   setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen) =>
     set({ calendarScheduleDropdownIsOpen }),
+  hasSchedule: false,
+  setHasSchedule: (hasSchedule) => set({ hasSchedule }),
 }));

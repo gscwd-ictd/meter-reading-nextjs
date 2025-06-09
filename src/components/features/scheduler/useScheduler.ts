@@ -23,6 +23,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -46,16 +47,24 @@ type DisconnectionDate = {
 
 export type Scheduler = ReturnType<typeof useScheduler>;
 
-export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date) => {
-  const [currentDate, setCurrentDate] = useState(date ?? new Date());
-  const [currentMonthYear, setCurrentMonthYear] = useState(format(currentDate, "MM/yyyy"));
+export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: string) => {
+  const [currentDate, setCurrentDate] = useState(
+    monthYear ? parse(monthYear, "MM-yyyy", new Date()) : new Date(),
+  );
+  const [currentMonthYear, setCurrentMonthYear] = useState(monthYear);
+
+  const router = useRouter();
+
+  // useEffect(() => {
+  //   if (date !== undefined && date.getTime() !== currentDate.getTime()) {
+  //     setCurrentDate(date);
+  //     setCurrentMonthYear(format(currentDate, "MM-yyyy"));
+  //   }
+  // }, [currentDate, date, currentMonthYear]);
 
   useEffect(() => {
-    if (date !== undefined && date.getTime() !== currentDate.getTime()) {
-      setCurrentDate(date);
-      setCurrentMonthYear(format(currentDate, "MM/yyyy"));
-    }
-  }, [currentDate, date, currentMonthYear]);
+    router.replace(`/schedule?date=${currentMonthYear}`);
+  }, [currentMonthYear]);
 
   // get map day number to restDay type
   const getDayName = (date: Date): "sunday" | "saturday" | undefined => {
@@ -303,8 +312,6 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
           };
     });
 
-    // addSundayReadings(schedule);
-
     return schedule;
   }, [calculateDisconnectionDates, calculateDueDates, getCalendarDays]);
 
@@ -422,17 +429,17 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], date?: Date)
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
-    setCurrentMonthYear(format(subMonths(currentDate, 1), "MM/yyyy"));
+    setCurrentMonthYear(format(subMonths(currentDate, 1), "MM-yyyy"));
   };
 
   const goToNextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
-    setCurrentMonthYear(format(addMonths(currentDate, 1), "MM/yyyy"));
+    setCurrentMonthYear(format(addMonths(currentDate, 1), "MM-yyyy"));
   };
 
   const today = () => {
     setCurrentDate(new Date());
-    setCurrentMonthYear(format(new Date(), "MM/yyyy"));
+    setCurrentMonthYear(format(new Date(), "MM-yyyy"));
   };
 
   return {
