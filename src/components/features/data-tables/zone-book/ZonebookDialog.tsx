@@ -1,3 +1,5 @@
+"use client";
+
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { Dialog, DialogContent, DialogHeader } from "@mr/components/ui/Dialog";

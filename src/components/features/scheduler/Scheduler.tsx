@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
 import { Holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
@@ -11,18 +11,20 @@ import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
+import { useSearchParams } from "next/navigation";
 
 type SchedulerProps = {
-  monthYear?: string | null;
   holidays: Holidays;
 };
 
-export default function Scheduler({ holidays, monthYear }: SchedulerProps) {
+export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays }) => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
 
+  const searchParams = useSearchParams();
+  const monthYear = searchParams.get("date");
+
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
-  const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
 
   //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
@@ -33,7 +35,7 @@ export default function Scheduler({ holidays, monthYear }: SchedulerProps) {
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
 
-  const scheduler = useScheduler(holidays, [], monthYear!);
+  const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "MM-yyyy"));
 
   scheduler.addSundayReadings(currentSchedule);
 
@@ -160,4 +162,4 @@ export default function Scheduler({ holidays, monthYear }: SchedulerProps) {
       </div>
     </>
   );
-}
+};
