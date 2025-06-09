@@ -64,7 +64,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
   useEffect(() => {
     router.replace(`/schedule?date=${currentMonthYear}`);
-  }, [currentMonthYear]);
+  }, [currentMonthYear, router]);
 
   // get map day number to restDay type
   const getDayName = (date: Date): "sunday" | "saturday" | undefined => {
