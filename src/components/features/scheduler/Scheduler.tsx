@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { holidays } from "./holidays";
+import { Holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,9 +12,17 @@ import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 
-export default function Scheduler() {
+type SchedulerProps = {
+  monthYear?: string | null;
+  holidays: Holidays;
+};
+
+export default function Scheduler({ holidays, monthYear }: SchedulerProps) {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+
+  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
+  const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
 
   //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
@@ -25,18 +33,21 @@ export default function Scheduler() {
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
 
-  const scheduler = useScheduler(holidays, []);
+  const scheduler = useScheduler(holidays, [], monthYear!);
 
   scheduler.addSundayReadings(currentSchedule);
 
   useEffect(() => {
-    if (!calendarIsSet) {
+    //! Add a logic here to check the current monthyear and check from db if it has a schedule already
+    if (!calendarIsSet && !hasSchedule) {
       setCurrentSchedule(scheduler.splitDates(datesToSplit));
 
       setCalendarIsSet(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheduler.currentDate, setCurrentSchedule, setCalendarIsSet, calendarIsSet]);
+  }, [scheduler.currentDate, setCurrentSchedule, setCalendarIsSet, calendarIsSet, hasSchedule]);
+
+  useEffect(() => {}, [scheduler.currentDate]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);

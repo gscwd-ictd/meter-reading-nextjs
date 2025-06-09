@@ -345,8 +345,10 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow className="flex w-full justify-center border">
-                      <TableCell colSpan={5}>No zonebooks added</TableCell>
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        No zonebooks added
+                      </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
