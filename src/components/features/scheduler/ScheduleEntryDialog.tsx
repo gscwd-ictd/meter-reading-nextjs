@@ -153,7 +153,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         <DialogHeader className="space-y-0">
           <DialogTitle>
             <div className="text-lg font-bold text-gray-800">
-              {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
+              {selectedScheduleEntry && format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
             </div>
 
             <div className="flex flex-col text-sm sm:flex-row sm:gap-6">

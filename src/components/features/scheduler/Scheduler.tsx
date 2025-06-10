@@ -133,8 +133,8 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays }) => {
 
         <main className="flex h-full flex-1 flex-col overflow-hidden">
           {currentSchedule.length === 0 ? (
-            <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-2xl">
-              <LoadingSpinner className="size-14" /> Loading Calendar...
+            <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-xl">
+              <LoadingSpinner className="size-12" /> Loading Calendar...
             </div>
           ) : (
             currentSchedule &&
