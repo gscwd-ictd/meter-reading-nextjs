@@ -4,8 +4,6 @@ import { FunctionComponent, Suspense } from "react";
 import { useMeterReaderEntryColumns } from "./MeterReaderEntryColumns";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
 export const MeterReaderEntryDataTable: FunctionComponent = () => {
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
