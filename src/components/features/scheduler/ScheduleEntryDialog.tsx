@@ -18,7 +18,7 @@ import { MeterReaderDataTable } from "../data-tables/meter-readers/MeterReaderDa
 import { Button } from "@mr/components/ui/Button";
 import { MeterReadingEntry } from "@mr/lib/types/schedule";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
-import { CheckCircle2 } from "lucide-react";
+import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
 import { MeterReader } from "@mr/lib/types/personnel";
 
@@ -148,49 +148,43 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             )}
         </button>
       </DialogTrigger>
+
       <DialogContent className="max-h-[90%] w-[100vw] min-w-[75%] overflow-auto">
-        <DialogHeader>
-          <DialogTitle className="flex gap-2">
-            <div>
-              {selectedScheduleEntry
-                ? format(selectedScheduleEntry?.readingDate!, "EEE MMM dd, yyyy ")
-                : null}
+        <DialogHeader className="space-y-0">
+          <DialogTitle>
+            <div className="text-lg font-bold text-gray-800">
+              {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
+            </div>
+
+            <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
+              <div className="text-primary flex items-center gap-2 font-medium dark:text-blue-400">
+                <CalendarIcon className="h-4 w-4" />
+                <span>
+                  Due:{" "}
+                  {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate)
+                    ? "select-two"
+                    : selectedScheduleEntry?.dueDate && !Array.isArray(selectedScheduleEntry.dueDate)
+                      ? format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                      : null}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 font-medium text-red-500">
+                <AlertTriangleIcon className="h-4 w-4" />
+                <span>
+                  Disconnection:{" "}
+                  {selectedScheduleEntry?.disconnectionDate &&
+                  Array.isArray(selectedScheduleEntry.disconnectionDate)
+                    ? "select-two"
+                    : selectedScheduleEntry?.disconnectionDate &&
+                        !Array.isArray(selectedScheduleEntry.disconnectionDate)
+                      ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                      : null}
+                </span>
+              </div>
             </div>
           </DialogTitle>
           <DialogDescription>
-            <span className="flex items-center gap-2 tracking-tight text-blue-600">
-              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.dueDate) ? (
-                <span className="flex gap-2">
-                  {selectedScheduleEntry.dueDate.map((day, idx) => {
-                    if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
-                    return formatDate(day, "MMM dd, yyyy");
-                  })}
-                </span>
-              ) : selectedScheduleEntry &&
-                selectedScheduleEntry.dueDate &&
-                isValid(selectedScheduleEntry?.dueDate) &&
-                !Array.isArray(selectedScheduleEntry.dueDate) ? (
-                formatDate(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-              ) : null}
-              <span>Due</span>
-            </span>
-
-            <span className="flex items-center gap-2 tracking-tight text-red-600">
-              {selectedScheduleEntry && Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                <span className="flex gap-2">
-                  {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
-                    if (idx === 0) return ` ${formatDate(day, "MMM dd, yyyy")} / `;
-                    return formatDate(day, "MMM dd, yyyy");
-                  })}
-                </span>
-              ) : selectedScheduleEntry &&
-                selectedScheduleEntry.disconnectionDate &&
-                isValid(selectedScheduleEntry?.disconnectionDate) &&
-                !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                formatDate(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
-              ) : null}
-              <span>Disconnection</span>
-            </span>
+            <span>List of Meter Readers with their respective zonebooks</span>
           </DialogDescription>
         </DialogHeader>
 

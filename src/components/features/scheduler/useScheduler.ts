@@ -251,7 +251,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
     dueDate = addDays(readingDate, 15);
 
-    while (isSameMonth(readingDate, monthStart) && readingCount < 23) {
+    while (isSameMonth(readingDate, monthStart) && readingCount < 22) {
       dueDate = adjustForHolidayOrWeekend(dueDate);
 
       if (isSunday(readingDate)) {
@@ -419,7 +419,15 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
         const readingRestDay = getDayName(entry.readingDate);
 
-        const availableReaders = meterReaders.filter((reader) => reader.restDay !== readingRestDay);
+        const transferZonebookToRecommended = meterReaders.map((mr) => {
+          if (mr.zonebooks) return { ...mr, zonebooks: [], recommendedZonebooks: mr.zonebooks };
+
+          return mr;
+        });
+
+        const availableReaders = transferZonebookToRecommended.filter(
+          (reader) => reader.restDay !== readingRestDay,
+        );
 
         return { ...entry, meterReaders: availableReaders };
       });

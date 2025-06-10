@@ -12,6 +12,7 @@ import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 import { useSearchParams } from "next/navigation";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type SchedulerProps = {
   holidays: Holidays;
@@ -131,16 +132,25 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays }) => {
         </header>
 
         <main className="flex h-full flex-1 flex-col overflow-hidden">
-          <section className="grid grid-cols-7 border-y">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
-              <div
-                key={index}
-                className="border-l py-2 text-center text-xs font-semibold uppercase first:border-l-0"
-              >
-                {day}
-              </div>
-            ))}
-          </section>
+          {currentSchedule.length === 0 ? (
+            <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-2xl">
+              <LoadingSpinner className="size-14" /> Loading Calendar...
+            </div>
+          ) : (
+            currentSchedule &&
+            currentSchedule.length > 0 && (
+              <section className="grid grid-cols-7 border-y">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+                  <div
+                    key={index}
+                    className="border-l py-2 text-center text-xs font-semibold uppercase first:border-l-0"
+                  >
+                    {day}
+                  </div>
+                ))}
+              </section>
+            )
+          )}
 
           <section className="flex-1" style={gridStyle}>
             {currentSchedule &&

@@ -42,6 +42,7 @@ export const useMeterReaderEntryColumns = (data: PersonnelColumn[] | undefined) 
         accessorKey: "zonebooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
         cell: ({ row }) =>
+          row.original.zonebooks &&
           row.original.zonebooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
               {zoneBook.zoneBook}
