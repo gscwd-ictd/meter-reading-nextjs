@@ -161,11 +161,19 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 <CalendarIcon className="h-4 w-4" />
                 <span>
                   Due:{" "}
-                  {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate)
-                    ? "select-two"
-                    : selectedScheduleEntry?.dueDate && !Array.isArray(selectedScheduleEntry.dueDate)
-                      ? format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-                      : null}
+                  {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
+                    <span className="flex gap-2">
+                      {selectedScheduleEntry.dueDate.map((day, idx) => {
+                        if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                        return format(day, "MMM dd, yyyy");
+                      })}
+                    </span>
+                  ) : selectedScheduleEntry &&
+                    selectedScheduleEntry.dueDate &&
+                    isValid(selectedScheduleEntry?.dueDate) &&
+                    !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                    format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                  ) : null}
                 </span>
               </div>
               <div className="flex items-center gap-2 font-medium text-red-500">
@@ -173,12 +181,19 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 <span>
                   Disconnection:{" "}
                   {selectedScheduleEntry?.disconnectionDate &&
-                  Array.isArray(selectedScheduleEntry.disconnectionDate)
-                    ? "select-two"
-                    : selectedScheduleEntry?.disconnectionDate &&
-                        !Array.isArray(selectedScheduleEntry.disconnectionDate)
-                      ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
-                      : null}
+                  Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                    <span className="flex gap-2">
+                      {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
+                        if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                        return format(day, "MMM dd, yyyy");
+                      })}
+                    </span>
+                  ) : selectedScheduleEntry &&
+                    selectedScheduleEntry.disconnectionDate &&
+                    isValid(selectedScheduleEntry?.disconnectionDate) &&
+                    !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                    format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                  ) : null}
                 </span>
               </div>
             </div>
