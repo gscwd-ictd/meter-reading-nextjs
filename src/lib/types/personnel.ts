@@ -13,4 +13,5 @@ export type Employee = {
 export type MeterReader = Employee & {
   restDay: "sunday" | "saturday" | undefined;
   zonebooks: Zonebook[];
+  recommendedZonebooks?: Zonebook[];
 };

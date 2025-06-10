@@ -1,6 +1,6 @@
 "use client";
 
-import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
+// import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
 import { holidays } from "./holidays";
@@ -12,9 +12,6 @@ export default function SchedulerWrapper() {
   return (
     <div>
       <SubmitScheduleSuccessDialog />
-      <div className="flex justify-end">
-        <ZonebookDialog />
-      </div>
 
       <Suspense
         fallback={

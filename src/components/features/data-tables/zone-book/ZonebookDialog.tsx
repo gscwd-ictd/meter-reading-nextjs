@@ -78,7 +78,7 @@ export const ZonebookDialog: FunctionComponent = () => {
           onClick={() => addNewZonebooksToMeterReader(selectedZonebook!)}
           disabled={selectedZonebook !== null ? false : true}
         >
-          Add this zoneBook to list
+          Add this zonebook to list
         </Button>
 
         <Table>

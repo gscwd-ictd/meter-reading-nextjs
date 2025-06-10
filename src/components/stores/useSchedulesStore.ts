@@ -26,6 +26,8 @@ type SchedulesStore = {
   setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen: boolean) => void;
   hasSchedule: boolean;
   setHasSchedule: (hasSchedule: boolean) => void;
+  entryZonebookSelectorIsOpen: boolean;
+  setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -52,4 +54,6 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
     set({ calendarScheduleDropdownIsOpen }),
   hasSchedule: false,
   setHasSchedule: (hasSchedule) => set({ hasSchedule }),
+  entryZonebookSelectorIsOpen: false,
+  setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen) => set({ entryZonebookSelectorIsOpen }),
 }));

@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, FunctionComponent } from "react";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import { Check, ChevronDown, CircleXIcon, MapPinCheckIcon, MapPinIcon, PlusCircleIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  CalendarIcon,
+  Check,
+  ChevronDown,
+  CircleXIcon,
+  MapPinCheckIcon,
+  MapPinIcon,
+} from "lucide-react";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
@@ -19,98 +27,158 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@mr/components/ui/Dialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { format, isValid } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 
-type Props = {
+type ScheduleEntryZonebookSelectorProps = {
   isLoading: boolean;
-  onSelectionChange?: (zone: string, book: string) => void;
 };
 
-export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoading }: Props) {
+export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZonebookSelectorProps> = ({
+  isLoading,
+}) => {
   const [selectedZone, setSelectedZone] = useState<string>("");
   const [selectedBook, setSelectedBook] = useState<string>("");
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
 
-  const filteredZonebooks = useZonebookStore((state) => state.filteredZonebooks);
-  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
-  const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
-  const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
-
+  const entryZonebookSelectorIsOpen = useSchedulesStore((state) => state.entryZonebookSelectorIsOpen);
+  const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
+  const selectedMeterReader = useSchedulesStore((state) => state.selectedMeterReader);
+  const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
+  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
+  const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
-
   const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookSorter(zonebooks);
 
-  const zones = useMemo(() => {
-    if (filteredZonebooks && filteredZonebooks.length > 0) {
-      const allZones = filteredZonebooks.map((zb) => zb.zone);
-      return Array.from(new Set(allZones));
-    }
-  }, [filteredZonebooks]);
+  // this should be the filtered pool, all assigned zonebooks minus the currently selected
+  const allRemainingPool = useMemo(() => {
+    const getRemainingZonebooks = (pool: Zonebook[], selected: Zonebook[]) => {
+      return pool.filter((itemA) => !selected.some((itemB) => itemB.zoneBook === itemA.zoneBook));
+    };
 
+    if (entryZonebookSelectorIsOpen)
+      return getRemainingZonebooks(selectedMeterReader?.recommendedZonebooks!, meterReaderZonebooks);
+  }, [selectedMeterReader?.recommendedZonebooks, meterReaderZonebooks, entryZonebookSelectorIsOpen]);
+
+  // new zones
+  const zones = useMemo(() => {
+    if (allRemainingPool && allRemainingPool.length > 0) {
+      const allZonesForMeterReader = allRemainingPool.map((zb) => zb.zone);
+      return Array.from(new Set(allZonesForMeterReader));
+    }
+  }, [allRemainingPool]);
+
+  // new booksForZone
   const booksForZone = useMemo(() => {
     if (!selectedZone) return [];
-    const books = filteredZonebooks.filter((zb) => zb.zone === selectedZone).map((zb) => zb.book);
-    return Array.from(new Set(books));
-  }, [selectedZone, filteredZonebooks]);
+    const allBooksForSelectedZone = allRemainingPool
+      ?.filter((zb) => zb.zone === selectedZone)
+      .map((zb) => zb.book);
+    return Array.from(new Set(allBooksForSelectedZone));
+  }, [selectedZone, allRemainingPool]);
 
   const handleZoneSelect = (zone: string) => {
     setSelectedZone(zone);
     setSelectedBook(""); // reset book when zone changes
-    onSelectionChange?.(zone, "");
     setSelectedZonebook(null);
   };
 
   const handleBookSelect = (book: string) => {
     setSelectedBook(book);
-
-    setSelectedZonebook(filteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book)!);
-
-    onSelectionChange?.(selectedZone, book);
+    setSelectedZonebook(allRemainingPool?.find((zb) => zb.zone === selectedZone && zb.book === book)!);
   };
 
   const handleZonebookSelect = (zoneBook: Zonebook) => {
-    onSelectionChange?.(zoneBook.zone, zoneBook.book);
     setSelectedZonebook(zoneBook);
     setSelectedZone(zoneBook.zone);
     setSelectedBook(zoneBook.book);
   };
 
-  const getNewFilteredZonebooks = async (selectedZonebook: Zonebook): Promise<Zonebook[]> => {
-    return filteredZonebooks.filter((zb) => zb !== selectedZonebook);
-  };
-
   return (
     <div className="flex w-full flex-col">
       <Dialog
-        open={zonebookSelectorIsOpen}
+        open={entryZonebookSelectorIsOpen}
         onOpenChange={() => {
-          setZonebookSelectorIsOpen(!zonebookSelectorIsOpen);
+          setEntryZonebookSelectorIsOpen(!entryZonebookSelectorIsOpen);
           setSelectedBook("");
           setSelectedZone("");
           setSelectedZonebook(null);
         }}
-        modal
       >
-        <DialogTrigger asChild>
-          <div role="button" className="text-primary flex items-center gap-1">
-            <Label
-              htmlFor="zonebooks"
-              className="text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
-            >
-              Zonebooks
-            </Label>
-            <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
-          </div>
-        </DialogTrigger>
-        <DialogContent className="overflow-y-auto">
+        <DialogContent className="max-h-[90%] w-[100vw] min-w-[50%] overflow-y-auto">
           <DialogHeader className="gap-0">
-            <DialogTitle>Assign zonebook</DialogTitle>
+            <DialogTitle>
+              <div className="space-y-0">
+                <div className="flex items-center gap-1 text-xl font-bold dark:text-white">
+                  <Avatar>
+                    <AvatarImage
+                      src={
+                        selectedMeterReader?.photoUrl
+                          ? `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${selectedMeterReader.photoUrl}`
+                          : undefined
+                      }
+                      alt={selectedMeterReader?.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback>{selectedMeterReader?.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+
+                  {selectedMeterReader?.name}
+                </div>
+                <div className="text-muted-foreground text-sm">
+                  Reading Date: {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
+                </div>
+
+                <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
+                  <div className="text-primary flex items-center gap-2 font-medium dark:text-blue-400">
+                    <CalendarIcon className="h-4 w-4" />
+                    <span>
+                      Due:{" "}
+                      {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
+                        <span className="flex gap-2">
+                          {selectedScheduleEntry.dueDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : selectedScheduleEntry &&
+                        selectedScheduleEntry.dueDate &&
+                        isValid(selectedScheduleEntry?.dueDate) &&
+                        !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                        format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                      ) : null}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 font-medium text-red-500">
+                    <AlertTriangleIcon className="h-4 w-4" />
+                    <span>
+                      Disconnection:{" "}
+                      {selectedScheduleEntry?.disconnectionDate &&
+                      Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                        <span className="flex gap-2">
+                          {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : selectedScheduleEntry &&
+                        selectedScheduleEntry.disconnectionDate &&
+                        isValid(selectedScheduleEntry?.disconnectionDate) &&
+                        !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                        format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                      ) : null}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </DialogTitle>
+
             <DialogDescription className="text-gray-500">
               Select a zonebook and press add to assign
             </DialogDescription>
@@ -222,13 +290,8 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                 disabled={selectedZonebook === null ? true : false}
                 onClick={async () => {
                   const newMeterReaderZonebooks = [...meterReaderZonebooks];
-
                   newMeterReaderZonebooks.push(selectedZonebook!);
-
                   setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
-
-                  const news = await getNewFilteredZonebooks(selectedZonebook!);
-                  setFilteredZonebooks(zoneBookSorter(news));
 
                   setSelectedBook("");
                   setSelectedZone("");
@@ -247,16 +310,16 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
               </div>
             ) : (
               <CommandGroup
-                className="h-[8rem] overflow-auto rounded border"
+                className="h-[10rem] overflow-auto rounded border"
                 onWheel={(e) => e.stopPropagation()}
               >
-                {!selectedZone && !selectedBook && !filteredZonebooks && isLoading ? (
+                {!selectedZone && !selectedBook && !allRemainingPool && isLoading ? (
                   <div>
                     <LoadingSpinner />
                   </div>
-                ) : !selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
-                  filteredZonebooks.length > 0 &&
-                  filteredZonebooks.map((zb, idx) => (
+                ) : !selectedZone && !selectedBook && allRemainingPool && !isLoading ? (
+                  allRemainingPool.length > 0 &&
+                  allRemainingPool.map((zb, idx) => (
                     <CommandItem
                       key={idx}
                       value={selectedZonebook?.zoneBook}
@@ -268,8 +331,8 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                       <span className="col-span-9 font-medium text-black">{zb.area}</span>
                     </CommandItem>
                   ))
-                ) : selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
-                  filteredZonebooks
+                ) : selectedZone && !selectedBook && allRemainingPool && !isLoading ? (
+                  allRemainingPool
                     .filter((zb) => zb.zone === selectedZone)
                     .map((zb, idx) => (
                       <CommandItem
@@ -283,8 +346,8 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                         <span className="col-span-9 font-medium text-black">{zb.area}</span>
                       </CommandItem>
                     ))
-                ) : selectedZone && selectedBook && filteredZonebooks && !isLoading ? (
-                  filteredZonebooks
+                ) : selectedZone && selectedBook && allRemainingPool && !isLoading ? (
+                  allRemainingPool
                     .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
                     .map((zb, idx) => (
                       <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
@@ -310,6 +373,8 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                     <TableHead className="font-semibold text-gray-600">Zone</TableHead>
                     <TableHead className="font-semibold text-gray-600">Book</TableHead>
                     <TableHead className="font-semibold text-gray-600">Area</TableHead>
+                    <TableHead className="font-semibold text-gray-600">Due</TableHead>
+                    <TableHead className="font-semibold text-gray-600">Disc</TableHead>
                     <TableHead className="font-semibold text-gray-600"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -326,6 +391,22 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                         <TableCell>{entry.book}</TableCell>
                         <TableCell>{entry.area}</TableCell>
                         <TableCell>
+                          {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate)
+                            ? "select-two"
+                            : selectedScheduleEntry?.dueDate && !Array.isArray(selectedScheduleEntry.dueDate)
+                              ? format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                              : null}
+                        </TableCell>
+                        <TableCell>
+                          {selectedScheduleEntry?.disconnectionDate &&
+                          Array.isArray(selectedScheduleEntry.disconnectionDate)
+                            ? "select-two"
+                            : selectedScheduleEntry?.disconnectionDate &&
+                                !Array.isArray(selectedScheduleEntry.disconnectionDate)
+                              ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                              : null}
+                        </TableCell>
+                        <TableCell>
                           <button
                             onClick={() => {
                               const newMeterReaderZonebooks = meterReaderZonebooks.filter(
@@ -333,10 +414,10 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                               );
                               setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
 
-                              const newFilteredZonebooks = [...filteredZonebooks];
-                              newFilteredZonebooks.unshift(entry);
+                              // const newFilteredZonebooks = [...filteredZonebooks];
+                              // newFilteredZonebooks.unshift(entry);
 
-                              setFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
+                              // setFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
                             }}
                           >
                             <CircleXIcon className="fill-red-600 text-white" />
@@ -345,16 +426,61 @@ export default function ScheduleEntryZonebookSelector({ onSelectionChange, isLoa
                       </TableRow>
                     ))
                   ) : (
-                    <TableRow className="flex w-full justify-center border">
-                      <TableCell colSpan={5}>No zonebooks added</TableCell>
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        No zonebooks added
+                      </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
               </Table>
             </div>
           </div>
+
+          <Button
+            className="h-[3rem]"
+            onClick={() => {
+              const newMeterReaderZonebooks = [...selectedMeterReader!.zonebooks];
+
+              if (selectedMeterReader !== null) {
+                setSelectedMeterReader({
+                  ...selectedMeterReader,
+
+                  zonebooks: newMeterReaderZonebooks,
+                });
+
+                setMeterReaderZonebooks(newMeterReaderZonebooks);
+
+                setSelectedZonebook(null);
+
+                setEntryZonebookSelectorIsOpen(false);
+              }
+
+              if (selectedScheduleEntry && selectedMeterReader) {
+                setSelectedScheduleEntry({
+                  ...selectedScheduleEntry,
+                  disconnectionDate: selectedScheduleEntry.disconnectionDate,
+                  dueDate: selectedScheduleEntry.dueDate,
+                  readingDate: selectedScheduleEntry.readingDate,
+                  meterReaders: selectedScheduleEntry.meterReaders!.map((mr) => {
+                    if (selectedMeterReader && mr.companyId === selectedMeterReader?.companyId) {
+                      return {
+                        ...mr,
+                        zonebooks: meterReaderZonebooks,
+                      };
+                    }
+                    return mr;
+                  }),
+                });
+              }
+              setEntryZonebookSelectorIsOpen(false);
+              setSelectedMeterReader(null);
+            }}
+          >
+            Apply
+          </Button>
         </DialogContent>
       </Dialog>
     </div>
   );
-}
+};

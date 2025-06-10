@@ -65,7 +65,7 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
       }}
       modal
     >
-      <DialogContent>
+      <DialogContent className="w-full max-w-none">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Assign Zone book</DialogTitle>
         </DialogHeader>
@@ -76,7 +76,7 @@ export const AssignZonebooksDialog: FunctionComponent = () => {
           onClick={() => addNewZonebooksToMeterReader(selectedZonebook!)}
           disabled={selectedZonebook !== null ? false : true}
         >
-          Add this zoneBook to list
+          Add this zoneBook to listeu
         </Button>
 
         <Table>
