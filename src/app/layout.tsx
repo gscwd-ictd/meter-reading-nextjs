@@ -2,8 +2,9 @@ import { type Metadata } from "next";
 import { type PropsWithChildren } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { ReactQueryProvider } from "@mr/components/providers/ReactQueryProvider";
+import { ThemeProvider } from "@mr/components/providers/ThemeProvider";
+import { Toaster } from "@mr/components/ui/Sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NextJS Boilerplate",
+  title: "MetocaR Application",
 };
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <ReactQueryProvider>
+          <Toaster richColors />
           {/* prettier-ignore */}
           <ThemeProvider 
             attribute="class" 
