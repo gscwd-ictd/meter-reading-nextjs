@@ -12,7 +12,7 @@ import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
+
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import {
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 type Props = {
   isLoading: boolean;
@@ -36,15 +37,16 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
 
   const filteredZonebooks = useZonebookStore((state) => state.filteredZonebooks);
   const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
+
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
 
   const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
-  const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
+  const setSelectedZonebook = useZonebookStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
 
-  const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookSorter(zonebooks);
+  const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookFlatSorter(zonebooks);
 
   const zones = useMemo(() => {
     if (filteredZonebooks && filteredZonebooks.length > 0) {
@@ -69,6 +71,8 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const handleBookSelect = (book: string) => {
     setSelectedBook(book);
 
+    filteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book);
+
     setSelectedZonebook(filteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book)!);
 
     onSelectionChange?.(selectedZone, book);
@@ -82,7 +86,11 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   };
 
   const getNewFilteredZonebooks = async (selectedZonebook: Zonebook): Promise<Zonebook[]> => {
-    return filteredZonebooks.filter((zb) => zb !== selectedZonebook);
+    const tempFilteredZonebooks = filteredZonebooks.filter((zb) => zb !== selectedZonebook);
+
+    return tempFilteredZonebooks.map((zb) => {
+      return { ...zb, disconnectionDate: undefined!, dueDate: undefined! };
+    });
   };
 
   return (

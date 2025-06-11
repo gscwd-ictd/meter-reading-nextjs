@@ -4,14 +4,14 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
-import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 
-export const useMeterReaderColumns = (data: MeterReader[] | undefined) => {
-  const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<MeterReader>[]>([]);
+export const useMeterReaderColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
+  const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<MeterReaderWithZonebooks>[]>([]);
 
   useEffect(() => {
-    const cols: ColumnDef<MeterReader>[] = [
+    const cols: ColumnDef<MeterReaderWithZonebooks>[] = [
       {
         accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,

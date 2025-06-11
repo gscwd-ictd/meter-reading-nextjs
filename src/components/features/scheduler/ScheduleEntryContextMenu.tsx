@@ -6,17 +6,17 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@mr/components/ui/ContextMenu";
-import { MeterReadingEntry } from "@mr/lib/types/schedule";
 import { getDate, isSameMonth, isSaturday, isSunday, startOfMonth } from "date-fns";
 import { SquarePenIcon, SquareSplitHorizontalIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { toast } from "sonner";
 import { Scheduler } from "./useScheduler";
+import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 
 type ScheduleEntryContextMenuProps = {
   idx: number;
-  entry: MeterReadingEntry;
+  entry: MeterReadingEntryWithZonebooks;
   activeContext: number | null;
   currentDate: Date;
   setActiveContext: Dispatch<SetStateAction<number | null>>;

@@ -4,3 +4,8 @@ export type Zonebook = {
   book: string;
   area: string;
 };
+
+export type ZonebookWithDates = Zonebook & {
+  dueDate: Date | undefined;
+  disconnectionDate: Date | undefined;
+};

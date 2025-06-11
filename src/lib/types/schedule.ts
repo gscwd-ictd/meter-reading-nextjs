@@ -1,4 +1,4 @@
-import { MeterReader } from "./personnel";
+import { MeterReaderWithZonebooks } from "./personnel";
 
 // without meterReaders
 export type MeterReadingSchedule = {
@@ -7,9 +7,9 @@ export type MeterReadingSchedule = {
   disconnectionDate: Date | Date[] | undefined;
 };
 
-export type MeterReadingEntry = {
+export type MeterReadingEntryWithZonebooks = {
   readingDate: Date;
   dueDate: Date | Date[] | undefined;
   disconnectionDate: Date | Date[] | undefined;
-  meterReaders?: MeterReader[];
+  meterReaders?: MeterReaderWithZonebooks[];
 };

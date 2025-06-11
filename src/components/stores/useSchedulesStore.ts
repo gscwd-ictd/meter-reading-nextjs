@@ -1,23 +1,28 @@
-import { MeterReader } from "@mr/lib/types/personnel";
-import { MeterReadingEntry } from "@mr/lib/types/schedule";
-import { Zonebook } from "@mr/lib/types/zonebook";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
+export type SplitDate = {
+  dueDate: Date;
+  disconnectionDate: Date;
+};
+
 type SchedulesStore = {
-  currentSchedule: MeterReadingEntry[];
-  setCurrentSchedule: (currentSchedule: MeterReadingEntry[]) => void;
+  currentSchedule: MeterReadingEntryWithZonebooks[];
+  setCurrentSchedule: (currentSchedule: MeterReadingEntryWithZonebooks[]) => void;
   calendarIsSet: boolean;
   setCalendarIsSet: (calendarIsSet: boolean) => void;
-  selectedScheduleEntry: MeterReadingEntry | null;
-  setSelectedScheduleEntry: (selectedScheduleEntry: MeterReadingEntry | null) => void;
+  selectedScheduleEntry: MeterReadingEntryWithZonebooks | null;
+  setSelectedScheduleEntry: (selectedScheduleEntry: MeterReadingEntryWithZonebooks | null) => void;
   scheduleEntryDialogIsOpen: boolean;
   setScheduleEntryDialogIsOpen: (scheduleEntryDialogIsOpen: boolean) => void;
   zonebookDialogIsOpen: boolean;
   setZonebookDialogIsOpen: (zonebookDialogIsOpen: boolean) => void;
-  selectedMeterReader: MeterReader | null;
-  setSelectedMeterReader: (selectedMeterReader: MeterReader | null) => void;
-  selectedZonebook: Zonebook | null;
-  setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
+  selectedMeterReader: MeterReaderWithZonebooks | null;
+  setSelectedMeterReader: (selectedMeterReader: MeterReaderWithZonebooks | null) => void;
+  selectedZonebook: ZonebookWithDates | null;
+  setSelectedZonebook: (selectedZonebook: ZonebookWithDates | null) => void;
   submitSuccessDialogIsOpen: boolean;
   setSubmitSuccessDialogIsOpen: (submitSuccessDialogIsOpen: boolean) => void;
   datesToSplit: Date[];
@@ -28,6 +33,12 @@ type SchedulesStore = {
   setHasSchedule: (hasSchedule: boolean) => void;
   entryZonebookSelectorIsOpen: boolean;
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
+  meterReaderZonebooks: ZonebookWithDates[];
+  setMeterReaderZonebooks: (meterReaderZonebooks: ZonebookWithDates[]) => void;
+  isSplitted: boolean;
+  setIsSplitted: (isSplitted: boolean) => void;
+  splittedDates: SplitDate[];
+  setSplittedDates: (splittedDates: SplitDate[]) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -56,4 +67,10 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setHasSchedule: (hasSchedule) => set({ hasSchedule }),
   entryZonebookSelectorIsOpen: false,
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen) => set({ entryZonebookSelectorIsOpen }),
+  meterReaderZonebooks: [],
+  setMeterReaderZonebooks: (meterReaderZonebooks) => set({ meterReaderZonebooks }),
+  isSplitted: false,
+  setIsSplitted: (isSplitted) => set({ isSplitted }),
+  splittedDates: [],
+  setSplittedDates: (splittedDates) => set({ splittedDates }),
 }));

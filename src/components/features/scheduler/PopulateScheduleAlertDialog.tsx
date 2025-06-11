@@ -29,6 +29,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
+  // const tempMeterReaders = useMeterReadersStore((state) => state.meterReaders);
 
   return (
     <AlertDialog>
