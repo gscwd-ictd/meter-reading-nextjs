@@ -53,7 +53,7 @@ export const ZonebookCombobox: FunctionComponent = () => {
                     value={zb.zoneBook}
                     onSelect={(currentValue) => {
                       setSearchZonebook(currentValue === searchZonebook ? "" : currentValue);
-                      setSelectedZonebook(zb);
+                      setSelectedZonebook({ ...zb, dueDate: undefined!, disconnectionDate: undefined! });
                       setOpen(false);
                     }}
                   >

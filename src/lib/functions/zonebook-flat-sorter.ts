@@ -1,6 +1,6 @@
-import { ZonebookWithDates } from "../types/zonebook";
+import { Zonebook } from "../types/zonebook";
 
-export const ZonebookSorter = (zonebooks: ZonebookWithDates[]) => {
+export const ZonebookFlatSorter = (zonebooks: Zonebook[]) => {
   return zonebooks.sort((a, b) => {
     const [zoneA, bookA] = a.zoneBook.split("-").map(Number);
     const [zoneB, bookB] = b.zoneBook.split("-").map(Number);

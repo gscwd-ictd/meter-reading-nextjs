@@ -3,14 +3,13 @@
 
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
-import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { CircleXIcon, MapPinnedIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { ScheduleEntryZonebookSelector } from "../../scheduler/entry/ScheduleEntryZonebookSelector";
-import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
 type PersonnelRowActionsProps = {
-  meterReader: MeterReader;
+  meterReader: MeterReaderWithZonebooks;
 };
 
 // zone 8-63
@@ -20,9 +19,9 @@ export const MeterReaderRowActions: FunctionComponent<PersonnelRowActionsProps> 
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
-  const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
+  const setMeterReaderZonebooks = useSchedulesStore((state) => state.setMeterReaderZonebooks);
 
-  const openZonebookSelector = (meterReader: MeterReader) => {
+  const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
     setEntryZonebookSelectorIsOpen(true);
     setMeterReaderZonebooks(meterReader.zonebooks ?? []);

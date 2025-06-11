@@ -4,10 +4,10 @@ import { FunctionComponent, Suspense } from "react";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useMeterReaderColumns } from "./MeterReaderColumns";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
-import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 
 type MeterReaderDataTableProps = {
-  meterReaders: MeterReader[];
+  meterReaders: MeterReaderWithZonebooks[];
 };
 
 export const MeterReaderDataTable: FunctionComponent<MeterReaderDataTableProps> = ({ meterReaders }) => {

@@ -13,19 +13,19 @@ import {
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
 import { compareAsc, format, formatDate, isValid } from "date-fns";
-import { Dispatch, FunctionComponent, SetStateAction, useState } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { MeterReaderDataTable } from "../data-tables/meter-readers/MeterReaderDataTable";
 import { Button } from "@mr/components/ui/Button";
-import { MeterReadingEntry } from "@mr/lib/types/schedule";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
 import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
   setActiveContext: Dispatch<SetStateAction<number | null>>;
-  entry: MeterReadingEntry;
+  entry: MeterReadingEntryWithZonebooks;
   hasSchedule: MeterReader | undefined;
   isWithinMonth: boolean;
   dateIsSunday: boolean;
@@ -47,8 +47,31 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
+  const setIsSplitted = useSchedulesStore((state) => state.setIsSplitted);
+  const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
 
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
+
+  // if schedule entry is splitted
+  useEffect(() => {
+    if (
+      Array.isArray(selectedScheduleEntry?.dueDate) &&
+      Array.isArray(selectedScheduleEntry?.disconnectionDate)
+    ) {
+      setIsSplitted(true);
+      const dueDates = [...selectedScheduleEntry?.dueDate];
+      const disconnectionDates = [...selectedScheduleEntry?.disconnectionDate];
+
+      setSplittedDates([
+        { dueDate: dueDates[0], disconnectionDate: disconnectionDates[0] },
+        { dueDate: dueDates[1], disconnectionDate: disconnectionDates[1] },
+      ]);
+    } else if (
+      !Array.isArray(selectedScheduleEntry?.dueDate) &&
+      !Array.isArray(selectedScheduleEntry?.disconnectionDate)
+    )
+      setIsSplitted(false);
+  }, [selectedScheduleEntry?.dueDate, selectedScheduleEntry?.disconnectionDate, setIsSplitted]);
 
   return (
     <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
@@ -149,7 +172,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90%] w-[100vw] min-w-[75%] overflow-auto">
+      <DialogContent className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]">
         <DialogHeader className="space-y-0">
           <DialogTitle>
             <div className="text-lg font-bold text-gray-800">

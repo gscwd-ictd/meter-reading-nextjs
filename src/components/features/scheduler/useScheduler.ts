@@ -1,7 +1,7 @@
 "use client";
 
-import { MeterReader } from "@mr/lib/types/personnel";
-import { MeterReadingEntry, MeterReadingSchedule } from "@mr/lib/types/schedule";
+import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import {
   addDays,
   addMonths,
@@ -410,7 +410,22 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
   );
 
   const assignMeterReaders = useCallback(
-    (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntry[] => {
+    (
+      schedule: MeterReadingSchedule[],
+      meterReaders: MeterReader[], // MeterReaderWithZonebooks
+    ): MeterReadingEntryWithZonebooks[] => {
+      const transformMeterReaders: MeterReaderWithZonebooks[] = meterReaders.map((mr) => {
+        return {
+          ...mr,
+          zonebooks: mr.zonebooks.map((zb) => {
+            return { ...zb, dueDate: undefined, disconnectionDate: undefined };
+          }),
+          recommendedZonebooks: mr.recommendedZonebooks?.map((zb) => {
+            return { ...zb, dueDate: undefined, disconnectionDate: undefined };
+          }),
+        };
+      });
+
       return schedule.map((entry) => {
         // Guard: If readingDate is missing or invalid, skip assigning readers
         if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
@@ -419,7 +434,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
         const readingRestDay = getDayName(entry.readingDate);
 
-        const transferZonebookToRecommended = meterReaders.map((mr) => {
+        const transferZonebookToRecommended = transformMeterReaders.map((mr) => {
           if (mr.zonebooks) return { ...mr, zonebooks: [], recommendedZonebooks: mr.zonebooks };
 
           return mr;
