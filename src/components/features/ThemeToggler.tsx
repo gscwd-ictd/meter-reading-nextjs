@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
 import { Button } from "@mr/components/ui/Button";
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
+
 
 export const ThemeToggler: React.FunctionComponent = () => {
   const { setTheme } = useTheme();

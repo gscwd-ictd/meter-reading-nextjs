@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { exportJWK, importSPKI, calculateJwkThumbprint, SignJWT, importPKCS8 } from "jose";
 import env from "@mr/lib/env";
 
+
 const generateJwk = async () => {
   const publicKeyPem = Buffer.from(env.PUBLIC_KEY_B64, "base64").toString("utf-8");
   const publicKey = await importSPKI(publicKeyPem, "RS256");
