@@ -47,7 +47,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
-  const setIsSplitted = useSchedulesStore((state) => state.setIsSplitted);
+  const setScheduleEntryIsSplitted = useSchedulesStore((state) => state.setScheduleEntryIsSplitted);
   const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
 
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
@@ -58,7 +58,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       Array.isArray(selectedScheduleEntry?.dueDate) &&
       Array.isArray(selectedScheduleEntry?.disconnectionDate)
     ) {
-      setIsSplitted(true);
+      setScheduleEntryIsSplitted(true);
       const dueDates = [...selectedScheduleEntry?.dueDate];
       const disconnectionDates = [...selectedScheduleEntry?.disconnectionDate];
 
@@ -70,8 +70,13 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       !Array.isArray(selectedScheduleEntry?.dueDate) &&
       !Array.isArray(selectedScheduleEntry?.disconnectionDate)
     )
-      setIsSplitted(false);
-  }, [selectedScheduleEntry?.dueDate, selectedScheduleEntry?.disconnectionDate, setIsSplitted]);
+      setScheduleEntryIsSplitted(false);
+  }, [
+    selectedScheduleEntry?.dueDate,
+    selectedScheduleEntry?.disconnectionDate,
+    setScheduleEntryIsSplitted,
+    setSplittedDates,
+  ]);
 
   return (
     <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
@@ -172,7 +177,10 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]">
+      <DialogContent
+        onPointerDownOutside={(e) => e.preventDefault()}
+        className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]"
+      >
         <DialogHeader className="space-y-0">
           <DialogTitle>
             <div className="text-lg font-bold text-gray-800">

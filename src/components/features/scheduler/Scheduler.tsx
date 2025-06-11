@@ -26,6 +26,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays }) => {
   const monthYear = searchParams.get("date");
 
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
+  // const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
 
   //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);

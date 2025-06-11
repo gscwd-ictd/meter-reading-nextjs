@@ -40,6 +40,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
 
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
 
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
@@ -97,6 +98,8 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
 
                   return { ...entry, meterReaders: match?.meterReaders || [] };
                 });
+
+                setScheduleHasSplittedDates(true);
 
                 setCurrentSchedule(newSchedule);
               } else if (

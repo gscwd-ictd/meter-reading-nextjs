@@ -30,6 +30,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
   );
+  const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
 
   return (
     <AlertDialog>
@@ -49,6 +50,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
             onClick={() => {
               setCurrentSchedule(scheduler.calculateSchedule());
               setDatesToSplit([]);
+              setScheduleHasSplittedDates(false);
               toast.success("Success", {
                 description: "Successfully reset the calendar for this month!",
                 position: "top-right",

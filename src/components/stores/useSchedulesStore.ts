@@ -35,10 +35,14 @@ type SchedulesStore = {
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
   meterReaderZonebooks: ZonebookWithDates[];
   setMeterReaderZonebooks: (meterReaderZonebooks: ZonebookWithDates[]) => void;
-  isSplitted: boolean;
-  setIsSplitted: (isSplitted: boolean) => void;
+  scheduleEntryIsSplitted: boolean;
+  setScheduleEntryIsSplitted: (scheduleEntryIsSplitted: boolean) => void;
+  scheduleHasSplittedDates: boolean;
+  setScheduleHasSplittedDates: (scheduleHasSplittedDates: boolean) => void;
   splittedDates: SplitDate[];
   setSplittedDates: (splittedDates: SplitDate[]) => void;
+  hasPopulatedMeterReaders: boolean;
+  setHasPopulatedMeterReaders: (hasPopulatedMeterReaders: boolean) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -69,8 +73,12 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen) => set({ entryZonebookSelectorIsOpen }),
   meterReaderZonebooks: [],
   setMeterReaderZonebooks: (meterReaderZonebooks) => set({ meterReaderZonebooks }),
-  isSplitted: false,
-  setIsSplitted: (isSplitted) => set({ isSplitted }),
+  scheduleEntryIsSplitted: false,
+  setScheduleEntryIsSplitted: (scheduleEntryIsSplitted) => set({ scheduleEntryIsSplitted }),
   splittedDates: [],
   setSplittedDates: (splittedDates) => set({ splittedDates }),
+  scheduleHasSplittedDates: false,
+  setScheduleHasSplittedDates: (scheduleHasSplittedDates) => set({ scheduleHasSplittedDates }),
+  hasPopulatedMeterReaders: false,
+  setHasPopulatedMeterReaders: (hasPopulatedMeterReaders) => set({ hasPopulatedMeterReaders }),
 }));

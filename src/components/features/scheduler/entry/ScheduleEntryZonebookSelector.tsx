@@ -193,8 +193,12 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
         setMeterReaderZonebooks([]);
         setInitialPoolIsSet(false);
       }}
+      modal
     >
-      <DialogContent className="max-h-full min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]">
+      <DialogContent
+        className="max-h-full min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="gap-0">
           <DialogTitle>
             <div className="space-y-0">

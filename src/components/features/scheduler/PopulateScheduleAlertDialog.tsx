@@ -28,13 +28,16 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   scheduler,
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
-  // const tempMeterReaders = useMeterReadersStore((state) => state.meterReaders);
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button disabled={meterReaders.length < 1 ? true : false} className="dark:text-white">
+        <Button
+          disabled={meterReaders.length < 1 || !scheduleHasSplittedDates ? true : false}
+          className="dark:text-white"
+        >
           <CalendarPlus />
           Populate schedule
         </Button>

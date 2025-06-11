@@ -9,7 +9,6 @@ import { cn } from "@mr/lib/utils";
 import { Check, ChevronDown, CircleXIcon, MapPinCheckIcon, MapPinIcon, PlusCircleIcon } from "lucide-react";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
-import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
@@ -41,7 +40,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
 
-  const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
+  const selectedZonebook = useZonebookStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useZonebookStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
