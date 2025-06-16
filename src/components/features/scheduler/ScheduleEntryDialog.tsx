@@ -14,7 +14,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { compareAsc, format, formatDate, isValid } from "date-fns";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
-import { MeterReaderDataTable } from "../data-tables/meter-readers/MeterReaderDataTable";
+import { MeterReaderEntryDataTable } from "../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
 import { Button } from "@mr/components/ui/Button";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
@@ -179,7 +179,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
 
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
-        className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]"
+        className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[65%]"
       >
         <DialogHeader className="space-y-0">
           <DialogTitle>
@@ -235,7 +235,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         </DialogHeader>
 
         <div className="relative">
-          <MeterReaderDataTable
+          <MeterReaderEntryDataTable
             meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
           />
         </div>

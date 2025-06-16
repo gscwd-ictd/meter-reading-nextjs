@@ -1,4 +1,4 @@
-import { PersonnelTableComponent } from "@mr/components/features/data-tables/meter-reader-entry/MeterReaderEntryTableComponent";
+import { MeterReaderTableComponent } from "@mr/components/features/data-tables/meter-readers/MeterReaderTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,7 +27,7 @@ export default function PersonnelPage() {
 
       <h3 className="mt-5 text-xl font-bold">Personnel</h3>
       <div className="text-base font-medium text-gray-400">List of Meter Readers</div>
-      <PersonnelTableComponent />
+      <MeterReaderTableComponent />
     </div>
   );
 }

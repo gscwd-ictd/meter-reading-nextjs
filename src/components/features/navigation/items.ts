@@ -16,6 +16,8 @@ import {
   FileText,
 } from "lucide-react";
 
+import UserIcon from "@images/user-icon.svg";
+
 export type NavItem = {
   title: string;
   url: string;
@@ -116,7 +118,7 @@ export const teams: NavItemTeam[] = [
 ];
 
 export const user: NavItemUser = {
-  name: "shadcn",
-  email: "m@example.com",
-  avatar: "https://github.com/shadcn.png",
+  name: "admin",
+  email: "admin@gscwd.com",
+  avatar: UserIcon.src,
 };

@@ -1,48 +1,47 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef, FilterFn } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderEntryRowActions } from "./MeterReaderEntryRowActions";
-import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 
-export const useMeterReaderEntryColumns = (data: PersonnelColumn[] | undefined) => {
-  const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
-
-  const filterFn: FilterFn<PersonnelColumn> = (row, columnId, filterValue) => {
-    // filterValue is an array of selected options
-    return filterValue.includes(row.getValue(columnId));
-  };
+export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
+  const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<
+    ColumnDef<MeterReaderWithZonebooks>[]
+  >([]);
 
   useEffect(() => {
-    const cols: ColumnDef<PersonnelColumn>[] = [
-      {
-        accessorKey: "companyId",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID No." />,
-        filterFn: filterFn,
-        cell: ({ row }) => <span>{row.original.companyId}</span>,
-        enableColumnFilter: false,
-      },
+    const cols: ColumnDef<MeterReaderWithZonebooks>[] = [
       {
         accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => <span>{row.original.name}</span>,
-        enableColumnFilter: false,
+        cell: ({ row }) => (
+          <span className="inline-flex items-center gap-2">
+            <Avatar>
+              <AvatarImage
+                src={
+                  row.original.photoUrl
+                    ? `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${row.original.photoUrl}`
+                    : undefined
+                }
+                alt={row.original.name}
+                className="object-cover"
+              />
+              <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            {row.original.name}
+          </span>
+        ),
+
+        enableSorting: false,
       },
-      {
-        accessorKey: "positionTitle",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Position Title" />,
-        filterFn: filterFn,
-        cell: ({ row }) => <span>{row.original.positionTitle}</span>,
-        meta: {
-          exportLabel: "Position Title",
-        },
-      },
+
       {
         accessorKey: "zonebooks",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone-Book" />,
         cell: ({ row }) =>
-          row.original.zonebooks &&
           row.original.zonebooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
               {zoneBook.zoneBook}
@@ -51,30 +50,7 @@ export const useMeterReaderEntryColumns = (data: PersonnelColumn[] | undefined) 
           )),
         enableColumnFilter: false,
       },
-      {
-        accessorKey: "restDay",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Rest Day" />,
-        cell: ({ row }) => (
-          <span>
-            {row.original.restDay === "sunday"
-              ? "Sunday"
-              : row.original.restDay === "saturday"
-                ? "Saturday"
-                : null}
-          </span>
-        ),
-        filterFn: filterFn,
-        meta: {
-          exportLabel: "Rest day",
-        },
-      },
 
-      {
-        accessorKey: "mobileNumber",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
-        cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
-        enableColumnFilter: false,
-      },
       {
         id: "actions",
         header: "Actions",
