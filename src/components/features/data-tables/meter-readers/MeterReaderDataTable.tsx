@@ -1,25 +1,27 @@
 "use client";
 
 import { FunctionComponent, Suspense } from "react";
-import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useMeterReaderColumns } from "./MeterReaderColumns";
-import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
-import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
+import { DataTable } from "@mr/components/ui/data-table/data-table";
 
-type MeterReaderDataTableProps = {
-  meterReaders: MeterReaderWithZonebooks[];
-};
+export const MeterReaderDataTable: FunctionComponent = () => {
+  const meterReaders = useMeterReadersStore((state) => state.meterReaders);
 
-export const MeterReaderDataTable: FunctionComponent<MeterReaderDataTableProps> = ({ meterReaders }) => {
-  // const [meterReaders, setMeterReaders] = useState<MeterReader[]>([]);
+  // const { data: meterReaders } = useQuery({
+  //   queryKey: ["get-all-meter-readers"],
+  //   queryFn: async () => {
+  //     const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/personnel?status=assigned`);
 
-  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
+  //     return res.data;
+  //   },
+  // });
 
-  const meterReaderColumns = useMeterReaderColumns(selectedScheduleEntry?.meterReaders);
+  const meterReaderColumns = useMeterReaderColumns(meterReaders);
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={meterReaders ? meterReaders : []} columns={meterReaderColumns} />
+      <DataTable data={meterReaders ?? []} columns={meterReaderColumns} />
     </Suspense>
   );
 };

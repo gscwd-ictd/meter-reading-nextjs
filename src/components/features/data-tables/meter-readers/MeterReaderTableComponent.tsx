@@ -2,9 +2,9 @@
 
 import { FunctionComponent, useState } from "react";
 import { AddMeterReaderDialog } from "../../meter-readers/AddMeterReaderDialog";
-import { MeterReaderEntryDataTable } from "./MeterReaderEntryDataTable";
+import { MeterReaderDataTable } from "./MeterReaderDataTable";
 
-export const PersonnelTableComponent: FunctionComponent = () => {
+export const MeterReaderTableComponent: FunctionComponent = () => {
   const [addMeterReaderDialogIsOpen, setAddMeterReaderDialogIsOpen] = useState<boolean>(false);
 
   return (
@@ -16,7 +16,7 @@ export const PersonnelTableComponent: FunctionComponent = () => {
             setAddMeterReaderDialogIsOpen={setAddMeterReaderDialogIsOpen}
           />
         </div>
-        <MeterReaderEntryDataTable />
+        <MeterReaderDataTable />
       </div>
     </>
   );

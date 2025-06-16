@@ -1,45 +1,48 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
-import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
+import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 
-export const useMeterReaderColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
-  const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<MeterReaderWithZonebooks>[]>([]);
+export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
+  const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
+
+  const filterFn: FilterFn<PersonnelColumn> = (row, columnId, filterValue) => {
+    // filterValue is an array of selected options
+    return filterValue.includes(row.getValue(columnId));
+  };
 
   useEffect(() => {
-    const cols: ColumnDef<MeterReaderWithZonebooks>[] = [
+    const cols: ColumnDef<PersonnelColumn>[] = [
+      {
+        accessorKey: "companyId",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="ID No." />,
+        filterFn: filterFn,
+        cell: ({ row }) => <span>{row.original.companyId}</span>,
+        enableColumnFilter: false,
+      },
       {
         accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => (
-          <span className="inline-flex items-center gap-2">
-            <Avatar>
-              <AvatarImage
-                src={
-                  row.original.photoUrl
-                    ? `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${row.original.photoUrl}`
-                    : undefined
-                }
-                alt={row.original.name}
-                className="object-cover"
-              />
-              <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            {row.original.name}
-          </span>
-        ),
-
-        enableSorting: false,
+        cell: ({ row }) => <span>{row.original.name}</span>,
+        enableColumnFilter: false,
       },
-
+      {
+        accessorKey: "positionTitle",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Position Title" />,
+        filterFn: filterFn,
+        cell: ({ row }) => <span>{row.original.positionTitle}</span>,
+        meta: {
+          exportLabel: "Position Title",
+        },
+      },
       {
         accessorKey: "zonebooks",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone-Book" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
         cell: ({ row }) =>
+          row.original.zonebooks &&
           row.original.zonebooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
               {zoneBook.zoneBook}
@@ -48,7 +51,30 @@ export const useMeterReaderColumns = (data: MeterReaderWithZonebooks[] | undefin
           )),
         enableColumnFilter: false,
       },
+      {
+        accessorKey: "restDay",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Rest Day" />,
+        cell: ({ row }) => (
+          <span>
+            {row.original.restDay === "sunday"
+              ? "Sunday"
+              : row.original.restDay === "saturday"
+                ? "Saturday"
+                : null}
+          </span>
+        ),
+        filterFn: filterFn,
+        meta: {
+          exportLabel: "Rest day",
+        },
+      },
 
+      {
+        accessorKey: "mobileNumber",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
+        cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
+        enableColumnFilter: false,
+      },
       {
         id: "actions",
         header: "Actions",
