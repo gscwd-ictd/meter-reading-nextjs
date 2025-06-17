@@ -3,20 +3,22 @@ import { healthcheckHandler } from "./routes/healthcheck";
 import { personnelHandler } from "./routes/personnel";
 import { cors } from "hono/cors";
 import env from "@/lib/env";
+import { zoneBookHandler } from "./routes/zone-book";
+import { areaHandler } from "./routes/area";
 
 function createApp() {
   const app = new Hono().basePath("/api");
 
   app.use(
     cors({
-      origin: [env.APP_HOST],
+      origin: [env.APP_HOST, "http://172.20.10.57:3000", "http://172.20.10.63:3000"],
       allowMethods: ["POST", "GET", "PUT", "PATCH", "DELETE", "OPTIONS"],
       maxAge: 600,
       credentials: true,
     }),
   );
 
-  const routes = [healthcheckHandler, personnelHandler] as const;
+  const routes = [healthcheckHandler, personnelHandler, zoneBookHandler, areaHandler] as const;
 
   routes.forEach((route) => app.route("/", route));
 
