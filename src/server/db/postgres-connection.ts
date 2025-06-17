@@ -1,7 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import env from "@/lib/env";
-import { personnel, personnelZoneBook } from "./schemas/personnel";
+import { personnel, personnelZoneBook, personnelZoneBookView } from "./schemas/personnel";
+import { zoneBook } from "./schemas/zone-book";
+import { area } from "./schemas/area";
 
 const pool = new Pool({
   host: env.DB_HOST,
@@ -16,7 +18,10 @@ export const db = drizzle({
   client: pool,
   logger: true,
   schema: {
+    area,
+    zoneBook,
     personnel,
     personnelZoneBook,
+    personnelZoneBookView,
   },
 });
