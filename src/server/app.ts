@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { healthcheckHandler } from "./routes/healthcheck";
-import { personnelHandler } from "./routes/personnel";
+import { meterReaderHandler } from "./routes/meter-readers";
 import { cors } from "hono/cors";
 import env from "@/lib/env";
 import { zoneBookHandler } from "./routes/zone-book";
@@ -18,7 +18,7 @@ function createApp() {
     }),
   );
 
-  const routes = [healthcheckHandler, personnelHandler, zoneBookHandler, areaHandler] as const;
+  const routes = [healthcheckHandler, meterReaderHandler, zoneBookHandler, areaHandler] as const;
 
   routes.forEach((route) => app.route("/", route));
 
