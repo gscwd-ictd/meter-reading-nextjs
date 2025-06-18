@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import env from "@/lib/env";
-import { personnel, personnelZoneBook, personnelZoneBookView } from "./schemas/personnel";
+import { meterReaders, meterReaderZoneBook, meterReaderZoneBookView } from "./schemas/meter-readers";
 import { zoneBook } from "./schemas/zone-book";
 import { area } from "./schemas/area";
 
@@ -20,8 +20,8 @@ export const db = drizzle({
   schema: {
     area,
     zoneBook,
-    personnel,
-    personnelZoneBook,
-    personnelZoneBookView,
+    meterReaders,
+    meterReaderZoneBook,
+    meterReaderZoneBookView,
   },
 });

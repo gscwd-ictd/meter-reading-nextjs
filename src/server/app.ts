@@ -11,6 +11,11 @@ import { waterConcernsHandler } from "./routes/waterConcerns";
 import { zoneBookAddressHandler } from "./routes/zoneBookAddress";
 import { webhookHandler } from "./routes/webhook";
 import { readingDetailsHandler } from "./routes/readingDetails";
+import { meterReaderHandler } from "./routes/meter-readers";
+import { cors } from "hono/cors";
+import env from "@/lib/env";
+import { zoneBookHandler } from "./routes/zone-book";
+import { areaHandler } from "./routes/area";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -28,7 +33,19 @@ function createApp() {
     waterConcernsHandler,
     zoneBookAddressHandler,
     webhookHandler,
+    meterReaderHandler,
+    zoneBookHandler,
+    areaHandler,
   ] as const;
+
+  app.use(
+    cors({
+      origin: [env.APP_HOST, "http://172.20.10.57:3000", "http://172.20.10.63:3000"],
+      allowMethods: ["POST", "GET", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      maxAge: 600,
+      credentials: true,
+    }),
+  );
 
   routes.forEach((route) => app.route("/", route));
 

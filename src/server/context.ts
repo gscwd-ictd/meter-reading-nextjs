@@ -1,10 +1,10 @@
 import { IAreaRepository } from "./interfaces/area/area.interface.repository";
-import { IPersonnelRepository } from "./interfaces/personnel/personnel.interface.repository";
+import { IMeterReaderRepository } from "./interfaces/meter-readers/meter-readers.interface.repository";
 import { IZoneBookRepository } from "./interfaces/zone-book/zone-book.interface.repository";
 import { AreaRepository } from "./services/area/area.repository";
 import { AreaService } from "./services/area/area.service";
-import { PersonnelRepository } from "./services/personnel/personnel.repository";
-import { PersonnelService } from "./services/personnel/personnel.service";
+import { MeterReaderRepository } from "./services/meter-readers/meter-readers.repository";
+import { MeterReaderService } from "./services/meter-readers/meter-readers.service";
 import { ZoneBookRepository } from "./services/zone-book/zone-book.repository";
 import { ZoneBookService } from "./services/zone-book/zone-book.service";
 
@@ -12,12 +12,12 @@ export class MeterReadingContext {
   private static instance: MeterReadingContext;
 
   // Repositories
-  private _personnelRepository?: IPersonnelRepository;
+  private _meterReaderRepository?: IMeterReaderRepository;
   private _areaRepository?: IAreaRepository;
   private _zoneBookRepository?: IZoneBookRepository;
 
   // Services
-  private _personnelService?: PersonnelService;
+  private _meterReaderService?: MeterReaderService;
   private _areaService?: AreaService;
   private _zoneBookService?: ZoneBookService;
 
@@ -31,11 +31,11 @@ export class MeterReadingContext {
   }
 
   // Repositories
-  public getPersonnelRepository(): IPersonnelRepository {
-    if (!this._personnelRepository) {
-      this._personnelRepository = new PersonnelRepository();
+  public getMeterReaderRepository(): IMeterReaderRepository {
+    if (!this._meterReaderRepository) {
+      this._meterReaderRepository = new MeterReaderRepository();
     }
-    return this._personnelRepository;
+    return this._meterReaderRepository;
   }
 
   public getAreaRepository(): IAreaRepository {
@@ -53,11 +53,11 @@ export class MeterReadingContext {
   }
 
   // Services
-  public getPersonnelService(): PersonnelService {
-    if (!this._personnelService) {
-      this._personnelService = new PersonnelService(this.getPersonnelRepository());
+  public getMeterReaderService(): MeterReaderService {
+    if (!this._meterReaderService) {
+      this._meterReaderService = new MeterReaderService(this.getMeterReaderRepository());
     }
-    return this._personnelService;
+    return this._meterReaderService;
   }
 
   public getAreaService(): AreaService {

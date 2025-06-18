@@ -1,22 +1,22 @@
 import { z } from "zod";
-import { RestDayType } from "../db/schemas/personnel";
+import { RestDayType } from "../db/schemas/meter-readers";
 import { ZoneBookSchema } from "./zone-book.type";
 
-export const PersonnelQuerySchema = z.object({
+export const MeterReaderQuerySchema = z.object({
   page: z.coerce.number().default(0),
   limit: z.coerce.number().default(0),
   query: z.string().default(""),
   status: z.enum(["assigned", "unassigned"]),
 });
 
-export const PersonnelSchema = z.object({
+export const MeterReaderSchema = z.object({
   id: z.string(),
   employeeId: z.string(),
   restDay: z.enum(RestDayType),
   zoneBooks: ZoneBookSchema.array(),
 });
 
-export const UnassignedPersonnelSchema = PersonnelSchema.omit({
+export const UnassignedMeterReaderSchema = MeterReaderSchema.omit({
   id: true,
   restDay: true,
   zoneBooks: true,
@@ -30,7 +30,7 @@ export const UnassignedPersonnelSchema = PersonnelSchema.omit({
   totalCount: z.number().nullable().optional(),
 });
 
-export const AssignedPersonnelSchema = PersonnelSchema.extend({
+export const AssignedMeterReaderSchema = MeterReaderSchema.extend({
   companyId: z.string(),
   name: z.string(),
   positionTitle: z.string(),
@@ -51,15 +51,15 @@ export const PaginatedSchema = z.object({
   }),
 });
 
-export const PaginatedUnassignedPersonnelSchema = PaginatedSchema.extend({
-  items: UnassignedPersonnelSchema.array(),
+export const PaginatedUnassignedMeterReaderSchema = PaginatedSchema.extend({
+  items: UnassignedMeterReaderSchema.array(),
 });
 
-export const PaginatedAssignedPersonnelSchema = PaginatedSchema.extend({
-  items: AssignedPersonnelSchema.array(),
+export const PaginatedAssignedMeterReaderSchema = PaginatedSchema.extend({
+  items: AssignedMeterReaderSchema.array(),
 });
 
-export const CreateAssignedPersonnelSchema = AssignedPersonnelSchema.omit({
+export const CreateAssignedMeterReaderSchema = AssignedMeterReaderSchema.omit({
   id: true,
   zoneBooks: true,
   companyId: true,
@@ -91,12 +91,12 @@ export const CreateAssignedPersonnelSchema = AssignedPersonnelSchema.omit({
     }
   });
 
-export type Personnel = z.infer<typeof PersonnelSchema>;
+export type MeterReader = z.infer<typeof MeterReaderSchema>;
 
-export type UnassignedPersonnel = z.infer<typeof UnassignedPersonnelSchema>;
-export type PaginatedUnassignedPersonnel = z.infer<typeof PaginatedUnassignedPersonnelSchema>;
+export type UnassignedMeterReader = z.infer<typeof UnassignedMeterReaderSchema>;
+export type PaginatedUnassignedMeterReader = z.infer<typeof PaginatedUnassignedMeterReaderSchema>;
 
-export type AssignedPersonnel = z.infer<typeof AssignedPersonnelSchema>;
-export type PaginatedAssignedPersonnel = z.infer<typeof PaginatedAssignedPersonnelSchema>;
+export type AssignedMeterReader = z.infer<typeof AssignedMeterReaderSchema>;
+export type PaginatedAssignedMeterReader = z.infer<typeof PaginatedAssignedMeterReaderSchema>;
 
-export type CreateAssignedPersonnel = z.infer<typeof CreateAssignedPersonnelSchema>;
+export type CreateAssignedMeterReader = z.infer<typeof CreateAssignedMeterReaderSchema>;
