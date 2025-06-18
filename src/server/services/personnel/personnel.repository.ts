@@ -27,7 +27,7 @@ export class PersonnelRepository implements IPersonnelRepository {
 
     // 1. Fetch all employees (unpaginated)
     const [[rawEmployees]]: MySqlQueryResult = await hrmsDb.execute(
-      sql`CALL sp_get_all_commercial_employees(${query})`,
+      sql<string>`CALL sp_get_all_commercial_employees(${query})`,
     );
 
     const employees = UnassignedPersonnelSchema.array().parse(rawEmployees);
