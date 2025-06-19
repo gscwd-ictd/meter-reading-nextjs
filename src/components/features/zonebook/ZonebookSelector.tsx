@@ -45,7 +45,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
 
-  const zoneBookSorter = (zonebooks: Zonebook[]) => ZonebookFlatSorter(zonebooks);
+  const zoneBookSorter = (zoneBooks: Zonebook[]) => ZonebookFlatSorter(zoneBooks);
 
   const zones = useMemo(() => {
     if (filteredZonebooks && filteredZonebooks.length > 0) {
@@ -105,7 +105,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
       <DialogTrigger asChild>
         <div role="button" className="text-primary flex items-center gap-1">
           <Label
-            htmlFor="zonebooks"
+            htmlFor="zoneBooks"
             className="text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
           >
             Zonebooks
@@ -241,7 +241,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
 
           {isLoading ? (
             <div className="text-primary flex h-full w-full items-center justify-center">
-              <LoadingSpinner /> Loading zonebooks...
+              <LoadingSpinner /> Loading zoneBooks...
             </div>
           ) : (
             <CommandGroup
@@ -346,7 +346,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center">
-                      No zonebooks added
+                      No zoneBooks added
                     </TableCell>
                   </TableRow>
                 )}

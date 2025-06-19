@@ -16,7 +16,7 @@ type SelectedDate = {
 
 type ScheduleEntryDueDateSelectorProps = {
   zonebook: string;
-  zonebooks: ZonebookWithDates[];
+  zoneBooks: ZonebookWithDates[];
   setZonebooks: Dispatch<SetStateAction<ZonebookWithDates[]>>;
   dueDate: Date | undefined;
   disconnectionDate: Date | undefined;
@@ -24,7 +24,7 @@ type ScheduleEntryDueDateSelectorProps = {
 
 export const ScheduleEntryDueDateSelector: FunctionComponent<ScheduleEntryDueDateSelectorProps> = ({
   zonebook,
-  zonebooks,
+  zoneBooks,
   setZonebooks,
   disconnectionDate,
   dueDate,
@@ -65,7 +65,7 @@ export const ScheduleEntryDueDateSelector: FunctionComponent<ScheduleEntryDueDat
 
                     setValue(selectedZonebook);
 
-                    const newZonebooks = zonebooks.map((mr) => {
+                    const newZonebooks = zoneBooks.map((mr) => {
                       if (mr.zoneBook === zonebook)
                         return {
                           ...mr,

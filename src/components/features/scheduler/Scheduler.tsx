@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { holidays, Holidays } from "./holidays";
+import { holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";

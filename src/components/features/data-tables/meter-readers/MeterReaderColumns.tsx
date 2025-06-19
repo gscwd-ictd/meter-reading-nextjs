@@ -39,14 +39,14 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         },
       },
       {
-        accessorKey: "zonebooks",
+        accessorKey: "zoneBooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
         cell: ({ row }) =>
-          row.original.zonebooks &&
-          row.original.zonebooks.map((zoneBook, idx) => (
+          row.original.zoneBooks &&
+          row.original.zoneBooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
               {zoneBook.zoneBook}
-              {idx < row.original.zonebooks.length - 1 && ", "}
+              {idx < row.original.zoneBooks.length - 1 && ", "}
             </span>
           )),
         enableColumnFilter: false,

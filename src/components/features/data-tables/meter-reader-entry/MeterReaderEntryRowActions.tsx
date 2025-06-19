@@ -26,10 +26,10 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
     setEntryZonebookSelectorIsOpen(true);
-    setMeterReaderZonebooks(meterReader.zonebooks ?? []);
+    setMeterReaderZonebooks(meterReader.zoneBooks ?? []);
   };
 
-  const removeMeterReader = (employeeId: string) => {
+  const removeMeterReader = (meterReaderId: string) => {
     const temporaryMeterReaders = [...selectedScheduleEntry!.meterReaders!];
 
     setSelectedScheduleEntry({
@@ -37,7 +37,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       readingDate: selectedScheduleEntry?.readingDate!,
       disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
       dueDate: selectedScheduleEntry?.dueDate!,
-      meterReaders: temporaryMeterReaders.filter((mr) => mr.employeeId !== employeeId),
+      meterReaders: temporaryMeterReaders.filter((mr) => mr.meterReaderId !== meterReaderId),
     });
   };
 
@@ -56,7 +56,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
             variant="destructive"
             className="w-full px-2"
             size="sm"
-            onClick={() => removeMeterReader(meterReader.employeeId)}
+            onClick={() => removeMeterReader(meterReader.meterReaderId)}
           >
             <CircleXIcon className="size-2 fill-red-600 text-white sm:size-4 lg:size-4" />
             <span className="hidden text-xs sm:hidden md:hidden lg:block">Remove</span>

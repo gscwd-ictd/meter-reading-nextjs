@@ -62,7 +62,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
   const meterReadersWithDesignatedZonebooks = useSchedulesStore(
     (state) => state.meterReadersWithDesignatedZonebooks,
   );
-  const zoneBookSorter = (zonebooks: ZonebookWithDates[]) => ZonebookSorter(zonebooks);
+  const zoneBookSorter = (zoneBooks: ZonebookWithDates[]) => ZonebookSorter(zoneBooks);
 
   const [tempMeterReaderZonebooks, setTempMeterReaderZonebooks] = useState<ZonebookWithDates[]>([]);
   const [tempMeterReadersWithDesignatedZonebooks, setTempMeterReadersWithDesignatedZonebooks] = useState<
@@ -71,16 +71,15 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
 
   //! this has to be changed
   const selectedMeterReaderPool = useMemo(() => {
-    const zonebooksByEmployeeId = tempMeterReadersWithDesignatedZonebooks.find(
-      (mr) => selectedMeterReader?.employeeId === mr.employeeId,
-    )?.zonebooks.unassigned;
+    const zonebooksByMeterReaderId = tempMeterReadersWithDesignatedZonebooks.find(
+      (mr) => selectedMeterReader?.meterReaderId === mr.meterReaderId,
+    )?.zoneBooks.unassigned;
 
-    console.log(zonebooksByEmployeeId);
-    if (!zonebooksByEmployeeId) return [];
-    return zonebooksByEmployeeId;
+    if (!zonebooksByMeterReaderId) return [];
+    return zonebooksByMeterReaderId;
   }, [tempMeterReadersWithDesignatedZonebooks]);
 
-  // this should be the filtered pool, all assigned zonebooks minus the currently selected
+  // this should be the filtered pool, all assigned zoneBooks minus the currently selected
   const allRemainingPool = useMemo(() => {
     const getRemainingZonebooks = (pool: ZonebookWithDates[], selected: ZonebookWithDates[]) => {
       return pool && pool.filter((itemA) => !selected.some((itemB) => itemB.zoneBook === itemA.zoneBook));
@@ -118,7 +117,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
         setSelectedMeterReader({
           ...selectedMeterReader,
 
-          zonebooks: newMeterReaderZonebooks,
+          zoneBooks: newMeterReaderZonebooks,
         });
 
         setSelectedZonebook(null);
@@ -133,10 +132,10 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
           dueDate: selectedScheduleEntry.dueDate,
           readingDate: selectedScheduleEntry.readingDate,
           meterReaders: selectedScheduleEntry.meterReaders!.map((mr) => {
-            if (selectedMeterReader && mr.employeeId === selectedMeterReader?.employeeId) {
+            if (selectedMeterReader && mr.meterReaderId === selectedMeterReader?.meterReaderId) {
               return {
                 ...mr,
-                zonebooks: newMeterReaderZonebooks,
+                zoneBooks: newMeterReaderZonebooks,
               };
             }
             return mr;
@@ -184,12 +183,12 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
     const newMeterReadersWithDesignatedZonebooks = [...tempMeterReadersWithDesignatedZonebooks];
 
     const newReadersWithDesignatedZonebooks = newMeterReadersWithDesignatedZonebooks.map((mr) => {
-      if (mr.employeeId === selectedMeterReader?.employeeId) {
-        const newUnassigned = [...mr.zonebooks.unassigned];
+      if (mr.meterReaderId === selectedMeterReader?.meterReaderId) {
+        const newUnassigned = [...mr.zoneBooks.unassigned];
         newUnassigned.push(selectedZonebook!);
         return {
           ...mr,
-          zonebooks: {
+          zoneBooks: {
             unassigned: newUnassigned,
             assigned: newMeterReaderZonebooks,
           },
@@ -448,7 +447,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
           {/* <CommandEmpty>No zone found.</CommandEmpty> */}
           {isLoading ? (
             <div className="text-primary flex h-full w-full items-center justify-center">
-              <LoadingSpinner /> Loading zonebooks...
+              <LoadingSpinner /> Loading zoneBooks...
             </div>
           ) : (
             <CommandGroup
@@ -538,7 +537,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                         Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
                           <ScheduleEntryDueDateSelector
                             zonebook={entry.zoneBook}
-                            zonebooks={tempMeterReaderZonebooks}
+                            zoneBooks={tempMeterReaderZonebooks}
                             setZonebooks={setTempMeterReaderZonebooks}
                             dueDate={entry.dueDate ?? undefined}
                             disconnectionDate={entry.disconnectionDate}
@@ -573,7 +572,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                 ) : (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center">
-                      No zonebooks added
+                      No zoneBooks added
                     </TableCell>
                   </TableRow>
                 )}

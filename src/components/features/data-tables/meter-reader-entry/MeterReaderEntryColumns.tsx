@@ -39,13 +39,13 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
       },
 
       {
-        accessorKey: "zonebooks",
+        accessorKey: "zoneBooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone-Book" />,
         cell: ({ row }) =>
-          row.original.zonebooks.map((zoneBook, idx) => (
+          row.original.zoneBooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
               {zoneBook.zoneBook}
-              {idx < row.original.zonebooks.length - 1 && ", "}
+              {idx < row.original.zoneBooks.length - 1 && ", "}
             </span>
           )),
         enableColumnFilter: false,

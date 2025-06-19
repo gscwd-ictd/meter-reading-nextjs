@@ -10,25 +10,25 @@ export type Employee = {
   photoUrl: string;
 };
 
-// this only refers to meter readers and their default zonebooks without the due dates
+// this only refers to meter readers and their default zoneBooks without the due dates
 export type MeterReader = Employee & {
-  meterReaderId?: string;
+  meterReaderId: string;
   restDay: "sunday" | "saturday" | undefined;
-  zonebooks: Zonebook[];
+  zoneBooks: Zonebook[];
   // recommendedZonebooks?: Zonebook[];
 };
 
-// this refers to meter readers who have assigned zonebooks in the scheduling entry calendar which should have a due date and disconnection date
+// this refers to meter readers who have assigned zoneBooks in the scheduling entry calendar which should have a due date and disconnection date
 export type MeterReaderWithZonebooks = Employee & {
-  meterReaderId?: string;
+  meterReaderId: string;
   restDay: "sunday" | "saturday" | undefined;
-  zonebooks: ZonebookWithDates[];
+  zoneBooks: ZonebookWithDates[];
   // recommendedZonebooks?: ZonebookWithDates[];
 };
 
 export type MeterReaderWithDesignatedZonebooks = {
   meterReaderId: string;
-  zonebooks: {
+  zoneBooks: {
     assigned: ZonebookWithDates[];
     unassigned: ZonebookWithDates[];
   };

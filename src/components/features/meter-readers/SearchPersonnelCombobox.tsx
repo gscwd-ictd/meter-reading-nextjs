@@ -33,7 +33,7 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
-  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
   const setZonebooks = useZonebookStore((state) => state.setZonebooks);
 
   const {
@@ -43,9 +43,7 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
   } = useQuery({
     queryKey: ["get-all-employees"],
     queryFn: async () => {
-      const data = await axios.get(
-        `${process.env.NEXT_PUBLIC_HRMS_BE}/employees/meter-reading/all-employees?page=1&limit=320`,
-      );
+      const data = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=unassigned`);
       return data;
     },
     enabled: open,
@@ -80,7 +78,7 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
                 <AvatarFallback>{selectedEmployee?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               {
-                employees?.data.items?.find(
+                employees?.data?.find(
                   (employee: Employee) => employee.employeeId === selectedEmployee?.employeeId,
                 )?.name
               }
@@ -88,7 +86,7 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
           ) : (
             <span className="flex items-center gap-2 text-sm">
               <UserRoundSearchIcon className="text-primary size-5" />
-              <span className="text-primary text-sm">Search Employee...</span>
+              <span className="text-primary text-sm">Search from employee list...</span>
             </span>
           )}
         </Button>
@@ -104,13 +102,13 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
             <CommandList className="max-h-60 overflow-y-auto" role="listbox" tabIndex={-1}>
               <CommandEmpty>No employee found.</CommandEmpty>
               <CommandGroup>
-                {employees?.data.items.map((employee: Employee, index: number) => (
+                {employees?.data.map((employee: Employee, index: number) => (
                   <CommandItem
                     key={employee.companyId}
                     value={employee.name}
                     onSelect={(currentValue) => {
                       if (employee.companyId === selectedEmployee?.companyId) {
-                        const tempZonebooks = [...zonebooks];
+                        const tempZonebooks = [...zoneBooks];
                         tempZonebooks.concat(meterReaderZonebooks);
 
                         setSelectedEmployee(undefined);
