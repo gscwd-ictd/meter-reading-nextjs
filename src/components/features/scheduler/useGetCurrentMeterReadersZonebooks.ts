@@ -1,7 +1,6 @@
 import { MeterReaderWithDesignatedZonebooks } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
-import { useCallback } from "react";
 
 export const useGetCurrentMeterReadersZonebooks = () => {
   // set the default zonebooks for the month
@@ -17,7 +16,7 @@ export const useGetCurrentMeterReadersZonebooks = () => {
         // Skip if no zonebooks
         if (!reader.zonebooks || reader.zonebooks.length === 0) continue;
 
-        const key = `${reader.employeeId}-${reader.companyId}-${reader.assignment}`;
+        const key = `${reader.meterReaderId}-${reader.companyId}-${reader.assignment}`;
 
         // name: reader.name,
         // companyId: reader.companyId,
@@ -27,7 +26,7 @@ export const useGetCurrentMeterReadersZonebooks = () => {
         // photoUrl: reader.photoUrl,
         if (!map.has(key)) {
           map.set(key, {
-            employeeId: reader.employeeId,
+            meterReaderId: reader.meterReaderId!,
             zonebooks: {
               assigned: [],
               unassigned: [...reader.zonebooks],
@@ -65,11 +64,11 @@ export const useGetCurrentMeterReadersZonebooks = () => {
         // Skip if no zonebooks
         if (!reader.zonebooks || reader.zonebooks.length === 0) continue;
 
-        const key = `${reader.employeeId}`;
+        const key = `${reader.meterReaderId}`;
 
         if (!map.has(key)) {
           map.set(key, {
-            employeeId: reader.employeeId,
+            meterReaderId: reader.meterReaderId!,
             zonebooks: {
               assigned: [...reader.zonebooks],
               unassigned: [],
@@ -93,7 +92,7 @@ export const useGetCurrentMeterReadersZonebooks = () => {
 
     // Step 2: Reconstruct final result from defaults
     return defaults.map((defaultReader) => {
-      const matchedReader = current.find((c) => c.employeeId === defaultReader.employeeId);
+      const matchedReader = current.find((c) => c.meterReaderId === defaultReader.meterReaderId);
 
       const assigned = matchedReader?.zonebooks.assigned ?? [];
 
@@ -110,7 +109,7 @@ export const useGetCurrentMeterReadersZonebooks = () => {
       const unassigned = dedupeZonebooks([...unassignedFromDefault, ...missingFromPreviousAssigned]);
 
       return {
-        employeeId: defaultReader.employeeId,
+        meterReaderId: defaultReader.meterReaderId,
         zonebooks: {
           assigned,
           unassigned,

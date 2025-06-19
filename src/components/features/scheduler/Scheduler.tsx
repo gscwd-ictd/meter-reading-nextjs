@@ -17,23 +17,16 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
-
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
-
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
-  // const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
-
-  //!!!!! remove
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
-  //!!!!! remove
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
-  const [activeContext, setActiveContext] = useState<number | null>(null);
-
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
 
   const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "MM-yyyy"));
+  const [activeContext, setActiveContext] = useState<number | null>(null);
 
   scheduler.addSundayReadings(currentSchedule);
 
