@@ -22,9 +22,9 @@ export interface IMeterReaderRepository {
 
   createMeterReader(data: CreateAssignedMeterReader): Promise<MeterReader>;
 
-  // findPersonnel(): Promise<PersonnelAssignable[]>;
-  // findAllPersonnel(page: number, limit: number, query: string): Promise<Personnel[] | PaginatedPersonnel>;
   findMeterReaderById(id: string): Promise<AssignedMeterReader>;
+
+  //updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader>;
   /* 
   updateById
   removeById

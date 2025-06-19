@@ -32,11 +32,11 @@ const meterReaderRoutes = new Hono()
 //   return c.json(personnel);
 // })
 
-// .get("/:id", async (c) => {
-//   const id = c.req.param("id");
-//   const personnel = await personnelService.getPersonnelById(id);
-//   if (!personnel) return c.json({ error: "Personnel not found" }, 404);
-//   return c.json(personnel);
-// });
+/*   .get("/:id", async (c) => {
+    const id = c.req.param("id");
+    const meterReader = await meterReaderService.getMeterReaderById(id);
+    if (!meterReader) return c.json({ error: "Meter reader not found" }, 404);
+    return c.json(meterReader);
+  }); */
 
 export const meterReaderHandler = new Hono().route("/meter-readers", meterReaderRoutes);

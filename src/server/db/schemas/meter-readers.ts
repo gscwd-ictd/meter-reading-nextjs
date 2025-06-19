@@ -15,7 +15,7 @@ export const restDayEnum = pgEnum("rest_day_enum", RestDayType);
  */
 
 export const meterReaders = pgTable("meter_readers", {
-  id: varchar("id")
+  meterReaderId: varchar("meter_reader_id")
     .primaryKey()
     .$defaultFn(() => generateCuid())
     .notNull(),
@@ -40,12 +40,12 @@ export const meterReaderRelations = relations(meterReaders, ({ many }) => ({
 export const meterReaderZoneBook = pgTable(
   "meter_reader_zone_book",
   {
-    id: varchar("id")
+    meterReaderZoneBookId: varchar("meter_reader_zone_book_id")
       .primaryKey()
       .$defaultFn(() => generateCuid())
       .notNull(),
     meterReaderId: varchar("meter_reader_id")
-      .references(() => meterReaders.id, { onDelete: "cascade" })
+      .references(() => meterReaders.meterReaderId, { onDelete: "cascade" })
       .notNull(),
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
@@ -63,14 +63,14 @@ export const meterReaderZoneBook = pgTable(
 export const meterReaderZoneBookRelations = relations(meterReaderZoneBook, ({ one }) => ({
   meterReaders: one(meterReaders, {
     fields: [meterReaderZoneBook.meterReaderId],
-    references: [meterReaders.id],
+    references: [meterReaders.meterReaderId],
   }),
 }));
 
 export const meterReaderZoneBookView = pgView("meter_reader_zone_book_view").as((view) =>
   view
     .select({
-      id: meterReaders.id,
+      meterReaderId: meterReaders.meterReaderId,
       employeeId: meterReaders.employeeId,
       restDay: meterReaders.restDay,
       zoneBooks: sql`
@@ -84,6 +84,6 @@ export const meterReaderZoneBookView = pgView("meter_reader_zone_book_view").as(
       `.as("zoneBooks"),
     })
     .from(meterReaders)
-    .innerJoin(meterReaderZoneBook, eq(meterReaders.id, meterReaderZoneBook.meterReaderId))
-    .groupBy(meterReaders.id, meterReaders.employeeId, meterReaders.restDay),
+    .innerJoin(meterReaderZoneBook, eq(meterReaders.meterReaderId, meterReaderZoneBook.meterReaderId))
+    .groupBy(meterReaders.meterReaderId, meterReaders.employeeId, meterReaders.restDay),
 );

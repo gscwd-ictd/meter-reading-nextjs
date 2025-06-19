@@ -22,9 +22,9 @@ export interface IMeterReaderService {
 
   addMeterReader(data: CreateAssignedMeterReader): Promise<MeterReader>;
 
-  // getPersonnel(): Promise<PersonnelAssignable[]>;
-  // getAllPersonnel(page: number, limit: number, query: string): Promise<Personnel[] | PaginatedPersonnel>;
   getMeterReaderById(id: string): Promise<AssignedMeterReader>;
+
+  //updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader>;
   /* 
   updateById
   deleteById

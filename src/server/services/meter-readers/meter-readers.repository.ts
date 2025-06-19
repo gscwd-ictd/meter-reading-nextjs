@@ -9,7 +9,6 @@ import { paginate } from "@/server/helpers/paginate";
 import { IMeterReaderRepository } from "@/server/interfaces/meter-readers/meter-readers.interface.repository";
 import {
   AssignedMeterReader,
-  AssignedMeterReaderSchema,
   CreateAssignedMeterReader,
   MeterReader,
   MeterReaderSchema,
@@ -20,6 +19,7 @@ import {
 } from "@/server/types/meter-reader.type";
 import { eq, sql } from "drizzle-orm";
 import { MySqlQueryResult } from "drizzle-orm/mysql2";
+import { HTTPException } from "hono/http-exception";
 
 export class MeterReaderRepository implements IMeterReaderRepository {
   async findUnassignedMeterReader(
@@ -112,7 +112,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
         .insert(meterReaderZoneBook)
         .values(
           zoneBooks.map((item) => ({
-            meterReaderId: insertMeterReader.id,
+            meterReaderId: insertMeterReader.meterReaderId,
             ...item,
           })),
         )
@@ -121,7 +121,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       const [result] = await tx
         .select()
         .from(meterReaderZoneBookView)
-        .where(eq(meterReaderZoneBookView.id, insertMeterReader.id));
+        .where(eq(meterReaderZoneBookView.meterReaderId, insertMeterReader.meterReaderId));
 
       const parseResult = MeterReaderSchema.parse(result);
 
@@ -132,17 +132,34 @@ export class MeterReaderRepository implements IMeterReaderRepository {
   }
 
   async findMeterReaderById(id: string): Promise<AssignedMeterReader> {
-    const result = await db.select().from(meterReaderZoneBookView).where(eq(meterReaderZoneBookView.id, id));
+    const stmt = db
+      .select()
+      .from(meterReaderZoneBookView)
+      .where(eq(meterReaderZoneBookView.meterReaderId, id))
+      .$dynamic()
+      .prepare("get_meter_reader_zone_book_view_by_meter_id");
+
+    const [executeStmt] = await stmt.execute();
+
+    if (!executeStmt) {
+      throw new HTTPException(404, { message: `Meter reader id ${id} not found` });
+    }
+
+    const parseResult = MeterReaderSchema.parse(executeStmt);
 
     const [[rawEmployees]]: MySqlQueryResult = await hrmsDb.execute(
-      sql`select * from all_employees_view where employee_id = ${id}`,
+      sql`select employee_id as employeeId, company_id as companyId, name, position_title as positionTitle, assignment, mobile_number as mobileNumber, photo_url as photoUrl from all_employees_view where employee_id = ${parseResult.employeeId}`,
     );
 
-    const employeeDetails = AssignedMeterReaderSchema.parse(rawEmployees);
+    const parseRaw = UnassignedMeterReaderSchema.parse(rawEmployees);
 
     return {
-      ...employeeDetails,
-      ...result,
+      ...parseResult,
+      ...parseRaw,
     };
   }
+
+  /* async updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader> {
+    return { meterReaderId: id, ...data };
+  } */
 }
