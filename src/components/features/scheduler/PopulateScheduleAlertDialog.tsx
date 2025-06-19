@@ -17,6 +17,7 @@ import { FunctionComponent } from "react";
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
+import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -30,6 +31,11 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const meterReaders = useMeterReadersStore((state) => state.meterReaders);
+  const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
+    (state) => state.setMeterReadersWithDesignatedZonebooks,
+  );
+
+  const getMeterReaderZonebooks = useGetCurrentMeterReadersZonebooks();
 
   return (
     <AlertDialog>
@@ -55,7 +61,23 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           <AlertDialogAction
             className="dark:text-white"
             onClick={() => {
-              setCurrentSchedule(scheduler.assignMeterReaders(schedule, meterReaders));
+              const newSchedule = scheduler.assignMeterReaders(schedule, meterReaders);
+
+              // assign an empty array to zonebooks to initialize
+              setCurrentSchedule(
+                newSchedule.map((sched) => {
+                  return {
+                    ...sched,
+                    meterReaders: sched.meterReaders?.map((mr) => {
+                      return { ...mr, zonebooks: [] };
+                    }),
+                  };
+                }),
+              );
+
+              // this will be the default pool and will always be compared to after applying changes per entry(per day)
+              setMeterReadersWithDesignatedZonebooks(getMeterReaderZonebooks.defaultZonebooks(newSchedule));
+
               toast.success("Success", {
                 description: "Successfully populated all the meter readers for this month!",
                 position: "top-right",

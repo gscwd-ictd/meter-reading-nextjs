@@ -2,6 +2,7 @@
 
 import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
+
 import {
   addDays,
   addMonths,
@@ -85,21 +86,26 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     return format(date, dateFormat);
   };
 
+  //! removed this because we dont have to format and parse the dates anymore
   // Memoize formatted holiday dates for efficient lookups
-  const holidayDates = useMemo(
-    () =>
-      holidays.map((holiday) =>
-        format(parse(holiday.holidayDate, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd"),
-      ),
-    [holidays],
-  );
+  // const holidayDates = useMemo(
+  //   () =>
+  //     holidays.map((holiday) =>
+  //       format(parse(holiday.holidayDate, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd"),
+  //     ),
+  //   [holidays],
+  // );
 
   const restDayDates = useMemo(() => restDays.map((restDay) => formatDate(restDay)), [restDays]);
 
   // Check if a date is a holiday
   const isHoliday = useCallback(
-    (date: Date): boolean => holidayDates.includes(formatDate(date) as string),
-    [holidayDates],
+    (date: Date): boolean => {
+      const mmdd = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+      return holidays.some((holiday) => holiday.type === "recurring" && holiday.holidayDate === mmdd);
+    },
+    [holidays],
   );
 
   const isRestDay = useCallback((date: Date) => restDayDates.includes(formatDate(date)), [restDayDates]);
@@ -398,12 +404,6 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
         split = [...result];
       }
 
-      if (selectedDates.length > 1)
-        toast.success("Success", {
-          description: "Successfully splitted the dates!",
-          position: "top-right",
-          duration: 1500,
-        });
       return split;
     },
     [calculateSchedule, removeDuplicateDates],
@@ -420,9 +420,6 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
           zonebooks: mr.zonebooks.map((zb) => {
             return { ...zb, dueDate: undefined, disconnectionDate: undefined };
           }),
-          recommendedZonebooks: mr.recommendedZonebooks?.map((zb) => {
-            return { ...zb, dueDate: undefined, disconnectionDate: undefined };
-          }),
         };
       });
 
@@ -434,15 +431,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
         const readingRestDay = getDayName(entry.readingDate);
 
-        const transferZonebookToRecommended = transformMeterReaders.map((mr) => {
-          if (mr.zonebooks) return { ...mr, zonebooks: [], recommendedZonebooks: mr.zonebooks };
-
-          return mr;
-        });
-
-        const availableReaders = transferZonebookToRecommended.filter(
-          (reader) => reader.restDay !== readingRestDay,
-        );
+        const availableReaders = transformMeterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
         return { ...entry, meterReaders: availableReaders };
       });
@@ -471,7 +460,6 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     removeSundayReadings,
     assignMeterReaders,
     splitDates,
-
     formatDate,
     goToPreviousMonth,
     goToNextMonth,

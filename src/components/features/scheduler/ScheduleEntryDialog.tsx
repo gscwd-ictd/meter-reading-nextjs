@@ -21,6 +21,7 @@ import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
 import { MeterReader } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
@@ -48,7 +49,16 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setScheduleEntryIsSplitted = useSchedulesStore((state) => state.setScheduleEntryIsSplitted);
+  const meterReadersWithDesignatedZonebooks = useSchedulesStore(
+    (state) => state.meterReadersWithDesignatedZonebooks,
+  );
+  const setTempMeterReadersWithDesignatedZonebooks = useSchedulesStore(
+    (state) => state.setTempMeterReadersWithDesignatedZonebooks,
+  );
   const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
+  const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
+    (state) => state.setMeterReadersWithDesignatedZonebooks,
+  );
 
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
 
@@ -77,6 +87,10 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
     setScheduleEntryIsSplitted,
     setSplittedDates,
   ]);
+
+  useEffect(() => {
+    setTempMeterReadersWithDesignatedZonebooks(meterReadersWithDesignatedZonebooks);
+  }, [scheduleEntryDialogIsOpen, meterReadersWithDesignatedZonebooks]);
 
   return (
     <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
@@ -249,6 +263,15 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 return entry;
               });
 
+              const get = useGetCurrentMeterReadersZonebooks();
+
+              // this contains the pool of assigned and unassigned zonebooks of all meter readers
+              const currentZonebooks = get.currentZonebooks(
+                updatedCurrentSchedule,
+                meterReadersWithDesignatedZonebooks,
+              );
+
+              setMeterReadersWithDesignatedZonebooks(currentZonebooks);
               setCurrentSchedule(updatedCurrentSchedule);
               setScheduleEntryDialogIsOpen(false);
             }}
