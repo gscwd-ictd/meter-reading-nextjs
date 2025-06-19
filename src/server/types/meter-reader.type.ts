@@ -10,14 +10,14 @@ export const MeterReaderQuerySchema = z.object({
 });
 
 export const MeterReaderSchema = z.object({
-  id: z.string(),
+  meterReaderId: z.string(),
   employeeId: z.string(),
-  restDay: z.enum(RestDayType),
+  restDay: z.enum(RestDayType).transform((val) => (val === "0" ? "sunday" : "saturday")),
   zoneBooks: ZoneBookSchema.array(),
 });
 
 export const UnassignedMeterReaderSchema = MeterReaderSchema.omit({
-  id: true,
+  meterReaderId: true,
   restDay: true,
   zoneBooks: true,
 }).extend({
@@ -38,7 +38,6 @@ export const AssignedMeterReaderSchema = MeterReaderSchema.extend({
   mobileNumber: z.string(),
   photoUrl: z.string(),
   totalCount: z.number().nullable().optional(),
-  zoneBooks: ZoneBookSchema.array(),
 });
 
 export const PaginatedSchema = z.object({
@@ -60,7 +59,8 @@ export const PaginatedAssignedMeterReaderSchema = PaginatedSchema.extend({
 });
 
 export const CreateAssignedMeterReaderSchema = AssignedMeterReaderSchema.omit({
-  id: true,
+  meterReaderId: true,
+  restDay: true,
   zoneBooks: true,
   companyId: true,
   name: true,
@@ -71,6 +71,7 @@ export const CreateAssignedMeterReaderSchema = AssignedMeterReaderSchema.omit({
   totalCount: true,
 })
   .extend({
+    restDay: z.enum(RestDayType),
     zoneBooks: ZoneBookSchema.omit({ zoneBook: true })
       .array()
       .min(1, "At least one zone/book pair is required"),

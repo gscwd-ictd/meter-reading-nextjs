@@ -47,4 +47,8 @@ export class MeterReaderService implements IMeterReaderService {
   async getMeterReaderById(id: string): Promise<AssignedMeterReader> {
     return await this.repository.findMeterReaderById(id);
   }
+
+  /* async updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader> {
+    return await this.repository.updateMeterReaderById(id, data);
+  } */
 }
