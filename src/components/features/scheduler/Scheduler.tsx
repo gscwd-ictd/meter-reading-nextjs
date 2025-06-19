@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { Holidays } from "./holidays";
+import { holidays, Holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,11 +14,7 @@ import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 import { useSearchParams } from "next/navigation";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
-type SchedulerProps = {
-  holidays: Holidays;
-};
-
-export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays }) => {
+export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
 

@@ -32,6 +32,7 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { format, isValid } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ScheduleEntryDueDateSelector } from "./ScheduleEntryDueDateSelector";
+import { MeterReaderWithDesignatedZonebooks } from "@mr/lib/types/personnel";
 
 type ScheduleEntryZonebookSelectorProps = {
   isLoading: boolean;
@@ -45,6 +46,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
   const [initialPoolIsSet, setInitialPoolIsSet] = useState<boolean>(false);
+  const [hasFetchedUnassigned, setHasFetchedUnassigned] = useState<boolean>(false);
 
   const entryZonebookSelectorIsOpen = useSchedulesStore((state) => state.entryZonebookSelectorIsOpen);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
@@ -56,19 +58,39 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useSchedulesStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useSchedulesStore((state) => state.setMeterReaderZonebooks);
+
+  const meterReadersWithDesignatedZonebooks = useSchedulesStore(
+    (state) => state.meterReadersWithDesignatedZonebooks,
+  );
   const zoneBookSorter = (zonebooks: ZonebookWithDates[]) => ZonebookSorter(zonebooks);
 
   const [tempMeterReaderZonebooks, setTempMeterReaderZonebooks] = useState<ZonebookWithDates[]>([]);
+  const [tempMeterReadersWithDesignatedZonebooks, setTempMeterReadersWithDesignatedZonebooks] = useState<
+    MeterReaderWithDesignatedZonebooks[]
+  >([]);
+
+  //! this has to be changed
+  const selectedMeterReaderPool = useMemo(() => {
+    const zonebooksByEmployeeId = tempMeterReadersWithDesignatedZonebooks.find(
+      (mr) => selectedMeterReader?.employeeId === mr.employeeId,
+    )?.zonebooks.unassigned;
+
+    console.log(zonebooksByEmployeeId);
+    if (!zonebooksByEmployeeId) return [];
+    return zonebooksByEmployeeId;
+  }, [tempMeterReadersWithDesignatedZonebooks]);
 
   // this should be the filtered pool, all assigned zonebooks minus the currently selected
   const allRemainingPool = useMemo(() => {
     const getRemainingZonebooks = (pool: ZonebookWithDates[], selected: ZonebookWithDates[]) => {
-      return pool.filter((itemA) => !selected.some((itemB) => itemB.zoneBook === itemA.zoneBook));
+      return pool && pool.filter((itemA) => !selected.some((itemB) => itemB.zoneBook === itemA.zoneBook));
     };
 
+    // temp meterReaderZonebooks will be the currently selected ones
+
     if (entryZonebookSelectorIsOpen)
-      return getRemainingZonebooks(selectedMeterReader?.recommendedZonebooks!, tempMeterReaderZonebooks);
-  }, [selectedMeterReader?.recommendedZonebooks, tempMeterReaderZonebooks, entryZonebookSelectorIsOpen]);
+      return getRemainingZonebooks(selectedMeterReaderPool!, tempMeterReaderZonebooks);
+  }, [selectedMeterReaderPool, tempMeterReaderZonebooks, entryZonebookSelectorIsOpen]);
 
   // new zones
   const zones = useMemo(() => {
@@ -126,6 +148,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
       setTempMeterReaderZonebooks([]);
       setMeterReaderZonebooks([]);
       setInitialPoolIsSet(false);
+      setTempMeterReadersWithDesignatedZonebooks([]);
+      setHasFetchedUnassigned(false);
     }
   };
 
@@ -138,8 +162,10 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
       book: selectedZonebook?.book!,
       zone: selectedZonebook?.zone!,
       zoneBook: selectedZonebook?.zoneBook!,
-      dueDate: null!,
-      disconnectionDate: null!,
+      dueDate: Array.isArray(selectedScheduleEntry?.dueDate) ? undefined : selectedScheduleEntry?.dueDate,
+      disconnectionDate: Array.isArray(selectedScheduleEntry?.disconnectionDate)
+        ? undefined
+        : selectedScheduleEntry?.disconnectionDate,
     });
 
     setTempMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
@@ -152,6 +178,30 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
   // handle delete zonebook row
   const handleDelete = (zonebook: string) => {
     const newMeterReaderZonebooks = tempMeterReaderZonebooks.filter((zb) => zb.zoneBook !== zonebook);
+    const selectedZonebook = tempMeterReaderZonebooks.find((zb) => zb.zoneBook === zonebook);
+
+    //!
+    const newMeterReadersWithDesignatedZonebooks = [...tempMeterReadersWithDesignatedZonebooks];
+
+    const newReadersWithDesignatedZonebooks = newMeterReadersWithDesignatedZonebooks.map((mr) => {
+      if (mr.employeeId === selectedMeterReader?.employeeId) {
+        const newUnassigned = [...mr.zonebooks.unassigned];
+        newUnassigned.push(selectedZonebook!);
+        return {
+          ...mr,
+          zonebooks: {
+            unassigned: newUnassigned,
+            assigned: newMeterReaderZonebooks,
+          },
+        };
+      }
+
+      return mr;
+    });
+
+    console.log(newReadersWithDesignatedZonebooks);
+    setTempMeterReadersWithDesignatedZonebooks(newReadersWithDesignatedZonebooks);
+    // selectedMeterReaderPool?.push(selectedZonebook!);
     setTempMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
   };
 
@@ -175,11 +225,22 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
   // set initial pool from meterReaderZonebooks to temporary array
   useEffect(() => {
     if (entryZonebookSelectorIsOpen && initialPoolIsSet === false) {
-      console.log(meterReaderZonebooks);
       setTempMeterReaderZonebooks(meterReaderZonebooks);
       setInitialPoolIsSet(true);
     }
   }, [entryZonebookSelectorIsOpen, setTempMeterReaderZonebooks, initialPoolIsSet, meterReaderZonebooks]);
+
+  useEffect(() => {
+    if (entryZonebookSelectorIsOpen && !hasFetchedUnassigned) {
+      setTempMeterReadersWithDesignatedZonebooks(meterReadersWithDesignatedZonebooks);
+      setHasFetchedUnassigned(true);
+    }
+  }, [
+    entryZonebookSelectorIsOpen,
+    hasFetchedUnassigned,
+    setTempMeterReadersWithDesignatedZonebooks,
+    meterReadersWithDesignatedZonebooks,
+  ]);
 
   return (
     <Dialog
@@ -192,6 +253,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
         setTempMeterReaderZonebooks([]);
         setMeterReaderZonebooks([]);
         setInitialPoolIsSet(false);
+        setTempMeterReadersWithDesignatedZonebooks([]);
+        setHasFetchedUnassigned(false);
       }}
       modal
     >
@@ -270,6 +333,12 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
             Select a zonebook and press add to assign
           </DialogDescription>
         </DialogHeader>
+
+        <Button onClick={() => console.log(tempMeterReaderZonebooks)}>Log Temp Pool</Button>
+        <Button onClick={() => console.log(tempMeterReadersWithDesignatedZonebooks)}>
+          Log Temp Readers with Pool
+        </Button>
+        {/* <Button onClick={() => console.log(selectedMeterReaderPool)}>Log Pool</Button> */}
 
         <Command className="flex h-full flex-col gap-2 overflow-y-auto">
           <div className="grid w-full grid-cols-3 items-end gap-2">

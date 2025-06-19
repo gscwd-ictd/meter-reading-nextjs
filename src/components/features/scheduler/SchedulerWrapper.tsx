@@ -20,7 +20,7 @@ export default function SchedulerWrapper() {
           </div>
         }
       >
-        <Scheduler holidays={holidays} />
+        <Scheduler />
       </Suspense>
     </div>
   );

@@ -81,7 +81,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     if (editMeterReaderDialogIsOpen) {
       //! Temporary only, use find but replace it later with /findbyid
       const tempSelectedMeterReader = meterReaders.find(
-        (meterReader) => meterReader.employeeId === selectedMeterReader?.employeeId,
+        (meterReader) => meterReader.meterReaderId === selectedMeterReader?.meterReaderId,
       );
 
       setSelectedMeterReader(tempSelectedMeterReader);
