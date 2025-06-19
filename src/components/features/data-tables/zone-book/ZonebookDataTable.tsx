@@ -9,11 +9,11 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
 export const ZonebookDataTable: FunctionComponent = () => {
-  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
   const setZonebooks = useZonebookStore((state) => state.setZonebooks);
 
   const { data } = useQuery({
-    queryKey: ["get-all-zonebooks"],
+    queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
 
@@ -21,7 +21,7 @@ export const ZonebookDataTable: FunctionComponent = () => {
     },
   });
 
-  const zonebookColumns = useZonebookColumns(zonebooks);
+  const zonebookColumns = useZonebookColumns(zoneBooks);
 
   useEffect(() => {
     if (data) setZonebooks(data);
@@ -35,7 +35,7 @@ export const ZonebookDataTable: FunctionComponent = () => {
     );
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={zonebooks ? zonebooks : []} columns={zonebookColumns} />
+      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} />
     </Suspense>
   );
 };

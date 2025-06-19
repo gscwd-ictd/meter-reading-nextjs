@@ -34,10 +34,10 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
   }, [deleteMeterReaderDialogIsOpen, selectedMeterReader]);
 
   //! REPLACE THIS WITH ROUTE
-  const onDelete = (meterReaderEmployeeId: string) => {
+  const onDelete = (meterReaderId: string) => {
     // delete one and return the remaining meter readers
     const remainingMeterReaders = meterReaders.filter(
-      (meterReader) => meterReader.employeeId !== meterReaderEmployeeId,
+      (meterReader) => meterReader.meterReaderId !== meterReaderId,
     );
     setMeterReaders(remainingMeterReaders);
   };
@@ -68,7 +68,7 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
           <AlertDialogAction
             className="w-[6rem] bg-red-600"
             onClick={() => {
-              onDelete(selectedMeterReader.employeeId);
+              onDelete(selectedMeterReader.meterReaderId);
               toast.success("Success", {
                 description: `Successfully Removed ${selectedMeterReader.name} from the list of meter readers!`,
                 position: "top-right",

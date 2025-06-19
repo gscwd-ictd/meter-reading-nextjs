@@ -6,7 +6,7 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@mr/components/ui/ContextMenu";
-import { getDate, isSameDay, isSameMonth, isSaturday, isSunday, startOfMonth } from "date-fns";
+import { isSameDay, isSameMonth, isSaturday, isSunday, startOfMonth } from "date-fns";
 import { SquarePenIcon, SquareSplitHorizontalIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
@@ -35,7 +35,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
   const dateIsSunday = isSunday(entry.readingDate);
   const dateIsSaturday = isSaturday(entry.readingDate);
   const hasSchedule = entry.meterReaders?.find(
-    (mr) => Array.isArray(mr.zonebooks) && mr.zonebooks.length > 0,
+    (mr) => Array.isArray(mr.zoneBooks) && mr.zoneBooks.length > 0,
   );
 
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);

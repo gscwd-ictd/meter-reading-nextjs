@@ -52,14 +52,14 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         employeeId: selectedMeterReader?.employeeId!,
         photoUrl: selectedMeterReader?.photoUrl!,
         restDay: selectedRestDay,
-        zonebooks: meterReaderZonebooks,
+        zoneBooks: meterReaderZonebooks,
         assignment: selectedMeterReader?.assignment!,
       });
 
       setMeterReaders(
         meterReaders.map((meterReader) => {
-          if (meterReader.employeeId) {
-            return { ...meterReader, restDay: selectedRestDay, zonebooks: meterReaderZonebooks };
+          if (meterReader.meterReaderId) {
+            return { ...meterReader, restDay: selectedRestDay, zoneBooks: meterReaderZonebooks };
           }
           return meterReader;
         }),
@@ -86,7 +86,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
       setSelectedMeterReader(tempSelectedMeterReader);
 
-      setMeterReaderZonebooks(tempSelectedMeterReader?.zonebooks!);
+      setMeterReaderZonebooks(tempSelectedMeterReader?.zoneBooks!);
 
       setSelectedRestDay(tempSelectedMeterReader?.restDay);
     }

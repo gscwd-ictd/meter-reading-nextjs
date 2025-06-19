@@ -18,7 +18,7 @@ export const EditMeterReaderTabs: FunctionComponent = () => {
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["get-all-zonebooks"],
+    queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);

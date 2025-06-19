@@ -3,7 +3,7 @@ import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 
 export const useGetCurrentMeterReadersZonebooks = () => {
-  // set the default zonebooks for the month
+  // set the default zoneBooks for the month
   const defaultZonebooks = (
     schedule: MeterReadingEntryWithZonebooks[],
   ): MeterReaderWithDesignatedZonebooks[] => {
@@ -13,8 +13,8 @@ export const useGetCurrentMeterReadersZonebooks = () => {
       if (!entry.meterReaders) continue;
 
       for (const reader of entry.meterReaders) {
-        // Skip if no zonebooks
-        if (!reader.zonebooks || reader.zonebooks.length === 0) continue;
+        // Skip if no zoneBooks
+        if (!reader.zoneBooks || reader.zoneBooks.length === 0) continue;
 
         const key = `${reader.meterReaderId}-${reader.companyId}-${reader.assignment}`;
 
@@ -27,29 +27,29 @@ export const useGetCurrentMeterReadersZonebooks = () => {
         if (!map.has(key)) {
           map.set(key, {
             meterReaderId: reader.meterReaderId!,
-            zonebooks: {
+            zoneBooks: {
               assigned: [],
-              unassigned: [...reader.zonebooks],
+              unassigned: [...reader.zoneBooks],
             },
           });
         } else {
           const existing = map.get(key)!;
-          existing.zonebooks.unassigned.push(...reader.zonebooks);
+          existing.zoneBooks.unassigned.push(...reader.zoneBooks);
         }
       }
     }
 
-    // Optionally deduplicate zonebooks per reader
+    // Optionally deduplicate zoneBooks per reader
     return Array.from(map.values()).map((reader) => ({
       ...reader,
-      zonebooks: {
-        assigned: dedupeZonebooks(reader.zonebooks.assigned),
-        unassigned: dedupeZonebooks(reader.zonebooks.unassigned),
+      zoneBooks: {
+        assigned: dedupeZonebooks(reader.zoneBooks.assigned),
+        unassigned: dedupeZonebooks(reader.zoneBooks.unassigned),
       },
     }));
   };
 
-  // get the current zonebooks for the month
+  // get the current zoneBooks for the month
   const currentZonebooks = (
     schedule: MeterReadingEntryWithZonebooks[],
     defaults: MeterReaderWithDesignatedZonebooks[],
@@ -61,32 +61,32 @@ export const useGetCurrentMeterReadersZonebooks = () => {
       if (!entry.meterReaders) continue;
 
       for (const reader of entry.meterReaders) {
-        // Skip if no zonebooks
-        if (!reader.zonebooks || reader.zonebooks.length === 0) continue;
+        // Skip if no zoneBooks
+        if (!reader.zoneBooks || reader.zoneBooks.length === 0) continue;
 
         const key = `${reader.meterReaderId}`;
 
         if (!map.has(key)) {
           map.set(key, {
             meterReaderId: reader.meterReaderId!,
-            zonebooks: {
-              assigned: [...reader.zonebooks],
+            zoneBooks: {
+              assigned: [...reader.zoneBooks],
               unassigned: [],
             },
           });
         } else {
           const existing = map.get(key)!;
-          existing.zonebooks.assigned.push(...reader.zonebooks);
+          existing.zoneBooks.assigned.push(...reader.zoneBooks);
         }
       }
     }
 
-    // Optionally deduplicate zonebooks per reader
+    // Optionally deduplicate zoneBooks per reader
     const current = Array.from(map.values()).map((reader) => ({
       ...reader,
-      zonebooks: {
-        assigned: dedupeZonebooks(reader.zonebooks.assigned),
-        unassigned: dedupeZonebooks(reader.zonebooks.unassigned),
+      zoneBooks: {
+        assigned: dedupeZonebooks(reader.zoneBooks.assigned),
+        unassigned: dedupeZonebooks(reader.zoneBooks.unassigned),
       },
     }));
 
@@ -94,15 +94,15 @@ export const useGetCurrentMeterReadersZonebooks = () => {
     return defaults.map((defaultReader) => {
       const matchedReader = current.find((c) => c.meterReaderId === defaultReader.meterReaderId);
 
-      const assigned = matchedReader?.zonebooks.assigned ?? [];
+      const assigned = matchedReader?.zoneBooks.assigned ?? [];
 
       // Zonebooks from default unassigned not yet assigned
-      const unassignedFromDefault = defaultReader.zonebooks.unassigned.filter(
+      const unassignedFromDefault = defaultReader.zoneBooks.unassigned.filter(
         (zb) => !assigned.some((a) => a.zoneBook === zb.zoneBook),
       );
 
       // Zonebooks from default previously assigned but now missing → push back to unassigned
-      const missingFromPreviousAssigned = defaultReader.zonebooks.assigned.filter(
+      const missingFromPreviousAssigned = defaultReader.zoneBooks.assigned.filter(
         (zb) => !assigned.some((a) => a.zoneBook === zb.zoneBook),
       );
 
@@ -110,7 +110,7 @@ export const useGetCurrentMeterReadersZonebooks = () => {
 
       return {
         meterReaderId: defaultReader.meterReaderId,
-        zonebooks: {
+        zoneBooks: {
           assigned,
           unassigned,
         },
@@ -118,11 +118,11 @@ export const useGetCurrentMeterReadersZonebooks = () => {
     });
   };
 
-  const dedupeZonebooks = (zonebooks: ZonebookWithDates[]): ZonebookWithDates[] => {
+  const dedupeZonebooks = (zoneBooks: ZonebookWithDates[]): ZonebookWithDates[] => {
     const seen = new Set<string>();
     const result: ZonebookWithDates[] = [];
 
-    for (const zb of zonebooks) {
+    for (const zb of zoneBooks) {
       const key = zb.zoneBook; // you can enhance this with more fields if needed
       if (!seen.has(key)) {
         seen.add(key);

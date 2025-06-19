@@ -265,7 +265,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
   }, [
     currentDate,
     // isRestDay,
-    adjustForHolidayOrWeekend,
+    adjustForHoliday,
     isHoliday,
   ]);
 
@@ -439,7 +439,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
       const transformMeterReaders: MeterReaderWithZonebooks[] = meterReaders.map((mr) => {
         return {
           ...mr,
-          zonebooks: mr.zonebooks.map((zb) => {
+          zoneBooks: mr.zoneBooks.map((zb) => {
             return { ...zb, dueDate: undefined, disconnectionDate: undefined };
           }),
         };

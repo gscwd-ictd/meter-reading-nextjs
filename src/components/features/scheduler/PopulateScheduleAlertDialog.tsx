@@ -18,6 +18,8 @@ import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -30,10 +32,18 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
-  const meterReaders = useMeterReadersStore((state) => state.meterReaders);
+
   const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
     (state) => state.setMeterReadersWithDesignatedZonebooks,
   );
+
+  const { data: meterReaders } = useQuery({
+    queryKey: ["get-all-meter-readers"],
+    queryFn: async () => {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
+      return res.data;
+    },
+  });
 
   const getMeterReaderZonebooks = useGetCurrentMeterReadersZonebooks();
 
@@ -41,7 +51,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          disabled={meterReaders.length < 1 || !scheduleHasSplittedDates ? true : false}
+          disabled={(meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates ? true : false}
           className="dark:text-white"
         >
           <CalendarPlus />
@@ -52,7 +62,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         <AlertDialogHeader>
           <AlertDialogTitle>Populate this month&apos;s schedule with meter readers?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will populate all meter readers with their respective rest days and default zonebooks for
+            This will populate all meter readers with their respective rest days and default zoneBooks for
             this month.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -63,13 +73,13 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
             onClick={() => {
               const newSchedule = scheduler.assignMeterReaders(schedule, meterReaders);
 
-              // assign an empty array to zonebooks to initialize
+              // assign an empty array to zoneBooks to initialize
               setCurrentSchedule(
                 newSchedule.map((sched) => {
                   return {
                     ...sched,
                     meterReaders: sched.meterReaders?.map((mr) => {
-                      return { ...mr, zonebooks: [] };
+                      return { ...mr, zoneBooks: [] };
                     }),
                   };
                 }),

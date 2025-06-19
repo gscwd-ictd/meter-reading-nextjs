@@ -2,8 +2,8 @@ import { Zonebook } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
 type ZonebookStore = {
-  zonebooks: Zonebook[];
-  setZonebooks: (zonebooks: Zonebook[]) => void;
+  zoneBooks: Zonebook[];
+  setZonebooks: (zoneBooks: Zonebook[]) => void;
   filteredZonebooks: Zonebook[];
   setFilteredZonebooks: (filteredZonebooks: Zonebook[]) => void;
   meterReaderZonebooks: Zonebook[];
@@ -15,7 +15,7 @@ type ZonebookStore = {
 };
 
 export const useZonebookStore = create<ZonebookStore>((set) => ({
-  // zonebooks: defaultValues.zonebooks.sort((a, b) => {
+  // zoneBooks: defaultValues.zoneBooks.sort((a, b) => {
   //   const getLeadingNumber = (str: string) => {
   //     const match = str.match(/^(\d+)-/);
   //     return match ? parseInt(match[1], 10) : Infinity;
@@ -27,9 +27,9 @@ export const useZonebookStore = create<ZonebookStore>((set) => ({
   //   return a.zoneBook.localeCompare(b.zoneBook);
   // }),
 
-  zonebooks: [],
+  zoneBooks: [],
 
-  setZonebooks: (zonebooks) => set({ zonebooks }),
+  setZonebooks: (zoneBooks) => set({ zoneBooks }),
 
   filteredZonebooks: [],
   setFilteredZonebooks: (filteredZonebooks) => set({ filteredZonebooks }),

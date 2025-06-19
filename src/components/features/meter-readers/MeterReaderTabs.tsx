@@ -9,31 +9,50 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FunctionComponent, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Zonebook } from "@mr/lib/types/zonebook";
 
-export const MeterReaderTabs: FunctionComponent = () => {
+type MeterReaderTabsProps = {
+  open: boolean;
+};
+
+export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ open }) => {
   const [hasSetInitialZonebookPool, setHasSetInitialZonebookPool] = useState<boolean>(false);
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
   const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
-  const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["get-all-zonebooks"],
+    queryKey: ["get-all-unassigned-zoneBooks"],
     queryFn: async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
-        return res.data;
+        return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
-        return error;
+        toast.error("Error", { description: JSON.stringify(error) });
       }
     },
     enabled: !hasSetInitialZonebookPool,
   });
 
+  const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
+
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["get-all-zoneBooks"],
+  //   queryFn: async () => {
+  //     try {
+  //       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
+  //       return res.data;
+  //     } catch (error) {
+  //       return error;
+  //     }
+  //   },
+  //   enabled: !hasSetInitialZonebookPool,
+  // });
+
   // this useEffect should only run once and only when
   useEffect(() => {
     if (data && !hasSetInitialZonebookPool) {
-      setFilteredZonebooks(data);
+      setFilteredZonebooks(data.data);
       setHasSetInitialZonebookPool(true);
     }
   }, [data, hasSetInitialZonebookPool, setFilteredZonebooks]);
@@ -103,7 +122,7 @@ export const MeterReaderTabs: FunctionComponent = () => {
                 onClick={() => setZonebookSelectorIsOpen(true)}
                 value={
                   meterReaderZonebooks !== undefined
-                    ? meterReaderZonebooks.map((mrzb) => mrzb.zoneBook)
+                    ? meterReaderZonebooks.map((mrzb: Zonebook) => mrzb.zoneBook)
                     : "Empty"
                 }
               />

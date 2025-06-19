@@ -19,13 +19,13 @@ export default function PersonnelPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Personnel</BreadcrumbPage>
+              <BreadcrumbPage>Meter Readers</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      <h3 className="mt-5 text-xl font-bold">Personnel</h3>
+      <h3 className="mt-5 text-xl font-bold">Meter Readers</h3>
       <div className="text-base font-medium text-gray-400">List of Meter Readers</div>
       <MeterReaderTableComponent />
     </div>

@@ -90,7 +90,13 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
 
   useEffect(() => {
     setTempMeterReadersWithDesignatedZonebooks(meterReadersWithDesignatedZonebooks);
-  }, [scheduleEntryDialogIsOpen, meterReadersWithDesignatedZonebooks]);
+  }, [
+    scheduleEntryDialogIsOpen,
+    meterReadersWithDesignatedZonebooks,
+    setTempMeterReadersWithDesignatedZonebooks,
+  ]);
+
+  const get = useGetCurrentMeterReadersZonebooks();
 
   return (
     <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
@@ -244,7 +250,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             </div>
           </DialogTitle>
           <DialogDescription>
-            <span>List of Meter Readers with their respective zonebooks</span>
+            <span>List of Meter Readers with their respective zoneBooks</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -263,9 +269,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 return entry;
               });
 
-              const get = useGetCurrentMeterReadersZonebooks();
-
-              // this contains the pool of assigned and unassigned zonebooks of all meter readers
+              // this contains the pool of assigned and unassigned zoneBooks of all meter readers
               const currentZonebooks = get.currentZonebooks(
                 updatedCurrentSchedule,
                 meterReadersWithDesignatedZonebooks,

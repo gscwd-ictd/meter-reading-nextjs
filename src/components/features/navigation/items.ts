@@ -45,8 +45,8 @@ export const mainNav: NavItem[] = [
     icon: Package,
   },
   {
-    title: "Personnel",
-    url: "/personnel",
+    title: "Meter Readers",
+    url: "/meter-readers",
     icon: Users2Icon,
   },
   {

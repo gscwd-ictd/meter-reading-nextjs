@@ -23,20 +23,20 @@ export const ZonebookCombobox: FunctionComponent = () => {
   const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const zonebookDialogIsOpen = useSchedulesStore((state) => state.zonebookDialogIsOpen);
-  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
 
   useEffect(() => {
     if (zonebookDialogIsOpen && zonebooksPool.length === 0) {
-      setZonebooksPool(zonebooks);
+      setZonebooksPool(zoneBooks);
     }
-  }, [zonebookDialogIsOpen, zonebooksPool, zonebooks]);
+  }, [zonebookDialogIsOpen, zonebooksPool, zoneBooks]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="flex justify-between">
           {selectedZonebook && selectedZonebook !== null
-            ? zonebooks.find((zb) => zb.zoneBook === selectedZonebook.zoneBook)?.zoneBook
+            ? zoneBooks.find((zb) => zb.zoneBook === selectedZonebook.zoneBook)?.zoneBook
             : "Search zoneBook"}
         </Button>
       </PopoverTrigger>
@@ -44,7 +44,7 @@ export const ZonebookCombobox: FunctionComponent = () => {
         <Command>
           <CommandInput placeholder="Search for a zoneBook..." />
           <CommandList>
-            <CommandEmpty>No zonebooks found.</CommandEmpty>
+            <CommandEmpty>No zoneBooks found.</CommandEmpty>
             <CommandGroup>
               {zonebooksPool &&
                 zonebooksPool.map((zb) => (
