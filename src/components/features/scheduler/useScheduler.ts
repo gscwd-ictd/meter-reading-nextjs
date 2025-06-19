@@ -26,7 +26,6 @@ import {
 } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 type Holiday = {
   id: string;
