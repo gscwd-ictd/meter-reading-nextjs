@@ -3,7 +3,6 @@
 // import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
-import { holidays } from "./holidays";
 import { Suspense } from "react";
 import { Scheduler } from "./Scheduler";
 

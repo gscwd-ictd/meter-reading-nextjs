@@ -144,6 +144,19 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     [isHoliday],
   );
 
+  // add 1 day if the provided date is a holiday
+  const adjustForHoliday = useCallback(
+    (date: Date) => {
+      while (isHoliday(date)) {
+        if (isHoliday(date)) {
+          date = addDays(date, 1);
+        }
+      }
+      return date;
+    },
+    [isHoliday],
+  );
+
   const removeDuplicateDates = useCallback((dates: Date[]) => {
     const uniqueDates = new Map<string, Date>();
 
@@ -232,20 +245,30 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     let startOfReadingDate = monthStart;
 
     //* Use this instead, if starting date requires to skip holidays as well.
-    while (isHoliday(startOfReadingDate) || isSunday(startOfReadingDate)) {
-      startOfReadingDate = adjustForHolidayOrWeekend(startOfReadingDate);
+    while (
+      isHoliday(startOfReadingDate)
+      // || isWeekend(startOfReadingDate)
+    ) {
+      // startOfReadingDate = adjustForHolidayOrWeekend(startOfReadingDate);
+      startOfReadingDate = adjustForHoliday(startOfReadingDate);
     }
 
-    if (isSunday(startOfReadingDate)) {
-      startOfReadingDate = nextMonday(startOfReadingDate);
-    }
+    // if (isSunday(startOfReadingDate)) {
+    //   startOfReadingDate = nextMonday(startOfReadingDate);
+    // }
 
-    while (isRestDay(startOfReadingDate)) {
-      startOfReadingDate = addDays(startOfReadingDate, 1);
-    }
-
+    // while (isRestDay(startOfReadingDate)) {
+    //   startOfReadingDate = addDays(startOfReadingDate, 1);
+    // }
+    console.log("MonthStart: ", monthStart);
+    console.log("Start of reading date: ", startOfReadingDate);
     return { monthStart, startOfReadingDate };
-  }, [currentDate, isRestDay, adjustForHolidayOrWeekend, isHoliday]);
+  }, [
+    currentDate,
+    // isRestDay,
+    adjustForHolidayOrWeekend,
+    isHoliday,
+  ]);
 
   const calculateDueDates = useCallback((): DueDate[] => {
     const { monthStart, startOfReadingDate } = getStartingReadingDate();
