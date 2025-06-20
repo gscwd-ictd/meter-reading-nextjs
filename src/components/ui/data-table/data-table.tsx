@@ -150,7 +150,8 @@ export function DataTable<T>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   <div className="flex w-full items-center justify-center gap-2">
-                    <LoadingSpinner /> <span className="text-lg">Loading data...</span>
+                    <LoadingSpinner className="text-primary" />{" "}
+                    <span className="text-primary text-lg">Loading data...</span>
                   </div>
                 </TableCell>
               </TableRow>

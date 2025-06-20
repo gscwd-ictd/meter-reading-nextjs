@@ -259,8 +259,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     // while (isRestDay(startOfReadingDate)) {
     //   startOfReadingDate = addDays(startOfReadingDate, 1);
     // }
-    console.log("MonthStart: ", monthStart);
-    console.log("Start of reading date: ", startOfReadingDate);
+
     return { monthStart, startOfReadingDate };
   }, [
     currentDate,

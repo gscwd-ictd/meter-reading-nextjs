@@ -9,6 +9,9 @@ type MeterReadersStore = {
   selectedMeterReader: MeterReader | undefined;
   setSelectedMeterReader: (selectedMeterReader: MeterReader | undefined) => void;
 
+  mobileNumber: string | undefined;
+  setMobileNumber: (mobileNumber: string | undefined) => void;
+
   selectedRestDay: "sunday" | "saturday" | undefined;
   setSelectedRestDay: (selectedRestDay: "sunday" | "saturday" | undefined) => void;
 
@@ -40,4 +43,7 @@ export const useMeterReadersStore = create<MeterReadersStore>((set) => ({
 
   queryPersonnel: "",
   setQueryPersonnel: (queryPersonnel) => set({ queryPersonnel }),
+
+  mobileNumber: undefined,
+  setMobileNumber: (mobileNumber) => set({ mobileNumber }),
 }));

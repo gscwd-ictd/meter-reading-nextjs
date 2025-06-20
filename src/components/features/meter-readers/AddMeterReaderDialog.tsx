@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
 import { Button } from "@mr/components/ui/Button";
@@ -12,17 +11,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
-import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
+import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { PlusCircleIcon, Users2Icon } from "lucide-react";
 import { MeterReaderTabs } from "./MeterReaderTabs";
 import { SearchPersonnelCombobox } from "./SearchPersonnelCombobox";
-import { Employee } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import axios from "axios";
+import { z } from "zod";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type AddMeterReaderDialogProps = {
   addMeterReaderDialogIsOpen: boolean;
@@ -35,7 +36,24 @@ type SubmitEmployeeType = {
   employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
+  mobileNumber: string;
 };
+
+const meterReaderSchema = z.object({
+  employeeId: z.string().optional(),
+  mobileNumber: z.string().regex(/^\d{10}$/, {
+    message: "Mobile number must be exactly 10 digits",
+  }),
+  zoneBooks: z.array(
+    z.object({
+      zone: z.string(),
+      book: z.string(),
+    }),
+  ),
+  restDay: z.string().optional(),
+});
+
+type MeterReaderType = z.infer<typeof meterReaderSchema>;
 
 export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> = ({
   addMeterReaderDialogIsOpen,
@@ -48,12 +66,47 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
+  const setMobileNumber = useMeterReadersStore((state) => state.setMobileNumber);
+  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
+  const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
+  const [hasSetInitialZonebookPool, setHasSetInitialZonebookPool] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
 
-  const transformSelectedPersonnelToSubmit = async (personnel: Employee): Promise<SubmitEmployeeType> => {
+  const methods = useForm<MeterReaderType>({
+    resolver: zodResolver(meterReaderSchema),
+    reValidateMode: "onChange",
+    defaultValues: { employeeId: undefined, mobileNumber: "", restDay: undefined, zoneBooks: [] },
+  });
+
+  const { handleSubmit, reset } = methods;
+
+  const resetToDefaults = () => {
+    reset();
+    setMobileNumber(undefined);
+    setSelectedEmployee(undefined);
+    setSelectedRestDay(undefined);
+    setMeterReaderZonebooks([]);
+  };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["get-all-unassigned-zoneBooks"],
+    queryFn: async () => {
+      try {
+        return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
+      } catch (error) {
+        toast.error("Error", { description: JSON.stringify(error) });
+      }
+    },
+    enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
+  });
+
+  const transformSelectedPersonnelToSubmit = async (
+    employee: MeterReaderType,
+  ): Promise<SubmitEmployeeType> => {
     return {
-      employeeId: personnel.employeeId,
+      employeeId: employee.employeeId!,
+      mobileNumber: `+63${employee.mobileNumber}`,
       restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReaderZonebooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -61,20 +114,20 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     };
   };
 
+  // post
   const personnelMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (employee: MeterReaderType) => {
       try {
-        const employee = await transformSelectedPersonnelToSubmit(selectedEmployee!);
-        return await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers`, employee);
+        const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...employee });
+
+        return await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers`, transformedEmployee);
       } catch (error) {
         toast.error("Error", { description: JSON.stringify(error) });
       }
     },
     onSuccess: async () => {
       setAddMeterReaderDialogIsOpen(false);
-      setSelectedRestDay(undefined);
-      setMeterReaderZonebooks([]);
-      // const fetchMeterReaders = queryClient.getQueryData(["get-all-meter-readers"]);
+      resetToDefaults();
 
       const fetchMeterReaders = await axios.get(
         `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`,
@@ -89,23 +142,27 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     },
   });
 
-  const submitPersonnel = () => {
+  // submit
+  const submitPersonnel = (employee: MeterReaderType) => {
     if (selectedRestDay !== undefined && selectedRestDay) {
-      personnelMutation.mutateAsync();
+      personnelMutation.mutateAsync(employee);
     } else toast.error("No rest day", { description: "Please select a rest day", position: "top-right" });
   };
 
-  // set the selected employee to undefined when the modal is closed
   useEffect(() => {
-    if (addMeterReaderDialogIsOpen) setSelectedEmployee(undefined);
-  }, [addMeterReaderDialogIsOpen, setSelectedEmployee]);
+    if (data && !hasSetInitialZonebookPool) {
+      setFilteredZonebooks(data.data);
+      setTempFilteredZonebooks(data.data);
+      setHasSetInitialZonebookPool(true);
+    }
+  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks]);
 
   return (
     <Dialog
       open={addMeterReaderDialogIsOpen}
       onOpenChange={() => {
         setAddMeterReaderDialogIsOpen(!addMeterReaderDialogIsOpen);
-        setMeterReaderZonebooks([]);
+        resetToDefaults();
       }}
       modal
     >
@@ -128,10 +185,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
 
           <DialogDescription className="text-gray-500">Add employee as a meter reader</DialogDescription>
         </DialogHeader>
-        <div className="">
-          <SearchPersonnelCombobox />
-          <MeterReaderTabs open={addMeterReaderDialogIsOpen} />
-        </div>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(submitPersonnel)} id="add-meter-reader-form">
+            <SearchPersonnelCombobox />
+            <MeterReaderTabs loading={isLoading} />
+          </form>
+        </FormProvider>
 
         <DialogFooter className="grid grid-cols-2">
           <DialogClose asChild>
@@ -140,14 +199,19 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
               variant="outline"
               onClick={() => {
                 setAddMeterReaderDialogIsOpen(false);
-                setSelectedEmployee({} as Employee);
+                resetToDefaults();
               }}
             >
               Cancel
             </Button>
           </DialogClose>
 
-          <Button size="lg" disabled={!selectedEmployee ? true : false} onClick={submitPersonnel}>
+          <Button
+            size="lg"
+            disabled={!selectedEmployee ? true : false}
+            type="submit"
+            form="add-meter-reader-form"
+          >
             Add
           </Button>
         </DialogFooter>

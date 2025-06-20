@@ -21,11 +21,12 @@ type MeterReaderRowActionsProps = {
 
 export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps> = ({ meterReader }) => {
   const [editMeterReaderDialogIsOpen, setEditMeterReaderDialogIsOpen] = useState<boolean>(false);
+  const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
 
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={dropdownIsOpen} onOpenChange={setDropdownIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="data-[state=open]:bg-muted flex h-8 w-8 p-0">
           <div className="hidden sm:hidden md:block lg:block">
@@ -39,8 +40,9 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem
-          onClick={() => {
+          onSelect={() => {
             setSelectedMeterReader(meterReader);
+            setDropdownIsOpen(false);
           }}
           className="cursor-pointer"
           asChild
@@ -53,7 +55,12 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
           />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem
+          asChild
+          onSelect={() => {
+            setDropdownIsOpen(false);
+          }}
+        >
           <DeleteMeterReaderDialog selectedMeterReader={meterReader} />
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
@@ -22,20 +22,18 @@ import {
 } from "@mr/components/ui/Dialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
+import { useFormContext } from "react-hook-form";
 
 type Props = {
-  isLoading: boolean;
+  loading: boolean;
   onSelectionChange?: (zone: string, book: string) => void;
 };
 
-export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props) {
+export default function ZoneBookSelector({ onSelectionChange, loading }: Props) {
   const [selectedZone, setSelectedZone] = useState<string>("");
   const [selectedBook, setSelectedBook] = useState<string>("");
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
-
-  const filteredZonebooks = useZonebookStore((state) => state.filteredZonebooks);
-  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
 
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
@@ -44,21 +42,25 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const setSelectedZonebook = useZonebookStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
+  const tempFilteredZonebooks = useZonebookStore((state) => state.tempFilteredZonebooks);
+  const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
 
   const zoneBookSorter = (zoneBooks: Zonebook[]) => ZonebookFlatSorter(zoneBooks);
 
+  const { setValue } = useFormContext();
+
   const zones = useMemo(() => {
-    if (filteredZonebooks && filteredZonebooks.length > 0) {
-      const allZones = filteredZonebooks.map((zb) => zb.zone);
+    if (tempFilteredZonebooks && tempFilteredZonebooks.length > 0) {
+      const allZones = tempFilteredZonebooks.map((zb) => zb.zone);
       return Array.from(new Set(allZones));
     }
-  }, [filteredZonebooks]);
+  }, [tempFilteredZonebooks]);
 
   const booksForZone = useMemo(() => {
     if (!selectedZone) return [];
-    const books = filteredZonebooks.filter((zb) => zb.zone === selectedZone).map((zb) => zb.book);
+    const books = tempFilteredZonebooks.filter((zb) => zb.zone === selectedZone).map((zb) => zb.book);
     return Array.from(new Set(books));
-  }, [selectedZone, filteredZonebooks]);
+  }, [selectedZone, tempFilteredZonebooks]);
 
   const handleZoneSelect = (zone: string) => {
     setSelectedZone(zone);
@@ -70,9 +72,9 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   const handleBookSelect = (book: string) => {
     setSelectedBook(book);
 
-    filteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book);
+    tempFilteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book);
 
-    setSelectedZonebook(filteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book)!);
+    setSelectedZonebook(tempFilteredZonebooks.find((zb) => zb.zone === selectedZone && zb.book === book)!);
 
     onSelectionChange?.(selectedZone, book);
   };
@@ -85,9 +87,9 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
   };
 
   const getNewFilteredZonebooks = async (selectedZonebook: Zonebook): Promise<Zonebook[]> => {
-    const tempFilteredZonebooks = filteredZonebooks.filter((zb) => zb !== selectedZonebook);
+    const newFilteredZonebooks = tempFilteredZonebooks.filter((zb) => zb !== selectedZonebook);
 
-    return tempFilteredZonebooks.map((zb) => {
+    return newFilteredZonebooks.map((zb) => {
       return { ...zb, disconnectionDate: undefined!, dueDate: undefined! };
     });
   };
@@ -106,9 +108,9 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
         <div role="button" className="text-primary flex items-center gap-1">
           <Label
             htmlFor="zoneBooks"
-            className="text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
+            className="gap-1 text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
           >
-            Zonebooks
+            Zonebooks <span className="text-red-600">*</span>
           </Label>
           <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
         </div>
@@ -226,8 +228,11 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
 
                 setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
 
-                const news = await getNewFilteredZonebooks(selectedZonebook!);
-                setFilteredZonebooks(zoneBookSorter(news));
+                const newZonebooks = await getNewFilteredZonebooks(selectedZonebook!);
+
+                setTempFilteredZonebooks(ZonebookFlatSorter(newZonebooks));
+
+                setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
 
                 setSelectedBook("");
                 setSelectedZone("");
@@ -239,7 +244,7 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
             </Button>
           </div>
 
-          {isLoading ? (
+          {loading ? (
             <div className="text-primary flex h-full w-full items-center justify-center">
               <LoadingSpinner /> Loading zoneBooks...
             </div>
@@ -248,13 +253,13 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
               className="h-[8rem] overflow-auto rounded border"
               onWheel={(e) => e.stopPropagation()}
             >
-              {!selectedZone && !selectedBook && !filteredZonebooks && isLoading ? (
+              {!selectedZone && !selectedBook && !tempFilteredZonebooks && loading ? (
                 <div>
                   <LoadingSpinner />
                 </div>
-              ) : !selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
-                filteredZonebooks.length > 0 &&
-                filteredZonebooks.map((zb, idx) => (
+              ) : !selectedZone && !selectedBook && tempFilteredZonebooks && !loading ? (
+                tempFilteredZonebooks.length > 0 &&
+                tempFilteredZonebooks.map((zb, idx) => (
                   <CommandItem
                     key={idx}
                     value={selectedZonebook?.zoneBook}
@@ -266,8 +271,8 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                     <span className="col-span-9 font-medium text-black">{zb.area}</span>
                   </CommandItem>
                 ))
-              ) : selectedZone && !selectedBook && filteredZonebooks && !isLoading ? (
-                filteredZonebooks
+              ) : selectedZone && !selectedBook && tempFilteredZonebooks && !loading ? (
+                tempFilteredZonebooks
                   .filter((zb) => zb.zone === selectedZone)
                   .map((zb, idx) => (
                     <CommandItem
@@ -281,8 +286,8 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                       <span className="col-span-9 font-medium text-black">{zb.area}</span>
                     </CommandItem>
                   ))
-              ) : selectedZone && selectedBook && filteredZonebooks && !isLoading ? (
-                filteredZonebooks
+              ) : selectedZone && selectedBook && tempFilteredZonebooks && !loading ? (
+                tempFilteredZonebooks
                   .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
                   .map((zb, idx) => (
                     <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
@@ -297,7 +302,6 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
             </CommandGroup>
           )}
         </Command>
-
         <div className="flex flex-col gap-1">
           <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
           <div className="h-[16rem] overflow-auto rounded border p-0">
@@ -332,10 +336,12 @@ export default function ZoneBookSelector({ onSelectionChange, isLoading }: Props
                             );
                             setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
 
-                            const newFilteredZonebooks = [...filteredZonebooks];
+                            const newFilteredZonebooks = [...tempFilteredZonebooks];
                             newFilteredZonebooks.unshift(entry);
 
-                            setFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
+                            setValue("zoneBooks", newFilteredZonebooks);
+
+                            setTempFilteredZonebooks(zoneBookSorter(newMeterReaderZonebooks));
                           }}
                         >
                           <CircleXIcon className="fill-red-600 text-white" />

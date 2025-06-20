@@ -44,6 +44,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
 
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+  const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
 
   // get the reading date where it is the first day of duty of the month
   const firstReadingDate = currentSchedule.find((entry) => entry.dueDate !== undefined)?.readingDate;
@@ -81,7 +82,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
         avoidCollisions
         alignOffset={10}
       >
-        {!dateIsSunday && !dayIsFirstReadingDateOfTheMonth && (
+        {!dateIsSunday && !dayIsFirstReadingDateOfTheMonth && !hasPopulatedMeterReaders && (
           <>
             <ContextMenuItem
               className="hover:cursor-pointer"
