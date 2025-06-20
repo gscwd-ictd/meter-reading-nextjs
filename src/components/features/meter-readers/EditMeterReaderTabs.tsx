@@ -4,9 +4,7 @@ import { Input } from "@mr/components/ui/Input";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import ZoneBookSelector from "../zonebook/ZonebookSelector";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent } from "react";
 import { useFormContext } from "react-hook-form";
 import { EditSelectRestDayCombobox } from "./EditSelectRestDayCombobox";
 import { FormInput } from "@mr/components/ui/FormInput";
@@ -17,7 +15,6 @@ type EditMeterReaderTabsProps = {
 
 export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = ({ loading }) => {
   const selectedMeterReader = useMeterReadersStore((state) => state.selectedMeterReader);
-  const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
   const mobileNumber = useMeterReadersStore((state) => state.mobileNumber);
