@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
 import { Button } from "@mr/components/ui/Button";
@@ -14,7 +13,7 @@ import {
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { SquarePenIcon, Users2Icon } from "lucide-react";
-import { Employee, MeterReader } from "@mr/lib/types/personnel";
+import { MeterReader } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { EditMeterReaderTabs } from "./EditMeterReaderTabs";
@@ -102,10 +101,10 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   };
 
   // post
-  const personnelMutation = useMutation({
-    mutationFn: async (employee: MeterReaderType) => {
+  const meterReaderMutation = useMutation({
+    mutationFn: async (meterReader: MeterReaderType) => {
       try {
-        const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...employee });
+        const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
 
         return await axios.put(
           `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${transformedEmployee}`,
@@ -132,7 +131,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     },
   });
 
-  const submitPersonnel = () => {
+  const submitMeterReader = (meterReader: MeterReaderType) => {
     if (selectedRestDay !== undefined && selectedRestDay) {
       // setSelectedMeterReader({
       //   ...selectedMeterReader,
@@ -146,6 +145,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       //   zoneBooks: meterReaderZonebooks,
       //   assignment: selectedMeterReader?.assignment!,
       // });
+      meterReaderMutation.mutateAsync(meterReader);
 
       setEditMeterReaderDialogIsOpen(false);
       resetToDefaults();
@@ -200,10 +200,10 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   }, [
     setEditMeterReaderDialogIsOpen,
     setSelectedMeterReader,
+    setMobileNumber,
     editMeterReaderDialogIsOpen,
     selectedMeterReader,
     meterReader,
-
     setMeterReaderZonebooks,
     setSelectedMeterReader,
     setSelectedRestDay,
@@ -216,7 +216,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       setTempFilteredZonebooks(data);
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks]);
+  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
 
   return (
     <Dialog
@@ -247,7 +247,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         </DialogHeader>
         {selectedMeterReader && (
           <FormProvider {...methods}>
-            <form id="edit-meter-reader-form" onSubmit={handleSubmit(submitPersonnel)}>
+            <form id="edit-meter-reader-form" onSubmit={handleSubmit(submitMeterReader)}>
               <EditMeterReaderTabs loading={isLoading} />
             </form>
           </FormProvider>
