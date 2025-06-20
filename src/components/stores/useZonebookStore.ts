@@ -1,0 +1,49 @@
+import { Zonebook } from "@mr/lib/types/zonebook";
+import { create } from "zustand";
+
+type ZonebookStore = {
+  zoneBooks: Zonebook[];
+  setZonebooks: (zoneBooks: Zonebook[]) => void;
+  filteredZonebooks: Zonebook[];
+  setFilteredZonebooks: (filteredZonebooks: Zonebook[]) => void;
+  tempFilteredZonebooks: Zonebook[];
+  setTempFilteredZonebooks: (tempFilteredZonebooks: Zonebook[]) => void;
+  meterReaderZonebooks: Zonebook[];
+  setMeterReaderZonebooks: (meterReaderZonebooks: Zonebook[]) => void;
+  zonebookSelectorIsOpen: boolean;
+  setZonebookSelectorIsOpen: (zonebookSelector: boolean) => void;
+  selectedZonebook: Zonebook | null;
+  setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
+};
+
+export const useZonebookStore = create<ZonebookStore>((set) => ({
+  // zoneBooks: defaultValues.zoneBooks.sort((a, b) => {
+  //   const getLeadingNumber = (str: string) => {
+  //     const match = str.match(/^(\d+)-/);
+  //     return match ? parseInt(match[1], 10) : Infinity;
+  //   };
+  //   const numA = getLeadingNumber(a.zoneBook);
+  //   const numB = getLeadingNumber(b.zoneBook);
+
+  //   if (numA !== numB) return numA - numB;
+  //   return a.zoneBook.localeCompare(b.zoneBook);
+  // }),
+
+  zoneBooks: [],
+  setZonebooks: (zoneBooks) => set({ zoneBooks }),
+
+  filteredZonebooks: [],
+  setFilteredZonebooks: (filteredZonebooks) => set({ filteredZonebooks }),
+
+  tempFilteredZonebooks: [],
+  setTempFilteredZonebooks: (tempFilteredZonebooks) => set({ tempFilteredZonebooks }),
+
+  meterReaderZonebooks: [],
+  setMeterReaderZonebooks: (meterReaderZonebooks) => set({ meterReaderZonebooks }),
+
+  zonebookSelectorIsOpen: false,
+  setZonebookSelectorIsOpen: (zonebookSelectorIsOpen) => set({ zonebookSelectorIsOpen }),
+
+  selectedZonebook: null,
+  setSelectedZonebook: (selectedZonebook) => set({ selectedZonebook }),
+}));
