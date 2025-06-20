@@ -6,6 +6,8 @@ type ZonebookStore = {
   setZonebooks: (zoneBooks: Zonebook[]) => void;
   filteredZonebooks: Zonebook[];
   setFilteredZonebooks: (filteredZonebooks: Zonebook[]) => void;
+  tempFilteredZonebooks: Zonebook[];
+  setTempFilteredZonebooks: (tempFilteredZonebooks: Zonebook[]) => void;
   meterReaderZonebooks: Zonebook[];
   setMeterReaderZonebooks: (meterReaderZonebooks: Zonebook[]) => void;
   zonebookSelectorIsOpen: boolean;
@@ -28,11 +30,13 @@ export const useZonebookStore = create<ZonebookStore>((set) => ({
   // }),
 
   zoneBooks: [],
-
   setZonebooks: (zoneBooks) => set({ zoneBooks }),
 
   filteredZonebooks: [],
   setFilteredZonebooks: (filteredZonebooks) => set({ filteredZonebooks }),
+
+  tempFilteredZonebooks: [],
+  setTempFilteredZonebooks: (tempFilteredZonebooks) => set({ tempFilteredZonebooks }),
 
   meterReaderZonebooks: [],
   setMeterReaderZonebooks: (meterReaderZonebooks) => set({ meterReaderZonebooks }),

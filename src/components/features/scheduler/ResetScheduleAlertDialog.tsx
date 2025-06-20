@@ -27,6 +27,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+  const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
   );
@@ -51,6 +52,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
               setCurrentSchedule(scheduler.calculateSchedule());
               setDatesToSplit([]);
               setScheduleHasSplittedDates(false);
+              setHasPopulatedMeterReaders(false);
               toast.success("Success", {
                 description: "Successfully reset the calendar for this month!",
                 position: "top-right",

@@ -1,4 +1,3 @@
-import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import {
   AlertDialog,
@@ -12,13 +11,13 @@ import {
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { Button } from "@mr/components/ui/Button";
-import { CalendarPlus } from "lucide-react";
+import { CalendarCheck2, CalendarPlus } from "lucide-react";
 import { FunctionComponent } from "react";
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 type PopulateScheduleAlertDialogProps = {
@@ -32,6 +31,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
+  const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
+  const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
 
   const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
     (state) => state.setMeterReadersWithDesignatedZonebooks,
@@ -51,11 +52,17 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          disabled={(meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates ? true : false}
+          disabled={
+            (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+              ? true
+              : hasPopulatedMeterReaders
+                ? true
+                : false
+          }
           className="dark:text-white"
         >
-          <CalendarPlus />
-          Populate schedule
+          {hasPopulatedMeterReaders ? <CalendarCheck2 /> : <CalendarPlus />}
+          {!hasPopulatedMeterReaders ? "Populate schedule" : "Populated Schedule"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -84,6 +91,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
                   };
                 }),
               );
+
+              setHasPopulatedMeterReaders(true);
 
               // this will be the default pool and will always be compared to after applying changes per entry(per day)
               setMeterReadersWithDesignatedZonebooks(getMeterReaderZonebooks.defaultZonebooks(newSchedule));

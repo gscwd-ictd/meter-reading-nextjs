@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
+import { useFormContext } from "react-hook-form";
 
 export const SearchPersonnelCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -29,12 +30,17 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
   const debouncedSearchEmployee = useDebounce(searchEmployee, 1500);
 
   const setSelectedEmployee = useMeterReadersStore((state) => state.setSelectedEmployee);
+  const setMobileNumber = useMeterReadersStore((state) => state.setMobileNumber);
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
-  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
+
+  const filteredZonebooks = useZonebookStore((state) => state.filteredZonebooks);
+  const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
   const setZonebooks = useZonebookStore((state) => state.setZonebooks);
+
+  const { setValue } = useFormContext();
 
   const {
     data: employees,
@@ -104,19 +110,25 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
               <CommandGroup>
                 {employees?.data.map((employee: Employee, index: number) => (
                   <CommandItem
-                    key={employee.companyId}
+                    key={employee.employeeId}
                     value={employee.name}
                     onSelect={(currentValue) => {
-                      if (employee.companyId === selectedEmployee?.companyId) {
-                        const tempZonebooks = [...zoneBooks];
-                        tempZonebooks.concat(meterReaderZonebooks);
+                      if (employee.employeeId === selectedEmployee?.employeeId) {
+                        // this block removes all the selected values if the same employee is being selected in the dropdown
 
+                        setValue("mobileNumber", undefined);
                         setSelectedEmployee(undefined);
-                        setZonebooks(ZonebookFlatSorter(tempZonebooks));
-                        setMeterReaderZonebooks([]);
+                        setZonebooks(ZonebookFlatSorter(meterReaderZonebooks));
                       } else {
+                        // this block sets the employee if the same employee is not selected
                         setSelectedEmployee(employee);
+                        setValue("employeeId", employee.employeeId);
                       }
+                      setTempFilteredZonebooks(ZonebookFlatSorter(filteredZonebooks));
+                      setMobileNumber(undefined);
+                      setValue("mobileNumber", undefined);
+                      setMeterReaderZonebooks([]);
+                      setValue("restDay", undefined);
                       setSelectedRestDay(undefined);
                       setSearchEmployee(currentValue === searchEmployee ? "" : currentValue);
                       setOpen(false);

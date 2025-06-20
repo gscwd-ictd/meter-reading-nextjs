@@ -8,21 +8,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popov
 import { CommandList } from "cmdk";
 import { Check, CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 const restDays = [
   { label: "Sunday", value: "sunday" },
   { label: "Saturday", value: "saturday" },
 ];
 
-export const SelectRestDayCombobox: FunctionComponent = () => {
+export const EditSelectRestDayCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const selectedRestDay = useMeterReadersStore((state) => state.selectedRestDay);
 
+  const { setValue } = useFormContext();
+
   return (
     <div className="w-full items-center">
-      <Label id="select-rest-day" className="text-sm font-medium text-gray-700">
-        Rest Day
+      <Label id="select-rest-day" className="gap-1 text-sm font-medium text-gray-700">
+        Rest Day <span className="text-red-600">*</span>
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -38,7 +41,7 @@ export const SelectRestDayCombobox: FunctionComponent = () => {
             <ChevronsUpDownIcon />
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start">
+        <PopoverContent align="start" className="p-1">
           <Command>
             <CommandList>
               {restDays.map((restDay) => (
@@ -47,6 +50,7 @@ export const SelectRestDayCombobox: FunctionComponent = () => {
                   onSelect={() => {
                     setSelectedRestDay(restDay.value === "sunday" ? "sunday" : "saturday");
                     setOpen(false);
+                    setValue("restDay", restDay.value === "sunday" ? "sunday" : "saturday");
                   }}
                 >
                   {restDay.label}

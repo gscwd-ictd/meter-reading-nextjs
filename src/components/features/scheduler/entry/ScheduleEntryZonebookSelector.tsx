@@ -77,7 +77,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
 
     if (!zonebooksByMeterReaderId) return [];
     return zonebooksByMeterReaderId;
-  }, [tempMeterReadersWithDesignatedZonebooks]);
+  }, [tempMeterReadersWithDesignatedZonebooks, selectedMeterReader]);
 
   // this should be the filtered pool, all assigned zoneBooks minus the currently selected
   const allRemainingPool = useMemo(() => {
