@@ -15,13 +15,11 @@ import {
 import { compareAsc, format, formatDate, isValid } from "date-fns";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { MeterReaderEntryDataTable } from "../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
-import { Button } from "@mr/components/ui/Button";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
 import { MeterReader } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
-import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
@@ -45,24 +43,13 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   entry,
 }) => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
-  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
-  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setScheduleEntryIsSplitted = useSchedulesStore((state) => state.setScheduleEntryIsSplitted);
-  const meterReadersWithDesignatedZonebooks = useSchedulesStore(
-    (state) => state.meterReadersWithDesignatedZonebooks,
-  );
-  const setTempMeterReadersWithDesignatedZonebooks = useSchedulesStore(
-    (state) => state.setTempMeterReadersWithDesignatedZonebooks,
-  );
   const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
-  const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
-    (state) => state.setMeterReadersWithDesignatedZonebooks,
-  );
 
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
 
-  // if schedule entry is splitted
+  // if schedule entry is splitted, this only sets the schedule entry/singular/selected day splitted dates
   useEffect(() => {
     if (
       Array.isArray(selectedScheduleEntry?.dueDate) &&
@@ -88,30 +75,22 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
     setSplittedDates,
   ]);
 
-  useEffect(() => {
-    setTempMeterReadersWithDesignatedZonebooks(meterReadersWithDesignatedZonebooks);
-  }, [
-    scheduleEntryDialogIsOpen,
-    meterReadersWithDesignatedZonebooks,
-    setTempMeterReadersWithDesignatedZonebooks,
-  ]);
-
-  const get = useGetCurrentMeterReadersZonebooks();
-
   return (
     <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
       <DialogTrigger asChild className="h-full w-full">
         <button
           onContextMenu={() => setActiveContext(idx)}
-          onClick={() => {
-            setScheduleEntryDialogIsOpen(true);
-            setSelectedScheduleEntry(entry);
+          onClick={(e) => {
+            if (isWithinMonth) {
+              setScheduleEntryDialogIsOpen(true);
+              setSelectedScheduleEntry(entry);
+            } else e.preventDefault();
           }}
           className={`group relative grid h-full ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.05] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800`}
         >
           {/* Date Number */}
           <div
-            className={`flex items-center justify-center font-bold ${
+            className={`flex items-center justify-center px-0 font-bold sm:justify-center sm:px-0 md:justify-center md:px-0 lg:justify-end lg:px-2 ${
               isWithinMonth ? "" : "text-gray-300"
             } group-hover:text-primary items-center text-center`}
           >
@@ -132,6 +111,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             )}
           </div>
           <div className="absolute top-0 right-1">
+            {/* replace with has set all zonebooks */}
             {hasSchedule && (
               <div className="flex items-center justify-center">
                 <CheckCircle2 className="fill-green-500 text-white" />
@@ -259,30 +239,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
           />
         </div>
-        <DialogFooter>
-          <Button
-            onClick={() => {
-              const updatedCurrentSchedule = currentSchedule.map((entry) => {
-                if (entry.readingDate === selectedScheduleEntry?.readingDate) {
-                  return { ...entry, meterReaders: selectedScheduleEntry.meterReaders };
-                }
-                return entry;
-              });
-
-              // this contains the pool of assigned and unassigned zoneBooks of all meter readers
-              const currentZonebooks = get.currentZonebooks(
-                updatedCurrentSchedule,
-                meterReadersWithDesignatedZonebooks,
-              );
-
-              setMeterReadersWithDesignatedZonebooks(currentZonebooks);
-              setCurrentSchedule(updatedCurrentSchedule);
-              setScheduleEntryDialogIsOpen(false);
-            }}
-          >
-            Apply for the current day
-          </Button>
-        </DialogFooter>
+        <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   );

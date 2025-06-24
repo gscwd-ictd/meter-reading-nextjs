@@ -11,7 +11,6 @@ import {
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { FunctionComponent, useState } from "react";
 import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
-import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { MeterReader } from "@mr/lib/types/personnel";
 import { DeleteMeterReaderDialog } from "../../meter-readers/DeleteMeterReaderDialog";
 
@@ -22,8 +21,6 @@ type MeterReaderRowActionsProps = {
 export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps> = ({ meterReader }) => {
   const [editMeterReaderDialogIsOpen, setEditMeterReaderDialogIsOpen] = useState<boolean>(false);
   const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
-
-  const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
 
   return (
     <DropdownMenu open={dropdownIsOpen} onOpenChange={setDropdownIsOpen}>
@@ -41,7 +38,6 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
       <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuItem
           onSelect={() => {
-            setSelectedMeterReader(meterReader);
             setDropdownIsOpen(false);
           }}
           className="cursor-pointer"

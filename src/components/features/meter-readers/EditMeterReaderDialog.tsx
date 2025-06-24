@@ -187,11 +187,11 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
-      setSelectedMeterReader(meterReader);
+      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(3) });
 
-      setMobileNumber(meterReader.mobileNumber);
+      setMobileNumber(meterReader.mobileNumber.slice(3));
 
-      setValue("mobileNumber", meterReader.mobileNumber);
+      setValue("mobileNumber", meterReader.mobileNumber.slice(3));
 
       setMeterReaderZonebooks(meterReader?.zoneBooks);
 
@@ -199,7 +199,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     }
   }, [
     setEditMeterReaderDialogIsOpen,
-    setSelectedMeterReader,
     setMobileNumber,
     editMeterReaderDialogIsOpen,
     selectedMeterReader,
@@ -207,6 +206,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     setMeterReaderZonebooks,
     setSelectedMeterReader,
     setSelectedRestDay,
+    setValue,
   ]);
 
   // this useEffect should only run once and only when

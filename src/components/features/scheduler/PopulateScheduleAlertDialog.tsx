@@ -16,9 +16,9 @@ import { FunctionComponent } from "react";
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
-import { useGetCurrentMeterReadersZonebooks } from "./useGetCurrentMeterReadersZonebooks";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -33,10 +33,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
-
-  const setMeterReadersWithDesignatedZonebooks = useSchedulesStore(
-    (state) => state.setMeterReadersWithDesignatedZonebooks,
-  );
+  const searchParams = useSearchParams();
+  const monthYear = searchParams.get("date");
 
   const { data: meterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
@@ -46,7 +44,56 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     },
   });
 
-  const getMeterReaderZonebooks = useGetCurrentMeterReadersZonebooks();
+  const postSchedule = useMutation({
+    mutationKey: ["set-schedule", monthYear],
+    mutationFn: async (newSchedule: MeterReadingSchedule[]) => {
+      try {
+        const filteredSchedule = newSchedule.filter((s) => s.dueDate !== undefined);
+        console.log(filteredSchedule);
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, filteredSchedule);
+        console.log(res);
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
+
+  const populateSchedule = async () => {
+    const newSchedule = scheduler.assignMeterReaders(schedule, meterReaders);
+
+    // assign an empty array to zoneBooks to initialize
+    setCurrentSchedule(
+      newSchedule.map((sched) => {
+        return {
+          ...sched,
+          meterReaders: sched.meterReaders?.map((mr) => {
+            return { ...mr, zoneBooks: [] };
+          }),
+        };
+      }),
+    );
+
+    setHasPopulatedMeterReaders(true);
+
+    // mutate here
+    postSchedule.mutateAsync(
+      newSchedule.map((sched) => {
+        return {
+          ...sched,
+          meterReaders: sched.meterReaders?.map((mr) => {
+            return { ...mr, zoneBooks: [] };
+          }),
+        };
+      }),
+    );
+
+    toast.success("Success", {
+      description: "Successfully populated all the meter readers for this month!",
+      position: "top-right",
+      duration: 1500,
+    });
+  };
 
   return (
     <AlertDialog>
@@ -75,35 +122,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="dark:text-white"
-            onClick={() => {
-              const newSchedule = scheduler.assignMeterReaders(schedule, meterReaders);
-
-              // assign an empty array to zoneBooks to initialize
-              setCurrentSchedule(
-                newSchedule.map((sched) => {
-                  return {
-                    ...sched,
-                    meterReaders: sched.meterReaders?.map((mr) => {
-                      return { ...mr, zoneBooks: [] };
-                    }),
-                  };
-                }),
-              );
-
-              setHasPopulatedMeterReaders(true);
-
-              // this will be the default pool and will always be compared to after applying changes per entry(per day)
-              setMeterReadersWithDesignatedZonebooks(getMeterReaderZonebooks.defaultZonebooks(newSchedule));
-
-              toast.success("Success", {
-                description: "Successfully populated all the meter readers for this month!",
-                position: "top-right",
-                duration: 1500,
-              });
-            }}
-          >
+          <AlertDialogAction className="dark:text-white" onClick={populateSchedule}>
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>

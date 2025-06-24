@@ -1,4 +1,4 @@
-import { MeterReaderWithDesignatedZonebooks, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
@@ -31,10 +31,10 @@ type SchedulesStore = {
   setCalendarScheduleDropdownIsOpen: (calendarScheduleDropdownIsOpen: boolean) => void;
   hasSchedule: boolean;
   setHasSchedule: (hasSchedule: boolean) => void;
+  hasFetchedSchedule: boolean;
+  setHasFetchedSchedule: (hasFetchedSchedule: boolean) => void;
   entryZonebookSelectorIsOpen: boolean;
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
-  meterReaderZonebooks: ZonebookWithDates[];
-  setMeterReaderZonebooks: (meterReaderZonebooks: ZonebookWithDates[]) => void;
   scheduleEntryIsSplitted: boolean;
   setScheduleEntryIsSplitted: (scheduleEntryIsSplitted: boolean) => void;
   scheduleHasSplittedDates: boolean;
@@ -43,14 +43,6 @@ type SchedulesStore = {
   setSplittedDates: (splittedDates: SplitDate[]) => void;
   hasPopulatedMeterReaders: boolean;
   setHasPopulatedMeterReaders: (hasPopulatedMeterReaders: boolean) => void;
-  meterReadersWithDesignatedZonebooks: MeterReaderWithDesignatedZonebooks[];
-  setMeterReadersWithDesignatedZonebooks: (
-    meterReadersWithDesignatedZonebooks: MeterReaderWithDesignatedZonebooks[],
-  ) => void;
-  tempMeterReadersWithDesignatedZonebooks: MeterReaderWithDesignatedZonebooks[];
-  setTempMeterReadersWithDesignatedZonebooks: (
-    tempMeterReadersWithDesignatedZonebooks: MeterReaderWithDesignatedZonebooks[],
-  ) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -79,8 +71,6 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setHasSchedule: (hasSchedule) => set({ hasSchedule }),
   entryZonebookSelectorIsOpen: false,
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen) => set({ entryZonebookSelectorIsOpen }),
-  meterReaderZonebooks: [],
-  setMeterReaderZonebooks: (meterReaderZonebooks) => set({ meterReaderZonebooks }),
   scheduleEntryIsSplitted: false,
   setScheduleEntryIsSplitted: (scheduleEntryIsSplitted) => set({ scheduleEntryIsSplitted }),
   splittedDates: [],
@@ -89,10 +79,6 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setScheduleHasSplittedDates: (scheduleHasSplittedDates) => set({ scheduleHasSplittedDates }),
   hasPopulatedMeterReaders: false,
   setHasPopulatedMeterReaders: (hasPopulatedMeterReaders) => set({ hasPopulatedMeterReaders }),
-  meterReadersWithDesignatedZonebooks: [],
-  setMeterReadersWithDesignatedZonebooks: (meterReadersWithDesignatedZonebooks) =>
-    set({ meterReadersWithDesignatedZonebooks }),
-  tempMeterReadersWithDesignatedZonebooks: [],
-  setTempMeterReadersWithDesignatedZonebooks: (tempMeterReadersWithDesignatedZonebooks) =>
-    set({ tempMeterReadersWithDesignatedZonebooks }),
+  hasFetchedSchedule: false,
+  setHasFetchedSchedule: (hasFetchedSchedule) => set({ hasFetchedSchedule }),
 }));
