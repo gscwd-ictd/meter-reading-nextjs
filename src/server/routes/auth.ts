@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { TokenService } from "@/lib/tokenService";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import { AuthSchema, loginAccounts } from "../db/schemas/loginAccounts";
+import { AuthSchema, loginAccounts, LoginSchema } from "../db/schemas/loginAccounts";
 import { eq } from "drizzle-orm";
 import db from "../db/connection";
 import argon2 from "argon2";
@@ -22,7 +22,7 @@ export const authHandler = new Hono()
     return c.json(result[0]);
   })
 
-  .post("/login", zValidator("json", AuthSchema), async (c) => {
+  .post("/login", zValidator("json", LoginSchema), async (c) => {
     const data = c.req.valid("json");
 
     const result = await db.select().from(loginAccounts).where(eq(loginAccounts.username, data.username));
@@ -43,7 +43,7 @@ export const authHandler = new Hono()
 
     const tokenService = new TokenService();
 
-    const { token } = await tokenService.issueToken({ sub: user.id });
+    const { token } = await tokenService.issueToken({ sub: user.id, avatar: user.image });
 
     return c.json({ token });
   });
