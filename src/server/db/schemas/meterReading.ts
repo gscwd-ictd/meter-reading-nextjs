@@ -51,6 +51,7 @@ export const accountHistory = pgTable("account_history", {
 
 export const accounts = pgTable("accounts", {
   id: varchar("id").primaryKey().notNull(),
+  accountNumber: varchar("account_number"),
   accountName: varchar("account_name"),
   meterNumber: varchar("meter_number"),
   previousReading: varchar("previous_reading"),
