@@ -17,7 +17,7 @@ export const authHandler = new Hono()
     const result = await db
       .insert(loginAccounts)
       .values({ ...data, password: hashedPw })
-      .returning({ userId: loginAccounts.id, username: loginAccounts.number });
+      .returning({ userId: loginAccounts.id, username: loginAccounts.username });
 
     return c.json(result[0]);
   })
@@ -25,7 +25,7 @@ export const authHandler = new Hono()
   .post("/login", zValidator("json", AuthSchema), async (c) => {
     const data = c.req.valid("json");
 
-    const result = await db.select().from(loginAccounts).where(eq(loginAccounts.number, data.number));
+    const result = await db.select().from(loginAccounts).where(eq(loginAccounts.username, data.username));
 
     if (result.length === 0) {
       console.error("User number not found!");
