@@ -18,7 +18,6 @@ import {
   isSunday,
   isValid,
   isWeekend,
-  nextMonday,
   parse,
   startOfMonth,
   startOfWeek,
@@ -27,11 +26,18 @@ import {
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type Holiday = {
+type Day = {
   id: string;
   name: string;
-  holidayDate: string;
+  date: string;
+};
+
+type Holiday = Day & {
   type: string;
+};
+
+type MeterReadingDate = {
+  readingDate: Date;
 };
 
 type DueDate = {
@@ -45,6 +51,11 @@ type DisconnectionDate = {
   disconnectionDate: Date;
 };
 
+const NonBusinessDays: Day[] = [
+  { id: "001", date: "01-01", name: "New Year" },
+  { id: "002", date: "12-25", name: "Christmas Day" },
+];
+
 export type Scheduler = ReturnType<typeof useScheduler>;
 
 export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: string) => {
@@ -54,13 +65,6 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
   const [currentMonthYear, setCurrentMonthYear] = useState(monthYear);
 
   const router = useRouter();
-
-  // useEffect(() => {
-  //   if (date !== undefined && date.getTime() !== currentDate.getTime()) {
-  //     setCurrentDate(date);
-  //     setCurrentMonthYear(format(currentDate, "MM-yyyy"));
-  //   }
-  // }, [currentDate, date, currentMonthYear]);
 
   useEffect(() => {
     router.replace(`/schedule?date=${currentMonthYear}`);
@@ -85,76 +89,21 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     return format(date, dateFormat);
   };
 
-  //! removed this because we dont have to format and parse the dates anymore
-  // Memoize formatted holiday dates for efficient lookups
-  // const holidayDates = useMemo(
-  //   () =>
-  //     holidays.map((holiday) =>
-  //       format(parse(holiday.holidayDate, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd"),
-  //     ),
-  //   [holidays],
-  // );
-
-  const restDayDates = useMemo(() => restDays.map((restDay) => formatDate(restDay)), [restDays]);
-
-  // Check if a date is a holiday
-  const isHoliday = useCallback(
-    (date: Date): boolean => {
-      const mmdd = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-      return holidays.some((holiday) => holiday.type === "recurring" && holiday.holidayDate === mmdd);
-    },
+  const holidayDates = useMemo(
+    () => holidays.map((holiday) => format(parse(holiday.date, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd")),
     [holidays],
   );
 
-  const isRestDay = useCallback((date: Date) => restDayDates.includes(formatDate(date)), [restDayDates]);
-
-  const addBusinessDays = useCallback(
-    (date: Date, daysToAdd: number) => {
-      let daysAdded = 0;
-
-      while (daysAdded < daysToAdd) {
-        date = addDays(date, 1);
-
-        if (!isWeekend(date) && !isHoliday(date)) {
-          daysAdded++;
-        }
-      }
-
-      return date;
-    },
-    [isHoliday],
+  const isHoliday = useCallback(
+    (date: Date): boolean => holidayDates.includes(formatDate(date) as string),
+    [holidayDates],
   );
 
-  // Add 1 day if the provided date is a holiday
-  const adjustForHolidayOrWeekend = useCallback(
-    (date: Date) => {
-      while (isHoliday(date) || isWeekend(date)) {
-        if (isHoliday(date)) {
-          date = addDays(date, 1);
-        }
+  const isNoDutyDay = useCallback((date: Date) => {
+    const mmdd = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-        if (isWeekend(date)) {
-          date = nextMonday(date);
-        }
-      }
-      return date;
-    },
-    [isHoliday],
-  );
-
-  // add 1 day if the provided date is a holiday
-  const adjustForHoliday = useCallback(
-    (date: Date) => {
-      while (isHoliday(date)) {
-        if (isHoliday(date)) {
-          date = addDays(date, 1);
-        }
-      }
-      return date;
-    },
-    [isHoliday],
-  );
+    return NonBusinessDays.some((day) => day.date === mmdd);
+  }, []);
 
   const removeDuplicateDates = useCallback((dates: Date[]) => {
     const uniqueDates = new Map<string, Date>();
@@ -243,81 +192,155 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
     let startOfReadingDate = monthStart;
 
-    //* Use this instead, if starting date requires to skip holidays as well.
-    while (
-      isHoliday(startOfReadingDate)
-      // || isWeekend(startOfReadingDate)
-    ) {
-      // startOfReadingDate = adjustForHolidayOrWeekend(startOfReadingDate);
-      startOfReadingDate = adjustForHoliday(startOfReadingDate);
+    while (isNoDutyDay(startOfReadingDate)) {
+      startOfReadingDate = addDays(startOfReadingDate, 1);
     }
 
-    // if (isSunday(startOfReadingDate)) {
-    //   startOfReadingDate = nextMonday(startOfReadingDate);
-    // }
-
-    // while (isRestDay(startOfReadingDate)) {
-    //   startOfReadingDate = addDays(startOfReadingDate, 1);
-    // }
-
     return { monthStart, startOfReadingDate };
-  }, [
-    currentDate,
-    // isRestDay,
-    adjustForHoliday,
-    isHoliday,
-  ]);
+  }, [currentDate, isNoDutyDay]);
 
   const calculateDueDates = useCallback((): DueDate[] => {
     const { monthStart, startOfReadingDate } = getStartingReadingDate();
     const dueDates: DueDate[] = [];
+    const usedDueDates = new Set<string>();
 
     let readingDate = startOfReadingDate;
-    let dueDate = readingDate;
-    let readingCount = 1;
+    let readingCount = 0;
 
-    dueDate = addDays(readingDate, 15);
-
-    while (isSameMonth(readingDate, monthStart) && readingCount < 22) {
-      dueDate = adjustForHolidayOrWeekend(dueDate);
-
-      if (isSunday(readingDate)) {
-        readingDate = nextMonday(readingDate);
-      }
-
-      if (isRestDay(readingDate)) {
+    while (isSameMonth(readingDate, monthStart) && readingCount < 21) {
+      if (isNoDutyDay(readingDate)) {
         readingDate = addDays(readingDate, 1);
+        continue;
       }
 
+      const isSaturday = getDay(readingDate) === 6;
+      const isSunday = getDay(readingDate) === 0;
+
+      if (isSaturday) {
+        const nextDay = addDays(readingDate, 1);
+
+        // Case: Saturday is followed by valid Sunday in same month
+        const isValidSunday =
+          isSameMonth(nextDay, monthStart) && getDay(nextDay) === 0 && !isNoDutyDay(nextDay);
+
+        let dueDate = addDays(readingDate, 15);
+        let dueDateStr = format(dueDate, "yyyy-MM-dd");
+
+        while (
+          isHoliday(dueDate) ||
+          isWeekend(dueDate) ||
+          isNoDutyDay(dueDate) ||
+          usedDueDates.has(dueDateStr)
+        ) {
+          dueDate = addDays(dueDate, 1);
+          dueDateStr = format(dueDate, "yyyy-MM-dd");
+        }
+
+        usedDueDates.add(dueDateStr);
+
+        // Push Saturday now, and maybe Sunday next
+        dueDates.push({ readingDate, dueDate });
+
+        if (isValidSunday) {
+          readingDate = nextDay;
+          dueDates.push({ readingDate, dueDate }); // same dueDate
+        }
+
+        readingCount++; // ✅ Count Sat+Sun as 1
+        readingDate = addDays(readingDate, 1); // move past Sunday (or Sat if no Sunday)
+        continue;
+      }
+
+      // if (isSunday) {
+      //   // Skip Sunday alone — already handled by Sat
+      //   readingDate = addDays(readingDate, 1);
+      //   continue;
+      // }
+      if (isSunday) {
+        if (dueDates.length === 0) {
+          // First reading day is a Sunday — allow it
+        } else {
+          // Regular Sunday — skip (already handled by Saturday)
+          readingDate = addDays(readingDate, 1);
+          continue;
+        }
+      }
+
+      // Regular weekday reading
+      let dueDate = addDays(readingDate, 15);
+      let dueDateStr = format(dueDate, "yyyy-MM-dd");
+
+      while (
+        isHoliday(dueDate) ||
+        isWeekend(dueDate) ||
+        isNoDutyDay(dueDate) ||
+        usedDueDates.has(dueDateStr)
+      ) {
+        dueDate = addDays(dueDate, 1);
+        dueDateStr = format(dueDate, "yyyy-MM-dd");
+      }
+
+      usedDueDates.add(dueDateStr);
       dueDates.push({ readingDate, dueDate });
+      readingCount++;
 
       readingDate = addDays(readingDate, 1);
-      dueDate = addDays(dueDate, 1);
-      readingCount++;
     }
 
     return dueDates;
-  }, [adjustForHolidayOrWeekend, getStartingReadingDate, isRestDay]);
+  }, [getStartingReadingDate, isHoliday, isNoDutyDay]);
 
   const calculateDisconnectionDates = useCallback(
     (dueDates: DueDate[]): DisconnectionDate[] => {
-      let disconnectionDate = dueDates[0]!.dueDate;
+      const disconnectionDates: DisconnectionDate[] = [];
+      const usedDisconnectionDates = new Set<string>();
 
-      const disconnectionDates = dueDates.map((date, index) => {
-        if (index === 0) {
-          disconnectionDate = addBusinessDays(disconnectionDate, 3);
-        } else {
+      let i = 0;
+
+      while (i < dueDates.length) {
+        const current = dueDates[i];
+        const next = dueDates[i + 1];
+
+        const isSaturday = getDay(current.readingDate) === 6;
+        const isSunday = getDay(current.readingDate) === 0;
+        const isNextSunday =
+          next && getDay(next.readingDate) === 0 && isSameMonth(current.readingDate, next.readingDate);
+
+        let disconnectionDate = addDays(current.dueDate, 3);
+        let disconnectionDateStr = format(disconnectionDate, "yyyy-MM-dd");
+
+        // Adjust to next working day and avoid duplicates
+        while (
+          isHoliday(disconnectionDate) ||
+          isWeekend(disconnectionDate) ||
+          isNoDutyDay(disconnectionDate) ||
+          usedDisconnectionDates.has(disconnectionDateStr)
+        ) {
           disconnectionDate = addDays(disconnectionDate, 1);
+          disconnectionDateStr = format(disconnectionDate, "yyyy-MM-dd");
         }
 
-        disconnectionDate = adjustForHolidayOrWeekend(disconnectionDate);
+        usedDisconnectionDates.add(disconnectionDateStr);
 
-        return { ...date, disconnectionDate };
-      });
+        if (isSaturday && isNextSunday) {
+          // Assign same disconnection date to Saturday and Sunday
+          disconnectionDates.push({ ...current, disconnectionDate });
+          disconnectionDates.push({ ...next!, disconnectionDate });
+          i += 2; // Skip both Sat and Sun
+        } else if (isSunday && i > 0 && isSameDay(dueDates[i - 1].dueDate, current.dueDate)) {
+          // Sunday that's already handled with Saturday – skip it
+          i++;
+          continue;
+        } else {
+          // Normal weekday or unpaired Sat/Sun
+          disconnectionDates.push({ ...current, disconnectionDate });
+          i++;
+        }
+      }
 
       return disconnectionDates;
     },
-    [addBusinessDays, adjustForHolidayOrWeekend],
+    [isHoliday, isNoDutyDay],
   );
 
   const calculateSchedule = useCallback((): MeterReadingSchedule[] => {
@@ -475,12 +498,23 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     setCurrentMonthYear(format(new Date(), "MM-yyyy"));
   };
 
+  const getWorkingDays = useCallback((): MeterReadingDate[] => {
+    const schedule = calculateSchedule();
+
+    schedule.map((day) => {
+      if (day) return { readingDate: day.readingDate };
+    });
+
+    return schedule;
+  }, [calculateSchedule]);
+
   return {
     calculateSchedule,
     addSundayReadings,
     removeSundayReadings,
     assignMeterReaders,
     splitDates,
+    getWorkingDays,
     formatDate,
     goToPreviousMonth,
     goToNextMonth,

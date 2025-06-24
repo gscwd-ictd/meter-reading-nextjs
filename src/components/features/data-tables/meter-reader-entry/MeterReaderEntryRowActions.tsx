@@ -21,12 +21,10 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
-  const setMeterReaderZonebooks = useSchedulesStore((state) => state.setMeterReaderZonebooks);
 
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
     setEntryZonebookSelectorIsOpen(true);
-    setMeterReaderZonebooks(meterReader.zoneBooks ?? []);
   };
 
   const removeMeterReader = (meterReaderId: string) => {
@@ -46,7 +44,12 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       <ScheduleEntryZonebookSelector isLoading={false} />
       <div className="flex grid-cols-2 gap-2">
         <div className="col-span-1">
-          <Button className="w-full px-2" size="sm" onClick={() => openZonebookSelector(meterReader)}>
+          <Button
+            className="w-full px-2"
+            variant="outline"
+            size="sm"
+            onClick={() => openZonebookSelector(meterReader)}
+          >
             <MapPinnedIcon className="size-2 sm:size-4 lg:size-4 dark:text-white" />
             <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Zonebooks</span>
           </Button>
@@ -54,7 +57,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
         <div className="col-span-1">
           <Button
             variant="destructive"
-            className="w-full px-2"
+            className="w-full px-2 hover:brightness-90"
             size="sm"
             onClick={() => removeMeterReader(meterReader.meterReaderId)}
           >

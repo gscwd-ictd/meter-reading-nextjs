@@ -155,7 +155,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       setTempFilteredZonebooks(data.data);
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks]);
+  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
 
   return (
     <Dialog

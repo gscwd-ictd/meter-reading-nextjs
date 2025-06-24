@@ -35,12 +35,12 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
           </span>
         ),
 
-        enableSorting: false,
+        enableSorting: true,
       },
 
       {
         accessorKey: "zoneBooks",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone-Book" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Books" />,
         cell: ({ row }) =>
           row.original.zoneBooks.map((zoneBook, idx) => (
             <span key={zoneBook.zoneBook} className="w-full truncate">
@@ -49,6 +49,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
             </span>
           )),
         enableColumnFilter: false,
+        enableSorting: false,
       },
 
       {

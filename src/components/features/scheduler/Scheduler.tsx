@@ -13,34 +13,76 @@ import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 import { useSearchParams } from "next/navigation";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
+import { MeterReadingSchedule } from "@mr/lib/types/schedule";
+import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
 
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
-  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
+  const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
+  const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
+  const hasFetchedSchedule = useSchedulesStore((state) => state.hasFetchedSchedule);
+  const setHasFetchedSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
 
   const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "MM-yyyy"));
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   scheduler.addSundayReadings(currentSchedule);
 
-  useEffect(() => {
-    //! Add a logic here to check the current monthyear and check from db if it has a schedule already
-    if (!calendarIsSet && !hasSchedule) {
-      setCurrentSchedule(scheduler.splitDates(datesToSplit));
+  const {
+    data: schedule,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["get-schedule", monthYear],
+    enabled: calendarIsSet && !hasFetchedSchedule && monthYear !== null,
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${monthYear}`);
+        return res.data as MeterReadingSchedule[];
+      } catch (error) {
+        console.log(error);
+        toast.error("Cannot find schedule");
+      }
+    },
+  });
 
+  // this should populate the calendar first
+  useEffect(() => {
+    if (!calendarIsSet) {
+      setCurrentSchedule(scheduler.splitDates(datesToSplit));
       setCalendarIsSet(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheduler.currentDate, setCurrentSchedule, setCalendarIsSet, calendarIsSet, hasSchedule]);
+  }, [scheduler, setCurrentSchedule, setCalendarIsSet, calendarIsSet, datesToSplit]);
 
-  useEffect(() => {}, [scheduler.currentDate]);
+  // this should populate the schedule if ever there is
+  useEffect(() => {
+    if (schedule && !isError && schedule.length > 0 && !hasFetchedSchedule) {
+      // append the schedule to the calendar
+      setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
+      setHasFetchedSchedule(true);
+    } else if (((schedule && schedule.length === 0) || isError) && !hasFetchedSchedule) {
+      setHasFetchedSchedule(true);
+    }
+  }, [
+    schedule,
+    isError,
+    isLoading,
+    currentSchedule,
+    setCurrentSchedule,
+    setHasFetchedSchedule,
+    calendarIsSet,
+    hasFetchedSchedule,
+  ]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);
@@ -85,6 +127,8 @@ export const Scheduler: FunctionComponent = () => {
                 scheduler.goToPreviousMonth();
                 setDatesToSplit([]);
                 setCalendarIsSet(false);
+                setScheduleHasSplittedDates(false);
+                setHasPopulatedMeterReaders(false);
               }}
             >
               <ChevronLeft />
@@ -95,6 +139,8 @@ export const Scheduler: FunctionComponent = () => {
                 scheduler.today();
                 setDatesToSplit([]);
                 setCalendarIsSet(false);
+                setScheduleHasSplittedDates(false);
+                setHasPopulatedMeterReaders(false);
               }}
             >
               Today

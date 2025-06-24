@@ -25,11 +25,3 @@ export type MeterReaderWithZonebooks = Employee & {
   zoneBooks: ZonebookWithDates[];
   // recommendedZonebooks?: ZonebookWithDates[];
 };
-
-export type MeterReaderWithDesignatedZonebooks = {
-  meterReaderId: string;
-  zoneBooks: {
-    assigned: ZonebookWithDates[];
-    unassigned: ZonebookWithDates[];
-  };
-};
