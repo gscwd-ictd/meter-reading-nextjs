@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1750230009457,
-      "tag": "0000_red_rocket_racer",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1750298494036,
-      "tag": "0001_fluffy_leper_queen",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1750299639357,
-      "tag": "0002_funny_zzzax",
+      "when": 1750730957881,
+      "tag": "0000_eager_sasquatch",
       "breakpoints": true
     }
   ]

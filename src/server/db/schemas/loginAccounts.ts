@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 import z4 from "zod/v4";
 
 export const loginAccounts = pgTable("login_accounts", {
@@ -6,15 +6,19 @@ export const loginAccounts = pgTable("login_accounts", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  number: varchar("number").notNull().unique(),
+  username: varchar("username").notNull().unique(),
   password: varchar("password").notNull(),
-  createdAt: timestamp({ mode: "date" }).defaultNow(),
-  updatedAt: timestamp({ mode: "date" })
+  positionTitle: varchar("position_title").notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
 
 export const AuthSchema = z4.object({
-  number: z4.string(),
+  username: z4.string(),
   password: z4.string(),
+  positionTitle: z4.string(),
+  image: z4.url().optional(),
 });
