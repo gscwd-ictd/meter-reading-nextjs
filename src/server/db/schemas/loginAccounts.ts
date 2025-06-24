@@ -16,6 +16,11 @@ export const loginAccounts = pgTable("login_accounts", {
     .$onUpdate(() => new Date()),
 });
 
+export const LoginSchema = z4.object({
+  username: z4.string(),
+  password: z4.string(),
+});
+
 export const AuthSchema = z4.object({
   username: z4.string(),
   password: z4.string(),
