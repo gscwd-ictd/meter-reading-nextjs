@@ -12,13 +12,14 @@ import {
 } from "@mr/components/ui/AlertDialog";
 import { Button } from "@mr/components/ui/Button";
 import { CalendarCheck2, CalendarPlus } from "lucide-react";
-import { FunctionComponent } from "react";
-import { MeterReadingSchedule } from "@mr/lib/types/schedule";
+import { FunctionComponent, useEffect } from "react";
+import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import { toDatesOrDateOnly, toDateString } from "@mr/lib/functions/handleDateArrayOrObject";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -33,6 +34,9 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
+  const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
+  const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
@@ -46,16 +50,33 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 
   const postSchedule = useMutation({
     mutationKey: ["set-schedule", monthYear],
-    mutationFn: async (newSchedule: MeterReadingSchedule[]) => {
+    mutationFn: async (newSchedule: MeterReadingEntryWithZonebooks[]) => {
       try {
         const filteredSchedule = newSchedule.filter((s) => s.dueDate !== undefined);
-        console.log(filteredSchedule);
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, filteredSchedule);
+        const formattedFilteredSchedule = filteredSchedule.map((schedule) => {
+          return {
+            ...schedule,
+            dueDate: toDatesOrDateOnly(schedule.dueDate),
+            readingDate: toDateString(schedule.readingDate),
+            disconnectionDate: toDatesOrDateOnly(schedule.disconnectionDate),
+          };
+        });
+
+        console.log(formattedFilteredSchedule);
+
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
         console.log(res);
         return res.data;
       } catch (error) {
         console.log(error);
       }
+    },
+    onSuccess: async () => {
+      toast.success("Success", {
+        description: "Successfully populated all the meter readers for this month!",
+        position: "top-right",
+        duration: 1500,
+      });
     },
   });
 
@@ -77,7 +98,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     setHasPopulatedMeterReaders(true);
 
     // mutate here
-    postSchedule.mutateAsync(
+    await postSchedule.mutateAsync(
       newSchedule.map((sched) => {
         return {
           ...sched,
@@ -87,13 +108,17 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         };
       }),
     );
-
-    toast.success("Success", {
-      description: "Successfully populated all the meter readers for this month!",
-      position: "top-right",
-      duration: 1500,
-    });
   };
+
+  useEffect(() => {
+    if (postSchedule.isSuccess) {
+      refetchData?.();
+      postSchedule.reset();
+
+      setHasSchedule(true);
+      setHasFetchedThisMonthsSchedule(true);
+    }
+  }, [postSchedule, refetchData, setHasSchedule, setHasFetchedThisMonthsSchedule]);
 
   return (
     <AlertDialog>
@@ -109,7 +134,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           className="dark:text-white"
         >
           {hasPopulatedMeterReaders ? <CalendarCheck2 /> : <CalendarPlus />}
-          {!hasPopulatedMeterReaders ? "Populate schedule" : "Populated Schedule"}
+          {!hasPopulatedMeterReaders ? "Populate schedule" : "Fetched Schedule"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

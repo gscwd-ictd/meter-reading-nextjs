@@ -12,20 +12,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
-import { compareAsc, format, formatDate, isValid } from "date-fns";
+import { compareAsc, format, formatDate } from "date-fns";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { MeterReaderEntryDataTable } from "../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
-import { AlertTriangleIcon, CalendarIcon, CheckCircle2 } from "lucide-react";
+import { AlertTriangleIcon, CalendarIcon } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
-import { MeterReader } from "@mr/lib/types/personnel";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import {
+  getDayFromDate,
+  isValidYyyyMmDdOrDate,
+  toParsedDateOnly,
+} from "@mr/lib/functions/handleDateArrayOrObject";
+import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
   setActiveContext: Dispatch<SetStateAction<number | null>>;
   entry: MeterReadingEntryWithZonebooks;
-  hasSchedule: MeterReader | undefined;
   isWithinMonth: boolean;
   dateIsSunday: boolean;
   dateIsSaturday: boolean;
@@ -35,7 +41,6 @@ type ScheduleEntryDialogProps = {
 export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = ({
   activeContext,
   setActiveContext,
-  hasSchedule,
   isWithinMonth,
   dateIsSaturday,
   dateIsSunday,
@@ -46,8 +51,13 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setScheduleEntryIsSplitted = useSchedulesStore((state) => state.setScheduleEntryIsSplitted);
   const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
-
+  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
+
+  const transformDateToStringIfInvalid = (date: string | Date) =>
+    isValidYyyyMmDdOrDate(date) ? date : toParsedDateOnly(date);
+
+  const transformedReadingDate = format(transformDateToStringIfInvalid(entry.readingDate), "yyyy-MM-dd");
 
   // if schedule entry is splitted, this only sets the schedule entry/singular/selected day splitted dates
   useEffect(() => {
@@ -75,106 +85,141 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
     setSplittedDates,
   ]);
 
+  const { data: scheduleEntry } = useQuery({
+    enabled: scheduleEntryDialogIsOpen,
+    queryKey: ["get-schedule-entry-by-id", transformedReadingDate],
+    queryFn: async () => {
+      console.log(transformedReadingDate);
+      try {
+        const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
+        console.log(transformedReadingDate, ": ", res.data);
+        return res.data as MeterReadingEntryWithZonebooks;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+  });
+
+  useEffect(() => {
+    if (scheduleEntry && scheduleEntryDialogIsOpen) {
+      setSelectedScheduleEntry(scheduleEntry);
+    }
+  }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry]);
+
   return (
-    <Dialog open={scheduleEntryDialogIsOpen} onOpenChange={setScheduleEntryDialogIsOpen} modal>
+    <Dialog
+      open={scheduleEntryDialogIsOpen}
+      onOpenChange={() => {
+        setScheduleEntryDialogIsOpen(!scheduleEntryDialogIsOpen);
+        setSelectedScheduleEntry(null);
+      }}
+      modal
+    >
       <DialogTrigger asChild className="h-full w-full">
-        <button
+        <motion.button
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.05, ease: "easeOut" }}
           onContextMenu={() => setActiveContext(idx)}
           onClick={(e) => {
-            if (isWithinMonth) {
+            if (isWithinMonth && hasSchedule) {
               setScheduleEntryDialogIsOpen(true);
-              setSelectedScheduleEntry(entry);
-            } else e.preventDefault();
+            } else {
+              e.preventDefault();
+            }
           }}
-          className={`group relative grid h-full ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:scale-[1.05] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800`}
+          className={`group relative grid h-full grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800 ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} `}
         >
-          {/* Date Number */}
-          <div
-            className={`flex items-center justify-center px-0 font-bold sm:justify-center sm:px-0 md:justify-center md:px-0 lg:justify-end lg:px-2 ${
-              isWithinMonth ? "" : "text-gray-300"
-            } group-hover:text-primary items-center text-center`}
-          >
-            {formatDate(entry.readingDate, "dd")}
-          </div>
-          {/* Meter Readers */}
-          <div className="col-span-1 flex justify-center">
-            {entry.meterReaders && entry.meterReaders.length > 0 && (
-              <StackedAvatars
-                users={entry.meterReaders
-                  .map((meterReader) => ({
-                    id: meterReader.companyId,
-                    image: `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${meterReader.photoUrl}`,
-                    name: meterReader.name,
-                  }))
-                  .sort((a, b) => (a.name > b.name ? 1 : -1))}
-              />
-            )}
-          </div>
-          <div className="absolute top-0 right-1">
-            {/* replace with has set all zonebooks */}
-            {hasSchedule && (
-              <div className="flex items-center justify-center">
-                <CheckCircle2 className="fill-green-500 text-white" />
-                {/* <span className="text-sm text-green-600">Assigned</span> */}
+          {isWithinMonth && (
+            <>
+              {/* Date Number */}
+
+              <div
+                className={`flex items-center justify-center px-0 font-bold sm:justify-center sm:px-0 md:justify-center md:px-0 lg:justify-end lg:px-2 ${
+                  isWithinMonth ? "" : "text-gray-300"
+                } group-hover:text-primary items-center text-center`}
+              >
+                {getDayFromDate(entry.readingDate)}
               </div>
-            )}
-          </div>
-          {/* Due Date */}
-          {Array.isArray(entry.dueDate) ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
-                <span className="text-blue-600 dark:text-blue-600">
-                  {entry.dueDate.sort(compareAsc).map((day, idx) => (
-                    <span className="overflow-auto font-bold" key={idx}>
-                      {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
+
+              {/* Meter Readers */}
+              <div className="col-span-1 flex justify-center">
+                {entry.meterReaders && entry.meterReaders.length > 0 && (
+                  <StackedAvatars
+                    users={entry.meterReaders
+                      .map((meterReader) => ({
+                        id: meterReader.companyId,
+                        image: `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${meterReader.photoUrl}`,
+                        name: meterReader.name,
+                      }))
+                      .sort((a, b) => (a.name > b.name ? 1 : -1))}
+                  />
+                )}
+              </div>
+
+              {/* Due Date */}
+              {Array.isArray(entry.dueDate) ? (
+                <div className="flex items-center justify-center">
+                  <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+                    <span className="text-blue-600 dark:text-blue-600">
+                      {entry.dueDate.sort(compareAsc).map((day, idx) => (
+                        <span className="overflow-auto font-bold" key={idx}>
+                          {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
+                        </span>
+                      ))}
                     </span>
-                  ))}
-                </span>
-              </Badge>
-            </div>
-          ) : entry.dueDate ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
-                <span className="font-bold text-blue-600 dark:text-blue-600">
-                  {formatDate(entry.dueDate, "MMM dd")}
-                </span>
-              </Badge>
-            </div>
-          ) : null}
-          {/* Disconnection Date */}
-          {Array.isArray(entry.disconnectionDate) ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
-                <div className="text-red-600 dark:text-rose-600">
-                  {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
-                    <span className="font-bold" key={idx}>
-                      {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
-                    </span>
-                  ))}
+                  </Badge>
                 </div>
-              </Badge>
-            </div>
-          ) : entry.disconnectionDate ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
-                <span className="font-bold text-red-600 dark:text-rose-600">
-                  {formatDate(entry.disconnectionDate, "MMM dd")}
-                </span>
-              </Badge>
-            </div>
-          ) : null}
-          {/* Rest Day Indicator */}
-          {(dateIsSunday || dateIsSaturday) &&
-            isWithinMonth &&
-            entry.dueDate &&
-            entry.meterReaders?.length === 0 && (
-              <div className="flex items-center justify-center">
-                <Badge className="w-full gap-0 rounded-none bg-gray-100 text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
-                  Applicable Rest Day
-                </Badge>
-              </div>
-            )}
-        </button>
+              ) : entry.dueDate ? (
+                <div className="flex items-center justify-center">
+                  <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+                    <span className="font-bold text-blue-600 dark:text-blue-600">
+                      {formatDate(entry.dueDate, "MMM dd")}
+                    </span>
+                  </Badge>
+                </div>
+              ) : null}
+              {/* Disconnection Date */}
+              {Array.isArray(entry.disconnectionDate) ? (
+                <div className="flex items-center justify-center">
+                  <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+                    <div className="text-red-600 dark:text-rose-600">
+                      {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
+                        <span className="font-bold" key={idx}>
+                          {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
+                        </span>
+                      ))}
+                    </div>
+                  </Badge>
+                </div>
+              ) : entry.disconnectionDate ? (
+                <div className="flex items-center justify-center">
+                  <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+                    <span className="font-bold text-red-600 dark:text-rose-600">
+                      {formatDate(entry.disconnectionDate, "MMM dd")}
+                    </span>
+                  </Badge>
+                </div>
+              ) : null}
+              {/* Rest Day Indicator */}
+              {(dateIsSunday || dateIsSaturday) &&
+                isWithinMonth &&
+                entry.dueDate &&
+                entry.meterReaders?.length === 0 && (
+                  <div className="flex items-center justify-center">
+                    <Badge className="w-full gap-0 rounded-none bg-gray-100 text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
+                      Applicable Rest Day
+                    </Badge>
+                  </div>
+                )}
+            </>
+          )}
+        </motion.button>
       </DialogTrigger>
 
       <DialogContent
@@ -184,7 +229,11 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         <DialogHeader className="space-y-0">
           <DialogTitle>
             <div className="text-lg font-bold text-gray-800">
-              {selectedScheduleEntry && format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
+              {entry && !selectedScheduleEntry
+                ? format(entry.readingDate!, "MMM dd, yyyy")
+                : entry && selectedScheduleEntry
+                  ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
+                  : null}
             </div>
 
             <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
@@ -192,18 +241,34 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 <CalendarIcon className="h-4 w-4" />
                 <span>
                   Due:{" "}
-                  {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
-                    <span className="flex gap-2">
-                      {selectedScheduleEntry.dueDate.map((day, idx) => {
-                        if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                        return format(day, "MMM dd, yyyy");
-                      })}
-                    </span>
-                  ) : selectedScheduleEntry &&
-                    selectedScheduleEntry.dueDate &&
-                    isValid(selectedScheduleEntry?.dueDate) &&
-                    !Array.isArray(selectedScheduleEntry.dueDate) ? (
-                    format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                  {entry && !selectedScheduleEntry?.dueDate ? (
+                    <>
+                      {entry?.dueDate && Array.isArray(entry.dueDate) ? (
+                        <span className="flex gap-2">
+                          {entry.dueDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : entry && entry.dueDate && !Array.isArray(entry.dueDate) ? (
+                        format(entry.dueDate, "MMM dd, yyyy")
+                      ) : null}
+                    </>
+                  ) : entry && selectedScheduleEntry && selectedScheduleEntry?.dueDate ? (
+                    <>
+                      {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
+                        <span className="flex gap-2">
+                          {selectedScheduleEntry.dueDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : selectedScheduleEntry &&
+                        selectedScheduleEntry.dueDate &&
+                        !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                        format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                      ) : null}
+                    </>
                   ) : null}
                 </span>
               </div>
@@ -211,19 +276,35 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 <AlertTriangleIcon className="h-4 w-4" />
                 <span>
                   Disconnection:{" "}
-                  {selectedScheduleEntry?.disconnectionDate &&
-                  Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                    <span className="flex gap-2">
-                      {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
-                        if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                        return format(day, "MMM dd, yyyy");
-                      })}
-                    </span>
-                  ) : selectedScheduleEntry &&
-                    selectedScheduleEntry.disconnectionDate &&
-                    isValid(selectedScheduleEntry?.disconnectionDate) &&
-                    !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                    format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                  {entry && !selectedScheduleEntry?.disconnectionDate ? (
+                    <>
+                      {entry?.disconnectionDate && Array.isArray(entry.disconnectionDate) ? (
+                        <span className="flex gap-2">
+                          {entry.disconnectionDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : entry && entry.disconnectionDate && !Array.isArray(entry.disconnectionDate) ? (
+                        format(entry.disconnectionDate, "MMM dd, yyyy")
+                      ) : null}
+                    </>
+                  ) : entry && selectedScheduleEntry && selectedScheduleEntry.disconnectionDate ? (
+                    <>
+                      {selectedScheduleEntry?.disconnectionDate &&
+                      Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                        <span className="flex gap-2">
+                          {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
+                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
+                            return format(day, "MMM dd, yyyy");
+                          })}
+                        </span>
+                      ) : selectedScheduleEntry &&
+                        selectedScheduleEntry.disconnectionDate &&
+                        !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                        format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                      ) : null}
+                    </>
                   ) : null}
                 </span>
               </div>

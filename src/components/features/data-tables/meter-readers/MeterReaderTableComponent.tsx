@@ -10,7 +10,7 @@ export const MeterReaderTableComponent: FunctionComponent = () => {
   return (
     <>
       <div className="">
-        <div className="flex justify-end">
+        <div className="flex justify-start">
           <AddMeterReaderDialog
             addMeterReaderDialogIsOpen={addMeterReaderDialogIsOpen}
             setAddMeterReaderDialogIsOpen={setAddMeterReaderDialogIsOpen}

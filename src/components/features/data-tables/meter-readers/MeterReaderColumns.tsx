@@ -5,6 +5,7 @@ import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
+import { Badge } from "@mr/components/ui/Badge";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
   const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
@@ -21,22 +22,46 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID No." />,
         filterFn: filterFn,
         cell: ({ row }) => <span>{row.original.companyId}</span>,
-        enableColumnFilter: false,
+        enableColumnFilter: true,
       },
       {
         accessorKey: "name",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => <span>{row.original.name}</span>,
-        enableColumnFilter: false,
-      },
-      {
-        accessorKey: "positionTitle",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Position Title" />,
+        header: "Meter Reader",
         filterFn: filterFn,
-        cell: ({ row }) => <span>{row.original.positionTitle}</span>,
-        meta: {
-          exportLabel: "Position Title",
-        },
+        cell: ({ row }) => (
+          <div>
+            <div className="flex flex-col">
+              <div className="flex items-center justify-start gap-2">
+                <div>{row.original.name}</div>
+                {/* <Badge className="text-xs">{row.original.companyId}</Badge> */}
+              </div>
+              <div className="text-xs text-gray-500">{row.original.positionTitle}</div>
+            </div>
+          </div>
+        ),
+        enableColumnFilter: true,
+      },
+      // {
+      //   accessorKey: "positionTitle",
+      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Position Title" />,
+      //   filterFn: filterFn,
+      //   cell: ({ row }) => (
+      //     <div>
+      //       <div className="flex flex-col">
+      //         <div>{row.original.positionTitle}</div>
+      //         <div>{row.original.positionTitle}</div>
+      //       </div>
+      //     </div>
+      //   ),
+      //   meta: {
+      //     exportLabel: "Position Title",
+      //   },
+      // },
+      {
+        accessorKey: "mobileNumber",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
+        cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
+        enableColumnFilter: false,
       },
       {
         accessorKey: "zoneBooks",
@@ -56,11 +81,11 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         header: ({ column }) => <DataTableColumnHeader column={column} title="Rest Day" />,
         cell: ({ row }) => (
           <span>
-            {row.original.restDay === "sunday"
-              ? "Sunday"
-              : row.original.restDay === "saturday"
-                ? "Saturday"
-                : null}
+            {row.original.restDay === "sunday" ? (
+              <Badge className="w-[4rem] border-black bg-gray-50 text-black">Sunday</Badge>
+            ) : row.original.restDay === "saturday" ? (
+              <Badge className="w-[4rem] border-black bg-black text-white">Saturday</Badge>
+            ) : null}
           </span>
         ),
         filterFn: filterFn,
@@ -69,12 +94,6 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         },
       },
 
-      {
-        accessorKey: "mobileNumber",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
-        cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
-        enableColumnFilter: false,
-      },
       {
         id: "actions",
         header: "Actions",

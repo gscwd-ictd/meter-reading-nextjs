@@ -7,7 +7,7 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { FunctionComponent } from "react";
 import { useFormContext } from "react-hook-form";
 import { EditSelectRestDayCombobox } from "./EditSelectRestDayCombobox";
-import { FormInput } from "@mr/components/ui/FormInput";
+import { ContactNumberInput } from "@mr/components/ui/input/ContactNumberInput";
 
 type EditMeterReaderTabsProps = {
   loading: boolean;
@@ -54,9 +54,9 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
           </div>
 
           <div className="col-span-2 flex flex-col items-start gap-0">
-            <FormInput
+            <ContactNumberInput
               id="mobileNumber"
-              label="Contact Number (+63)"
+              label="Contact Number"
               isRequired
               minLength={10}
               maxLength={10}
