@@ -8,7 +8,7 @@ import {
   varchar,
   real,
 } from "drizzle-orm/pg-core";
-import { z } from "zod";
+import z4 from "zod/v4";
 
 export const readingDetails = pgTable("reading_details", {
   id: varchar("id").primaryKey().notNull(),
@@ -118,22 +118,141 @@ export const rates = pgTable("rates", {
   rate51: real("rate51"),
 });
 
-export const ReadingDetailsSchema = z.object({
-  id: z.string().uuid(),
-  meterReaderId: z.string(),
-  accountNo: z.string(),
-  presentReading: z.number(),
-  usage: z.number(),
-  billedAmount: z.number(),
-  readingDate: z.string(),
-  dueDate: z.string(),
-  disconnectionDate: z.string(),
-  remarks: z.string().optional(),
-  additionalRemarks: z.string().optional(),
-  penalty: z.number().optional(),
-  isPosted: z.boolean(),
+const BaseSchema = z4.object({
+  id: z4.uuid(),
 });
 
-export const UpdateReadingDetailsSchema = z.object({
-  isPosted: z.boolean(),
+export const ReadingDetailsSchema = BaseSchema.extend({
+  meterReaderId: z4.string(),
+  accountNo: z4.string(),
+  presentReading: z4.number(),
+  usage: z4.number(),
+  billedAmount: z4.number(),
+  readingDate: z4.string(),
+  dueDate: z4.string(),
+  disconnectionDate: z4.string(),
+  remarks: z4.string().optional(),
+  additionalRemarks: z4.string().optional(),
+  penalty: z4.number().optional(),
+  isPosted: z4.boolean(),
+});
+
+export const UpdateReadingDetailsSchema = z4.object({
+  isPosted: z4.boolean(),
+});
+
+export const ZoneBookAddressSchema = BaseSchema.extend({
+  zoneCode: z4.number().optional(),
+  bookCode: z4.number().optional(),
+  address: z4.string().optional(),
+});
+
+export const UpdateZoneBookAddressSchema = ZoneBookAddressSchema.omit({
+  id: true,
+});
+
+export const UsageSchema = BaseSchema.extend({
+  accountNumber: z4.string().optional(),
+  month1Usage: z4.string().optional(),
+  month2Usage: z4.string().optional(),
+  month3Usage: z4.string().optional(),
+  month4Usage: z4.string().optional(),
+});
+
+export const UpdateUsageSchema = UsageSchema.omit({
+  id: true,
+});
+
+export const AccountHistorySchema = BaseSchema.extend({
+  accountNumber: z4.string().optional(),
+  dateTime: z4.string().optional(),
+  remarks: z4.string().optional(),
+});
+
+export const UpdateAccountHistorySchema = AccountHistorySchema.omit({
+  id: true,
+});
+
+export const AccountsSchema = BaseSchema.extend({
+  accountNumber: z4.string().optional(),
+  accountName: z4.string().optional(),
+  meterNumber: z4.string().optional(),
+  previousReading: z4.string().optional(),
+  zoneCode: z4.string().optional(),
+  bookCode: z4.string().optional(),
+  meterStatus: z4.string().optional(),
+  isRead: z4.boolean().optional(),
+  sequenceNumber: z4.string().optional(),
+  address: z4.string().optional(),
+  dateInstalled: z4.string().optional(),
+  disconnectionType: z4.string().optional(),
+  disconnectionDate: z4.string().optional(),
+  reconnectionDate: z4.string().optional(),
+  contactNumber: z4.string().optional(),
+  classification: z4.string().optional(),
+  arrears: z4.string().optional(),
+  currentReading: z4.string().optional(),
+  billedAmount: z4.string().optional(),
+  remarks: z4.string().optional(),
+  additionalRemarks: z4.string().optional(),
+  image: z4.string().optional(),
+  longlat: z4.string().optional(),
+  printCount: z4.number().optional(),
+  checkDigit: z4.number().optional(),
+  dueDate: z4.string().optional(),
+  consumerType: z4.string().optional(),
+  meterCode: z4.number().optional(),
+});
+
+export const UpdateAccountsSchema = AccountsSchema.omit({
+  id: true,
+});
+
+export const NewMeterSchema = BaseSchema.extend({
+  currentReading: z4.string().optional(),
+  meterNumber: z4.string().optional(),
+  image: z4.string().optional(),
+  dateTime: z4.string().optional(),
+});
+
+export const UpdateNewMeterSchema = NewMeterSchema.omit({
+  id: true,
+});
+
+export const WaterConcernsSchema = BaseSchema.extend({
+  remakrs: z4.string().optional(),
+  additionalRemarks: z4.string().optional(),
+  nearestMeterNumber: z4.string().optional(),
+  image: z4.string().optional(),
+});
+
+export const UpdateWaterConcernsSchema = WaterConcernsSchema.omit({
+  id: true,
+});
+
+export const LeakageSchema = BaseSchema.extend({
+  nearestMeterNumber: z4.string().optional(),
+  remarks: z4.string().optional(),
+  additionalRemarks: z4.string().optional(),
+  dateTime: z4.string().optional(),
+});
+
+export const UpdateLeakageSchema = LeakageSchema.omit({
+  id: true,
+});
+
+export const RatesSchema = BaseSchema.extend({
+  accountType: z4.string().optional(),
+  description: z4.string().optional(),
+  meterCode: z4.number().optional(),
+  minimumRate: z4.number().optional(),
+  rate11: z4.number().optional(),
+  rate21: z4.number().optional(),
+  rate31: z4.number().optional(),
+  rate41: z4.number().optional(),
+  rate51: z4.number().optional(),
+});
+
+export const UpdateRatesSchema = RatesSchema.omit({
+  id: true,
 });
