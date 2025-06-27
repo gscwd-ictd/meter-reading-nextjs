@@ -40,6 +40,11 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     return format(transformDateToStringIfInvalid(selectedScheduleEntry.readingDate), "yyyy-MM-dd");
   }, [selectedScheduleEntry?.readingDate]);
 
+  const transformDateToStringIfInvalid = (date: string | Date) =>
+    isValidYyyyMmDdOrDate(date) ? date : toParsedDateOnly(date);
+
+  const transformedReadingDate = format(transformDateToStringIfInvalid(entry.readingDate), "yyyy-MM-dd");
+
   // if schedule entry is splitted, this only sets the schedule entry/singular/selected day splitted dates
   useEffect(() => {
     if (

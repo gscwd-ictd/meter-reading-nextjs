@@ -36,6 +36,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
       dueDate: selectedScheduleEntry?.dueDate!,
       meterReaders: temporaryMeterReaders.filter((mr) => mr.meterReaderId !== meterReaderId),
+      id: selectedScheduleEntry?.id!,
     });
   };
 
