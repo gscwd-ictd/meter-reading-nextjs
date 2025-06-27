@@ -60,7 +60,7 @@ export type Scheduler = ReturnType<typeof useScheduler>;
 
 export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: string) => {
   const [currentDate, setCurrentDate] = useState(
-    monthYear ? parse(monthYear, "MM-yyyy", new Date()) : new Date(),
+    monthYear ? parse(monthYear, "yyyy-MM", new Date()) : new Date(),
   );
   const [currentMonthYear, setCurrentMonthYear] = useState(monthYear);
 
@@ -378,19 +378,36 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
       let split = [...schedule];
 
       // Helper function to find previous valid reading with defined dates
+      // const findPreviousValidReading = (readings: MeterReadingSchedule[], idx: number) => {
+      //   let lookBack = 1;
+
+      //   while (
+      //     (!readings[idx - lookBack]?.dueDate && !readings[idx - lookBack]?.disconnectionDate) ||
+      //     isSunday(readings[idx - lookBack]?.readingDate as Date)
+      //   ) {
+      //     //! lookBack is creating a loop due to having no break statement in while when clicked date is the first date of the month
+
+      //     lookBack++;
+      //   }
+
+      //   return readings[idx - lookBack];
+      // };
+
       const findPreviousValidReading = (readings: MeterReadingSchedule[], idx: number) => {
         let lookBack = 1;
 
-        while (
-          (!readings[idx - lookBack]?.dueDate && !readings[idx - lookBack]?.disconnectionDate) ||
-          isSunday(readings[idx - lookBack]?.readingDate as Date)
-        ) {
-          //! lookBack is creating a loop due to having no break statement in while when clicked date is the first date of the month
+        while (idx - lookBack >= 0) {
+          const candidate = readings[idx - lookBack];
+
+          // Exit early if valid reading is found, even if it's Sunday
+          if (candidate?.dueDate || candidate?.disconnectionDate) {
+            return candidate;
+          }
 
           lookBack++;
         }
 
-        return readings[idx - lookBack];
+        return undefined; // fallback in case nothing is found
       };
 
       // Process each selected date
@@ -411,10 +428,30 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
             const curr = split[j];
             const prev = findPreviousValidReading(split, j);
 
+            // const currentReading: MeterReadingSchedule = {
+            //   readingDate: curr?.readingDate as Date,
+            //   dueDate: [curr?.dueDate, prev?.dueDate] as Date[],
+            //   disconnectionDate: [curr?.disconnectionDate, prev?.disconnectionDate] as Date[],
+            // };
+
+            // const currentReading: MeterReadingSchedule = {
+            //   readingDate: curr?.readingDate as Date,
+            //   dueDate: [curr?.dueDate, prev?.dueDate].filter(Boolean) as Date[],
+            //   disconnectionDate: [curr?.disconnectionDate, prev?.disconnectionDate].filter(Boolean) as Date[],
+            // };
+
+            // const currentReading: MeterReadingSchedule = {
+            //   readingDate: curr?.readingDate as Date,
+            //   dueDate: mergeDates(curr?.dueDate, prev?.dueDate),
+            //   disconnectionDate: mergeDates(curr?.disconnectionDate, prev?.disconnectionDate),
+            // };
+
             const currentReading: MeterReadingSchedule = {
-              readingDate: curr?.readingDate as Date,
-              dueDate: [curr?.dueDate, prev?.dueDate] as Date[],
-              disconnectionDate: [curr?.disconnectionDate, prev?.disconnectionDate] as Date[],
+              readingDate: curr.readingDate,
+              dueDate: [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[],
+              disconnectionDate: [curr.disconnectionDate, prev?.disconnectionDate]
+                .filter(Boolean)
+                .slice(0, 2) as Date[],
             };
 
             result.push(currentReading);
@@ -453,6 +490,49 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     [calculateSchedule, removeDuplicateDates],
   );
 
+  // const splitDates = useCallback(
+  //   (selectedDates: Date[]) => {
+  //     const originalSchedule = calculateSchedule();
+
+  //     // Step 1: clean input
+  //     const uniqueDates = removeDuplicateDates(selectedDates).sort(compareAsc);
+
+  //     const updatedSchedule = originalSchedule.map((entry) => ({ ...entry }));
+
+  //     for (const selected of uniqueDates) {
+  //       const idx = updatedSchedule.findIndex((entry) => isSameDay(entry.readingDate, selected));
+
+  //       // Skip if not found or it's the first reading (no previous)
+  //       if (idx <= 0) continue;
+
+  //       const current = updatedSchedule[idx];
+  //       const prev = updatedSchedule
+  //         .slice(0, idx)
+  //         .reverse()
+  //         .find((r) => r.dueDate && r.disconnectionDate && !isSunday(r.readingDate));
+
+  //       // Skip if there's no valid previous date
+  //       if (!prev) continue;
+
+  //       // Merge due dates and disconnection dates (only for the selected date)
+  //       const mergedDue = [current.dueDate, prev.dueDate].filter(Boolean).flat() as Date[];
+  //       const mergedDisc = [current.disconnectionDate, prev.disconnectionDate]
+  //         .filter(Boolean)
+  //         .flat() as Date[];
+
+  //       // Apply merged values back, limited to 2
+  //       updatedSchedule[idx] = {
+  //         ...current,
+  //         dueDate: mergedDue.slice(0, 2),
+  //         disconnectionDate: mergedDisc.slice(0, 2),
+  //       };
+  //     }
+
+  //     return updatedSchedule;
+  //   },
+  //   [calculateSchedule, removeDuplicateDates],
+  // );
+
   const assignMeterReaders = useCallback(
     (
       schedule: MeterReadingSchedule[],
@@ -470,14 +550,14 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
       return schedule.map((entry) => {
         // Guard: If readingDate is missing or invalid, skip assigning readers
         if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
-          return { ...entry, meterReaders: [] }; // no meterReaders field
+          return { ...entry, meterReaders: [], id: entry.id! }; // no meterReaders field
         }
 
         const readingRestDay = getDayName(entry.readingDate);
 
         const availableReaders = transformMeterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
-        return { ...entry, meterReaders: availableReaders };
+        return { ...entry, meterReaders: availableReaders, id: entry.id! };
       });
     },
     [],
@@ -485,17 +565,17 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
-    setCurrentMonthYear(format(subMonths(currentDate, 1), "MM-yyyy"));
+    setCurrentMonthYear(format(subMonths(currentDate, 1), "yyyy-MM"));
   };
 
   const goToNextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
-    setCurrentMonthYear(format(addMonths(currentDate, 1), "MM-yyyy"));
+    setCurrentMonthYear(format(addMonths(currentDate, 1), "yyyy-MM"));
   };
 
   const today = () => {
     setCurrentDate(new Date());
-    setCurrentMonthYear(format(new Date(), "MM-yyyy"));
+    setCurrentMonthYear(format(new Date(), "yyyy-MM"));
   };
 
   const getWorkingDays = useCallback((): MeterReadingDate[] => {

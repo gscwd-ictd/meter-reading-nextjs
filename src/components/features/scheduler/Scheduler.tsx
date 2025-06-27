@@ -16,8 +16,10 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
-import { MeterReadingSchedule } from "@mr/lib/types/schedule";
+import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
+import { motion } from "framer-motion";
+import { Skeleton } from "@mr/components/ui/Skeleton";
 
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
@@ -30,59 +32,139 @@ export const Scheduler: FunctionComponent = () => {
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
-  const hasFetchedSchedule = useSchedulesStore((state) => state.hasFetchedSchedule);
-  const setHasFetchedSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
-
-  const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "MM-yyyy"));
+  const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
+  const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
+  const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
+  const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "yyyy-MM"));
   const [activeContext, setActiveContext] = useState<number | null>(null);
+
+  // these are derived states
+  const hasFetched = lastFetchedMonthYear === monthYear;
 
   scheduler.addSundayReadings(currentSchedule);
 
   const {
     data: schedule,
-    isError,
     isLoading,
+    isFetching,
+    refetch,
   } = useQuery({
     queryKey: ["get-schedule", monthYear],
-    enabled: calendarIsSet && !hasFetchedSchedule && monthYear !== null,
+    enabled: calendarIsSet && !hasFetched && currentSchedule.length > 0,
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${monthYear}`);
-        return res.data as MeterReadingSchedule[];
+        return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
         toast.error("Cannot find schedule");
       }
     },
+    retry: false,
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
-  // this should populate the calendar first
+  // these are derived loading states, it should be below the useQuery since loading is derived
+  const isInitializingCalendar = !calendarIsSet && currentSchedule.length === 0;
+  const isFetchingSchedule = calendarIsSet && currentSchedule.length > 0 && isLoading;
+  const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading;
+
+  // this should populate the calendar first #1
   useEffect(() => {
-    if (!calendarIsSet) {
-      setCurrentSchedule(scheduler.splitDates(datesToSplit));
+    if (!calendarIsSet && monthYear) {
+      const initialDates = scheduler.splitDates(datesToSplit);
+      setCurrentSchedule(
+        initialDates.map((sched) => {
+          return { ...sched, meterReaders: [], id: sched.id! };
+        }),
+      );
       setCalendarIsSet(true);
     }
-  }, [scheduler, setCurrentSchedule, setCalendarIsSet, calendarIsSet, datesToSplit]);
+  }, [calendarIsSet, monthYear, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
-  // this should populate the schedule if ever there is
+  // run this state setter if the there is a fetched schedule for the month
+  const hasScheduleOption = () => {
+    // this should be true since this function is executed
+    setHasSchedule(true);
+
+    // this would turn true since you cannot submit without submitting
+    setScheduleHasSplittedDates(true);
+
+    // this should turn true since populating of meter readers is only allowed when the schedule is empty for the month
+    setHasPopulatedMeterReaders(true);
+  };
+
+  // run this state setter if there is no fetched schedule for the month
+  const hasNoScheduleOption = () => {
+    // this should be false since this function is executed
+    setHasSchedule(false);
+
+    // this would turn false since schedule has not yet been submitted
+    setScheduleHasSplittedDates(false);
+
+    // this should turn false since schedule has not yet been submitted
+    setHasPopulatedMeterReaders(false);
+  };
+
+  // this is the reset state button when from one month to another
+  const resetOnChange = () => {
+    // set the calendar populate state to false
+    setCalendarIsSet(false);
+
+    // set dates to split to empty
+    setDatesToSplit([]);
+
+    // reset the populate meter readers observer
+    setHasPopulatedMeterReaders(false);
+
+    // reset the splittedDates observer
+    setScheduleHasSplittedDates(false);
+
+    // reset the observer
+    setHasSchedule(false);
+
+    setCurrentSchedule([]);
+
+    setLastFetchedMonthYear(null);
+  };
+
+  // update the state of currentSchedule based on the fetched schedule
   useEffect(() => {
-    if (schedule && !isError && schedule.length > 0 && !hasFetchedSchedule) {
-      // append the schedule to the calendar
+    if (!calendarIsSet || hasFetched || !monthYear || isFetching || isLoading) return;
+
+    if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && monthYear) {
       setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
-      setHasFetchedSchedule(true);
-    } else if (((schedule && schedule.length === 0) || isError) && !hasFetchedSchedule) {
-      setHasFetchedSchedule(true);
+      hasScheduleOption();
+      setRefetchData(() => refetch);
+      setLastFetchedMonthYear(monthYear);
+    } else if (calendarIsSet && !isLoading && schedule && schedule.length === 0 && !isFetching && monthYear) {
+      hasNoScheduleOption();
+      setLastFetchedMonthYear(monthYear);
+      setRefetchData(() => refetch);
     }
   }, [
     schedule,
-    isError,
     isLoading,
-    currentSchedule,
-    setCurrentSchedule,
-    setHasFetchedSchedule,
+    isFetching,
+    monthYear,
+    hasFetched,
     calendarIsSet,
-    hasFetchedSchedule,
+    currentSchedule,
+    refetch,
+    setRefetchData,
+    setCurrentSchedule,
+    hasNoScheduleOption,
+    setLastFetchedMonthYear,
+    hasScheduleOption,
   ]);
+
+  // this sets the global state of the current month's fetch
+  useEffect(() => {
+    setHasFetchedThisMonthsSchedule(hasFetched);
+  }, [setHasFetchedThisMonthsSchedule, hasFetched]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);
@@ -96,7 +178,7 @@ export const Scheduler: FunctionComponent = () => {
 
   return (
     <>
-      <div className="m-5 flex h-full flex-col rounded border">
+      <div className="bg-background m-5 flex h-full flex-col overflow-hidden rounded border shadow-sm">
         <header className="flex items-center justify-between p-4">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">
@@ -110,7 +192,7 @@ export const Scheduler: FunctionComponent = () => {
             </div>
 
             <div>
-              <h1 className="text-lg font-bold">{format(scheduler.currentDate, "MMMM yyyy")}</h1>
+              <h1 className="text-lg font-bold">{format(scheduler.currentDate, "yyyy MMMM")}</h1>
 
               <section className="text-muted-foreground flex items-center gap-1 text-sm">
                 <p>{format(startOfMonth(scheduler.currentDate), "MMM dd, yyyy")}</p>
@@ -124,11 +206,8 @@ export const Scheduler: FunctionComponent = () => {
             <Button
               variant="outline"
               onClick={() => {
+                resetOnChange();
                 scheduler.goToPreviousMonth();
-                setDatesToSplit([]);
-                setCalendarIsSet(false);
-                setScheduleHasSplittedDates(false);
-                setHasPopulatedMeterReaders(false);
               }}
             >
               <ChevronLeft />
@@ -136,11 +215,8 @@ export const Scheduler: FunctionComponent = () => {
             <Button
               variant="outline"
               onClick={() => {
+                resetOnChange();
                 scheduler.today();
-                setDatesToSplit([]);
-                setCalendarIsSet(false);
-                setScheduleHasSplittedDates(false);
-                setHasPopulatedMeterReaders(false);
               }}
             >
               Today
@@ -148,9 +224,8 @@ export const Scheduler: FunctionComponent = () => {
             <Button
               variant="outline"
               onClick={() => {
+                resetOnChange();
                 scheduler.goToNextMonth();
-                setDatesToSplit([]);
-                setCalendarIsSet(false);
               }}
             >
               <ChevronRight />
@@ -167,43 +242,90 @@ export const Scheduler: FunctionComponent = () => {
           </section>
         </header>
 
-        <main className="flex h-full flex-1 flex-col overflow-hidden">
-          {currentSchedule.length === 0 ? (
+        <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
+          {isInitializingCalendar ? (
             <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-xl">
               <LoadingSpinner className="size-12" /> Loading Calendar...
             </div>
           ) : (
-            currentSchedule &&
-            currentSchedule.length > 0 && (
-              <section className="grid grid-cols-7 border-y">
+            <>
+              {/* Calendar Header Section */}
+              <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
-                  <div
-                    key={index}
-                    className="border-l py-2 text-center text-xs font-semibold uppercase first:border-l-0"
-                  >
+                  <div key={index} className="border-none py-2 text-center">
                     {day}
                   </div>
                 ))}
               </section>
-            )
-          )}
 
-          <section className="flex-1" style={gridStyle}>
-            {currentSchedule &&
-              currentSchedule.map((entry, idx) => {
-                return (
-                  <ScheduleEntryContextMenu
-                    activeContext={activeContext}
-                    currentDate={scheduler.currentDate}
-                    entry={entry}
-                    setActiveContext={setActiveContext}
-                    idx={idx}
-                    key={idx}
-                    scheduler={scheduler}
-                  />
-                );
-              })}
-          </section>
+              {/* Calendar Body Section */}
+              <section className="relative flex-1 overflow-hidden rounded border-t" style={gridStyle}>
+                {/* Overlay loading indicator while fetching schedules */}
+                {isFetchingSchedule && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-slate-900/70">
+                    <div className="text-primary flex items-center gap-2 text-xl">
+                      <LoadingSpinner className="size-10 animate-spin" /> Getting Schedules...
+                    </div>
+                  </div>
+                )}
+
+                {/* Skeleton grid cells during fetch */}
+                {isFetchingSchedule && !isReady && (
+                  <>
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+                      <div key={index} className="border-none py-2 text-center">
+                        {day}
+                      </div>
+                    ))}
+                    <div className="absolute inset-0 z-10 grid grid-cols-7 gap-px p-1">
+                      {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 rounded border border-dashed p-0"
+                        >
+                          <div className="flex justify-end">
+                            <Skeleton className="size-6 rounded-full p-2" />
+                          </div>
+                          <div className="flex w-full justify-center">
+                            <div className="flex w-1/3 justify-center">
+                              <Skeleton className="size-6 rounded-full" />
+                              <Skeleton className="-ml-2 size-6 rounded-full" />
+                              <Skeleton className="-ml-2 size-6 rounded-full" />
+                            </div>
+                          </div>
+                          <Skeleton className="w-full" />
+                          <Skeleton className="w-full" />
+                          <div></div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Render actual calendar only when ready */}
+                {isReady &&
+                  currentSchedule.map((entry, idx) => (
+                    <motion.div
+                      key={idx}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                      className="group relative flex flex-col rounded border-x border-b border-dashed p-0 transition-colors duration-150 ease-in-out"
+                    >
+                      <ScheduleEntryContextMenu
+                        activeContext={activeContext}
+                        currentDate={scheduler.currentDate}
+                        entry={entry}
+                        setActiveContext={setActiveContext}
+                        idx={idx}
+                        scheduler={scheduler}
+                      />
+                    </motion.div>
+                  ))}
+              </section>
+            </>
+          )}
         </main>
       </div>
     </>

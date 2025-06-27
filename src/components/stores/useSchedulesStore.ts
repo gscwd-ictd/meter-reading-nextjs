@@ -43,6 +43,10 @@ type SchedulesStore = {
   setSplittedDates: (splittedDates: SplitDate[]) => void;
   hasPopulatedMeterReaders: boolean;
   setHasPopulatedMeterReaders: (hasPopulatedMeterReaders: boolean) => void;
+  lastFetchedMonthYear: string | null;
+  setLastFetchedMonthYear: (monthYear: string | null) => void;
+  refetchData?: () => void;
+  setRefetchData: (fn: () => void) => void;
 };
 
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
@@ -81,4 +85,8 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setHasPopulatedMeterReaders: (hasPopulatedMeterReaders) => set({ hasPopulatedMeterReaders }),
   hasFetchedSchedule: false,
   setHasFetchedSchedule: (hasFetchedSchedule) => set({ hasFetchedSchedule }),
+  lastFetchedMonthYear: null,
+  setLastFetchedMonthYear: (lastFetchedMonthYear) => set({ lastFetchedMonthYear }),
+  refetchData: undefined,
+  setRefetchData: (fn) => set({ refetchData: fn }),
 }));

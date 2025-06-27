@@ -8,7 +8,7 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { FunctionComponent } from "react";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { useFormContext } from "react-hook-form";
-import { FormInput } from "@mr/components/ui/FormInput";
+import { ContactNumberInput } from "@mr/components/ui/input/ContactNumberInput";
 
 type MeterReaderTabsProps = {
   loading: boolean;
@@ -56,10 +56,10 @@ export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ loadi
             />
           </div>
 
-          <div className="col-span-2 flex flex-col items-start gap-0">
-            <FormInput
+          <div className="col-span-2 flex flex-col items-center gap-0">
+            <ContactNumberInput
               id="mobileNumber"
-              label="Contact Number (+63)"
+              label="Contact Number"
               isRequired
               minLength={10}
               maxLength={10}
