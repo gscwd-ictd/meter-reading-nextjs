@@ -266,7 +266,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                       </span>
                     ) : selectedScheduleEntry &&
                       selectedScheduleEntry.dueDate &&
-                      isValid(selectedScheduleEntry?.dueDate) &&
                       !Array.isArray(selectedScheduleEntry.dueDate) ? (
                       format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
                     ) : null}
@@ -286,7 +285,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                       </span>
                     ) : selectedScheduleEntry &&
                       selectedScheduleEntry.disconnectionDate &&
-                      isValid(selectedScheduleEntry?.disconnectionDate) &&
                       !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
                       format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
                     ) : null}

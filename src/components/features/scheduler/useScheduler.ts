@@ -18,6 +18,7 @@ import {
   isSunday,
   isValid,
   isWeekend,
+  nextMonday,
   parse,
   startOfMonth,
   startOfWeek,
@@ -62,6 +63,7 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
   const [currentDate, setCurrentDate] = useState(
     monthYear ? parse(monthYear, "yyyy-MM", new Date()) : new Date(),
   );
+
   const [currentMonthYear, setCurrentMonthYear] = useState(monthYear);
 
   const router = useRouter();
@@ -117,6 +119,47 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
 
     return Array.from(uniqueDates.values());
   }, []);
+
+  const addBusinessDays = useCallback(
+    (startDate: Date, daysToAdd: number): Date => {
+      let currentDate = new Date(startDate); // avoid mutating input
+      let daysAdded = 0;
+
+      while (daysAdded < daysToAdd) {
+        currentDate = addDays(currentDate, 1);
+
+        const isWorkday = !isWeekend(currentDate) && !isHoliday(currentDate) && !isNoDutyDay(currentDate);
+
+        if (isWorkday) {
+          daysAdded++;
+        }
+      }
+
+      return currentDate;
+    },
+    [isHoliday, isNoDutyDay], // make sure these are stable refs
+  );
+
+  // Add 1 day if the provided date is a holiday
+  const adjustForHolidayOrWeekend = useCallback(
+    (date: Date) => {
+      while (isHoliday(date) || isWeekend(date) || isNoDutyDay(date)) {
+        if (isHoliday(date)) {
+          date = addDays(date, 1);
+        }
+
+        if (isNoDutyDay(date)) {
+          date = addDays(date, 1);
+        }
+
+        if (isWeekend(date)) {
+          date = nextMonday(date);
+        }
+      }
+      return date;
+    },
+    [isHoliday],
+  );
 
   const addSundayReadings = useCallback((schedule: MeterReadingSchedule[]) => {
     // Create a new array to avoid mutating the original
@@ -199,6 +242,97 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     return { monthStart, startOfReadingDate };
   }, [currentDate, isNoDutyDay]);
 
+  // const calculateDueDates = useCallback((): DueDate[] => {
+  //   const { monthStart, startOfReadingDate } = getStartingReadingDate();
+  //   const dueDates: DueDate[] = [];
+  //   const usedDueDates = new Set<string>();
+
+  //   let readingDate = startOfReadingDate;
+  //   let readingCount = 0;
+
+  //   while (isSameMonth(readingDate, monthStart) && readingCount < 21) {
+  //     if (isNoDutyDay(readingDate)) {
+  //       readingDate = addDays(readingDate, 1);
+  //       continue;
+  //     }
+
+  //     const isSaturday = getDay(readingDate) === 6;
+  //     const isSunday = getDay(readingDate) === 0;
+
+  //     if (isSaturday) {
+  //       const nextDay = addDays(readingDate, 1);
+
+  //       // Case: Saturday is followed by valid Sunday in same month
+  //       const isValidSunday =
+  //         isSameMonth(nextDay, monthStart) && getDay(nextDay) === 0 && !isNoDutyDay(nextDay);
+
+  //       let dueDate = addDays(readingDate, 15);
+  //       let dueDateStr = format(dueDate, "yyyy-MM-dd");
+
+  //       while (
+  //         isHoliday(dueDate) ||
+  //         isWeekend(dueDate) ||
+  //         isNoDutyDay(dueDate) ||
+  //         usedDueDates.has(dueDateStr)
+  //       ) {
+  //         dueDate = addDays(dueDate, 1);
+  //         dueDateStr = format(dueDate, "yyyy-MM-dd");
+  //       }
+
+  //       usedDueDates.add(dueDateStr);
+
+  //       // Push Saturday now, and maybe Sunday next
+  //       dueDates.push({ readingDate, dueDate });
+
+  //       if (isValidSunday) {
+  //         readingDate = nextDay;
+  //         dueDates.push({ readingDate, dueDate }); // same dueDate
+  //       }
+
+  //       readingCount++; // ✅ Count Sat+Sun as 1
+  //       readingDate = addDays(readingDate, 1); // move past Sunday (or Sat if no Sunday)
+  //       continue;
+  //     }
+
+  //     // if (isSunday) {
+  //     //   // Skip Sunday alone — already handled by Sat
+  //     //   readingDate = addDays(readingDate, 1);
+  //     //   continue;
+  //     // }
+  //     if (isSunday) {
+  //       if (dueDates.length === 0) {
+  //         // First reading day is a Sunday — allow it
+  //       } else {
+  //         // Regular Sunday — skip (already handled by Saturday)
+  //         readingDate = addDays(readingDate, 1);
+  //         continue;
+  //       }
+  //     }
+
+  //     // Regular weekday reading
+  //     let dueDate = addDays(readingDate, 15);
+  //     let dueDateStr = format(dueDate, "yyyy-MM-dd");
+
+  //     while (
+  //       isHoliday(dueDate) ||
+  //       isWeekend(dueDate) ||
+  //       isNoDutyDay(dueDate) ||
+  //       usedDueDates.has(dueDateStr)
+  //     ) {
+  //       dueDate = addDays(dueDate, 1);
+  //       dueDateStr = format(dueDate, "yyyy-MM-dd");
+  //     }
+
+  //     usedDueDates.add(dueDateStr);
+  //     dueDates.push({ readingDate, dueDate });
+  //     readingCount++;
+
+  //     readingDate = addDays(readingDate, 1);
+  //   }
+
+  //   return dueDates;
+  // }, [getStartingReadingDate, isHoliday, isNoDutyDay]);
+
   const calculateDueDates = useCallback((): DueDate[] => {
     const { monthStart, startOfReadingDate } = getStartingReadingDate();
     const dueDates: DueDate[] = [];
@@ -213,61 +347,11 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
         continue;
       }
 
-      const isSaturday = getDay(readingDate) === 6;
-      const isSunday = getDay(readingDate) === 0;
+      const baseDueDate = addDays(readingDate, 15);
+      const isSaturday = getDay(baseDueDate) === 6;
+      const isSunday = getDay(baseDueDate) === 0;
 
-      if (isSaturday) {
-        const nextDay = addDays(readingDate, 1);
-
-        // Case: Saturday is followed by valid Sunday in same month
-        const isValidSunday =
-          isSameMonth(nextDay, monthStart) && getDay(nextDay) === 0 && !isNoDutyDay(nextDay);
-
-        let dueDate = addDays(readingDate, 15);
-        let dueDateStr = format(dueDate, "yyyy-MM-dd");
-
-        while (
-          isHoliday(dueDate) ||
-          isWeekend(dueDate) ||
-          isNoDutyDay(dueDate) ||
-          usedDueDates.has(dueDateStr)
-        ) {
-          dueDate = addDays(dueDate, 1);
-          dueDateStr = format(dueDate, "yyyy-MM-dd");
-        }
-
-        usedDueDates.add(dueDateStr);
-
-        // Push Saturday now, and maybe Sunday next
-        dueDates.push({ readingDate, dueDate });
-
-        if (isValidSunday) {
-          readingDate = nextDay;
-          dueDates.push({ readingDate, dueDate }); // same dueDate
-        }
-
-        readingCount++; // ✅ Count Sat+Sun as 1
-        readingDate = addDays(readingDate, 1); // move past Sunday (or Sat if no Sunday)
-        continue;
-      }
-
-      // if (isSunday) {
-      //   // Skip Sunday alone — already handled by Sat
-      //   readingDate = addDays(readingDate, 1);
-      //   continue;
-      // }
-      if (isSunday) {
-        if (dueDates.length === 0) {
-          // First reading day is a Sunday — allow it
-        } else {
-          // Regular Sunday — skip (already handled by Saturday)
-          readingDate = addDays(readingDate, 1);
-          continue;
-        }
-      }
-
-      // Regular weekday reading
-      let dueDate = addDays(readingDate, 15);
+      let dueDate = baseDueDate;
       let dueDateStr = format(dueDate, "yyyy-MM-dd");
 
       while (
@@ -280,10 +364,19 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
         dueDateStr = format(dueDate, "yyyy-MM-dd");
       }
 
+      const nextDay = addDays(readingDate, 1);
+      const isValidSunday =
+        isSameMonth(nextDay, monthStart) && getDay(addDays(nextDay, 15)) === 0 && !isNoDutyDay(nextDay);
+
       usedDueDates.add(dueDateStr);
       dueDates.push({ readingDate, dueDate });
-      readingCount++;
 
+      if (isSaturday && isValidSunday) {
+        readingDate = nextDay;
+        dueDates.push({ readingDate, dueDate }); // same dueDate
+      }
+
+      readingCount++; // count Sat+Sun pair as 1
       readingDate = addDays(readingDate, 1);
     }
 
@@ -342,6 +435,27 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     },
     [isHoliday, isNoDutyDay],
   );
+
+  // const calculateDisconnectionDates = useCallback(
+  //   (dueDates: DueDate[]): DisconnectionDate[] => {
+  //     let disconnectionDate = dueDates[0]!.dueDate;
+
+  //     const disconnectionDates = dueDates.map((date, index) => {
+  //       if (index === 0) {
+  //         disconnectionDate = addBusinessDays(disconnectionDate, 3);
+  //       } else {
+  //         disconnectionDate = addDays(disconnectionDate, 1);
+  //       }
+
+  //       disconnectionDate = adjustForHolidayOrWeekend(disconnectionDate);
+
+  //       return { ...date, disconnectionDate };
+  //     });
+
+  //     return disconnectionDates;
+  //   },
+  //   [addBusinessDays],
+  // );
 
   const calculateSchedule = useCallback((): MeterReadingSchedule[] => {
     const calendarDays = getCalendarDays();
@@ -529,6 +643,98 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
   //     }
 
   //     return updatedSchedule;
+  //   },
+  //   [calculateSchedule, removeDuplicateDates],
+  // );
+
+  // const splitDates = useCallback(
+  //   (selectedDates: Date[]) => {
+  //     const schedule = calculateSchedule();
+
+  //     const uniqueDates = removeDuplicateDates(selectedDates);
+  //     const sortedSelectedDates = [...uniqueDates].sort(compareAsc);
+
+  //     let split = [...schedule];
+
+  //     const findPreviousValidReading = (readings: MeterReadingSchedule[], idx: number) => {
+  //       let lookBack = 1;
+  //       while (idx - lookBack >= 0) {
+  //         const candidate = readings[idx - lookBack];
+  //         if (candidate?.dueDate || candidate?.disconnectionDate) {
+  //           return candidate;
+  //         }
+  //         lookBack++;
+  //       }
+  //       return undefined;
+  //     };
+
+  //     for (let i = 0; i < sortedSelectedDates.length; i++) {
+  //       const result: MeterReadingSchedule[] = [];
+  //       const currentSelectedDate = sortedSelectedDates[i]!;
+
+  //       for (let j = 0; j < split.length; j++) {
+  //         const curr = split[j]!;
+
+  //         if (isBefore(curr.readingDate, currentSelectedDate)) {
+  //           result.push(curr);
+  //           continue;
+  //         }
+
+  //         if (isSameDay(curr.readingDate, currentSelectedDate)) {
+  //           const prev = findPreviousValidReading(split, j);
+
+  //           const dueDates = [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[];
+  //           const disconnectionDates = [curr.disconnectionDate, prev?.disconnectionDate]
+  //             .filter(Boolean)
+  //             .slice(0, 2) as Date[];
+
+  //           const currentReading: MeterReadingSchedule = {
+  //             readingDate: curr.readingDate,
+  //             dueDate: dueDates,
+  //             disconnectionDate: disconnectionDates,
+  //           };
+
+  //           result.push(currentReading);
+
+  //           // Setup next starting points
+  //           const baseDue = addDays(dueDates[0]!, 1); // due + 1
+  //           let dueCursor = baseDue;
+
+  //           const fixedDisconnection = disconnectionDates[1]!; // last disconnectionDate, fixed
+  //           let discCursor = fixedDisconnection;
+
+  //           let prevDue = dueCursor;
+  //           let prevDisc = discCursor;
+
+  //           for (let k = j + 1; k < split.length; k++) {
+  //             const next = split[k]!;
+  //             const isSunday = getDay(next.readingDate) === 0;
+
+  //             const nextReading: MeterReadingSchedule = {
+  //               readingDate: next.readingDate,
+  //               dueDate: isSunday ? prevDue : dueCursor,
+  //               disconnectionDate: isSunday ? prevDisc : discCursor,
+  //             };
+
+  //             result.push(nextReading);
+
+  //             if (!isSunday) {
+  //               prevDue = dueCursor;
+  //               prevDisc = discCursor;
+
+  //               dueCursor = addDays(dueCursor, 1);
+  //               discCursor = addDays(discCursor, 1);
+  //             }
+  //           }
+
+  //           break; // handle one split at a time
+  //         }
+  //       }
+
+  //       split = [...result];
+  //     }
+
+  //     return split;
   //   },
   //   [calculateSchedule, removeDuplicateDates],
   // );

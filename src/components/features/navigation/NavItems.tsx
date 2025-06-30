@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
 } from "@mr/components/ui/Sidebar";
 import { usePathname, useRouter } from "next/navigation";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
 type NavProps = {
   items: NavItem[];
@@ -24,6 +25,9 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
   const pathname = usePathname();
   const router = useRouter();
 
+  // reset the state in calendar
+  const reset = useSchedulesStore((state) => state.reset);
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -33,7 +37,10 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
             <SidebarMenuButton
               tooltip={item.title}
               isActive={pathname.startsWith(item.url)}
-              onClick={() => router.push(item.url)}
+              onClick={() => {
+                if (item.title === "Schedule") reset();
+                router.push(item.url);
+              }}
             >
               {item.icon && <item.icon />}
               <span>{item.title}</span>
