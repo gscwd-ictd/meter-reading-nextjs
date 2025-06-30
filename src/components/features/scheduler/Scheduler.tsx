@@ -37,11 +37,12 @@ export const Scheduler: FunctionComponent = () => {
   const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  // const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "yyyy-MM"));
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   // these are derived states
-  const hasFetched = lastFetchedMonthYear === monthYear;
+  const hasFetched = lastFetchedMonthYear === scheduler.currentMonthYear;
 
   scheduler.addSundayReadings(currentSchedule);
 
@@ -51,11 +52,14 @@ export const Scheduler: FunctionComponent = () => {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["get-schedule", monthYear],
-    enabled: calendarIsSet && !hasFetched && currentSchedule.length > 0,
+    queryKey: ["get-schedule", scheduler.currentMonthYear],
+    enabled:
+      calendarIsSet && !hasFetched && currentSchedule.length > 0 && scheduler.currentMonthYear !== null,
     queryFn: async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${monthYear}`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${scheduler.currentMonthYear}`,
+        );
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
@@ -72,9 +76,14 @@ export const Scheduler: FunctionComponent = () => {
   const isFetchingSchedule = calendarIsSet && currentSchedule.length > 0 && isLoading;
   const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading;
 
+  // this ensures that monthYear does not go null
+  // useEffect(() => {
+  //   if (monthYear) setCurrentMonthYear(monthYear);
+  // }, [monthYear]);
+
   // this should populate the calendar first #1
   useEffect(() => {
-    if (!calendarIsSet && monthYear) {
+    if (!calendarIsSet && scheduler.currentMonthYear) {
       const initialDates = scheduler.splitDates(datesToSplit);
       setCurrentSchedule(
         initialDates.map((sched) => {
@@ -83,7 +92,7 @@ export const Scheduler: FunctionComponent = () => {
       );
       setCalendarIsSet(true);
     }
-  }, [calendarIsSet, monthYear, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
+  }, [calendarIsSet, scheduler, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
   // run this state setter if the there is a fetched schedule for the month
   const hasScheduleOption = () => {
@@ -133,23 +142,37 @@ export const Scheduler: FunctionComponent = () => {
 
   // update the state of currentSchedule based on the fetched schedule
   useEffect(() => {
-    if (!calendarIsSet || hasFetched || !monthYear || isFetching || isLoading) return;
+    if (!calendarIsSet || hasFetched || !scheduler.currentMonthYear || isFetching || isLoading) return;
 
-    if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && monthYear) {
+    if (
+      calendarIsSet &&
+      schedule &&
+      schedule.length > 0 &&
+      !isFetching &&
+      !isLoading &&
+      scheduler.currentMonthYear
+    ) {
       setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
       hasScheduleOption();
       setRefetchData(() => refetch);
-      setLastFetchedMonthYear(monthYear);
-    } else if (calendarIsSet && !isLoading && schedule && schedule.length === 0 && !isFetching && monthYear) {
+      setLastFetchedMonthYear(scheduler.currentMonthYear);
+    } else if (
+      calendarIsSet &&
+      !isLoading &&
+      schedule &&
+      schedule.length === 0 &&
+      !isFetching &&
+      scheduler.currentMonthYear
+    ) {
       hasNoScheduleOption();
-      setLastFetchedMonthYear(monthYear);
+      setLastFetchedMonthYear(scheduler.currentMonthYear);
       setRefetchData(() => refetch);
     }
   }, [
     schedule,
     isLoading,
     isFetching,
-    monthYear,
+    scheduler,
     hasFetched,
     calendarIsSet,
     currentSchedule,
@@ -241,7 +264,6 @@ export const Scheduler: FunctionComponent = () => {
             </section>
           </section>
         </header>
-
         <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
           {isInitializingCalendar ? (
             <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-xl">
@@ -259,7 +281,7 @@ export const Scheduler: FunctionComponent = () => {
               </section>
 
               {/* Calendar Body Section */}
-              <section className="relative flex-1 overflow-hidden rounded border-t" style={gridStyle}>
+              <section className="relative flex-1 overflow-hidden border-t" style={gridStyle}>
                 {/* Overlay loading indicator while fetching schedules */}
                 {isFetchingSchedule && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-slate-900/70">
@@ -281,7 +303,7 @@ export const Scheduler: FunctionComponent = () => {
                       {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
                         <div
                           key={idx}
-                          className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 rounded border border-dashed p-0"
+                          className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
                         >
                           <div className="flex justify-end">
                             <Skeleton className="size-6 rounded-full p-2" />
@@ -311,7 +333,7 @@ export const Scheduler: FunctionComponent = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.2, ease: "easeInOut" }}
-                      className="group relative flex flex-col rounded border-x border-b border-dashed p-0 transition-colors duration-150 ease-in-out"
+                      className={`group relative flex flex-col border-b border-l ${idx + 1 !== 1 && (idx + 1) % 7 === 0 ? "border-r" : "border-r-0"} p-0 transition-colors duration-150 ease-in-out`}
                     >
                       <ScheduleEntryContextMenu
                         activeContext={activeContext}
