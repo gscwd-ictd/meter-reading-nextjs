@@ -23,6 +23,9 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         filterFn: filterFn,
         cell: ({ row }) => <span>{row.original.companyId}</span>,
         enableColumnFilter: true,
+        meta: {
+          exportLabel: "Company ID",
+        },
       },
       {
         accessorKey: "name",
@@ -40,6 +43,9 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
           </div>
         ),
         enableColumnFilter: true,
+        meta: {
+          exportLabel: "Name",
+        },
       },
       // {
       //   accessorKey: "positionTitle",

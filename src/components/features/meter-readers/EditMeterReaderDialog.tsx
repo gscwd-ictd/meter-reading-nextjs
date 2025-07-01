@@ -32,8 +32,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Zonebook } from "@mr/lib/types/zonebook";
 
 const meterReaderSchema = z.object({
-  mobileNumber: z.string().regex(/^\d{10}$/, {
-    message: "Mobile number must be exactly 10 digits",
+  employeeId: z.string(),
+  mobileNumber: z.string().regex(/^\d{9}$/, {
+    message: "Mobile number must be exactly 9 digits",
   }),
   zoneBooks: z.array(
     z.object({
@@ -49,6 +50,7 @@ type MeterReaderType = z.infer<typeof meterReaderSchema>;
 type ZonebookToSubmit = Pick<Zonebook, "zone" | "book">;
 
 type SubmitMeterReaderType = {
+  employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
   mobileNumber: string;
@@ -63,7 +65,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   const selectedRestDay = useMeterReadersStore((state) => state.selectedRestDay);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
-  const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
@@ -92,9 +93,10 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     meterReader: MeterReaderType,
   ): Promise<SubmitMeterReaderType> => {
     return {
-      mobileNumber: `+63${meterReader.mobileNumber}`,
-      restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
-      zoneBooks: meterReaderZonebooks.map((zb) => {
+      employeeId: meterReader.employeeId,
+      mobileNumber: `+639${meterReader.mobileNumber}`,
+      restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
+      zoneBooks: meterReader.zoneBooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
       }),
     };
@@ -103,14 +105,16 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // post
   const meterReaderMutation = useMutation({
     mutationFn: async (meterReader: MeterReaderType) => {
+      console.log(meterReader);
       try {
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
 
         return await axios.put(
-          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${transformedEmployee}`,
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
           transformedEmployee,
         );
       } catch (error) {
+        console.log(error);
         toast.error("Error", { description: JSON.stringify(error) });
       }
     },
@@ -125,7 +129,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       queryClient.setQueryData(["get-all-meter-readers"], fetchMeterReaders.data);
 
       toast.success("Success", {
-        description: "You have successfully added a meter reader!",
+        description: "You have successfully updated this meter reader!",
         position: "top-right",
       });
     },
@@ -149,11 +153,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
       setEditMeterReaderDialogIsOpen(false);
       resetToDefaults();
-
-      toast.success("Success", {
-        description: "You have successfully updated this meter reader!",
-        position: "top-right",
-      });
     } else toast.error("No rest day", { description: "Please select a rest day", position: "top-right" });
   };
 
@@ -187,11 +186,17 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
-      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(3) });
+      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(4) });
 
-      setMobileNumber(meterReader.mobileNumber.slice(3));
+      setMobileNumber(meterReader.mobileNumber.slice(4));
 
-      setValue("mobileNumber", meterReader.mobileNumber.slice(3));
+      setValue("employeeId", meterReader.employeeId);
+
+      setValue("mobileNumber", meterReader.mobileNumber.slice(4));
+
+      setValue("restDay", meterReader.restDay);
+
+      setValue("zoneBooks", meterReader?.zoneBooks);
 
       setMeterReaderZonebooks(meterReader?.zoneBooks);
 
