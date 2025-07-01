@@ -92,7 +92,7 @@ export const Scheduler: FunctionComponent = () => {
       );
       setCalendarIsSet(true);
     }
-  }, [calendarIsSet, scheduler, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
+  }, [calendarIsSet, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
   // run this state setter if the there is a fetched schedule for the month
   const hasScheduleOption = () => {

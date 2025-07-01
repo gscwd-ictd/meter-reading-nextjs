@@ -42,7 +42,7 @@ export const ContactNumberInput: FunctionComponent<FormInputProps> = ({
       {/* Input wrapper with prefix */}
       <div className="relative w-full">
         <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm leading-none font-normal text-gray-500">
-          (+63)
+          (+639)
         </span>
         <Input
           {...props}

@@ -41,8 +41,8 @@ type SubmitEmployeeType = {
 
 const meterReaderSchema = z.object({
   employeeId: z.string().optional(),
-  mobileNumber: z.string().regex(/^\d{10}$/, {
-    message: "Mobile number must be exactly 10 digits",
+  mobileNumber: z.string().regex(/^\d{9}$/, {
+    message: "Mobile number must be exactly 9 digits",
   }),
   zoneBooks: z.array(
     z.object({
@@ -106,7 +106,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   ): Promise<SubmitEmployeeType> => {
     return {
       employeeId: employee.employeeId!,
-      mobileNumber: `+63${employee.mobileNumber}`,
+      mobileNumber: `+639${employee.mobileNumber}`,
       restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReaderZonebooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -122,6 +122,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
 
         return await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers`, transformedEmployee);
       } catch (error) {
+        console.log(error);
         toast.error("Error", { description: JSON.stringify(error) });
       }
     },
