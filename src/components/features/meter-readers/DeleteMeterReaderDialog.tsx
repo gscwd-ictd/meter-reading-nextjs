@@ -13,7 +13,7 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { UserRoundXIcon } from "lucide-react";
-import { FunctionComponent, PropsWithChildren } from "react";
+import { FunctionComponent } from "react";
 import { toast } from "sonner";
 
 type DeleteMeterReaderDialogProps = {

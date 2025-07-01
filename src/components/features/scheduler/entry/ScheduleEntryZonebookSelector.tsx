@@ -312,7 +312,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
           </DialogTitle>
 
           <DialogDescription className="text-gray-500">
-            Select a zonebook and press add to assign, don't forget to press apply to finalize.
+            Select a zonebook and press add to assign, don&apos;t forget to press apply to finalize.
           </DialogDescription>
         </DialogHeader>
 
