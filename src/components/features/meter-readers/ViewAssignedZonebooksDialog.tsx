@@ -4,18 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mr/components/ui/Skeleton";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { EyeIcon } from "lucide-react";
-
-// Types
-interface MeterReader {
-  meterReaderId: string;
-  fullName?: string;
-  [key: string]: any;
-}
+import { MeterReader } from "@mr/lib/types/personnel";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface ViewAssignedZonebooksDialogProps {
   meterReader: MeterReader;
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  setOpen: (open: boolean) => void;
 }
 
 // Placeholder fetch function
@@ -45,47 +41,74 @@ const fetchMeterReaderDetails = async (meterReaderId: string) => {
 export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogProps> = ({
   meterReader,
   open,
-  onOpenChange,
+  setOpen,
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["meterReaderDetails", meterReader.meterReaderId],
-    queryFn: () => fetchMeterReaderDetails(meterReader.meterReaderId),
+    // queryFn: () => fetchMeterReaderDetails(meterReader.meterReaderId),
+    queryFn: async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${meterReader.meterReaderId}`,
+        );
+        return res.data as MeterReader;
+      } catch (error) {
+        console.log(error);
+        toast.error("Cannot get zonebooks", {
+          description: "A problem has been encountered. Please try again in a few seconds",
+          position: "top-right",
+        });
+      }
+    },
     enabled: open,
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-amber-400">
+        <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-emerald-400">
           <EyeIcon className="size-4" />
           View Assigned Zonebooks
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="flex h-screen w-full max-w-full flex-col overflow-hidden p-0 sm:p-0 md:p-6 lg:h-[90vh] lg:!max-w-3xl lg:p-6">
         <DialogHeader>
           <DialogTitle>Assigned Zonebooks</DialogTitle>
           <p className="text-muted-foreground text-sm">
-            Meter Reader:{" "}
-            <span className="font-medium">{meterReader.fullName || meterReader.meterReaderId}</span>
+            Meter Reader: <span className="font-medium">{meterReader.name || meterReader.meterReaderId}</span>
           </p>
         </DialogHeader>
 
-        <div className="mt-4 space-y-2">
+        {/* This grows and makes table scrollable */}
+        <div className="flex-1 overflow-hidden rounded-md border">
           {isLoading ? (
-            <>
+            <div className="space-y-2 p-4">
               <Skeleton className="h-6 w-full" />
               <Skeleton className="h-6 w-full" />
-            </>
+            </div>
           ) : (
-            data?.zoneBooks?.map((zb, index) => (
-              <div key={index} className="rounded-md border p-3 text-sm shadow-sm">
-                <p className="font-medium">{zb.zoneBook}</p>
-                <p className="text-muted-foreground">
-                  Zone: {zb.zone} | Book: {zb.book}
-                </p>
-                <p className="text-muted-foreground">Area: {zb.area}</p>
-              </div>
-            ))
+            <div className="h-full overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted text-muted-foreground sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Zonebook</th>
+                    <th className="px-4 py-2 text-left">Zone</th>
+                    <th className="px-4 py-2 text-left">Book</th>
+                    <th className="px-4 py-2 text-left">Area</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.zoneBooks?.map((zb, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-2 font-medium">{zb.zoneBook}</td>
+                      <td className="px-4 py-2">{zb.zone}</td>
+                      <td className="px-4 py-2">{zb.book}</td>
+                      <td className="px-4 py-2">{zb.area ?? "N/A"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </DialogContent>
