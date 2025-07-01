@@ -16,7 +16,6 @@ import { compareAsc, format, formatDate } from "date-fns";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { MeterReaderEntryDataTable } from "../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
-import { AlertTriangleIcon, CalendarIcon } from "lucide-react";
 import { Badge } from "@mr/components/ui/Badge";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import {
