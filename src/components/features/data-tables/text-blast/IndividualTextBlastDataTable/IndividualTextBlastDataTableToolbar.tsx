@@ -1,0 +1,81 @@
+"use client";
+
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Table } from "@tanstack/react-table";
+import { Button } from "@/components/ui/Button";
+import { useContext, useEffect, useState } from "react";
+import { DataTableFacetedFilter } from "@/components/ui/data-table/data-table-faceted-filter";
+import { Label } from "@/components/ui/Label";
+import { Input } from "@/components/ui/Input";
+import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { ColumnVisibilityToggleContext } from "./IndividualTextBlastDataTable";
+
+interface IndividualTextBlastDataTableToolbarProps<TData> {
+  table: Table<TData>;
+}
+
+export function IndividualTextBlastDataTableToolbar<TData>({
+  table,
+}: IndividualTextBlastDataTableToolbarProps<TData>) {
+  const isFiltered = table.getState().columnFilters.length > 0;
+
+  const { enableColumnVisibilityToggle } = useContext(ColumnVisibilityToggleContext);
+
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [debounceValue, setDebounceValue] = useState(globalFilter ?? "");
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setGlobalFilter(debounceValue);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [debounceValue, setGlobalFilter]);
+
+  return (
+    <div className="flex w-full items-center justify-between">
+      <div className="flex flex-1 items-center gap-2">
+        {table.getAllColumns().map((col) => {
+          if (col.getCanFilter()) {
+            // Default faceted filter
+            if (col.id !== "dueDate" && col.id !== "disconnectionDate" && col.id !== "readingDate") {
+              return (
+                <DataTableFacetedFilter
+                  key={col.id}
+                  column={col}
+                  title={col.columnDef.meta?.exportLabel ?? col.id}
+                />
+              );
+            }
+
+            // Filter for date/s
+            return (
+              <div key={col.id} className="flex flex-row items-center gap-2 whitespace-nowrap">
+                <Label htmlFor={col.id}>{col.columnDef.meta?.exportLabel ?? col.id}</Label>
+                <Input
+                  type="date"
+                  id={col.id}
+                  value={(col.getFilterValue() as string) || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    col.setFilterValue(value || undefined);
+                    setDebounceValue(value);
+                  }}
+                />
+              </div>
+            );
+          }
+        })}
+
+        {isFiltered && (
+          <Button variant="ghost" onClick={() => table.resetColumnFilters()} className="px-2 lg:px-3">
+            Reset
+            <Cross2Icon className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+
+        {enableColumnVisibilityToggle && <DataTableViewOptions table={table} />}
+      </div>
+    </div>
+  );
+}
