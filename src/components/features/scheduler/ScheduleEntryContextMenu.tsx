@@ -112,11 +112,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
 
                     setScheduleHasSplittedDates(true);
 
-                    setCurrentSchedule(
-                      newSchedule.map((schedule) => {
-                        return { ...schedule, id: schedule.id! };
-                      }),
-                    );
+                    setCurrentSchedule(newSchedule);
 
                     toast.success("Success", {
                       description: "Successfully splitted the dates!",

@@ -2,20 +2,11 @@
 "use client";
 
 import { useState, useMemo, FunctionComponent, useEffect } from "react";
-
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import {
-  AlertTriangleIcon,
-  CalendarIcon,
-  Check,
-  ChevronDown,
-  CircleXIcon,
-  MapPinCheckIcon,
-  MapPinIcon,
-} from "lucide-react";
+import { Check, ChevronDown, CircleXIcon, MapPinCheckIcon, MapPinIcon } from "lucide-react";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
@@ -35,6 +26,9 @@ import { ScheduleEntryDueDateSelector } from "./ScheduleEntryDueDateSelector";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { MeterReader } from "@mr/lib/types/personnel";
+import { Badge } from "@mr/components/ui/Badge";
+import { SplittedDates } from "./SplittedDates";
+import { NormalDates } from "./NormalDates";
 
 type ScheduleEntryZonebookSelectorProps = {
   isLoading: boolean;
@@ -69,26 +63,17 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
 
   const zoneBookSorter = (zoneBooks: ZonebookWithDates[]) => ZonebookSorter(zoneBooks);
 
-  //! this has to be changed
-  // const selectedMeterReaderPool = useMemo(() => {
-  //   const zonebooksByMeterReaderId = tempMeterReadersWithDesignatedZonebooks.find(
-  //     (mr) => selectedMeterReader?.meterReaderId === mr.meterReaderId,
-  //   )?.zoneBooks.unassigned;
-
-  //   if (!zonebooksByMeterReaderId) return [];
-  //   return zonebooksByMeterReaderId;
-  // }, [tempMeterReadersWithDesignatedZonebooks, selectedMeterReader]);
-
-  // new meter reader unselected zonebooks pool
+  // new meter reader assigned and unassigned zonebooks pool
   const { data: meterReaderData, status } = useQuery({
-    queryKey: [selectedMeterReader?.meterReaderId, selectedScheduleEntry?.id],
+    queryKey: [selectedMeterReader?.meterReaderId, selectedScheduleEntry?.scheduleId],
     queryFn: async () => {
       //! replace with actual get route SCHEDULE-ENTRY-ID/METER-READER-ID
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_MR_BE}/schedule/${selectedScheduleEntry?.id}/${selectedMeterReader?.meterReaderId}`,
+          // `${process.env.NEXT_PUBLIC_MR_BE}/schedule/${selectedScheduleEntry?.id}/${selectedMeterReader?.meterReaderId}`,
+          `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.meterReaderId}/zone-book`,
         );
-
+        console.log(res.data);
         return res.data as MeterReaderZonebooks;
       } catch (error) {
         if (error instanceof Error) {
@@ -97,7 +82,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
       }
     },
 
-    enabled: !hasFetchedZonebooks,
+    enabled: !hasFetchedZonebooks && entryZonebookSelectorIsOpen,
   });
 
   // new zones, should target unassigned
@@ -222,12 +207,14 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
         setSelectedBook("");
         setSelectedZone("");
         setSelectedZonebook(null);
+        setHasFetchedZonebooks(false);
       }}
       modal
     >
       <DialogContent
         className="max-h-full min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]"
         onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader className="gap-0">
           <DialogTitle>
@@ -253,49 +240,28 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
               </div>
 
               <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
-                <div className="text-primary flex items-center gap-2 font-medium dark:text-blue-400">
-                  <CalendarIcon className="h-4 w-4" />
-                  <span>
-                    Due:{" "}
-                    {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
-                      <span className="flex gap-2">
-                        {selectedScheduleEntry.dueDate.map((day, idx) => {
-                          if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                          return format(day, "MMM dd, yyyy");
-                        })}
-                      </span>
-                    ) : selectedScheduleEntry &&
-                      selectedScheduleEntry.dueDate &&
-                      !Array.isArray(selectedScheduleEntry.dueDate) ? (
-                      format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-                    ) : null}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 font-medium text-red-500">
-                  <AlertTriangleIcon className="h-4 w-4" />
-                  <span>
-                    Disconnection:{" "}
-                    {selectedScheduleEntry?.disconnectionDate &&
-                    Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                      <span className="flex gap-2">
-                        {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
-                          if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                          return format(day, "MMM dd, yyyy");
-                        })}
-                      </span>
-                    ) : selectedScheduleEntry &&
-                      selectedScheduleEntry.disconnectionDate &&
-                      !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                      format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
-                    ) : null}
-                  </span>
-                </div>
+                {Array.isArray(selectedScheduleEntry?.dueDate) &&
+                  Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                    <SplittedDates
+                      dueDates={selectedScheduleEntry.dueDate}
+                      disconnectionDates={selectedScheduleEntry.disconnectionDate}
+                    />
+                  )}
+
+                {selectedScheduleEntry &&
+                  !Array.isArray(selectedScheduleEntry?.dueDate) &&
+                  !Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                    <NormalDates
+                      dueDate={selectedScheduleEntry.dueDate!}
+                      disconnectionDate={selectedScheduleEntry.disconnectionDate!}
+                    />
+                  )}
               </div>
             </div>
           </DialogTitle>
 
           <DialogDescription className="text-gray-500">
-            Select a zonebook and press add to assign
+            Select a zonebook and press add to assign, don't forget to press apply to finalize.
           </DialogDescription>
         </DialogHeader>
 
@@ -319,7 +285,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                   </Button>
                 </div>
               </PopoverTrigger>
-              <PopoverContent avoidCollisions>
+              <PopoverContent avoidCollisions className="p-0" side="top">
                 <Command>
                   <CommandInput placeholder="Search zones..." />
                   <CommandEmpty>No zone found.</CommandEmpty>
@@ -368,7 +334,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                   </Button>
                 </div>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
+              <PopoverContent className="w-full p-0" side="top">
                 <Command>
                   <CommandInput placeholder="Search books..." />
                   <CommandEmpty>No book found.</CommandEmpty>

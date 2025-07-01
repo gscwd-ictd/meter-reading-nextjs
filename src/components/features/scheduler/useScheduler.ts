@@ -791,14 +791,14 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
       return schedule.map((entry) => {
         // Guard: If readingDate is missing or invalid, skip assigning readers
         if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
-          return { ...entry, meterReaders: [], id: entry.id! }; // no meterReaders field
+          return { ...entry, meterReaders: [] }; // no meterReaders field
         }
 
         const readingRestDay = getDayName(entry.readingDate);
 
         const availableReaders = transformMeterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
-        return { ...entry, meterReaders: availableReaders, id: entry.id! };
+        return { ...entry, meterReaders: availableReaders };
       });
     },
     [],

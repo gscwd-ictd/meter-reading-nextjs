@@ -21,6 +21,7 @@ export type MeterReader = Employee & {
 // this refers to meter readers who have assigned zoneBooks in the scheduling entry calendar which should have a due date and disconnection date
 export type MeterReaderWithZonebooks = Employee & {
   meterReaderId: string;
+  scheduleMeterReaderId?: string;
   restDay: "sunday" | "saturday" | undefined;
   zoneBooks: ZonebookWithDates[];
   // recommendedZonebooks?: ZonebookWithDates[];

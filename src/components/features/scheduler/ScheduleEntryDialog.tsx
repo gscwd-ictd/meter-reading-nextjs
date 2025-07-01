@@ -27,6 +27,8 @@ import {
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { SplittedDates } from "./entry/SplittedDates";
+import { NormalDates } from "./entry/NormalDates";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
@@ -228,7 +230,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       >
         <DialogHeader className="space-y-0">
           <DialogTitle>
-            <div className="text-lg font-bold text-gray-800">
+            <div className="text-lg font-bold text-gray-800 dark:text-white">
               {entry && !selectedScheduleEntry
                 ? format(entry.readingDate!, "MMM dd, yyyy")
                 : entry && selectedScheduleEntry
@@ -237,81 +239,26 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
             </div>
 
             <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
-              <div className="text-primary flex items-center gap-2 font-medium dark:text-blue-400">
-                <CalendarIcon className="h-4 w-4" />
-                <span>
-                  Due:{" "}
-                  {entry && !selectedScheduleEntry?.dueDate ? (
-                    <>
-                      {entry?.dueDate && Array.isArray(entry.dueDate) ? (
-                        <span className="flex gap-2">
-                          {entry.dueDate.map((day, idx) => {
-                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                            return format(day, "MMM dd, yyyy");
-                          })}
-                        </span>
-                      ) : entry && entry.dueDate && !Array.isArray(entry.dueDate) ? (
-                        format(entry.dueDate, "MMM dd, yyyy")
-                      ) : null}
-                    </>
-                  ) : entry && selectedScheduleEntry && selectedScheduleEntry?.dueDate ? (
-                    <>
-                      {selectedScheduleEntry?.dueDate && Array.isArray(selectedScheduleEntry.dueDate) ? (
-                        <span className="flex gap-2">
-                          {selectedScheduleEntry.dueDate.map((day, idx) => {
-                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                            return format(day, "MMM dd, yyyy");
-                          })}
-                        </span>
-                      ) : selectedScheduleEntry &&
-                        selectedScheduleEntry.dueDate &&
-                        !Array.isArray(selectedScheduleEntry.dueDate) ? (
-                        format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-                      ) : null}
-                    </>
-                  ) : null}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 font-medium text-red-500">
-                <AlertTriangleIcon className="h-4 w-4" />
-                <span>
-                  Disconnection:{" "}
-                  {entry && !selectedScheduleEntry?.disconnectionDate ? (
-                    <>
-                      {entry?.disconnectionDate && Array.isArray(entry.disconnectionDate) ? (
-                        <span className="flex gap-2">
-                          {entry.disconnectionDate.map((day, idx) => {
-                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                            return format(day, "MMM dd, yyyy");
-                          })}
-                        </span>
-                      ) : entry && entry.disconnectionDate && !Array.isArray(entry.disconnectionDate) ? (
-                        format(entry.disconnectionDate, "MMM dd, yyyy")
-                      ) : null}
-                    </>
-                  ) : entry && selectedScheduleEntry && selectedScheduleEntry.disconnectionDate ? (
-                    <>
-                      {selectedScheduleEntry?.disconnectionDate &&
-                      Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                        <span className="flex gap-2">
-                          {selectedScheduleEntry.disconnectionDate.map((day, idx) => {
-                            if (idx === 0) return ` ${format(day, "MMM dd, yyyy")} / `;
-                            return format(day, "MMM dd, yyyy");
-                          })}
-                        </span>
-                      ) : selectedScheduleEntry &&
-                        selectedScheduleEntry.disconnectionDate &&
-                        !Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                        format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
-                      ) : null}
-                    </>
-                  ) : null}
-                </span>
-              </div>
+              {Array.isArray(selectedScheduleEntry?.dueDate) &&
+                Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                  <SplittedDates
+                    dueDates={selectedScheduleEntry.dueDate}
+                    disconnectionDates={selectedScheduleEntry.disconnectionDate}
+                  />
+                )}
+
+              {selectedScheduleEntry &&
+                !Array.isArray(selectedScheduleEntry?.dueDate) &&
+                !Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                  <NormalDates
+                    dueDate={selectedScheduleEntry.dueDate!}
+                    disconnectionDate={selectedScheduleEntry.disconnectionDate!}
+                  />
+                )}
             </div>
           </DialogTitle>
           <DialogDescription>
-            <span>List of Meter Readers with their respective zoneBooks</span>
+            <span>List of Meter Readers with their zone books</span>
           </DialogDescription>
         </DialogHeader>
 

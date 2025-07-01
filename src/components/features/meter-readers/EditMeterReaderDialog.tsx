@@ -13,7 +13,7 @@ import {
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { SquarePenIcon, Users2Icon } from "lucide-react";
-import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { EditMeterReaderTabs } from "./EditMeterReaderTabs";
@@ -105,7 +105,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // post
   const meterReaderMutation = useMutation({
     mutationFn: async (meterReader: MeterReaderType) => {
-      console.log(meterReader);
       try {
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
 
@@ -136,24 +135,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   });
 
   const submitMeterReader = (meterReader: MeterReaderType) => {
-    if (selectedRestDay !== undefined && selectedRestDay) {
-      // setSelectedMeterReader({
-      //   ...selectedMeterReader,
-      //   name: selectedMeterReader?.name!,
-      //   mobileNumber: selectedMeterReader?.mobileNumber!,
-      //   positionTitle: selectedMeterReader?.positionTitle!,
-      //   companyId: selectedMeterReader?.companyId!,
-      //   employeeId: selectedMeterReader?.employeeId!,
-      //   photoUrl: selectedMeterReader?.photoUrl!,
-      //   restDay: selectedRestDay,
-      //   zoneBooks: meterReaderZonebooks,
-      //   assignment: selectedMeterReader?.assignment!,
-      // });
-      meterReaderMutation.mutateAsync(meterReader);
-
-      setEditMeterReaderDialogIsOpen(false);
-      resetToDefaults();
-    } else toast.error("No rest day", { description: "Please select a rest day", position: "top-right" });
+    meterReaderMutation.mutateAsync(meterReader);
   };
 
   // get meter reader by id
@@ -164,20 +146,20 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
       );
 
-      return res.data;
+      return res.data as MeterReaderWithZonebooks;
     },
     enabled: !!editMeterReaderDialogIsOpen,
   });
 
   //! get the filtered zonebooks
-  const { data, isLoading } = useQuery({
+  const { data: zoneBooks, isLoading } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
-        return res.data;
+        return res.data as Zonebook[];
       } catch (error) {
-        return error;
+        console.log(error);
       }
     },
     enabled: !hasSetInitialZonebookPool,
@@ -198,7 +180,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
       setValue("zoneBooks", meterReader?.zoneBooks);
 
-      setMeterReaderZonebooks(meterReader?.zoneBooks);
+      setMeterReaderZonebooks(meterReader?.zoneBooks); // this refers to the meter reader's assigned zonebooks
 
       setSelectedRestDay(meterReader?.restDay);
     }
@@ -214,14 +196,18 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     setValue,
   ]);
 
-  // this useEffect should only run once and only when
+  //! this will be the zonebooks unassigned pool
   useEffect(() => {
-    if (data && !hasSetInitialZonebookPool) {
-      setFilteredZonebooks(data);
-      setTempFilteredZonebooks(data);
+    if (zoneBooks && !hasSetInitialZonebookPool && meterReader) {
+      const filteredZonebooks = zoneBooks.filter(
+        (orig) => !meterReader.zoneBooks.some((current) => current.zoneBook === orig.zoneBook),
+      );
+
+      setFilteredZonebooks(filteredZonebooks); // this refers to the unassigned pool
+      setTempFilteredZonebooks(filteredZonebooks); // this refers to the copied unassigned pool
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
+  }, [zoneBooks, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks, meterReader]);
 
   return (
     <Dialog
@@ -275,6 +261,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             disabled={!selectedMeterReader ? true : false}
             type="submit"
             form="edit-meter-reader-form"
+            className="dark:text-white"
           >
             Update
           </Button>

@@ -35,6 +35,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
@@ -84,6 +85,19 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
     }
   };
 
+  const reset = () => {
+    // set the calendar populate state to false
+    setCalendarIsSet(false);
+
+    // set dates to split to empty
+    setDatesToSplit([]);
+
+    // reset the splittedDates observer
+    setScheduleHasSplittedDates(false);
+
+    setLastFetchedMonthYear(null);
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger className="flex w-full gap-2 px-2 py-1 text-sm">
@@ -98,7 +112,12 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={removeMonthlySchedule}>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={hasSchedule ? removeMonthlySchedule : reset}
+            className="dark:text-white"
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
