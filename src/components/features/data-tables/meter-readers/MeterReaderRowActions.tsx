@@ -13,6 +13,7 @@ import { FunctionComponent, useState } from "react";
 import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
 import { MeterReader } from "@mr/lib/types/personnel";
 import { DeleteMeterReaderDialog } from "../../meter-readers/DeleteMeterReaderDialog";
+import { ViewAssignedZonebooksDialog } from "../../meter-readers/ViewAssignedZonebooksDialog";
 
 type MeterReaderRowActionsProps = {
   meterReader: MeterReader;
@@ -20,6 +21,7 @@ type MeterReaderRowActionsProps = {
 
 export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps> = ({ meterReader }) => {
   const [editMeterReaderDialogIsOpen, setEditMeterReaderDialogIsOpen] = useState<boolean>(false);
+  const [viewAssignedZonebooksDialogIsOpen, setViewAssignedZonebooksDialogIsOpen] = useState<boolean>(false);
   const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
 
   return (
@@ -35,7 +37,7 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px]">
+      <DropdownMenuContent align="end" className="min-w-[200px]">
         <DropdownMenuItem
           onSelect={() => {
             setDropdownIsOpen(false);
@@ -48,6 +50,19 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
             editMeterReaderDialogIsOpen={editMeterReaderDialogIsOpen}
             setEditMeterReaderDialogIsOpen={setEditMeterReaderDialogIsOpen}
             selectedMeterReader={meterReader}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={() => {
+            setDropdownIsOpen(false);
+          }}
+          asChild
+        >
+          <ViewAssignedZonebooksDialog
+            meterReader={meterReader}
+            open={viewAssignedZonebooksDialogIsOpen}
+            onOpenChange={setViewAssignedZonebooksDialogIsOpen}
           />
         </DropdownMenuItem>
         <DropdownMenuSeparator />

@@ -62,8 +62,6 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           };
         });
 
-        console.log(formattedFilteredSchedule);
-
         const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
         console.log(res);
         return res.data;
@@ -101,9 +99,14 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     await postSchedule.mutateAsync(
       newSchedule.map((sched) => {
         return {
-          ...sched,
+          readingDate: sched.readingDate,
+          dueDate: sched.dueDate,
+          disconnectionDate: sched.disconnectionDate,
           meterReaders: sched.meterReaders?.map((mr) => {
-            return { ...mr, zoneBooks: [] };
+            return {
+              ...mr,
+              zoneBooks: [],
+            };
           }),
         };
       }),

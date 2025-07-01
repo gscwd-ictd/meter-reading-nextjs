@@ -89,7 +89,7 @@ export const Scheduler: FunctionComponent = () => {
       const initialDates = scheduler.splitDates(datesToSplit);
       setCurrentSchedule(
         initialDates.map((sched) => {
-          return { ...sched, meterReaders: [], id: sched.id! };
+          return { ...sched, meterReaders: [] };
         }),
       );
       setCalendarIsSet(true);
@@ -274,7 +274,7 @@ export const Scheduler: FunctionComponent = () => {
           ) : (
             <>
               {/* Calendar Header Section */}
-              <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase">
+              <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase dark:text-white">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
                   <div key={index} className="border-none py-2 text-center">
                     {day}
@@ -295,7 +295,7 @@ export const Scheduler: FunctionComponent = () => {
 
                 {/* Skeleton grid cells during fetch */}
                 {isFetchingSchedule && !isReady && (
-                  <>
+                  <div className="text-black dark:text-white">
                     {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
                       <div key={index} className="border-none py-2 text-center">
                         {day}
@@ -323,7 +323,7 @@ export const Scheduler: FunctionComponent = () => {
                         </div>
                       ))}
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {/* Render actual calendar only when ready */}

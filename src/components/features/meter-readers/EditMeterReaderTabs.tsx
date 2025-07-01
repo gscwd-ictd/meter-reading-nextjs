@@ -2,12 +2,12 @@
 import { Label } from "@mr/components/ui/Label";
 import { Input } from "@mr/components/ui/Input";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
-import ZoneBookSelector from "../zonebook/ZonebookSelector";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { FunctionComponent } from "react";
 import { useFormContext } from "react-hook-form";
 import { EditSelectRestDayCombobox } from "./EditSelectRestDayCombobox";
 import { ContactNumberInput } from "@mr/components/ui/input/ContactNumberInput";
+import EditZonebookSelector from "../zonebook/EditZonebookSelector";
 
 type EditMeterReaderTabsProps = {
   loading: boolean;
@@ -86,7 +86,7 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
 
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col items-start gap-0">
-            <ZoneBookSelector loading={loading} />
+            <EditZonebookSelector loading={loading} />
             <Input
               id="meterReaderZonebooks"
               className="w-full cursor-default truncate hover:cursor-pointer"

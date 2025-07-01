@@ -38,7 +38,7 @@ type Props = {
   onSelectionChange?: (zone: string, book: string) => void;
 };
 
-export default function ZoneBookSelector({ onSelectionChange, loading }: Props) {
+export default function EditZonebookSelector({ onSelectionChange, loading }: Props) {
   const [selectedZone, setSelectedZone] = useState<string>("");
   const [selectedBook, setSelectedBook] = useState<string>("");
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
@@ -369,13 +369,12 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                               (zb) => zb.zoneBook !== entry.zoneBook,
                             );
                             setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+                            setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
 
                             const newFilteredZonebooks = [...tempFilteredZonebooks];
                             newFilteredZonebooks.unshift(entry);
 
-                            setValue("zoneBooks", newFilteredZonebooks);
-
-                            setTempFilteredZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+                            setTempFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
                           }}
                         >
                           <CircleXIcon className="fill-red-600 text-white" />

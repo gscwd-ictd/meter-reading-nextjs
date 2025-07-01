@@ -36,7 +36,6 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
       dueDate: selectedScheduleEntry?.dueDate!,
       meterReaders: temporaryMeterReaders.filter((mr) => mr.meterReaderId !== meterReaderId),
-      id: selectedScheduleEntry?.id!,
     });
   };
 
@@ -62,7 +61,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
             size="sm"
             onClick={() => removeMeterReader(meterReader.meterReaderId)}
           >
-            <CircleXIcon className="size-2 fill-red-600 text-white sm:size-4 lg:size-4" />
+            <CircleXIcon className="size-2 fill-transparent text-white sm:size-4 lg:size-4" />
             <span className="hidden text-xs sm:hidden md:hidden lg:block">Remove</span>
           </Button>
         </div>
