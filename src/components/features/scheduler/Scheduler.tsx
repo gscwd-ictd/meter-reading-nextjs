@@ -39,12 +39,12 @@ export const Scheduler: FunctionComponent = () => {
   const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
-  // const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
+  const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "yyyy-MM"));
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   // these are derived states
-  const hasFetched = lastFetchedMonthYear === scheduler.currentMonthYear;
+  const hasFetched = lastFetchedMonthYear === currentMonthYear;
 
   scheduler.addSundayReadings(currentSchedule);
 
@@ -55,13 +55,10 @@ export const Scheduler: FunctionComponent = () => {
     refetch,
   } = useQuery({
     queryKey: ["get-schedule", scheduler.currentMonthYear],
-    enabled:
-      calendarIsSet && !hasFetched && currentSchedule.length > 0 && scheduler.currentMonthYear !== null,
+    enabled: calendarIsSet && !hasFetched && currentSchedule.length > 0 && currentMonthYear !== null,
     queryFn: async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${scheduler.currentMonthYear}`,
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${currentMonthYear}`);
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
@@ -79,13 +76,13 @@ export const Scheduler: FunctionComponent = () => {
   const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading;
 
   // this ensures that monthYear does not go null
-  // useEffect(() => {
-  //   if (monthYear) setCurrentMonthYear(monthYear);
-  // }, [monthYear]);
+  useEffect(() => {
+    if (monthYear) setCurrentMonthYear(monthYear);
+  }, [monthYear]);
 
   // this should populate the calendar first #1
   useEffect(() => {
-    if (!calendarIsSet && scheduler.currentMonthYear) {
+    if (!calendarIsSet && currentMonthYear) {
       const initialDates = scheduler.splitDates(datesToSplit);
       setCurrentSchedule(
         initialDates.map((sched) => {
@@ -94,7 +91,7 @@ export const Scheduler: FunctionComponent = () => {
       );
       setCalendarIsSet(true);
     }
-  }, [calendarIsSet, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
+  }, [calendarIsSet, currentMonthYear, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
   // run this state setter if the there is a fetched schedule for the month
   const hasScheduleOption = () => {
@@ -144,36 +141,30 @@ export const Scheduler: FunctionComponent = () => {
 
   // update the state of currentSchedule based on the fetched schedule
   useEffect(() => {
-    if (!calendarIsSet || hasFetched || !scheduler.currentMonthYear || isFetching || isLoading) return;
+    if (!calendarIsSet || hasFetched || !currentMonthYear || isFetching || isLoading) return;
 
-    if (
-      calendarIsSet &&
-      schedule &&
-      schedule.length > 0 &&
-      !isFetching &&
-      !isLoading &&
-      scheduler.currentMonthYear
-    ) {
+    if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && currentMonthYear) {
       setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
       hasScheduleOption();
       setRefetchData(() => refetch);
-      setLastFetchedMonthYear(scheduler.currentMonthYear);
+      setLastFetchedMonthYear(currentMonthYear);
     } else if (
       calendarIsSet &&
       !isLoading &&
       schedule &&
       schedule.length === 0 &&
       !isFetching &&
-      scheduler.currentMonthYear
+      currentMonthYear
     ) {
       hasNoScheduleOption();
-      setLastFetchedMonthYear(scheduler.currentMonthYear);
+      setLastFetchedMonthYear(currentMonthYear);
       setRefetchData(() => refetch);
     }
   }, [
     schedule,
     isLoading,
     isFetching,
+    currentMonthYear,
     scheduler,
     hasFetched,
     calendarIsSet,
@@ -203,7 +194,7 @@ export const Scheduler: FunctionComponent = () => {
 
   return (
     <>
-      <div className="bg-background m-5 flex h-full flex-col overflow-hidden rounded border shadow-sm">
+      <div className="bg-background m-5 flex h-full flex-col overflow-hidden rounded border shadow-xs">
         <header className="flex items-center justify-between p-4">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">

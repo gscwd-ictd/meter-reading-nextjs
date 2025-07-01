@@ -23,12 +23,12 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { format, isValid } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ScheduleEntryDueDateSelector } from "./ScheduleEntryDueDateSelector";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { MeterReader } from "@mr/lib/types/personnel";
-import { Badge } from "@mr/components/ui/Badge";
 import { SplittedDates } from "./SplittedDates";
 import { NormalDates } from "./NormalDates";
+import { toast } from "sonner";
 
 type ScheduleEntryZonebookSelectorProps = {
   isLoading: boolean;
@@ -38,6 +38,13 @@ type MeterReaderZonebooks = {
   assigned: ZonebookWithDates[];
   unassigned: ZonebookWithDates[];
 } & Omit<MeterReader, "zoneBooks" | "restDay">;
+
+type NewZonebooks = Omit<ZonebookWithDates, "zoneBook" | "area">;
+
+type MeterReaderZonebooksSubmit = {
+  scheduleMeterReaderId: string;
+  zoneBooks: NewZonebooks[];
+};
 
 export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZonebookSelectorProps> = ({
   isLoading,
@@ -65,13 +72,13 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
 
   // new meter reader assigned and unassigned zonebooks pool
   const { data: meterReaderData, status } = useQuery({
-    queryKey: [selectedMeterReader?.meterReaderId, selectedScheduleEntry?.scheduleId],
+    queryKey: [selectedMeterReader?.scheduleMeterReaderId],
     queryFn: async () => {
       //! replace with actual get route SCHEDULE-ENTRY-ID/METER-READER-ID
       try {
         const res = await axios.get(
-          // `${process.env.NEXT_PUBLIC_MR_BE}/schedule/${selectedScheduleEntry?.id}/${selectedMeterReader?.meterReaderId}`,
-          `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.meterReaderId}/zone-book`,
+          // `${process.env.NEXT_PUBLIC_MR_BE}/schedule/${selectedScheduleEntry?.id}/${selectedMeterReader?.scheduleMeterReaderId}`,
+          `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/zone-books`,
         );
         console.log(res.data);
         return res.data as MeterReaderZonebooks;
@@ -102,45 +109,86 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
     return Array.from(new Set(allBooksForSelectedZone));
   }, [selectedZone, unassignedZonebooks]);
 
-  // handle apply all changes to the zone book
-  const handleApplyAllZonebooks = () => {
-    {
-      const zonebooksToBeAssigned = [...assignedZonebooks];
-
-      if (selectedMeterReader !== null) {
-        setSelectedMeterReader({
-          ...selectedMeterReader,
-
-          zoneBooks: zonebooksToBeAssigned,
-        });
-
-        setSelectedZonebook(null);
-
-        setEntryZonebookSelectorIsOpen(false);
+  const postMeterReaderZonebooks = useMutation({
+    mutationKey: [selectedMeterReader?.scheduleMeterReaderId],
+    mutationFn: async (meterReaderWithZonebooks: MeterReaderZonebooksSubmit) => {
+      console.log(meterReaderWithZonebooks);
+      try {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/zone-books`,
+          meterReaderWithZonebooks,
+        );
+        return res.data;
+      } catch (error) {
+        console.log(error);
       }
-
-      if (selectedScheduleEntry && selectedMeterReader) {
-        setSelectedScheduleEntry({
-          ...selectedScheduleEntry,
-          disconnectionDate: selectedScheduleEntry.disconnectionDate,
-          dueDate: selectedScheduleEntry.dueDate,
-          readingDate: selectedScheduleEntry.readingDate,
-          meterReaders: selectedScheduleEntry.meterReaders!.map((mr) => {
-            if (selectedMeterReader && mr.meterReaderId === selectedMeterReader?.meterReaderId) {
-              return {
-                ...mr,
-                zoneBooks: zonebooksToBeAssigned,
-              };
-            }
-            return mr;
-          }),
-        });
-      }
+    },
+    onSuccess: async () => {
       setEntryZonebookSelectorIsOpen(false);
-      setSelectedMeterReader(null);
+      toast.success("Success", {
+        description: "Successfully updated the meter reader zonebooks!",
+        position: "top-right",
+      });
+    },
+    onError: () => {
+      toast.error("Error", {
+        description: "Something went wrong. Please try again later.",
+        position: "top-right",
+      });
+    },
+  });
 
-      //! post route here
+  // handle apply all changes to the zone book
+  const handleApplyAllZonebooks = async () => {
+    const zonebooksToBeAssigned = [...assignedZonebooks];
+
+    if (selectedMeterReader !== null) {
+      setSelectedMeterReader({
+        ...selectedMeterReader,
+
+        zoneBooks: zonebooksToBeAssigned,
+      });
+
+      setSelectedZonebook(null);
+
+      setEntryZonebookSelectorIsOpen(false);
+
+      const submitObject = {
+        scheduleMeterReaderId: selectedMeterReader.scheduleMeterReaderId!,
+        zoneBooks: zonebooksToBeAssigned.map((zb) => {
+          return {
+            zone: zb.zone,
+            book: zb.book,
+            dueDate: zb.dueDate,
+            disconnectionDate: zb.disconnectionDate,
+          };
+        }),
+      };
+
+      postMeterReaderZonebooks.mutateAsync(submitObject);
     }
+
+    if (selectedScheduleEntry && selectedMeterReader) {
+      setSelectedScheduleEntry({
+        ...selectedScheduleEntry,
+        disconnectionDate: selectedScheduleEntry.disconnectionDate,
+        dueDate: selectedScheduleEntry.dueDate,
+        readingDate: selectedScheduleEntry.readingDate,
+        meterReaders: selectedScheduleEntry.meterReaders!.map((mr) => {
+          if (selectedMeterReader && mr.meterReaderId === selectedMeterReader?.meterReaderId) {
+            return {
+              ...mr,
+              zoneBooks: zonebooksToBeAssigned,
+            };
+          }
+          return mr;
+        }),
+      });
+    }
+    setEntryZonebookSelectorIsOpen(false);
+    setSelectedMeterReader(null);
+
+    //! post route here
   };
 
   // handle add zonebook from tempPool
@@ -157,6 +205,9 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
         ? undefined
         : selectedScheduleEntry?.disconnectionDate,
     });
+
+    //! new
+    setAssignedZonebooks(ZonebookSorter(zoneBooksToBeAssigned));
 
     const newUnassignedZonebooks = [...unassignedZonebooks];
     // filter the unassigned with the selected zonebook
@@ -500,7 +551,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent<ScheduleEntryZoneb
                 ) : (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center">
-                      No zoneBooks added
+                      No zone books added
                     </TableCell>
                   </TableRow>
                 )}
