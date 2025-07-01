@@ -2,7 +2,6 @@ import * as React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@mr/components/ui/Dialog";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@mr/components/ui/Skeleton";
-import { Zonebook } from "@mr/lib/types/zonebook";
 import { EyeIcon } from "lucide-react";
 import { MeterReader } from "@mr/lib/types/personnel";
 import axios from "axios";
@@ -13,30 +12,6 @@ interface ViewAssignedZonebooksDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
-
-// Placeholder fetch function
-const fetchMeterReaderDetails = async (meterReaderId: string) => {
-  // Simulate API delay
-  await new Promise((res) => setTimeout(res, 500));
-  return {
-    meterReaderId,
-    name: "Juan Dela Cruz",
-    zoneBooks: [
-      {
-        zone: "Z01",
-        book: "B01",
-        zoneBook: "Z01-B01",
-        area: "Downtown",
-      },
-      {
-        zone: "Z02",
-        book: "B03",
-        zoneBook: "Z02-B03",
-        area: "Uptown",
-      },
-    ] as Zonebook[],
-  };
-};
 
 export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogProps> = ({
   meterReader,

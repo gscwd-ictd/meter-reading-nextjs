@@ -62,7 +62,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   selectedMeterReader,
 }) => {
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
-  const selectedRestDay = useMeterReadersStore((state) => state.selectedRestDay);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
