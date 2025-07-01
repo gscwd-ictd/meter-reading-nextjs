@@ -10,21 +10,21 @@ import {
 } from "drizzle-orm/pg-core";
 import z4 from "zod/v4";
 
-export const readingDetails = pgTable("reading_details", {
-  id: varchar("id").primaryKey().notNull(),
-  meterReaderId: varchar("meter_reader_id").notNull(),
-  accountNo: varchar("account_no").notNull(),
-  presentReading: doublePrecision("present_reading").notNull(),
-  usage: doublePrecision("usage").notNull(),
-  billedAmount: doublePrecision("billed_amount").notNull(),
-  readingDate: timestamp("reading_date", { mode: "date" }).notNull(),
-  dueDate: timestamp("due_date", { mode: "date" }).notNull(),
-  disconnectionDate: timestamp("disconnection_date", { mode: "date" }).notNull(),
-  remarks: varchar("remarks"),
-  additionalRemarks: text("additional_remarks"),
-  penalty: doublePrecision("penalty"),
-  isPosted: boolean("is_posted").default(false).notNull(),
-});
+// export const readingDetails = pgTable("reading_details", {
+//   id: varchar("id").primaryKey().notNull(),
+//   meterReaderId: varchar("meter_reader_id").notNull(),
+//   accountNo: varchar("account_no").notNull(),
+//   presentReading: doublePrecision("present_reading").notNull(),
+//   usage: doublePrecision("usage").notNull(),
+//   billedAmount: doublePrecision("billed_amount").notNull(),
+//   readingDate: timestamp("reading_date", { mode: "date" }).notNull(),
+//   dueDate: timestamp("due_date", { mode: "date" }).notNull(),
+//   disconnectionDate: timestamp("disconnection_date", { mode: "date" }).notNull(),
+//   remarks: varchar("remarks"),
+//   additionalRemarks: text("additional_remarks"),
+//   penalty: doublePrecision("penalty"),
+//   isPosted: boolean("is_posted").default(false).notNull(),
+// });
 
 export const zoneBookAddress = pgTable("zone_book_address", {
   id: varchar("id").primaryKey().notNull(),
@@ -49,8 +49,9 @@ export const accountHistory = pgTable("account_history", {
   remarks: text("remarks"),
 });
 
-export const accounts = pgTable("accounts", {
+export const readingDetails = pgTable("reading_details", {
   id: varchar("id").primaryKey().notNull(),
+  meterReaderId: varchar("meter_reader_id"),
   accountNumber: varchar("account_number"),
   accountName: varchar("account_name"),
   meterNumber: varchar("meter_number"),
@@ -63,6 +64,7 @@ export const accounts = pgTable("accounts", {
   address: varchar("address"),
   dateInstalled: varchar("date_installed"),
   disconnectionType: varchar("disconnection_type"),
+  readingDate: varchar("reading_date"),
   disconnectionDate: varchar("disconnection_date"),
   reconnectionDate: varchar("reconnection_date"),
   contactNumber: varchar("contact_number"),
@@ -122,24 +124,24 @@ const BaseSchema = z4.object({
   id: z4.uuid(),
 });
 
-export const ReadingDetailsSchema = BaseSchema.extend({
-  meterReaderId: z4.string(),
-  accountNo: z4.string(),
-  presentReading: z4.number(),
-  usage: z4.number(),
-  billedAmount: z4.number(),
-  readingDate: z4.string(),
-  dueDate: z4.string(),
-  disconnectionDate: z4.string(),
-  remarks: z4.string().optional(),
-  additionalRemarks: z4.string().optional(),
-  penalty: z4.number().optional(),
-  isPosted: z4.boolean(),
-});
+// export const ReadingDetailsSchema = BaseSchema.extend({
+//   meterReaderId: z4.string(),
+//   accountNo: z4.string(),
+//   presentReading: z4.number(),
+//   usage: z4.number(),
+//   billedAmount: z4.number(),
+//   readingDate: z4.string(),
+//   dueDate: z4.string(),
+//   disconnectionDate: z4.string(),
+//   remarks: z4.string().optional(),
+//   additionalRemarks: z4.string().optional(),
+//   penalty: z4.number().optional(),
+//   isPosted: z4.boolean(),
+// });
 
-export const UpdateReadingDetailsSchema = z4.object({
-  isPosted: z4.boolean(),
-});
+// export const UpdateReadingDetailsSchema = z4.object({
+//   isPosted: z4.boolean(),
+// });
 
 export const ZoneBookAddressSchema = BaseSchema.extend({
   zoneCode: z4.number().optional(),
@@ -173,7 +175,8 @@ export const UpdateAccountHistorySchema = AccountHistorySchema.omit({
   id: true,
 });
 
-export const AccountsSchema = BaseSchema.extend({
+export const ReadingDetailsSchema = BaseSchema.extend({
+  meterReaderId: z4.string(),
   accountNumber: z4.string().optional(),
   accountName: z4.string().optional(),
   meterNumber: z4.string().optional(),
@@ -186,6 +189,7 @@ export const AccountsSchema = BaseSchema.extend({
   address: z4.string().optional(),
   dateInstalled: z4.string().optional(),
   disconnectionType: z4.string().optional(),
+  readingDate: z4.string().optional(),
   disconnectionDate: z4.string().optional(),
   reconnectionDate: z4.string().optional(),
   contactNumber: z4.string().optional(),
@@ -204,7 +208,7 @@ export const AccountsSchema = BaseSchema.extend({
   meterCode: z4.number().optional(),
 });
 
-export const UpdateAccountsSchema = AccountsSchema.omit({
+export const UpdateReadingDetailsSchema = ReadingDetailsSchema.omit({
   id: true,
 });
 
