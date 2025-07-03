@@ -20,7 +20,7 @@ import {
   DialogTitle,
 } from "@mr/components/ui/Dialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { format, isValid } from "date-fns";
+import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ScheduleEntryDueDateSelector } from "./ScheduleEntryDueDateSelector";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -94,7 +94,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       const allZonesForMeterReader = unassignedZonebooks.map((zb) => zb.zone);
       return Array.from(new Set(allZonesForMeterReader));
     }
-  }, [unassignedZonebooks, hasFetchedZonebooks]);
+  }, [unassignedZonebooks]);
 
   // new booksForZone
   const booksForZone = useMemo(() => {
@@ -103,7 +103,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       ?.filter((zb) => zb.zone === selectedZone)
       .map((zb) => zb.book);
     return Array.from(new Set(allBooksForSelectedZone));
-  }, [selectedZone, unassignedZonebooks, hasFetchedZonebooks]);
+  }, [selectedZone, unassignedZonebooks]);
 
   // post mutation
   const postMeterReaderZonebooks = useMutation({

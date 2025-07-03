@@ -113,7 +113,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       setSelectedScheduleEntry(scheduleEntry);
       setRefetchEntry(refetch);
     }
-  }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry]);
+  }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry, refetch, setRefetchEntry]);
 
   return (
     <Dialog

@@ -252,7 +252,7 @@ export const Scheduler: FunctionComponent = () => {
             <section className="flex items-center gap-4">
               <div className="space-x-2">
                 <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
-                <CalendarSettingDropdown scheduler={scheduler} />
+                <CalendarSettingDropdown />
               </div>
             </section>
           </section>
