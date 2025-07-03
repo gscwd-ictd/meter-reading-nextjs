@@ -9,16 +9,11 @@ import {
 } from "@mr/components/ui/DropdownMenu";
 import { Ellipsis } from "lucide-react";
 import { FunctionComponent } from "react";
-import { Scheduler } from "./useScheduler";
 import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
 import { SubmitScheduleAlertDialog } from "./SubmitScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
-type CalendarSettingDropdownProps = {
-  scheduler: Scheduler;
-};
-
-export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
+export const CalendarSettingDropdown: FunctionComponent = () => {
   const calendarScheduleDropdownIsOpen = useSchedulesStore((state) => state.calendarScheduleDropdownIsOpen);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
