@@ -63,7 +63,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         });
 
         const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
-        console.log(res);
+
         return res.data;
       } catch (error) {
         console.log(error);
@@ -115,7 +115,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 
   useEffect(() => {
     if (postSchedule.isSuccess) {
-      refetchData?.();
+      refetchData!();
       postSchedule.reset();
 
       setHasSchedule(true);

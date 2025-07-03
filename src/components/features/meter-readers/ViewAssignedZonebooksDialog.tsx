@@ -20,7 +20,6 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["meterReaderDetails", meterReader.meterReaderId],
-    // queryFn: () => fetchMeterReaderDetails(meterReader.meterReaderId),
     queryFn: async () => {
       try {
         const res = await axios.get(

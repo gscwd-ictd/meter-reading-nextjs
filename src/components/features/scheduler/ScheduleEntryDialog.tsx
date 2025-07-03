@@ -28,6 +28,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
@@ -51,6 +52,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setScheduleEntryIsSplitted = useSchedulesStore((state) => state.setScheduleEntryIsSplitted);
+  const setRefetchEntry = useSchedulesStore((state) => state.setRefetchEntry);
   const setSplittedDates = useSchedulesStore((state) => state.setSplittedDates);
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const [scheduleEntryDialogIsOpen, setScheduleEntryDialogIsOpen] = useState<boolean>(false);
@@ -86,27 +88,30 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
     setSplittedDates,
   ]);
 
-  const { data: scheduleEntry } = useQuery({
+  const {
+    data: scheduleEntry,
+    isLoading,
+    isFetching,
+    isRefetching,
+    refetch,
+  } = useQuery({
     enabled: scheduleEntryDialogIsOpen,
     queryKey: ["get-schedule-entry-by-id", transformedReadingDate],
     queryFn: async () => {
-      console.log(transformedReadingDate);
       try {
         const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
-        console.log(transformedReadingDate, ": ", res.data);
+
         return res.data as MeterReadingEntryWithZonebooks;
       } catch (error) {
         console.log(error);
       }
     },
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
     if (scheduleEntry && scheduleEntryDialogIsOpen) {
       setSelectedScheduleEntry(scheduleEntry);
+      setRefetchEntry(refetch);
     }
   }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry]);
 
@@ -228,8 +233,9 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
         className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[65%]"
       >
         <DialogHeader className="space-y-0">
-          <DialogTitle>
+          <DialogTitle className="flex flex-col gap-0 text-start">
             <div className="text-lg font-bold text-gray-800 dark:text-white">
+              Reading Date:{" "}
               {entry && !selectedScheduleEntry
                 ? format(entry.readingDate!, "MMM dd, yyyy")
                 : entry && selectedScheduleEntry
@@ -256,16 +262,24 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
                 )}
             </div>
           </DialogTitle>
-          <DialogDescription>
-            <span>List of Meter Readers with their zone books</span>
+          <DialogDescription className="text-start">
+            <span className="text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
+              List of Meter Readers with their zone books
+            </span>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative">
-          <MeterReaderEntryDataTable
-            meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
-          />
-        </div>
+        {isLoading || isFetching || isRefetching ? (
+          <div className="flex h-full w-full justify-center">
+            Loading Meter Readers <LoadingSpinner />
+          </div>
+        ) : (
+          <div className="relative">
+            <MeterReaderEntryDataTable
+              meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
+            />
+          </div>
+        )}
         <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
