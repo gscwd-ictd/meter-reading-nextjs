@@ -47,6 +47,8 @@ type SchedulesStore = {
   setLastFetchedMonthYear: (monthYear: string | null) => void;
   refetchData?: () => void;
   setRefetchData: (fn: () => void) => void;
+  refetchEntry?: () => void;
+  setRefetchEntry: (fn: () => void) => void;
   reset: () => void;
 };
 
@@ -90,6 +92,8 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setLastFetchedMonthYear: (lastFetchedMonthYear) => set({ lastFetchedMonthYear }),
   refetchData: undefined,
   setRefetchData: (fn) => set({ refetchData: fn }),
+  refetchEntry: undefined,
+  setRefetchEntry: (fn) => set({ refetchEntry: fn }),
   reset: () => {
     set({
       calendarIsSet: false,

@@ -38,7 +38,7 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
         <DropdownMenuItem asChild>
-          <ResetScheduleAlertDialog scheduler={scheduler} />
+          <ResetScheduleAlertDialog />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

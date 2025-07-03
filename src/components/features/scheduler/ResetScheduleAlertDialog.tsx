@@ -20,13 +20,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
-type PopulateScheduleAlertDialogProps = {
-  scheduler: Scheduler;
-};
-
-export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDialogProps> = ({
-  scheduler,
-}) => {
+export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
@@ -34,6 +28,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const searchParams = useSearchParams();
@@ -66,9 +61,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
       // setCurrentSchedule(scheduler.calculateSchedule().);
       resetStates();
 
-      //! Replace this and improve refetching
-      window.location.reload();
-
+      refetchData!();
       toast.success("Success", {
         description: "Successfully reset the calendar for this month!",
         position: "top-right",

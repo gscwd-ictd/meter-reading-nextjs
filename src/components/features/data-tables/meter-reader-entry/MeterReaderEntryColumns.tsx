@@ -42,14 +42,14 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
         accessorKey: "zoneBooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Books" />,
         cell: ({ row }) => {
-          if (row.original.zoneBooks.length < 1) return "-";
-          else
-            row.original.zoneBooks.map((zoneBook, idx) => (
-              <span key={zoneBook.zoneBook} className="w-full truncate">
-                {zoneBook.zoneBook}
+          if (row.original.zoneBooks && row.original.zoneBooks.length > 0)
+            return row.original.zoneBooks.map((zoneBook, idx) => (
+              <span key={idx} className="w-full truncate">
+                {zoneBook.zone}-{zoneBook.book}
                 {idx < row.original.zoneBooks.length - 1 && ", "}
               </span>
             ));
+          else return <span>-</span>;
         },
         enableColumnFilter: false,
         enableSorting: false,

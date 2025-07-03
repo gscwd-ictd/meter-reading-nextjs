@@ -57,10 +57,10 @@ export const ScheduleEntryDueDateSelector: FunctionComponent<ScheduleEntryDueDat
               splittedDates.map((date, idx) => (
                 <CommandItem
                   key={idx}
-                  value={date ? formatDate(date.dueDate!) : undefined}
+                  value={date.dueDate ? formatDate(date.dueDate!) : undefined}
                   onSelect={(currentValue) => {
                     const selectedZonebook = splittedDates.find(
-                      (x) => compareAsc(x.dueDate!, currentValue) === 0,
+                      (x) => compareAsc(formatDate(x.dueDate), currentValue) === 0,
                     )!;
 
                     setValue(selectedZonebook);
