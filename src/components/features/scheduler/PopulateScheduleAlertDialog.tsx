@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
-import { Button } from "@mr/components/ui/Button";
 import { CalendarCheck2, CalendarPlus } from "lucide-react";
 import { FunctionComponent, useEffect } from "react";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
@@ -125,20 +124,22 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button
-          disabled={
-            (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+      <AlertDialogTrigger
+        disabled={
+          (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+            ? true
+            : hasPopulatedMeterReaders
               ? true
-              : hasPopulatedMeterReaders
-                ? true
-                : false
-          }
-          className="dark:text-white"
-        >
-          {hasPopulatedMeterReaders ? <CalendarCheck2 /> : <CalendarPlus />}
-          {!hasPopulatedMeterReaders ? "Populate schedule" : "Fetched Schedule"}
-        </Button>
+              : false
+        }
+        className="flex w-full gap-2 px-2 py-1 text-sm dark:text-white"
+      >
+        {hasPopulatedMeterReaders ? (
+          <CalendarCheck2 className="size-5" />
+        ) : (
+          <CalendarPlus className="size-5" />
+        )}
+        {!hasPopulatedMeterReaders ? "Populate schedule" : "Fetched Schedule"}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

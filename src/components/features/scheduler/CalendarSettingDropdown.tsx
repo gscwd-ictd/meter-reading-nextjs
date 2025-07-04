@@ -10,11 +10,17 @@ import {
 import { Ellipsis } from "lucide-react";
 import { FunctionComponent } from "react";
 import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
-import { SubmitScheduleAlertDialog } from "./SubmitScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
+import { Scheduler } from "./useScheduler";
 
-export const CalendarSettingDropdown: FunctionComponent = () => {
+type CalendarSettingDropdownProps = {
+  scheduler: Scheduler;
+};
+
+export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
   const calendarScheduleDropdownIsOpen = useSchedulesStore((state) => state.calendarScheduleDropdownIsOpen);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
   );
@@ -37,7 +43,7 @@ export const CalendarSettingDropdown: FunctionComponent = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <SubmitScheduleAlertDialog />
+          <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

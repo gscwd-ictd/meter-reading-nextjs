@@ -9,7 +9,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
-import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
 import { useSearchParams } from "next/navigation";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
@@ -20,6 +19,7 @@ import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
 import { motion } from "framer-motion";
 import { Skeleton } from "@mr/components/ui/Skeleton";
+import { MonthYearPicker } from "../calendar/MonthYearPicker";
 
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
@@ -40,7 +40,7 @@ export const Scheduler: FunctionComponent = () => {
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
-  const scheduler = useScheduler(holidays, [], monthYear ?? format(new Date(), "yyyy-MM"));
+  const scheduler = useScheduler(holidays);
   const [activeContext, setActiveContext] = useState<number | null>(null);
 
   // these are derived states
@@ -54,7 +54,7 @@ export const Scheduler: FunctionComponent = () => {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ["get-schedule", scheduler.currentMonthYear],
+    queryKey: ["get-schedule", currentMonthYear],
     enabled: calendarIsSet && !hasFetched && currentSchedule.length > 0 && currentMonthYear !== null,
     queryFn: async () => {
       try {
@@ -251,8 +251,14 @@ export const Scheduler: FunctionComponent = () => {
           <section className="flex items-center gap-0">
             <section className="flex items-center gap-4">
               <div className="space-x-2">
-                <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
-                <CalendarSettingDropdown />
+                <MonthYearPicker
+                  currentMonthYear={currentMonthYear}
+                  setCurrentMonthYear={setCurrentMonthYear}
+                  resetOnChange={resetOnChange}
+                  scheduler={scheduler}
+                />
+
+                <CalendarSettingDropdown scheduler={scheduler} />
               </div>
             </section>
           </section>
