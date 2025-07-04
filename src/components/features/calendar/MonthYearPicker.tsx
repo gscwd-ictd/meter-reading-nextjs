@@ -111,7 +111,8 @@ export function MonthYearPicker({
           {years.map((year) => (
             <Button
               key={year}
-              variant={selectedYear === year ? "default" : "ghost"}
+              variant={selectedYear === year ? "default" : "outline"}
+              className="border"
               onClick={() => setSelectedYear(year)}
             >
               {year}
@@ -124,7 +125,11 @@ export function MonthYearPicker({
           {months.map((month, index) => (
             <Button
               key={month}
-              variant="ghost"
+              variant="outline"
+              className={cn(
+                "hover:border-primary border transition-colors",
+                selectedYear === null && "cursor-not-allowed opacity-50",
+              )}
               onClick={() => handleMonthClick(index)}
               disabled={selectedYear === null}
             >
