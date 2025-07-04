@@ -19,7 +19,10 @@ export const MeterReaderEntryDataTable: FunctionComponent<MeterReaderDataTablePr
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={meterReaders ? meterReaders : []} columns={meterReaderEntryColumns} />
+      <DataTable
+        data={meterReaders ? meterReaders.sort((a, b) => (a.name > b.name ? 1 : -1)) : []}
+        columns={meterReaderEntryColumns}
+      />
     </Suspense>
   );
 };

@@ -24,7 +24,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Day = {
@@ -59,7 +59,11 @@ const NonBusinessDays: Day[] = [
 
 export type Scheduler = ReturnType<typeof useScheduler>;
 
-export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: string) => {
+export const useScheduler = (holidays: Holiday[]) => {
+  const searchParams = useSearchParams();
+  const monthYear =
+    searchParams.get("date") === null ? format(new Date(), "yyyy-MM") : searchParams.get("date");
+
   const [currentDate, setCurrentDate] = useState(
     monthYear ? parse(monthYear, "yyyy-MM", new Date()) : new Date(),
   );
@@ -840,6 +844,8 @@ export const useScheduler = (holidays: Holiday[], restDays: Date[], monthYear?: 
     goToPreviousMonth,
     goToNextMonth,
     today,
+    setCurrentDate,
+    setCurrentMonthYear,
     currentDate,
     currentMonthYear,
   };
