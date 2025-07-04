@@ -27,6 +27,7 @@ export function MonthYearPicker({
   const searchParams = useSearchParams();
 
   const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<"year" | "month">("year");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
@@ -76,16 +77,15 @@ export function MonthYearPicker({
         setOpen(val);
 
         if (val) {
-          // When opening, retain selected year from currentMonthYear
+          // Opening popover: retain year from current value if available
           if (currentMonthYear) {
             const parsed = parse(currentMonthYear, "yyyy-MM", new Date());
             setSelectedYear(parsed.getFullYear());
-          } else {
-            setSelectedYear(null);
           }
+          setStep("year"); // always start at year selection
         } else {
-          // On close, clear selection state
           setSelectedYear(null);
+          setStep("year");
         }
       }}
     >
@@ -105,38 +105,42 @@ export function MonthYearPicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4">
-        <div className="text-muted-foreground mb-2 text-sm font-medium">Select a year</div>
-        <div className="mb-4 grid grid-cols-3 gap-2">
-          {years.map((year) => (
-            <Button
-              key={year}
-              variant={selectedYear === year ? "default" : "outline"}
-              className="border"
-              onClick={() => setSelectedYear(year)}
-            >
-              {year}
-            </Button>
-          ))}
-        </div>
-
-        <div className="text-muted-foreground mb-2 text-sm font-medium">Select a month</div>
-        <div className="grid grid-cols-3 gap-2">
-          {months.map((month, index) => (
-            <Button
-              key={month}
-              variant="outline"
-              className={cn(
-                "hover:border-primary border transition-colors",
-                selectedYear === null && "cursor-not-allowed opacity-50",
-              )}
-              onClick={() => handleMonthClick(index)}
-              disabled={selectedYear === null}
-            >
-              {month.slice(0, 3)}
-            </Button>
-          ))}
-        </div>
+      <PopoverContent className="w-[220px] p-4">
+        {step === "year" ? (
+          <>
+            <div className="text-muted-foreground mb-2 text-sm font-medium">Select a year</div>
+            <div className="grid grid-cols-3 gap-2">
+              {years.map((year) => (
+                <Button
+                  key={year}
+                  variant={selectedYear === year ? "default" : "outline"}
+                  onClick={() => {
+                    setSelectedYear(year);
+                    setStep("month");
+                  }}
+                >
+                  {year}
+                </Button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-muted-foreground text-sm font-medium">Select a month</span>
+              <Button variant="ghost" size="sm" onClick={() => setStep("year")}>
+                Back
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {months.map((month, index) => (
+                <Button key={month} variant="outline" onClick={() => handleMonthClick(index)}>
+                  {month.slice(0, 3)}
+                </Button>
+              ))}
+            </div>
+          </>
+        )}
       </PopoverContent>
     </Popover>
   );
