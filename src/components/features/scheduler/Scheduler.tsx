@@ -248,19 +248,15 @@ export const Scheduler: FunctionComponent = () => {
             </Button>
           </ButtonGroup>
 
-          <section className="flex items-center gap-0">
-            <section className="flex items-center gap-4">
-              <div className="space-x-2">
-                <MonthYearPicker
-                  currentMonthYear={currentMonthYear}
-                  setCurrentMonthYear={setCurrentMonthYear}
-                  resetOnChange={resetOnChange}
-                  scheduler={scheduler}
-                />
+          <section className="flex items-center gap-4">
+            <MonthYearPicker
+              currentMonthYear={currentMonthYear}
+              setCurrentMonthYear={setCurrentMonthYear}
+              resetOnChange={resetOnChange}
+              scheduler={scheduler}
+            />
 
-                <CalendarSettingDropdown scheduler={scheduler} />
-              </div>
-            </section>
+            <CalendarSettingDropdown scheduler={scheduler} />
           </section>
         </header>
         <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
