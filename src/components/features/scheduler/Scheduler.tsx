@@ -192,8 +192,8 @@ export const Scheduler: FunctionComponent = () => {
 
   return (
     <>
-      <div className="bg-background m-5 flex h-full flex-col overflow-hidden rounded border shadow-xs">
-        <header className="flex items-center justify-between p-4">
+      <div className="bg-background mx-3 flex h-full flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-2">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">
               <div className="bg-secondary text-secondary-foreground/70 flex flex-1 items-center justify-center border-b text-xs font-semibold tracking-wider uppercase">
@@ -216,35 +216,37 @@ export const Scheduler: FunctionComponent = () => {
             </div>
           </section>
 
-          <ButtonGroup>
-            <Button
-              variant="outline"
-              onClick={() => {
-                resetOnChange();
-                scheduler.goToPreviousMonth();
-              }}
-            >
-              <ChevronLeft />
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                resetOnChange();
-                scheduler.today();
-              }}
-            >
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                resetOnChange();
-                scheduler.goToNextMonth();
-              }}
-            >
-              <ChevronRight />
-            </Button>
-          </ButtonGroup>
+          <section className="hidden sm:hidden md:block lg:block">
+            <ButtonGroup>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetOnChange();
+                  scheduler.goToPreviousMonth();
+                }}
+              >
+                <ChevronLeft />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetOnChange();
+                  scheduler.today();
+                }}
+              >
+                Today
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetOnChange();
+                  scheduler.goToNextMonth();
+                }}
+              >
+                <ChevronRight />
+              </Button>
+            </ButtonGroup>
+          </section>
 
           <section className="flex items-center gap-4">
             <MonthYearPicker
