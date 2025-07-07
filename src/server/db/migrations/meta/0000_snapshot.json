@@ -1,9 +1,180 @@
 {
-  "id": "67e4fd32-1e03-434f-b410-e537e90345b2",
+  "id": "b4cc3776-b653-4c77-abf7-3db51ad2f385",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.account_history": {
+      "name": "account_history",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_time": {
+          "name": "date_time",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "account_history_account_number_reading_details_account_number_fk": {
+          "name": "account_history_account_number_reading_details_account_number_fk",
+          "tableFrom": "account_history",
+          "tableTo": "reading_details",
+          "columnsFrom": [
+            "account_number"
+          ],
+          "columnsTo": [
+            "account_number"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.usage": {
+      "name": "usage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_number": {
+          "name": "account_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month_1_usage": {
+          "name": "month_1_usage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month_2_usage": {
+          "name": "month_2_usage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month_3_usage": {
+          "name": "month_3_usage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month_4_usage": {
+          "name": "month_4_usage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usage_account_number_reading_details_account_number_fk": {
+          "name": "usage_account_number_reading_details_account_number_fk",
+          "tableFrom": "usage",
+          "tableTo": "reading_details",
+          "columnsFrom": [
+            "account_number"
+          ],
+          "columnsTo": [
+            "account_number"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.leakages": {
+      "name": "leakages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nearest_meter_number": {
+          "name": "nearest_meter_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "additional_remarks": {
+          "name": "additional_remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_time": {
+          "name": "date_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.login_accounts": {
       "name": "login_accounts",
       "schema": "",
@@ -69,269 +240,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.account_history": {
-      "name": "account_history",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "account_number": {
-          "name": "account_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "date_time": {
-          "name": "date_time",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "remarks": {
-          "name": "remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.accounts": {
-      "name": "accounts",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "account_name": {
-          "name": "account_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "meter_number": {
-          "name": "meter_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "previous_reading": {
-          "name": "previous_reading",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "zone_code": {
-          "name": "zone_code",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "book_code": {
-          "name": "book_code",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "meter_status": {
-          "name": "meter_status",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_read": {
-          "name": "is_read",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sequence_number": {
-          "name": "sequence_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address": {
-          "name": "address",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "date_installed": {
-          "name": "date_installed",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "disconnection_type": {
-          "name": "disconnection_type",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "disconnection_date": {
-          "name": "disconnection_date",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reconnection_date": {
-          "name": "reconnection_date",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "contact_number": {
-          "name": "contact_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "classification": {
-          "name": "classification",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "arrears": {
-          "name": "arrears",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "current_reading": {
-          "name": "current_reading",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "billed_amount": {
-          "name": "billed_amount",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "remarks": {
-          "name": "remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "additional_remarks": {
-          "name": "additional_remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "longlat": {
-          "name": "longlat",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "print_count": {
-          "name": "print_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "check_digit": {
-          "name": "check_digit",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "due_date": {
-          "name": "due_date",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "consumer_type": {
-          "name": "consumer_type",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "meter_code": {
-          "name": "meter_code",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.leakage": {
-      "name": "leakage",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "nearest_meter_number": {
-          "name": "nearest_meter_number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "remarks": {
-          "name": "remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "additional_remarks": {
-          "name": "additional_remarks",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "date_time": {
-          "name": "date_time",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.new_meter": {
-      "name": "new_meter",
+    "public.new_meters": {
+      "name": "new_meters",
       "schema": "",
       "columns": {
         "id": {
@@ -342,7 +252,7 @@
         },
         "current_reading": {
           "name": "current_reading",
-          "type": "varchar",
+          "type": "real",
           "primaryKey": false,
           "notNull": false
         },
@@ -350,19 +260,19 @@
           "name": "meter_number",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "image": {
           "name": "image",
-          "type": "varchar",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "date_time": {
           "name": "date_time",
-          "type": "varchar",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -383,11 +293,17 @@
           "primaryKey": true,
           "notNull": true
         },
-        "account_type": {
-          "name": "account_type",
+        "meter_code": {
+          "name": "meter_code",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "consumer_type": {
+          "name": "consumer_type",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
@@ -395,53 +311,72 @@
           "primaryKey": false,
           "notNull": false
         },
-        "meter_code": {
-          "name": "meter_code",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "minimum_rate": {
           "name": "minimum_rate",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "rate11": {
-          "name": "rate11",
+        "rate_11": {
+          "name": "rate_11",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "rate21": {
-          "name": "rate21",
+        "rate_21": {
+          "name": "rate_21",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "rate31": {
-          "name": "rate31",
+        "rate_31": {
+          "name": "rate_31",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "rate41": {
-          "name": "rate41",
+        "rate_41": {
+          "name": "rate_41",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "rate51": {
-          "name": "rate51",
+        "rate_51": {
+          "name": "rate_51",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rates_meter_code_consumer_type_reading_details_meter_code_consumer_type_fk": {
+          "name": "rates_meter_code_consumer_type_reading_details_meter_code_consumer_type_fk",
+          "tableFrom": "rates",
+          "tableTo": "reading_details",
+          "columnsFrom": [
+            "meter_code",
+            "consumer_type"
+          ],
+          "columnsTo": [
+            "meter_code",
+            "consumer_type"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "rates_meter_code_consumer_type_unique": {
+          "name": "rates_meter_code_consumer_type_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "meter_code",
+            "consumer_type"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -453,56 +388,159 @@
         "id": {
           "name": "id",
           "type": "varchar",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
-        "meter_reader_id": {
-          "name": "meter_reader_id",
+        "account_number": {
+          "name": "account_number",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "account_no": {
-          "name": "account_no",
+        "account_name": {
+          "name": "account_name",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "present_reading": {
-          "name": "present_reading",
-          "type": "double precision",
+        "meter_number": {
+          "name": "meter_number",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "usage": {
-          "name": "usage",
-          "type": "double precision",
+        "check_digit": {
+          "name": "check_digit",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "billed_amount": {
-          "name": "billed_amount",
-          "type": "double precision",
+        "meter_code": {
+          "name": "meter_code",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "consumer_type": {
+          "name": "consumer_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previous_reading": {
+          "name": "previous_reading",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "longlat": {
+          "name": "longlat",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zone_code": {
+          "name": "zone_code",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "book_code": {
+          "name": "book_code",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meter_status": {
+          "name": "meter_status",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_read": {
+          "name": "is_read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "sequence_number": {
+          "name": "sequence_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date_installed": {
+          "name": "date_installed",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disconnection_type": {
+          "name": "disconnection_type",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
         "reading_date": {
           "name": "reading_date",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
         "due_date": {
           "name": "due_date",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
         "disconnection_date": {
           "name": "disconnection_date",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
+        },
+        "reconnection_date": {
+          "name": "reconnection_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_number": {
+          "name": "contact_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "classification": {
+          "name": "classification",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "arrears": {
+          "name": "arrears",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_reading": {
+          "name": "current_reading",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "billed_amount": {
+          "name": "billed_amount",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
         },
         "remarks": {
           "name": "remarks",
@@ -510,79 +548,80 @@
           "primaryKey": false,
           "notNull": false
         },
-        "additional_remarks": {
-          "name": "additional_remarks",
+        "additional_remakrs": {
+          "name": "additional_remakrs",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image": {
+          "name": "image",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "penalty": {
-          "name": "penalty",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_posted": {
-          "name": "is_posted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.usage": {
-      "name": "usage",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "account_number": {
-          "name": "account_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "month1_usage": {
-          "name": "month1_usage",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "month2_usage": {
-          "name": "month2_usage",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "month3_usage": {
-          "name": "month3_usage",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "month4_usage": {
-          "name": "month4_usage",
-          "type": "varchar",
+        "print_count": {
+          "name": "print_count",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "reading_details_id_login_accounts_id_fk": {
+          "name": "reading_details_id_login_accounts_id_fk",
+          "tableFrom": "reading_details",
+          "tableTo": "login_accounts",
+          "columnsFrom": [
+            "id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "reading_details_account_number_unique": {
+          "name": "reading_details_account_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "account_number"
+          ]
+        },
+        "reading_details_meter_number_unique": {
+          "name": "reading_details_meter_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "meter_number"
+          ]
+        },
+        "reading_details_zone_code_unique": {
+          "name": "reading_details_zone_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "zone_code"
+          ]
+        },
+        "reading_details_book_code_unique": {
+          "name": "reading_details_book_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "book_code"
+          ]
+        },
+        "reading_details_meter_code_consumer_type_unique": {
+          "name": "reading_details_meter_code_consumer_type_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "meter_code",
+            "consumer_type"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -597,6 +636,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "nearest_water_meter": {
+          "name": "nearest_water_meter",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "remarks": {
           "name": "remarks",
           "type": "text",
@@ -609,54 +654,17 @@
           "primaryKey": false,
           "notNull": false
         },
-        "nearest_meter_number": {
-          "name": "nearest_meter_number",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "image": {
           "name": "image",
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.zone_book_address": {
-      "name": "zone_book_address",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar",
-          "primaryKey": true,
+        },
+        "date_time": {
+          "name": "date_time",
+          "type": "timestamp",
+          "primaryKey": false,
           "notNull": true
-        },
-        "zone_code": {
-          "name": "zone_code",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "book_code": {
-          "name": "book_code",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address": {
-          "name": "address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},

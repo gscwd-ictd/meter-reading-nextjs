@@ -1,0 +1,1 @@
+ALTER TABLE "account_history" ALTER COLUMN "date_time" SET DATA TYPE timestamp;
