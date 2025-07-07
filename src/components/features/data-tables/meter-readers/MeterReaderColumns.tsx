@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef, FilterFn } from "@tanstack/react-table";
+import { ColumnDef, FilterFn, Row } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
@@ -72,6 +72,7 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       },
       {
         accessorKey: "zoneBooks",
+        accessorFn: (row) => row.zoneBooks.map((zb) => zb.zoneBook),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
         cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
         enableColumnFilter: false,

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { MeterReaderEntryRowActions } from "./MeterReaderEntryRowActions";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
+import { ZonebookPreview } from "../../zonebook/ZonebookPreview";
 
 export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
   const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<
@@ -41,16 +42,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
       {
         accessorKey: "zoneBooks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Books" />,
-        cell: ({ row }) => {
-          if (row.original.zoneBooks && row.original.zoneBooks.length > 0)
-            return row.original.zoneBooks.map((zoneBook, idx) => (
-              <span key={idx} className="w-full truncate">
-                {zoneBook.zone}-{zoneBook.book}
-                {idx < row.original.zoneBooks.length - 1 && ", "}
-              </span>
-            ));
-          else return <span>-</span>;
-        },
+        cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
         enableColumnFilter: false,
         enableSorting: false,
       },
