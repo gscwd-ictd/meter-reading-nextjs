@@ -1,10 +1,15 @@
 import z4 from "zod/v4";
 import db from "@/server/db/connections";
+import {
+  AccountHistory,
+  CreateAccountHistorySchema,
+  UpdateAccountHistorySchema,
+} from "../validators/account-history-schema";
 import { eq } from "drizzle-orm";
-import { CreateAccountHistorySchema, UpdateAccountHistorySchema } from "../validators/account-history-schema";
+import { I_Crud } from "../interfaces/crud";
 import { accountHistory } from "@/server/db/schemas/account-ledger";
 
-export class AccountHistoryRepository {
+export class AccountHistoryRepository implements I_Crud<AccountHistory> {
   async create(dto: z4.infer<typeof CreateAccountHistorySchema>) {
     try {
       const res = await db.pgConn.insert(accountHistory).values(dto).returning();

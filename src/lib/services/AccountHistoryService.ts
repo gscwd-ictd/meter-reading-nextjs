@@ -1,12 +1,9 @@
 import z4 from "zod/v4";
+import { I_Crud } from "../interfaces/crud";
 import { AccountHistoryRepository } from "../repositories/AccountHistoryRepository";
-import {
-  AccountHistory,
-  CreateAccountHistorySchema,
-  UpdateAccountHistorySchema,
-} from "../validators/account-history-schema";
+import { AccountHistory, UpdateAccountHistorySchema } from "../validators/account-history-schema";
 
-export class AccountHistoryService {
+export class AccountHistoryService implements I_Crud<AccountHistory> {
   constructor(private readonly accountHistoryRepository: AccountHistoryRepository) {}
 
   async create(dto: AccountHistory): Promise<AccountHistory> {
