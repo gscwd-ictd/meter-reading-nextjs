@@ -229,7 +229,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
       </DialogTrigger>
 
       <DialogContent
-        onPointerDownOutside={(e) => e.preventDefault()}
+        // onPointerDownOutside={(e) => e.preventDefault()}
         className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[65%]"
       >
         <DialogHeader className="space-y-0">

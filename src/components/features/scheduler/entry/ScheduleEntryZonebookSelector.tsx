@@ -29,6 +29,7 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import { SplittedDates } from "./SplittedDates";
 import { NormalDates } from "./NormalDates";
 import { toast } from "sonner";
+import { RemoveZonebookAlertDialog } from "./RemoveZonebookAlertDialog";
 
 type MeterReaderZonebooks = {
   assigned: ZonebookWithDates[];
@@ -48,6 +49,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
   const [hasFetchedZonebooks, setHasFetchedZonebooks] = useState<boolean>(false);
+  const [hasAnEmptyDueDate, setHasAnEmptyDueDate] = useState<boolean>(false);
 
   // this is the existing selected zonebooks for the selected meter reader
   const [assignedZonebooks, setAssignedZonebooks] = useState<ZonebookWithDates[]>([]);
@@ -64,6 +66,9 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const queryClient = useQueryClient();
 
   const zoneBookSorter = (zoneBooks: ZonebookWithDates[]) => ZonebookSorter(zoneBooks);
+
+  const hasEmptyDueDate = (zonebooks: ZonebookWithDates[]): boolean =>
+    zonebooks.some((item) => item.dueDate === undefined || item.dueDate === null);
 
   // new meter reader assigned and unassigned zonebooks pool
   const { data: meterReaderData, isLoading } = useQuery({
@@ -161,14 +166,17 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
       const submitObject = {
         scheduleMeterReaderId: selectedMeterReader.scheduleMeterReaderId!,
-        zoneBooks: zonebooksToBeAssigned.map((zb) => {
-          return {
-            zone: zb.zone,
-            book: zb.book,
-            dueDate: zb.dueDate,
-            disconnectionDate: zb.disconnectionDate,
-          };
-        }),
+        zoneBooks:
+          zonebooksToBeAssigned && zonebooksToBeAssigned.length > 0
+            ? zonebooksToBeAssigned.map((zb) => {
+                return {
+                  zone: zb.zone,
+                  book: zb.book,
+                  dueDate: zb.dueDate,
+                  disconnectionDate: zb.disconnectionDate,
+                };
+              })
+            : [],
       };
 
       postMeterReaderZonebooks.mutateAsync(submitObject);
@@ -192,6 +200,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
     setAssignedZonebooks(zoneBooksToBeAssigned);
 
+    // setHasAnEmptyDueDate(hasEmptyDueDate(zoneBooksToBeAssigned));
+
     const newUnassignedZonebooks = [...unassignedZonebooks];
     // filter the unassigned with the selected zonebook
 
@@ -206,6 +216,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const handleDelete = (zonebook: string) => {
     const tempAssignedZonebooks = [...assignedZonebooks];
     setAssignedZonebooks(zoneBookSorter(tempAssignedZonebooks.filter((zb) => zb.zoneBook !== zonebook)));
+
+    // setHasAnEmptyDueDate(hasEmptyDueDate(tempAssignedZonebooks.filter((zb) => zb.zoneBook !== zonebook)));
 
     const tempUnassignedZonebooks = [...unassignedZonebooks];
     const foundZonebook = tempAssignedZonebooks.find((zb) => zb.zoneBook === zonebook);
@@ -244,6 +256,13 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       setHasFetchedZonebooks(true);
     }
   }, [meterReaderData, hasFetchedZonebooks, entryZonebookSelectorIsOpen, isLoading, setAssignedZonebooks]);
+
+  useEffect(() => {
+    if (entryZonebookSelectorIsOpen) {
+      console.log("HAS EMPTY: ", hasEmptyDueDate(assignedZonebooks));
+      setHasAnEmptyDueDate(hasEmptyDueDate(assignedZonebooks));
+    }
+  }, [assignedZonebooks, entryZonebookSelectorIsOpen]);
 
   return (
     <Dialog
@@ -420,7 +439,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
             </Button>
           </div>
 
-          {/* <CommandEmpty>No zone found.</CommandEmpty> */}
           {isLoading ? (
             <div className="text-primary flex h-full w-full items-center justify-center">
               <LoadingSpinner /> Loading zone books...
@@ -537,9 +555,13 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                             : null}
                       </TableCell>
                       <TableCell>
-                        <button onClick={() => handleDelete(entry.zoneBook)}>
+                        {/* <button onClick={() => handleDelete(entry.zoneBook)}>
                           <CircleXIcon className="fill-red-600 text-white" />
-                        </button>
+                        </button> */}
+                        <RemoveZonebookAlertDialog
+                          zoneBook={entry.zoneBook}
+                          onDelete={() => handleDelete(entry.zoneBook)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))
@@ -561,7 +583,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
           </div>
         </div>
 
-        <Button className="h-[3rem]" onClick={handleApplyAllZonebooks}>
+        <Button
+          className="h-[3rem]"
+          onClick={handleApplyAllZonebooks}
+          disabled={hasAnEmptyDueDate ? true : false}
+        >
           Apply
         </Button>
       </DialogContent>
