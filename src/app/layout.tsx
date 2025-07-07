@@ -12,7 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MetocaR Application",
+  title: "MetraX",
+  description: "Meter Reading Application",
 };
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
