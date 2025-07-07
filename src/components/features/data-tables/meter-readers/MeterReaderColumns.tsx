@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef, FilterFn, Row } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
