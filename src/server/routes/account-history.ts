@@ -13,22 +13,22 @@ const accountHistoryService = new AccountHistoryService(accountHistoryRepository
 export const accountHistoryHandler = new Hono()
   .basePath("account-history")
   .get("/", async (c) => {
-    return c.json(accountHistoryService.getAll());
+    return c.json(await accountHistoryService.getAll());
   })
   .get("/:id", async (c) => {
     const id = c.req.param("id");
-    return c.json(accountHistoryService.getById(id));
+    return c.json(await accountHistoryService.getById(id));
   })
   .post("/", zValidator("json", CreateAccountHistorySchema), async (c) => {
     const body = c.req.valid("json");
-    return c.json(accountHistoryService.create(body));
+    return c.json(await accountHistoryService.create(body));
   })
   .patch("/:id", zValidator("json", UpdateAccountHistorySchema), async (c) => {
     const id = c.req.param("id");
     const body = c.req.valid("json");
-    return c.json(accountHistoryService.update(id, body));
+    return c.json(await accountHistoryService.update(id, body));
   })
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
-    return c.json(accountHistoryService.delete(id));
+    return c.json(await accountHistoryService.delete(id));
   });
