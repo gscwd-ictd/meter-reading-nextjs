@@ -6,7 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import { Check, ChevronDown, CircleXIcon, MapPinCheckIcon, MapPinIcon } from "lucide-react";
+import { Check, ChevronDown, MapPinCheckIcon, MapPinIcon } from "lucide-react";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
