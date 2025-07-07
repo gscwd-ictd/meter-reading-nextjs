@@ -16,10 +16,6 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
     return filterValue.includes(row.getValue(columnId));
   };
 
-  const filterByZonebookFn: FilterFn<PersonnelColumn> = (row, columnId, filterValue) => {
-    return filterValue.filter(row.original.zoneBooks);
-  };
-
   useEffect(() => {
     const cols: ColumnDef<PersonnelColumn>[] = [
       {
