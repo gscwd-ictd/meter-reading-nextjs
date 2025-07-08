@@ -2,6 +2,7 @@ import db from "@/server/db/connections";
 import { leakages } from "@/server/db/schemas/leakages";
 import { Leakage } from "../validators/leakage-schema";
 import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 export class LeakageRepository {
   async create(dto: Leakage): Promise<Leakage> {
@@ -20,6 +21,11 @@ export class LeakageRepository {
   async getById(id: string): Promise<Leakage> {
     try {
       const res = await db.pgConn.select().from(leakages).where(eq(leakages.id, id));
+
+      if (res.length === 0) {
+        throw new HTTPException(404, { message: "Not found!" });
+      }
+
       return res[0];
     } catch (error) {
       throw error;
