@@ -20,10 +20,11 @@ import UserIcon from "@images/user-icon.svg";
 
 export type NavItem = {
   title: string;
-  url: string;
+  url?: string;
   icon?: LucideIcon;
   isActive?: boolean;
   count?: number;
+  children?: NavItem[];
 };
 
 export type NavItemTeam = {
@@ -55,9 +56,12 @@ export const mainNav: NavItem[] = [
     icon: Calendar,
   },
   {
-    title: "Zone - Book",
-    url: "/zone-book",
+    title: "Zonebooks",
     icon: MapPinned,
+    children: [
+      { title: "List", url: "/list" },
+      { title: "Areas", url: "/areas" },
+    ],
   },
   {
     title: "Text Blast",

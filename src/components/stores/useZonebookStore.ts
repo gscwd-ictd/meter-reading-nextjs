@@ -14,21 +14,15 @@ type ZonebookStore = {
   setZonebookSelectorIsOpen: (zonebookSelector: boolean) => void;
   selectedZonebook: Zonebook | null;
   setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
+  addAreaDialogIsOpen: boolean;
+  setAddAreaDialogIsOpen: (addAreaDialogIsOpen: boolean) => void;
+  refetchAreas?: () => void;
+  setRefetchAreas: (fn: () => void) => void;
+  refetchZonebooks?: () => void;
+  setRefetchZonebooks: (fn: () => void) => void;
 };
 
 export const useZonebookStore = create<ZonebookStore>((set) => ({
-  // zoneBooks: defaultValues.zoneBooks.sort((a, b) => {
-  //   const getLeadingNumber = (str: string) => {
-  //     const match = str.match(/^(\d+)-/);
-  //     return match ? parseInt(match[1], 10) : Infinity;
-  //   };
-  //   const numA = getLeadingNumber(a.zoneBook);
-  //   const numB = getLeadingNumber(b.zoneBook);
-
-  //   if (numA !== numB) return numA - numB;
-  //   return a.zoneBook.localeCompare(b.zoneBook);
-  // }),
-
   zoneBooks: [],
   setZonebooks: (zoneBooks) => set({ zoneBooks }),
 
@@ -46,4 +40,13 @@ export const useZonebookStore = create<ZonebookStore>((set) => ({
 
   selectedZonebook: null,
   setSelectedZonebook: (selectedZonebook) => set({ selectedZonebook }),
+
+  addAreaDialogIsOpen: false,
+  setAddAreaDialogIsOpen: (addAreaDialogIsOpen) => set({ addAreaDialogIsOpen }),
+
+  refetchAreas: undefined,
+  setRefetchAreas: (fn) => set({ refetchAreas: fn }),
+
+  refetchZonebooks: undefined,
+  setRefetchZonebooks: (fn) => set({ refetchZonebooks: fn }),
 }));

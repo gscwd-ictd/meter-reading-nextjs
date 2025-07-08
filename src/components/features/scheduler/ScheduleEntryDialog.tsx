@@ -29,7 +29,7 @@ import axios from "axios";
 import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { CheckCircle, Circle } from "lucide-react";
+import { ZonebookStatusIndicator } from "../zonebook/ZonebookStatusIndicator";
 
 type ScheduleEntryDialogProps = {
   activeContext: number | null;
@@ -60,12 +60,6 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
 
   const transformDateToStringIfInvalid = (date: string | Date) =>
     isValidYyyyMmDdOrDate(date) ? date : toParsedDateOnly(date);
-
-  const hasEmptyZonebooks = (entry: MeterReadingEntryWithZonebooks): boolean => {
-    if (!entry.meterReaders || entry.meterReaders.length === 0) return true;
-
-    return entry.meterReaders.some((reader) => reader.zoneBooks.length === 0);
-  };
 
   const transformedReadingDate = format(transformDateToStringIfInvalid(entry.readingDate), "yyyy-MM-dd");
 
@@ -151,13 +145,7 @@ export const ScheduleEntryDialog: FunctionComponent<ScheduleEntryDialogProps> = 
           {isWithinMonth && (
             <>
               {entry.dueDate && entry.meterReaders && entry.meterReaders.length > 0 && (
-                <div className="absolute top-1 left-1 z-10">
-                  {!hasEmptyZonebooks(entry) ? (
-                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
-                  )}
-                </div>
+                <ZonebookStatusIndicator entry={entry} />
               )}
 
               {/* Date Number */}
