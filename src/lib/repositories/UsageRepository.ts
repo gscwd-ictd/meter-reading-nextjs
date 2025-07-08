@@ -4,6 +4,7 @@ import { I_Crud } from "../interfaces/crud";
 import { UpdateUsageSchema, Usage } from "../validators/usage-schema";
 import { usage } from "@/server/db/schemas/account-ledger";
 import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 export class UsageRepository implements I_Crud<Usage> {
   async create(dto: Usage): Promise<Usage> {
@@ -22,6 +23,11 @@ export class UsageRepository implements I_Crud<Usage> {
   async getById(id: string): Promise<Usage> {
     try {
       const res = await db.pgConn.select().from(usage).where(eq(usage.id, id));
+
+      if (res.length === 0) {
+        throw new HTTPException(404, { message: "Not found!" });
+      }
+
       return res[0];
     } catch (error) {
       throw error;

@@ -8,6 +8,7 @@ import {
 import { eq } from "drizzle-orm";
 import { I_Crud } from "../interfaces/crud";
 import { accountHistory } from "@/server/db/schemas/account-ledger";
+import { HTTPException } from "hono/http-exception";
 
 export class AccountHistoryRepository implements I_Crud<AccountHistory> {
   async create(dto: z4.infer<typeof CreateAccountHistorySchema>) {
@@ -26,6 +27,10 @@ export class AccountHistoryRepository implements I_Crud<AccountHistory> {
   async getById(id: string) {
     try {
       const res = await db.pgConn.select().from(accountHistory).where(eq(accountHistory.id, id));
+
+      if (res.length === 0) {
+        throw new HTTPException(404, { message: "Not found!" });
+      }
       return res[0];
     } catch (error) {
       throw error;
