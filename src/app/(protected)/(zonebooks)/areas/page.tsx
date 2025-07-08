@@ -1,16 +1,16 @@
-import { ZonebookTableComponent } from "@mr/components/features/data-tables/zone-book/ZonebookTableComponent";
+import { AreaTableComponent } from "@mr/components/features/data-tables/zone-book-areas/AreaTableComponent";
 import {
   Breadcrumb,
+  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
+  BreadcrumbPage,
 } from "@mr/components/ui/Breadcrumb";
 
-export default function ZoneBookpage() {
+export default function AreasPage() {
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex h-full flex-col gap-0 p-5">
       <div className="">
         <Breadcrumb>
           <BreadcrumbList>
@@ -25,9 +25,7 @@ export default function ZoneBookpage() {
         </Breadcrumb>
       </div>
 
-      <h3 className="mt-5 text-xl font-bold">Zone & Books</h3>
-      <div className="text-base font-medium text-gray-400">List of Zones & Books</div>
-      <ZonebookTableComponent />
+      <AreaTableComponent />
     </div>
   );
 }

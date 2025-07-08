@@ -1,4 +1,4 @@
-import { MeterReaderTableComponent } from "@mr/components/features/data-tables/meter-readers/MeterReaderTableComponent";
+import { ZonebookTableComponent } from "@mr/components/features/data-tables/zone-book/ZonebookTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,9 +8,9 @@ import {
   BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
 
-export default function PersonnelPage() {
+export default function ZoneBookpage() {
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex h-full flex-col gap-0 p-5">
       <div className="">
         <Breadcrumb>
           <BreadcrumbList>
@@ -19,15 +19,13 @@ export default function PersonnelPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Meter Readers</BreadcrumbPage>
+              <BreadcrumbPage>Zone & Books</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      <h3 className="mt-5 text-xl font-bold">Meter Readers</h3>
-      <div className="mb-1 text-base font-medium text-gray-400">List of Meter Readers</div>
-      <MeterReaderTableComponent />
+      <ZonebookTableComponent />
     </div>
   );
 }

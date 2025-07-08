@@ -2,34 +2,30 @@
 
 import { FunctionComponent, Suspense, useEffect } from "react";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
-import { useZonebookColumns } from "./ZonebookColumns";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { useAreasColumns } from "./AreasColumns";
+import { Area } from "@mr/lib/types/zonebook";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
-export const ZonebookDataTable: FunctionComponent = () => {
-  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
-  const setZonebooks = useZonebookStore((state) => state.setZonebooks);
-  const setRefetchZonebooks = useZonebookStore((state) => state.setRefetchZonebooks);
+export const AreasDataTable: FunctionComponent = () => {
+  const setRefetchAreas = useZonebookStore((state) => state.setRefetchAreas);
 
   const { data, refetch } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/area`); // should be areas
 
-      return res.data;
+      return res.data as Area[];
     },
   });
 
-  const zonebookColumns = useZonebookColumns(zoneBooks);
+  const areaColumns = useAreasColumns(data);
 
   useEffect(() => {
-    if (data) {
-      setZonebooks(data);
-      setRefetchZonebooks(refetch);
-    }
-  }, [data, setZonebooks, setRefetchZonebooks, refetch]);
+    if (data) setRefetchAreas(refetch);
+  }, [data, setRefetchAreas, refetch]);
 
   if (!data)
     return (
@@ -39,7 +35,7 @@ export const ZonebookDataTable: FunctionComponent = () => {
     );
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} />
+      <DataTable data={data ? data : []} columns={areaColumns} />
     </Suspense>
   );
 };
