@@ -61,6 +61,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
+  const reset = useSchedulesStore((state) => state.reset);
   const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const queryClient = useQueryClient();
@@ -138,7 +140,10 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       setAssignedZonebooks([]);
       setUnassignedZonebooks([]);
       setHasFetchedZonebooks(false);
+      reset();
+
       refetchEntry!();
+      refetchData!();
       setSelectedMeterReader(null);
       toast.success("Success", {
         description: "Successfully updated the meter reader zonebooks!",
