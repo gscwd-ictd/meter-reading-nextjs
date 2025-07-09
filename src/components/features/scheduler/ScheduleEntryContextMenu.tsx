@@ -13,6 +13,7 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { toast } from "sonner";
 import { Scheduler } from "./useScheduler";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import { ScheduleEntryTile } from "./ScheduleEntryTile";
 
 type ScheduleEntryContextMenuProps = {
   idx: number;
@@ -62,7 +63,7 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
     >
       <ContextMenuTrigger asChild>
         <div className="h-full w-full border-t border-l [&:nth-child(-n+7)]:border-t-0 [&:nth-child(7n+1)]:border-l-0">
-          <ScheduleEntryDialog
+          <ScheduleEntryTile
             activeContext={activeContext}
             setActiveContext={setActiveContext}
             dateIsSaturday={dateIsSaturday}

@@ -94,6 +94,7 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setRefetchData: (fn) => set({ refetchData: fn }),
   refetchEntry: undefined,
   setRefetchEntry: (fn) => set({ refetchEntry: fn }),
+
   reset: () => {
     set({
       calendarIsSet: false,
