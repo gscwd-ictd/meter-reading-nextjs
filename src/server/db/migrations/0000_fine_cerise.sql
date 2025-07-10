@@ -1,7 +1,7 @@
 CREATE TABLE "account_history" (
 	"id" varchar PRIMARY KEY NOT NULL,
 	"account_number" varchar NOT NULL,
-	"date_time" date NOT NULL,
+	"date_time" timestamp NOT NULL,
 	"remarks" varchar NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
@@ -58,7 +58,8 @@ CREATE TABLE "rates" (
 );
 --> statement-breakpoint
 CREATE TABLE "reading_details" (
-	"id" varchar NOT NULL,
+	"id" varchar PRIMARY KEY NOT NULL,
+	"meter_reader_id" varchar NOT NULL,
 	"account_number" varchar NOT NULL,
 	"account_name" varchar NOT NULL,
 	"meter_number" varchar NOT NULL,
@@ -73,12 +74,12 @@ CREATE TABLE "reading_details" (
 	"is_read" boolean DEFAULT false NOT NULL,
 	"sequence_number" varchar NOT NULL,
 	"address" text NOT NULL,
-	"date_installed" date NOT NULL,
+	"date_installed" timestamp NOT NULL,
 	"disconnection_type" varchar NOT NULL,
-	"reading_date" date NOT NULL,
-	"due_date" date NOT NULL,
-	"disconnection_date" date NOT NULL,
-	"reconnection_date" date NOT NULL,
+	"reading_date" timestamp NOT NULL,
+	"due_date" timestamp NOT NULL,
+	"disconnection_date" timestamp NOT NULL,
+	"reconnection_date" timestamp NOT NULL,
 	"contact_number" varchar NOT NULL,
 	"classification" varchar NOT NULL,
 	"arrears" real NOT NULL,
@@ -107,4 +108,4 @@ CREATE TABLE "water_concerns" (
 ALTER TABLE "account_history" ADD CONSTRAINT "account_history_account_number_reading_details_account_number_fk" FOREIGN KEY ("account_number") REFERENCES "public"."reading_details"("account_number") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "usage" ADD CONSTRAINT "usage_account_number_reading_details_account_number_fk" FOREIGN KEY ("account_number") REFERENCES "public"."reading_details"("account_number") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "rates" ADD CONSTRAINT "rates_meter_code_consumer_type_reading_details_meter_code_consumer_type_fk" FOREIGN KEY ("meter_code","consumer_type") REFERENCES "public"."reading_details"("meter_code","consumer_type") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "reading_details" ADD CONSTRAINT "reading_details_id_login_accounts_id_fk" FOREIGN KEY ("id") REFERENCES "public"."login_accounts"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "reading_details" ADD CONSTRAINT "reading_details_meter_reader_id_login_accounts_id_fk" FOREIGN KEY ("meter_reader_id") REFERENCES "public"."login_accounts"("id") ON DELETE no action ON UPDATE no action;
