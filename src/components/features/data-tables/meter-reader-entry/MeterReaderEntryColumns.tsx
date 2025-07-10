@@ -35,6 +35,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
             {row.original.name}
           </span>
         ),
+        meta: { exportLabel: "Name" },
 
         enableSorting: true,
       },

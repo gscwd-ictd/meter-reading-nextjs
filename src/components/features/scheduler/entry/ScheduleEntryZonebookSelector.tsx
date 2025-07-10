@@ -446,7 +446,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
           {isLoading ? (
             <div className="text-primary flex h-full w-full items-center justify-center">
-              <LoadingSpinner /> Loading zone books...
+              Loading zone books <LoadingSpinner className="text-primary" />
             </div>
           ) : (
             <CommandGroup
@@ -572,8 +572,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   ))
                 ) : isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">
-                      Loading assigned zonebooks <LoadingSpinner className="text-primary" />
+                    <TableCell colSpan={8} className="p-4">
+                      <div className="flex w-full items-center justify-center gap-2 text-center">
+                        <span className="text-primary">Loading assigned zonebooks</span>
+                        <LoadingSpinner className="text-primary" />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (

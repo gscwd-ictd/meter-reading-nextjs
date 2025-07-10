@@ -1,4 +1,4 @@
-import { Zonebook } from "@mr/lib/types/zonebook";
+import { Area, Zonebook } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
 type ZonebookStore = {
@@ -16,6 +16,14 @@ type ZonebookStore = {
   setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
   addAreaDialogIsOpen: boolean;
   setAddAreaDialogIsOpen: (addAreaDialogIsOpen: boolean) => void;
+  editAreaDialogIsOpen: boolean;
+  setEditAreaDialogIsOpen: (editAreaDialogIsOpen: boolean) => void;
+  assignAreaZonebookDialogIsOpen: boolean;
+  setAssignAreaZonebookDialogIsOpen: (assignAreaZonebookDialogIsOpen: boolean) => void;
+  editAssignAreaZonebookDialogIsOpen: boolean;
+  setEditAssignAreaZonebookDialogIsOpen: (editAssignAreaZonebookDialogIsOpen: boolean) => void;
+  selectedArea: Area;
+  setSelectedArea: (selectedArea: Area) => void;
   refetchAreas?: () => void;
   setRefetchAreas: (fn: () => void) => void;
   refetchZonebooks?: () => void;
@@ -44,9 +52,23 @@ export const useZonebookStore = create<ZonebookStore>((set) => ({
   addAreaDialogIsOpen: false,
   setAddAreaDialogIsOpen: (addAreaDialogIsOpen) => set({ addAreaDialogIsOpen }),
 
+  editAreaDialogIsOpen: false,
+  setEditAreaDialogIsOpen: (editAreaDialogIsOpen) => set({ editAreaDialogIsOpen }),
+
+  assignAreaZonebookDialogIsOpen: false,
+  setAssignAreaZonebookDialogIsOpen: (assignAreaZonebookDialogIsOpen) =>
+    set({ assignAreaZonebookDialogIsOpen }),
+
+  editAssignAreaZonebookDialogIsOpen: false,
+  setEditAssignAreaZonebookDialogIsOpen: (editAssignAreaZonebookDialogIsOpen) =>
+    set({ editAssignAreaZonebookDialogIsOpen }),
+
   refetchAreas: undefined,
   setRefetchAreas: (fn) => set({ refetchAreas: fn }),
 
   refetchZonebooks: undefined,
   setRefetchZonebooks: (fn) => set({ refetchZonebooks: fn }),
+
+  selectedArea: {} as Area,
+  setSelectedArea: (selectedArea) => set({ selectedArea }),
 }));

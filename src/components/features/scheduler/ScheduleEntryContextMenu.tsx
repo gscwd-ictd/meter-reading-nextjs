@@ -9,7 +9,6 @@ import {
 import { isSameDay, isSameMonth, isSaturday, isSunday, startOfMonth } from "date-fns";
 import { SquarePenIcon, SquareSplitHorizontalIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
-import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { toast } from "sonner";
 import { Scheduler } from "./useScheduler";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";

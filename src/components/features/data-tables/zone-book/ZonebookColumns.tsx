@@ -5,6 +5,7 @@ import { Zonebook } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { PlusIcon, SquarePenIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ZonebookRowActions } from "./ZonebookRowActions";
 
 export const useZonebookColumns = (data: Zonebook[] | undefined) => {
   const [areaColumns, setAreaColumns] = useState<ColumnDef<Zonebook>[]>([]);
@@ -55,29 +56,17 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
       {
         header: "Actions",
         cell: ({ row }) => (
-          <div className="flex gap-2">
-            {!row.original.areaId && (
-              <PlusIcon className="text-primary size-8 rounded bg-gray-200 p-2 hover:cursor-pointer" />
-            )}
-            {row.original.areaId && (
-              <SquarePenIcon className="bg-primary size-8 rounded p-2 text-white hover:cursor-pointer" />
-            )}
-          </div>
+          <ZonebookRowActions
+            zonebook={{
+              area: row.original.area,
+              book: row.original.book,
+              zone: row.original.zone,
+              zoneBook: row.original.zoneBook,
+              zonebookId: row.original.zonebookId,
+            }}
+          />
         ),
       },
-      // {accessorKey:'zoneBook', cell: ({row})=>}
-      // {
-      //   accessorKey: "totalConsumers",
-      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Total Consumers" />,
-      //   enableColumnFilter: false,
-      //   cell: ({ row }) => <span>{row.original.totalConsumers}</span>,
-      // },
-      // {
-      //   accessorKey: "active",
-      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Active" />,
-      //   enableColumnFilter: false,
-      //   cell: ({ row }) => <span>{row.original.active}</span>,
-      // },
     ];
 
     setAreaColumns(cols);

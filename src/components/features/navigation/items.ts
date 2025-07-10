@@ -14,6 +14,8 @@ import {
   Users2Icon,
   MessageCircleWarning,
   FileText,
+  Book,
+  Scan,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -59,8 +61,8 @@ export const mainNav: NavItem[] = [
     title: "Zonebooks",
     icon: MapPinned,
     children: [
-      { title: "List", url: "/list" },
-      { title: "Areas", url: "/areas" },
+      { title: "List", url: "/list", icon: Book },
+      { title: "Areas", url: "/areas", icon: Scan },
     ],
   },
   {

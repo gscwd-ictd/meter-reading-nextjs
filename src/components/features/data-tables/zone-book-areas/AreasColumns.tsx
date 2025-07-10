@@ -3,8 +3,8 @@
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { Area } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { SquarePenIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { AreaRowActions } from "../../areas/AreaRowActions";
 
 export const useAreasColumns = (data: Area[] | undefined) => {
   const [areaColumns, setAreaColumns] = useState<ColumnDef<Area>[]>([]);
@@ -18,7 +18,7 @@ export const useAreasColumns = (data: Area[] | undefined) => {
     const cols: ColumnDef<Area>[] = [
       {
         accessorKey: "area",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Book" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Areas" />,
         enableColumnFilter: true,
         cell: ({ row }) => <span>{row.original.area}</span>,
         filterFn: filterFn,
@@ -29,17 +29,8 @@ export const useAreasColumns = (data: Area[] | undefined) => {
         accessorKey: "id",
         header: "Actions",
         enableColumnFilter: false,
-        cell: () => (
-          <div className="flex gap-2">
-            <SquarePenIcon
-              className="bg-primary size-8 rounded p-2 text-white hover:cursor-pointer"
-              role="button"
-            />
-            <TrashIcon
-              className="text-primary size-8 rounded bg-blue-100 p-2 hover:cursor-pointer"
-              role="button"
-            />
-          </div>
+        cell: ({ row }) => (
+          <AreaRowActions details={{ area: row.original.area, areaId: row.original.areaId! }} />
         ),
       },
     ];
