@@ -74,6 +74,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                             isActive={pathname.startsWith(child.url!)}
                             onClick={() => router.push(child.url!)}
                           >
+                            {child.icon && <child.icon />}
                             <span className="text-sm">{child.title}</span>
                           </SidebarMenuButton>
                         ))}

@@ -7,33 +7,44 @@ type ZonebookStatusIndicatorProps = {
   entry: MeterReadingEntryWithZonebooks;
 };
 
-const hasEmptyZonebooks = (entry: MeterReadingEntryWithZonebooks): boolean => {
-  if (!entry.meterReaders || entry.meterReaders.length === 0) return true;
-  return entry.meterReaders.some((reader) => reader.zoneBooks.length === 0);
-};
-
 export const ZonebookStatusIndicator: FC<ZonebookStatusIndicatorProps> = ({ entry }) => {
   const shouldRender = !!entry.dueDate && !!entry.meterReaders && entry.meterReaders.length > 0;
-
   if (!shouldRender) return null;
 
-  const isComplete = !hasEmptyZonebooks(entry);
+  const totalReaders = entry?.meterReaders?.length;
+  const readersWithZonebooks = entry?.meterReaders?.filter((r) => r.zoneBooks.length > 0).length;
+
+  let Icon = Circle;
+  let color = "text-gray-300 dark:text-gray-400";
+
+  if (readersWithZonebooks === 0) {
+    Icon = Circle;
+    color = "text-gray-300 dark:text-gray-400";
+  } else if (readersWithZonebooks! < totalReaders!) {
+    Icon = Circle;
+    color = "text-yellow-500 dark:text-yellow-400";
+  } else {
+    Icon = CheckCircle;
+    color = "text-green-600 dark:text-green-400";
+  }
 
   return (
     <div className="absolute top-1 left-1 z-10">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            {isComplete ? (
-              <CheckCircle className="h-4 w-4 cursor-default text-green-600 dark:text-green-400" />
-            ) : (
-              <Circle className="h-4 w-4 cursor-default text-yellow-500 dark:text-yellow-400" />
-            )}
+            <Icon className={`h-4 w-4 cursor-default ${color}`} />
           </TooltipTrigger>
-          <TooltipContent side="right" align="center" className="dark:text-white">
-            <p>
-              {isComplete ? "All meter readers have zonebooks" : "Some meter readers have missing zonebooks"}
-            </p>
+          <TooltipContent
+            side="top"
+            align="center"
+            className="border-primary text-primary dark:bg-primary border bg-blue-50 dark:text-white"
+          >
+            <div className="text-xs">
+              <div>
+                {readersWithZonebooks} of {totalReaders} meter readers have assigned zonebooks
+              </div>
+            </div>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

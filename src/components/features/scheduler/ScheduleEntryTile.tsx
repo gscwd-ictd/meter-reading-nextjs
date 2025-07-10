@@ -80,7 +80,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
           {/* Due Date */}
           {Array.isArray(entry.dueDate) ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+              <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <span className="text-blue-600 dark:text-blue-600">
                   {entry.dueDate.sort(compareAsc).map((day, idx) => (
                     <span className="overflow-auto font-bold" key={idx}>
@@ -92,7 +92,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
             </div>
           ) : entry.dueDate ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-blue-200 dark:bg-transparent">
+              <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <span className="font-bold text-blue-600 dark:text-blue-600">
                   {formatDate(entry.dueDate, "MMM dd")}
                 </span>
@@ -102,7 +102,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
           {/* Disconnection Date */}
           {Array.isArray(entry.disconnectionDate) ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+              <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <div className="text-red-600 dark:text-rose-600">
                   {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
                     <span className="font-bold" key={idx}>
@@ -114,7 +114,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
             </div>
           ) : entry.disconnectionDate ? (
             <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-rose-100 dark:bg-transparent">
+              <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <span className="font-bold text-red-600 dark:text-rose-600">
                   {formatDate(entry.disconnectionDate, "MMM dd")}
                 </span>
@@ -127,7 +127,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
             entry.dueDate &&
             entry.meterReaders?.length === 0 && (
               <div className="flex items-center justify-center">
-                <Badge className="w-full gap-0 rounded-none bg-gray-100 text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
+                <Badge className="w-full gap-0 rounded-none bg-transparent text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
                   Applicable Rest Day
                 </Badge>
               </div>

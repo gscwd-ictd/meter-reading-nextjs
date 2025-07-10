@@ -39,6 +39,13 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
+  const isDisabled = () =>
+    (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+      ? true
+      : hasPopulatedMeterReaders
+        ? true
+        : false;
+
   const { data: meterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
@@ -125,13 +132,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   return (
     <AlertDialog>
       <AlertDialogTrigger
-        disabled={
-          (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
-            ? true
-            : hasPopulatedMeterReaders
-              ? true
-              : false
-        }
+        disabled={isDisabled()}
         className="flex w-full gap-2 px-2 py-1 text-sm dark:text-white"
       >
         {hasPopulatedMeterReaders ? (
@@ -139,7 +140,11 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         ) : (
           <CalendarPlus className="size-5" />
         )}
-        {!hasPopulatedMeterReaders ? "Populate schedule" : "Fetched Schedule"}
+        {!hasPopulatedMeterReaders ? (
+          <span className={`${isDisabled() ? "line-through" : ""}`}>Populate schedule</span>
+        ) : (
+          "Fetched Schedule"
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
