@@ -1,4 +1,4 @@
-import { boolean, date, index, integer, pgTable, real, text, unique, varchar } from "drizzle-orm/pg-core";
+import { boolean, timestamp, integer, pgTable, real, text, unique, varchar } from "drizzle-orm/pg-core";
 import { loginAccounts } from "./login-accounts";
 
 export const readingDetails = pgTable(
@@ -24,12 +24,12 @@ export const readingDetails = pgTable(
     isRead: boolean("is_read").default(false).notNull(),
     sequenceNumber: varchar("sequence_number").notNull(),
     address: text("address").notNull(),
-    dateInstalled: date("date_installed").notNull(),
+    dateInstalled: timestamp("date_installed").notNull(),
     disconnectionType: varchar("disconnection_type").notNull(),
-    readingDate: date("reading_date").notNull(),
-    dueDate: date("due_date").notNull(),
-    disconnectionDate: date("disconnection_date").notNull(),
-    reconnectionDate: date("reconnection_date").notNull(),
+    readingDate: timestamp("reading_date").notNull(),
+    dueDate: timestamp("due_date").notNull(),
+    disconnectionDate: timestamp("disconnection_date").notNull(),
+    reconnectionDate: timestamp("reconnection_date").notNull(),
     contactNumber: varchar("contact_number").notNull(),
     classification: varchar("classification").notNull(),
     arrears: real("arrears").notNull(),
