@@ -36,7 +36,7 @@ export const readingDetails = pgTable(
     currentReading: real("current_reading"),
     billedAmount: real("billed_amount"),
     remarks: varchar("remarks"),
-    additionalRemarks: varchar("additional_remakrs"),
+    additionalRemarks: varchar("additional_remarks"),
     image: text("image"),
     printCount: integer("print_count"),
   },
