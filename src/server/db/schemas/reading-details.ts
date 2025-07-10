@@ -7,7 +7,7 @@ export const readingDetails = pgTable(
     id: varchar("id")
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    meterReaderId: varchar("id")
+    meterReaderId: varchar("meter_reader_id")
       .references(() => loginAccounts.id)
       .notNull(),
     accountNumber: varchar("account_number").unique().notNull(),

@@ -1,5 +1,5 @@
 {
-  "id": "b4cc3776-b653-4c77-abf7-3db51ad2f385",
+  "id": "0ab39cd9-1154-4812-a331-8f9b1212a180",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -22,7 +22,7 @@
         },
         "date_time": {
           "name": "date_time",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
@@ -388,6 +388,12 @@
         "id": {
           "name": "id",
           "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -478,7 +484,7 @@
         },
         "date_installed": {
           "name": "date_installed",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
@@ -490,25 +496,25 @@
         },
         "reading_date": {
           "name": "reading_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
         "due_date": {
           "name": "due_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
         "disconnection_date": {
           "name": "disconnection_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
         "reconnection_date": {
           "name": "reconnection_date",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         },
@@ -569,12 +575,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "reading_details_id_login_accounts_id_fk": {
-          "name": "reading_details_id_login_accounts_id_fk",
+        "reading_details_meter_reader_id_login_accounts_id_fk": {
+          "name": "reading_details_meter_reader_id_login_accounts_id_fk",
           "tableFrom": "reading_details",
           "tableTo": "login_accounts",
           "columnsFrom": [
-            "id"
+            "meter_reader_id"
           ],
           "columnsTo": [
             "id"
