@@ -82,7 +82,7 @@ export function DataTable<T>({
   useEffect(() => {
     const timeout = setTimeout(() => {
       setGlobalFilter(debounceValue);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [debounceValue, setGlobalFilter]);

@@ -5,7 +5,7 @@ import { FunctionComponent } from "react";
 export const DashboardComponent: FunctionComponent = () => {
   return (
     <div className="mt-5 flex w-full flex-col gap-5">
-      <div className="text-2xl font-bold text-gray-800">Welcome back</div>
+      <div className="text-2xl font-bold text-gray-800 dark:text-white">Welcome back</div>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-1 sm:grid-rows-4 md:grid-cols-2 md:grid-rows-2 lg:grid-cols-4">
         <DashboardCard
           title="Billed"

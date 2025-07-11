@@ -118,6 +118,7 @@ export function MonthYearPicker({
                     setSelectedYear(year);
                     setStep("month");
                   }}
+                  className="dark:text-white"
                 >
                   {year}
                 </Button>
