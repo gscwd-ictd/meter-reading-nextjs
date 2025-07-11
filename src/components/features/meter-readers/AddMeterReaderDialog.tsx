@@ -24,6 +24,7 @@ import axios from "axios";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type AddMeterReaderDialogProps = {
   addMeterReaderDialogIsOpen: boolean;
@@ -70,6 +71,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
   const [hasSetInitialZonebookPool, setHasSetInitialZonebookPool] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
 
@@ -123,10 +125,14 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         return await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers`, transformedEmployee);
       } catch (error) {
         console.log(error);
-        toast.error("Error", { description: JSON.stringify(error) });
+        return error;
       }
     },
+    onMutate: () => {
+      setIsSubmitting(true);
+    },
     onSuccess: async () => {
+      setIsSubmitting(false);
       setAddMeterReaderDialogIsOpen(false);
       resetToDefaults();
 
@@ -140,6 +146,10 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         description: "You have successfully added a meter reader!",
         position: "top-right",
       });
+    },
+    onError: (error: unknown) => {
+      setIsSubmitting(false);
+      toast.error("Error", { description: JSON.stringify(error) });
     },
   });
 
@@ -209,11 +219,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
 
           <Button
             size="lg"
-            disabled={!selectedEmployee ? true : false}
+            disabled={!selectedEmployee ? true : isSubmitting ? true : false}
             type="submit"
             form="add-meter-reader-form"
+            className="flex items-center gap-2"
           >
-            Add
+            Add {isSubmitting && <LoadingSpinner />}
           </Button>
         </DialogFooter>
       </DialogContent>

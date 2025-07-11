@@ -1,34 +1,62 @@
 "use client";
 
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@mr/components/ui/Dialog";
 import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
 import { Label } from "@mr/components/ui/Label";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { Area } from "@mr/lib/types/zonebook";
-
-type Zonebook = {
-  zoneBook: string;
-  zone: string;
-  book: number;
-  area?: string;
-};
+import { SearchAreaCombobox } from "../areas/SearchAreaCombobox";
+import { Area, Zonebook } from "@mr/lib/types/zonebook";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 
 export const AssignAreaZonebookDialog: FunctionComponent = () => {
-  const [area, setArea] = useState({} as Area);
-
   const assignAreaZonebookDialogIsOpen = useZonebookStore((state) => state.assignAreaZonebookDialogIsOpen);
   const setAssignAreaZonebookDialogIsOpen = useZonebookStore(
     (state) => state.setAssignAreaZonebookDialogIsOpen,
   );
+  const selectedArea = useZonebookStore((state) => state.selectedArea);
   const selectedZonebook = useZonebookStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useZonebookStore((state) => state.setSelectedZonebook);
+  const setSelectedArea = useZonebookStore((state) => state.setSelectedArea);
+  const refetchZonebooks = useZonebookStore((state) => state.refetchZonebooks);
+
+  const postAreaToZonebookMutation = useMutation({
+    mutationKey: ["post-area-mutation", selectedArea.areaId],
+    mutationFn: async (zonebook: Zonebook) => {
+      console.log(zonebook);
+      try {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`, {
+          zone: zonebook.zone,
+          book: zonebook.book,
+          areaId: zonebook.areaId,
+        });
+
+        return res.data;
+      } catch (error) {
+        console.log(error);
+        return error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Success", {
+        description: `You have successfully assigned area ${selectedArea.area} to zone book ${selectedZonebook?.zoneBook}`,
+      });
+
+      setSelectedArea({} as Area);
+      setSelectedZonebook({} as Zonebook);
+      setAssignAreaZonebookDialogIsOpen(false);
+      refetchZonebooks?.();
+    },
+  });
 
   return (
     <Dialog
       open={assignAreaZonebookDialogIsOpen}
       onOpenChange={() => {
+        setSelectedArea({} as Area);
         setAssignAreaZonebookDialogIsOpen(!assignAreaZonebookDialogIsOpen);
         setSelectedZonebook(null);
       }}
@@ -64,15 +92,36 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
             <Label htmlFor="area" className="text-right">
               Area
             </Label>
-            --area--
+            <div className="col-span-3">
+              <SearchAreaCombobox />
+            </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setAssignAreaZonebookDialogIsOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSelectedArea({} as Area);
+              setAssignAreaZonebookDialogIsOpen(false);
+            }}
+          >
             Cancel
           </Button>
-          <Button>Assign area</Button>
+          <Button
+            className="dark:text-white"
+            onClick={async () => {
+              await postAreaToZonebookMutation.mutateAsync({
+                zone: selectedZonebook?.zone!,
+                book: selectedZonebook?.book!,
+                areaId: selectedArea.areaId,
+                zoneBook: selectedZonebook?.zoneBook!,
+                area: selectedArea.area,
+              });
+            }}
+          >
+            Assign area
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
