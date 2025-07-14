@@ -1,7 +1,7 @@
-import { newMeters } from "@/server/db/schemas/new-meters";
+import { newMeters } from "@mr/server/db/schemas/new-meters";
 import { I_Crud } from "../interfaces/crud";
 import { NewMeter } from "../validators/new-meter-schema";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 

@@ -1,9 +1,9 @@
-import { ReadingDetailsRepository } from "@/lib/repositories/ReadingDetailsRepository";
-import { ReadingDetailsService } from "@/lib/services/ReadingDetailsService";
+import { ReadingDetailsRepository } from "@mr/lib/repositories/ReadingDetailsRepository";
+import { ReadingDetailsService } from "@mr/lib/services/ReadingDetailsService";
 import {
   CreateReadingDetailsSchema,
   UpdateReadingDetailsSchema,
-} from "@/lib/validators/reading-details-schema";
+} from "@mr/lib/validators/reading-details-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

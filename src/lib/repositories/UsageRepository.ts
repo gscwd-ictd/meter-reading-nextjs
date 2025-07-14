@@ -1,8 +1,8 @@
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import z4 from "zod/v4";
 import { I_Crud } from "../interfaces/crud";
 import { UpdateUsageSchema, Usage } from "../validators/usage-schema";
-import { usage } from "@/server/db/schemas/account-ledger";
+import { usage } from "@mr/server/db/schemas/account-ledger";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 

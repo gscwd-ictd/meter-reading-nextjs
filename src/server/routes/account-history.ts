@@ -1,9 +1,9 @@
-import { AccountHistoryRepository } from "@/lib/repositories/AccountHistoryRepository";
-import { AccountHistoryService } from "@/lib/services/AccountHistoryService";
+import { AccountHistoryRepository } from "@mr/lib/repositories/AccountHistoryRepository";
+import { AccountHistoryService } from "@mr/lib/services/AccountHistoryService";
 import {
   CreateAccountHistorySchema,
   UpdateAccountHistorySchema,
-} from "@/lib/validators/account-history-schema";
+} from "@mr/lib/validators/account-history-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

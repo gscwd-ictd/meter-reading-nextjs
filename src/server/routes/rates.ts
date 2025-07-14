@@ -1,6 +1,6 @@
-import { RateRepository } from "@/lib/repositories/RateRepository";
-import { RateService } from "@/lib/services/RateService";
-import { CreateRateSchema, UpdateRateSchema } from "@/lib/validators/rate-schema";
+import { RateRepository } from "@mr/lib/repositories/RateRepository";
+import { RateService } from "@mr/lib/services/RateService";
+import { CreateRateSchema, UpdateRateSchema } from "@mr/lib/validators/rate-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

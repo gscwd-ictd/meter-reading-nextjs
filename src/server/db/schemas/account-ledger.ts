@@ -1,4 +1,4 @@
-import { date, pgTable, real, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, real, timestamp, varchar } from "drizzle-orm/pg-core";
 import { readingDetails } from "./reading-details";
 
 export const accountHistory = pgTable("account_history", {

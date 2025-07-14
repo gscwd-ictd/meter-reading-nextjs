@@ -1,13 +1,5 @@
 import z4 from "zod/v4";
 
-// id: varchar("id")
-//     .primaryKey()
-//     .$defaultFn(() => crypto.randomUUID()),
-//   currentReading: real("current_reading"),
-//   meterNumber: varchar("meter_number").notNull(),
-//   image: text("image"),
-//   dateTime: timestamp("date_time", { mode: "date" }).notNull(),
-
 export const CreateNewMeterSchema = z4.object({
   id: z4.uuid(),
   currentReading: z4.number().nullable(),

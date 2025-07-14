@@ -1,5 +1,5 @@
 import z4 from "zod/v4";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import {
   AccountHistory,
   CreateAccountHistorySchema,
@@ -7,7 +7,7 @@ import {
 } from "../validators/account-history-schema";
 import { eq } from "drizzle-orm";
 import { I_Crud } from "../interfaces/crud";
-import { accountHistory } from "@/server/db/schemas/account-ledger";
+import { accountHistory } from "@mr/server/db/schemas/account-ledger";
 import { HTTPException } from "hono/http-exception";
 
 export class AccountHistoryRepository implements I_Crud<AccountHistory> {
