@@ -1,5 +1,5 @@
-import env from "@/lib/env";
-import { TokenService } from "@/lib/tokenService";
+import env from "@mr/lib/env";
+import { TokenService } from "@mr/lib/tokenService";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { createRemoteJWKSet, jwtVerify } from "jose";

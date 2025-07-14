@@ -1,5 +1,5 @@
-import db from "@/server/db/connections";
-import { leakages } from "@/server/db/schemas/leakages";
+import db from "@mr/server/db/connections";
+import { leakages } from "@mr/server/db/schemas/leakages";
 import { Leakage } from "../validators/leakage-schema";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";

@@ -1,6 +1,6 @@
-import { WaterConcernRepository } from "@/lib/repositories/WaterConcernRepository";
-import { WaterConcernService } from "@/lib/services/WaterConcernService";
-import { CreateWaterConcernSchema, UpdateWaterConcernSchema } from "@/lib/validators/water-concerns-schema";
+import { WaterConcernRepository } from "@mr/lib/repositories/WaterConcernRepository";
+import { WaterConcernService } from "@mr/lib/services/WaterConcernService";
+import { CreateWaterConcernSchema, UpdateWaterConcernSchema } from "@mr/lib/validators/water-concerns-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

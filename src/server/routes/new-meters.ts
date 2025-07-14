@@ -1,6 +1,6 @@
-import { NewMeterRepository } from "@/lib/repositories/NewMeterRepository";
-import { NewMeterService } from "@/lib/services/NewMeterService";
-import { CreateNewMeterSchema, UpdateNewMeterSchema } from "@/lib/validators/new-meter-schema";
+import { NewMeterRepository } from "@mr/lib/repositories/NewMeterRepository";
+import { NewMeterService } from "@mr/lib/services/NewMeterService";
+import { CreateNewMeterSchema, UpdateNewMeterSchema } from "@mr/lib/validators/new-meter-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

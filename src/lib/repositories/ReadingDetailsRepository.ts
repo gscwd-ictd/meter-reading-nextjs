@@ -1,7 +1,7 @@
-import { readingDetails } from "@/server/db/schemas/reading-details";
+import { readingDetails } from "@mr/server/db/schemas/reading-details";
 import { I_Crud } from "../interfaces/crud";
 import { ReadingDetails } from "../validators/reading-details-schema";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 

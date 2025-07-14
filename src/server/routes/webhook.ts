@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z4 from "zod/v4";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 
 export const webhookHandler = new Hono().basePath("/webhook").post(
   "/test",

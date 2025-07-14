@@ -9,7 +9,7 @@ A minimal and scalable Next.js boilerplate to kickstart your web project.
 - 🎨 Tailwind CSS for styling
 - ✅ ESLint & Prettier preconfigured
 - 🧪 Vitest & React Testing Library
-- 📦 Absolute imports (`@/` alias)
+- 📦 Absolute imports (`@mr/` alias)
 
 ## Getting Started
 
