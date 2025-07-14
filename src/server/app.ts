@@ -1,32 +1,22 @@
 import { Hono } from "hono";
 import { healthcheckHandler } from "./routes/healthcheck";
-import { authHandler } from "./routes/auth";
-import { tokensHandler } from "./routes/tokens";
-import { accountHistoryHandler } from "./routes/accountHistory";
-import { leakageHandler } from "./routes/leakage";
-import { newMeterHandler } from "./routes/newMeter";
-import { ratesHandler } from "./routes/rates";
-import { usageHandler } from "./routes/usage";
-import { waterConcernsHandler } from "./routes/waterConcerns";
-import { zoneBookAddressHandler } from "./routes/zoneBookAddress";
 import { webhookHandler } from "./routes/webhook";
-import { readingDetailsHandler } from "./routes/readingDetails";
+import { accountHistoryHandler } from "./routes/account-history";
+import { newMetersHandler } from "./routes/new-meters";
+import { ratesHandler } from "./routes/rates";
+import { readingDetailsHandler } from "./routes/reading-details";
+import { waterConcernsHandler } from "./routes/water-concerns";
 
 function createApp() {
   const app = new Hono().basePath("/api");
 
   const routes = [
     healthcheckHandler,
-    authHandler,
-    tokensHandler,
-    readingDetailsHandler,
     accountHistoryHandler,
-    leakageHandler,
-    newMeterHandler,
+    newMetersHandler,
     ratesHandler,
-    usageHandler,
+    readingDetailsHandler,
     waterConcernsHandler,
-    zoneBookAddressHandler,
     webhookHandler,
   ] as const;
 

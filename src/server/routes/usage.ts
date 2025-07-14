@@ -1,38 +1,31 @@
-import { Hono } from "hono";
-import db from "../db/connection";
-import { UpdateUsageSchema, usage, UsageSchema } from "../db/schemas/meterReading";
+import { UsageRepository } from "@/lib/repositories/UsageRepository";
+import { UsageService } from "@/lib/services/UsageService";
+import { CreateUsageSchema, UpdateUsageSchema } from "@/lib/validators/usage-schema";
 import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
+import { Hono } from "hono";
 
-export const usageHandler = new Hono()
+const usageRepository = new UsageRepository();
+const usageService = new UsageService(usageRepository);
+
+export const usage = new Hono()
   .basePath("usage")
   .get("/", async (c) => {
-    const res = await db.select().from(usage);
-    return c.json(res);
+    return c.json(await usageService.getAll());
   })
-
   .get("/:id", async (c) => {
     const id = c.req.param("id");
-    const res = await db.select().from(usage).where(eq(usage.id, id));
-    return c.json(res[0]);
+    return c.json(await usageService.getById(id));
   })
-
-  .post("/", zValidator("json", UsageSchema), async (c) => {
+  .post("/", zValidator("json", CreateUsageSchema), async (c) => {
     const body = c.req.valid("json");
-    const res = await db.insert(usage).values(body).returning();
-    return c.json(res[0]);
+    return c.json(await usageService.create(body));
   })
-
   .patch("/:id", zValidator("json", UpdateUsageSchema), async (c) => {
     const id = c.req.param("id");
     const body = c.req.valid("json");
-
-    const res = await db.update(usage).set(body).where(eq(usage.id, id)).returning();
-    return c.json(res[0]);
+    return c.json(await usageService.update(id, body));
   })
-
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
-    await db.delete(usage).where(eq(usage.id, id));
-    return c.json({ method: "delete", status: "successful" });
+    return c.json(await usageService.delete(id));
   });

@@ -1,34 +1,31 @@
+import { RateRepository } from "@/lib/repositories/RateRepository";
+import { RateService } from "@/lib/services/RateService";
+import { CreateRateSchema, UpdateRateSchema } from "@/lib/validators/rate-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { rates, RatesSchema, UpdateRatesSchema } from "../db/schemas/meterReading";
-import db from "../db/connection";
-import { eq } from "drizzle-orm";
+
+const rateRepository = new RateRepository();
+const rateService = new RateService(rateRepository);
 
 export const ratesHandler = new Hono()
-  .basePath("rates")
+  .basePath("/rates")
   .get("/", async (c) => {
-    const res = await db.select().from(rates);
-    return c.json(res);
+    return c.json(await rateService.getAll());
   })
   .get("/:id", async (c) => {
     const id = c.req.param("id");
-    const res = await db.select().from(rates).where(eq(rates.id, id));
-    return c.json(res[0]);
+    return c.json(await rateService.getById(id));
   })
-  .post("/", zValidator("json", RatesSchema), async (c) => {
+  .post("/", zValidator("json", CreateRateSchema), async (c) => {
     const body = c.req.valid("json");
-    const res = await db.insert(rates).values(body).returning();
-    return c.json(res[0]);
+    return c.json(await rateService.create(body));
   })
-  .patch("/:id", zValidator("json", UpdateRatesSchema), async (c) => {
+  .patch("/:id", zValidator("json", UpdateRateSchema), async (c) => {
     const id = c.req.param("id");
     const body = c.req.valid("json");
-
-    const res = await db.update(rates).set(body).where(eq(rates.id, id)).returning();
-    return c.json(res[0]);
+    return c.json(await rateService.update(id, body));
   })
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
-    await db.delete(rates).where(eq(rates.id, id));
-    return c.json({ method: "delete", status: "successful" });
+    return c.json(await rateService.delete(id));
   });
