@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
-import { Button } from "@mr/components/ui/Button";
 import { CalendarCheck2, CalendarPlus } from "lucide-react";
 import { FunctionComponent, useEffect } from "react";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
@@ -40,6 +39,13 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
+  const isDisabled = () =>
+    (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+      ? true
+      : hasPopulatedMeterReaders
+        ? true
+        : false;
+
   const { data: meterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
@@ -62,10 +68,8 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           };
         });
 
-        console.log(formattedFilteredSchedule);
-
         const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
-        console.log(res);
+
         return res.data;
       } catch (error) {
         console.log(error);
@@ -101,9 +105,14 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     await postSchedule.mutateAsync(
       newSchedule.map((sched) => {
         return {
-          ...sched,
+          readingDate: sched.readingDate,
+          dueDate: sched.dueDate,
+          disconnectionDate: sched.disconnectionDate,
           meterReaders: sched.meterReaders?.map((mr) => {
-            return { ...mr, zoneBooks: [] };
+            return {
+              ...mr,
+              zoneBooks: [],
+            };
           }),
         };
       }),
@@ -112,7 +121,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 
   useEffect(() => {
     if (postSchedule.isSuccess) {
-      refetchData?.();
+      refetchData!();
       postSchedule.reset();
 
       setHasSchedule(true);
@@ -122,20 +131,20 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button
-          disabled={
-            (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
-              ? true
-              : hasPopulatedMeterReaders
-                ? true
-                : false
-          }
-          className="dark:text-white"
-        >
-          {hasPopulatedMeterReaders ? <CalendarCheck2 /> : <CalendarPlus />}
-          {!hasPopulatedMeterReaders ? "Populate schedule" : "Fetched Schedule"}
-        </Button>
+      <AlertDialogTrigger
+        disabled={isDisabled()}
+        className="flex w-full gap-2 px-2 py-1 text-sm dark:text-white"
+      >
+        {hasPopulatedMeterReaders ? (
+          <CalendarCheck2 className="size-5" />
+        ) : (
+          <CalendarPlus className="size-5" />
+        )}
+        {!hasPopulatedMeterReaders ? (
+          <span className={`${isDisabled() ? "line-through" : ""}`}>Populate schedule</span>
+        ) : (
+          "Fetched Schedule"
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 import { Badge } from "@mr/components/ui/Badge";
+import { ZonebookPreview } from "../../zonebook/ZonebookPreview";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
   const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
@@ -23,6 +24,9 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         filterFn: filterFn,
         cell: ({ row }) => <span>{row.original.companyId}</span>,
         enableColumnFilter: true,
+        meta: {
+          exportLabel: "Company ID",
+        },
       },
       {
         accessorKey: "name",
@@ -40,6 +44,9 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
           </div>
         ),
         enableColumnFilter: true,
+        meta: {
+          exportLabel: "Name",
+        },
       },
       // {
       //   accessorKey: "positionTitle",
@@ -60,20 +67,14 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       {
         accessorKey: "mobileNumber",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
-        cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
+        cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.mobileNumber}</span>,
         enableColumnFilter: false,
       },
       {
         accessorKey: "zoneBooks",
+        accessorFn: (row) => row.zoneBooks.map((zb) => zb.zoneBook),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
-        cell: ({ row }) =>
-          row.original.zoneBooks &&
-          row.original.zoneBooks.map((zoneBook, idx) => (
-            <span key={zoneBook.zoneBook} className="w-full truncate">
-              {zoneBook.zoneBook}
-              {idx < row.original.zoneBooks.length - 1 && ", "}
-            </span>
-          )),
+        cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
         enableColumnFilter: false,
       },
       {

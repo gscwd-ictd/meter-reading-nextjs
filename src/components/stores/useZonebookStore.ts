@@ -1,4 +1,4 @@
-import { Zonebook } from "@mr/lib/types/zonebook";
+import { Area, Zonebook } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
 type ZonebookStore = {
@@ -14,21 +14,23 @@ type ZonebookStore = {
   setZonebookSelectorIsOpen: (zonebookSelector: boolean) => void;
   selectedZonebook: Zonebook | null;
   setSelectedZonebook: (selectedZonebook: Zonebook | null) => void;
+  addAreaDialogIsOpen: boolean;
+  setAddAreaDialogIsOpen: (addAreaDialogIsOpen: boolean) => void;
+  editAreaDialogIsOpen: boolean;
+  setEditAreaDialogIsOpen: (editAreaDialogIsOpen: boolean) => void;
+  assignAreaZonebookDialogIsOpen: boolean;
+  setAssignAreaZonebookDialogIsOpen: (assignAreaZonebookDialogIsOpen: boolean) => void;
+  editAssignAreaZonebookDialogIsOpen: boolean;
+  setEditAssignAreaZonebookDialogIsOpen: (editAssignAreaZonebookDialogIsOpen: boolean) => void;
+  selectedArea: Area;
+  setSelectedArea: (selectedArea: Area) => void;
+  refetchAreas?: () => void;
+  setRefetchAreas: (fn: () => void) => void;
+  refetchZonebooks?: () => void;
+  setRefetchZonebooks: (fn: () => void) => void;
 };
 
 export const useZonebookStore = create<ZonebookStore>((set) => ({
-  // zoneBooks: defaultValues.zoneBooks.sort((a, b) => {
-  //   const getLeadingNumber = (str: string) => {
-  //     const match = str.match(/^(\d+)-/);
-  //     return match ? parseInt(match[1], 10) : Infinity;
-  //   };
-  //   const numA = getLeadingNumber(a.zoneBook);
-  //   const numB = getLeadingNumber(b.zoneBook);
-
-  //   if (numA !== numB) return numA - numB;
-  //   return a.zoneBook.localeCompare(b.zoneBook);
-  // }),
-
   zoneBooks: [],
   setZonebooks: (zoneBooks) => set({ zoneBooks }),
 
@@ -46,4 +48,27 @@ export const useZonebookStore = create<ZonebookStore>((set) => ({
 
   selectedZonebook: null,
   setSelectedZonebook: (selectedZonebook) => set({ selectedZonebook }),
+
+  addAreaDialogIsOpen: false,
+  setAddAreaDialogIsOpen: (addAreaDialogIsOpen) => set({ addAreaDialogIsOpen }),
+
+  editAreaDialogIsOpen: false,
+  setEditAreaDialogIsOpen: (editAreaDialogIsOpen) => set({ editAreaDialogIsOpen }),
+
+  assignAreaZonebookDialogIsOpen: false,
+  setAssignAreaZonebookDialogIsOpen: (assignAreaZonebookDialogIsOpen) =>
+    set({ assignAreaZonebookDialogIsOpen }),
+
+  editAssignAreaZonebookDialogIsOpen: false,
+  setEditAssignAreaZonebookDialogIsOpen: (editAssignAreaZonebookDialogIsOpen) =>
+    set({ editAssignAreaZonebookDialogIsOpen }),
+
+  refetchAreas: undefined,
+  setRefetchAreas: (fn) => set({ refetchAreas: fn }),
+
+  refetchZonebooks: undefined,
+  setRefetchZonebooks: (fn) => set({ refetchZonebooks: fn }),
+
+  selectedArea: {} as Area,
+  setSelectedArea: (selectedArea) => set({ selectedArea }),
 }));

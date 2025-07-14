@@ -1,4 +1,3 @@
-import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,42 +10,63 @@ import {
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { MeterReader } from "@mr/lib/types/personnel";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { UserRoundXIcon } from "lucide-react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent } from "react";
 import { toast } from "sonner";
 
 type DeleteMeterReaderDialogProps = {
   selectedMeterReader: MeterReader;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 };
 
 export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogProps> = ({
   selectedMeterReader,
+  open,
+  setOpen,
 }) => {
-  const [deleteMeterReaderDialogIsOpen, setDeleteMeterReaderDialogIsOpen] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  const meterReaders = useMeterReadersStore((state) => state.meterReaders);
-  const setMeterReaders = useMeterReadersStore((state) => state.setMeterReaders);
+  const deleteMeterReader = useMutation({
+    mutationFn: async (meterReaderId: string) => {
+      try {
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${meterReaderId}`);
+        return res.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    onSuccess: async () => {
+      toast.success("Success", {
+        description: `Successfully Removed ${selectedMeterReader.name} from the list of meter readers!`,
+        position: "top-right",
+        duration: 1500,
+      });
 
-  //! REMOVE THIS LATER
-  useEffect(() => {
-    if (deleteMeterReaderDialogIsOpen && selectedMeterReader) {
-    }
-  }, [deleteMeterReaderDialogIsOpen, selectedMeterReader]);
+      const fetchMeterReaders = await axios.get(
+        `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`,
+      );
 
-  //! REPLACE THIS WITH ROUTE
-  const onDelete = (meterReaderId: string) => {
-    // delete one and return the remaining meter readers
-    const remainingMeterReaders = meterReaders.filter(
-      (meterReader) => meterReader.meterReaderId !== meterReaderId,
-    );
-    setMeterReaders(remainingMeterReaders);
-  };
+      queryClient.setQueryData(["get-all-meter-readers"], fetchMeterReaders.data);
+
+      setOpen(false);
+    },
+    onError: () => {
+      toast.error("Error", {
+        description: `Cannot remove ${selectedMeterReader.name}. Something went wrong. Please try again later`,
+        position: "top-right",
+        duration: 1500,
+      });
+    },
+  });
 
   return (
     <AlertDialog
-      open={deleteMeterReaderDialogIsOpen}
+      open={open}
       onOpenChange={() => {
-        setDeleteMeterReaderDialogIsOpen(!deleteMeterReaderDialogIsOpen);
+        setOpen(!open);
       }}
     >
       <AlertDialogTrigger asChild>
@@ -59,21 +79,16 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
         <AlertDialogHeader>
           <AlertDialogTitle>Delete meter reader</AlertDialogTitle>
           <AlertDialogDescription>
-            Do you want to remove <span className="font-bold text-black">{selectedMeterReader.name}</span> as
-            a meter reader?
+            Do you want to remove <span className="text-primary font-bold">{selectedMeterReader.name}</span>{" "}
+            as a meter reader?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="w-[6rem]">Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="w-[6rem] bg-red-600"
+            className="w-[6rem] bg-red-600 text-white"
             onClick={() => {
-              onDelete(selectedMeterReader.meterReaderId);
-              toast.success("Success", {
-                description: `Successfully Removed ${selectedMeterReader.name} from the list of meter readers!`,
-                position: "top-right",
-                duration: 1500,
-              });
+              deleteMeterReader.mutateAsync(selectedMeterReader.meterReaderId);
             }}
           >
             Delete

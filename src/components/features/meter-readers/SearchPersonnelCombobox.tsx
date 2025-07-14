@@ -14,10 +14,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popov
 import { cn } from "@mr/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, UserRoundSearchIcon } from "lucide-react";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Employee } from "@mr/lib/types/personnel";
-import { useDebounce } from "@mr/hooks/use-debounce";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
@@ -27,7 +26,7 @@ import { useFormContext } from "react-hook-form";
 export const SearchPersonnelCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [searchEmployee, setSearchEmployee] = useState<string>("");
-  const debouncedSearchEmployee = useDebounce(searchEmployee, 1500);
+  const searchPersonnelInputRef = useRef<HTMLInputElement>(null);
 
   const setSelectedEmployee = useMeterReadersStore((state) => state.setSelectedEmployee);
   const setMobileNumber = useMeterReadersStore((state) => state.setMobileNumber);
@@ -56,8 +55,15 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (debouncedSearchEmployee) setSearchEmployee(debouncedSearchEmployee);
-  }, [debouncedSearchEmployee]);
+    if (open) {
+      // Delay to ensure CommandInput is mounted
+      const timer = setTimeout(() => {
+        searchPersonnelInputRef.current?.focus();
+      }, 10); // 0–50ms usually works
+
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -97,14 +103,14 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full" onWheel={(e) => e.stopPropagation()}>
+      <PopoverContent className="w-full p-0" onWheel={(e) => e.stopPropagation()}>
         {!employees && (isLoading || isPending) ? (
           <div className="text-primary flex w-full justify-center gap-2 font-medium">
             <LoadingSpinner /> Loading...
           </div>
         ) : (
           <Command>
-            <CommandInput placeholder="Search employee..." />
+            <CommandInput placeholder="Search employee..." ref={searchPersonnelInputRef} />
             <CommandList className="max-h-60 overflow-y-auto" role="listbox" tabIndex={-1}>
               <CommandEmpty>No employee found.</CommandEmpty>
               <CommandGroup>

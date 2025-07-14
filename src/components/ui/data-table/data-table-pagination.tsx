@@ -23,7 +23,9 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
           row(s) selected.
         </div>
       ) : (
-        <p className="text-muted-foreground flex-1 text-sm">No rows selected.</p>
+        <p className="text-muted-foreground hidden flex-1 text-sm sm:hidden md:flex lg:flex">
+          No rows selected.
+        </p>
       )}
 
       <div className="flex items-center space-x-6 lg:space-x-8">

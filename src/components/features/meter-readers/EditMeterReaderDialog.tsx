@@ -13,7 +13,7 @@ import {
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 import { SquarePenIcon, Users2Icon } from "lucide-react";
-import { MeterReader } from "@mr/lib/types/personnel";
+import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { EditMeterReaderTabs } from "./EditMeterReaderTabs";
@@ -32,8 +32,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Zonebook } from "@mr/lib/types/zonebook";
 
 const meterReaderSchema = z.object({
-  mobileNumber: z.string().regex(/^\d{10}$/, {
-    message: "Mobile number must be exactly 10 digits",
+  employeeId: z.string(),
+  mobileNumber: z.string().regex(/^\d{9}$/, {
+    message: "Mobile number must be exactly 9 digits",
   }),
   zoneBooks: z.array(
     z.object({
@@ -49,6 +50,7 @@ type MeterReaderType = z.infer<typeof meterReaderSchema>;
 type ZonebookToSubmit = Pick<Zonebook, "zone" | "book">;
 
 type SubmitMeterReaderType = {
+  employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
   mobileNumber: string;
@@ -60,10 +62,8 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   selectedMeterReader,
 }) => {
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
-  const selectedRestDay = useMeterReadersStore((state) => state.selectedRestDay);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
-  const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setFilteredZonebooks = useZonebookStore((state) => state.setFilteredZonebooks);
   const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
@@ -92,9 +92,10 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     meterReader: MeterReaderType,
   ): Promise<SubmitMeterReaderType> => {
     return {
-      mobileNumber: `+63${meterReader.mobileNumber}`,
-      restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
-      zoneBooks: meterReaderZonebooks.map((zb) => {
+      employeeId: meterReader.employeeId,
+      mobileNumber: `+639${meterReader.mobileNumber}`,
+      restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
+      zoneBooks: meterReader.zoneBooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
       }),
     };
@@ -107,10 +108,11 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
 
         return await axios.put(
-          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${transformedEmployee}`,
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
           transformedEmployee,
         );
       } catch (error) {
+        console.log(error);
         toast.error("Error", { description: JSON.stringify(error) });
       }
     },
@@ -125,36 +127,14 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       queryClient.setQueryData(["get-all-meter-readers"], fetchMeterReaders.data);
 
       toast.success("Success", {
-        description: "You have successfully added a meter reader!",
+        description: "You have successfully updated this meter reader!",
         position: "top-right",
       });
     },
   });
 
   const submitMeterReader = (meterReader: MeterReaderType) => {
-    if (selectedRestDay !== undefined && selectedRestDay) {
-      // setSelectedMeterReader({
-      //   ...selectedMeterReader,
-      //   name: selectedMeterReader?.name!,
-      //   mobileNumber: selectedMeterReader?.mobileNumber!,
-      //   positionTitle: selectedMeterReader?.positionTitle!,
-      //   companyId: selectedMeterReader?.companyId!,
-      //   employeeId: selectedMeterReader?.employeeId!,
-      //   photoUrl: selectedMeterReader?.photoUrl!,
-      //   restDay: selectedRestDay,
-      //   zoneBooks: meterReaderZonebooks,
-      //   assignment: selectedMeterReader?.assignment!,
-      // });
-      meterReaderMutation.mutateAsync(meterReader);
-
-      setEditMeterReaderDialogIsOpen(false);
-      resetToDefaults();
-
-      toast.success("Success", {
-        description: "You have successfully updated this meter reader!",
-        position: "top-right",
-      });
-    } else toast.error("No rest day", { description: "Please select a rest day", position: "top-right" });
+    meterReaderMutation.mutateAsync(meterReader);
   };
 
   // get meter reader by id
@@ -165,20 +145,20 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
       );
 
-      return res.data;
+      return res.data as MeterReaderWithZonebooks;
     },
     enabled: !!editMeterReaderDialogIsOpen,
   });
 
   //! get the filtered zonebooks
-  const { data, isLoading } = useQuery({
+  const { data: zoneBooks, isLoading } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
-        return res.data;
+        return res.data as Zonebook[];
       } catch (error) {
-        return error;
+        console.log(error);
       }
     },
     enabled: !hasSetInitialZonebookPool,
@@ -187,13 +167,19 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
-      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(3) });
+      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(4) });
 
-      setMobileNumber(meterReader.mobileNumber.slice(3));
+      setMobileNumber(meterReader.mobileNumber.slice(4));
 
-      setValue("mobileNumber", meterReader.mobileNumber.slice(3));
+      setValue("employeeId", meterReader.employeeId);
 
-      setMeterReaderZonebooks(meterReader?.zoneBooks);
+      setValue("mobileNumber", meterReader.mobileNumber.slice(4));
+
+      setValue("restDay", meterReader.restDay);
+
+      setValue("zoneBooks", meterReader?.zoneBooks);
+
+      setMeterReaderZonebooks(meterReader?.zoneBooks); // this refers to the meter reader's assigned zonebooks
 
       setSelectedRestDay(meterReader?.restDay);
     }
@@ -209,14 +195,18 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     setValue,
   ]);
 
-  // this useEffect should only run once and only when
+  //! this will be the zonebooks unassigned pool
   useEffect(() => {
-    if (data && !hasSetInitialZonebookPool) {
-      setFilteredZonebooks(data);
-      setTempFilteredZonebooks(data);
+    if (zoneBooks && !hasSetInitialZonebookPool && meterReader) {
+      const filteredZonebooks = zoneBooks.filter(
+        (orig) => !meterReader.zoneBooks.some((current) => current.zoneBook === orig.zoneBook),
+      );
+
+      setFilteredZonebooks(filteredZonebooks); // this refers to the unassigned pool
+      setTempFilteredZonebooks(filteredZonebooks); // this refers to the copied unassigned pool
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
+  }, [zoneBooks, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks, meterReader]);
 
   return (
     <Dialog
@@ -270,6 +260,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             disabled={!selectedMeterReader ? true : false}
             type="submit"
             form="edit-meter-reader-form"
+            className="dark:text-white"
           >
             Update
           </Button>

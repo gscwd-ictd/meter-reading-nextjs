@@ -11,8 +11,9 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 export const ZonebookDataTable: FunctionComponent = () => {
   const zoneBooks = useZonebookStore((state) => state.zoneBooks);
   const setZonebooks = useZonebookStore((state) => state.setZonebooks);
+  const setRefetchZonebooks = useZonebookStore((state) => state.setRefetchZonebooks);
 
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
@@ -24,8 +25,11 @@ export const ZonebookDataTable: FunctionComponent = () => {
   const zonebookColumns = useZonebookColumns(zoneBooks);
 
   useEffect(() => {
-    if (data) setZonebooks(data);
-  }, [data, setZonebooks]);
+    if (data) {
+      setZonebooks(data);
+      setRefetchZonebooks(refetch);
+    }
+  }, [data, setZonebooks, setRefetchZonebooks, refetch]);
 
   if (!data)
     return (

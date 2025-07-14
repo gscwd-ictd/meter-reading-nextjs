@@ -20,13 +20,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
-type PopulateScheduleAlertDialogProps = {
-  scheduler: Scheduler;
-};
-
-export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDialogProps> = ({
-  scheduler,
-}) => {
+export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
@@ -34,7 +28,9 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
@@ -65,9 +61,7 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
       // setCurrentSchedule(scheduler.calculateSchedule().);
       resetStates();
 
-      //! Replace this and improve refetching
-      window.location.reload();
-
+      refetchData!();
       toast.success("Success", {
         description: "Successfully reset the calendar for this month!",
         position: "top-right",
@@ -84,6 +78,19 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
     }
   };
 
+  const reset = () => {
+    // set the calendar populate state to false
+    setCalendarIsSet(false);
+
+    // set dates to split to empty
+    setDatesToSplit([]);
+
+    // reset the splittedDates observer
+    setScheduleHasSplittedDates(false);
+
+    setLastFetchedMonthYear(null);
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger className="flex w-full gap-2 px-2 py-1 text-sm">
@@ -98,7 +105,12 @@ export const ResetScheduleAlertDialog: FunctionComponent<PopulateScheduleAlertDi
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={removeMonthlySchedule}>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={hasSchedule ? removeMonthlySchedule : reset}
+            className="dark:text-white"
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -2,7 +2,14 @@
 
 import { useState, useMemo } from "react";
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
@@ -14,8 +21,10 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,6 +43,8 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
   const [selectedBook, setSelectedBook] = useState<string>("");
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
+  const [zoneInput, setZoneInput] = useState<string>("");
+  const [bookInput, setBookInput] = useState<string>("");
 
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
@@ -61,6 +72,12 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
     const books = tempFilteredZonebooks.filter((zb) => zb.zone === selectedZone).map((zb) => zb.book);
     return Array.from(new Set(books));
   }, [selectedZone, tempFilteredZonebooks]);
+
+  const filteredZones = zones?.filter((option) => option.toLowerCase().includes(zoneInput.toLowerCase()));
+
+  const filteredBooks = booksForZone?.filter((option) =>
+    option.toLowerCase().includes(bookInput.toLowerCase()),
+  );
 
   const handleZoneSelect = (zone: string) => {
     setSelectedZone(zone);
@@ -115,7 +132,12 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
           <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
         </div>
       </DialogTrigger>
-      <DialogContent className="overflow-y-auto">
+      <DialogContent
+        className="overflow-y-auto"
+        hideClose
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader className="gap-0">
           <DialogTitle>Assign zonebook</DialogTitle>
           <DialogDescription className="text-gray-500">
@@ -123,7 +145,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
           </DialogDescription>
         </DialogHeader>
 
-        <Command className="flex h-full flex-col gap-2 overflow-y-auto">
+        <Command className="flex h-full flex-col gap-2 overflow-y-auto p-0">
           <div className="grid w-full grid-cols-3 items-end gap-2">
             {/* Zone Combobox */}
             <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
@@ -141,15 +163,19 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                   </Button>
                 </div>
               </PopoverTrigger>
-              <PopoverContent avoidCollisions>
-                <Command>
-                  <CommandInput placeholder="Search zones..." />
+              <PopoverContent avoidCollisions className="p-0">
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Search zones..."
+                    value={zoneInput}
+                    onValueChange={setZoneInput}
+                  />
                   <CommandEmpty>No zone found.</CommandEmpty>
-                  <CommandGroup
+                  <CommandList
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
-                    {zones?.map((zone) => (
+                    {filteredZones?.map((zone) => (
                       <CommandItem
                         key={zone}
                         value={zone}
@@ -164,7 +190,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                         {zone}
                       </CommandItem>
                     ))}
-                  </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
@@ -191,14 +217,18 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput placeholder="Search books..." />
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Search books..."
+                    value={bookInput}
+                    onValueChange={setBookInput}
+                  />
                   <CommandEmpty>No book found.</CommandEmpty>
-                  <CommandGroup
+                  <CommandList
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
-                    {booksForZone.map((book) => (
+                    {filteredBooks.map((book) => (
                       <CommandItem
                         key={book}
                         value={book}
@@ -213,7 +243,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                         {book}
                       </CommandItem>
                     ))}
-                  </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
@@ -225,6 +255,10 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                 const newMeterReaderZonebooks = [...meterReaderZonebooks];
 
                 newMeterReaderZonebooks.push(selectedZonebook!);
+
+                setZoneInput("");
+
+                setBookInput("");
 
                 setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
 
@@ -360,6 +394,14 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
             </Table>
           </div>
         </div>
+
+        <DialogFooter className="flex w-full justify-center">
+          <DialogClose asChild>
+            <Button variant="default" className="w-full dark:text-white">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

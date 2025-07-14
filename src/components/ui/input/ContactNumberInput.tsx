@@ -40,17 +40,17 @@ export const ContactNumberInput: FunctionComponent<FormInputProps> = ({
       </Label>
 
       {/* Input wrapper with prefix */}
-      <div className="relative w-full">
-        <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm leading-none font-normal text-gray-500">
-          (+63)
-        </span>
+      <div className="flex w-full gap-2">
+        <div className="pointer-events-none left-3 flex items-center justify-end text-center text-sm leading-none font-normal text-gray-500">
+          (+639)
+        </div>
         <Input
           {...props}
           {...controller}
           id={id}
           type="tel"
           inputMode="numeric"
-          className={`w-full pl-14 text-sm leading-none font-normal ${
+          className={`w-full text-sm leading-none font-normal ${
             isError
               ? "dark:bg-destructive ring-offset-background border-red-400 bg-white text-red-600 focus-visible:ring-1 focus-visible:ring-red-600 focus-visible:outline-none dark:text-white"
               : "border-input focus-visible:ring-ring ring-offset-background bg-white text-gray-700 focus-visible:ring-2 focus-visible:outline-none dark:bg-gray-700 dark:text-white"

@@ -14,16 +14,19 @@ import {
   Users2Icon,
   MessageCircleWarning,
   FileText,
+  Book,
+  Scan,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
 
 export type NavItem = {
   title: string;
-  url: string;
+  url?: string;
   icon?: LucideIcon;
   isActive?: boolean;
   count?: number;
+  children?: NavItem[];
 };
 
 export type NavItemTeam = {
@@ -50,14 +53,17 @@ export const mainNav: NavItem[] = [
     icon: Users2Icon,
   },
   {
-    title: "Schedule",
-    url: "/schedule",
+    title: "Schedules",
+    url: "/schedules",
     icon: Calendar,
   },
   {
-    title: "Zone - Book",
-    url: "/zone-book",
+    title: "Zonebooks",
     icon: MapPinned,
+    children: [
+      { title: "List", url: "/zonebooks-list", icon: Book },
+      { title: "Areas", url: "/areas", icon: Scan },
+    ],
   },
   {
     title: "Text Blast",

@@ -10,10 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@mr/components/ui/Sidebar";
 import { NavItemUser } from "./items";
+import { ThemeSwitcher } from "../tabs/ThemeSwitcher";
 
 type NavUserProps = {
   user: NavItemUser;
@@ -44,7 +46,7 @@ export const NavUser: FunctionComponent<NavUserProps> = ({ user }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? "bottom" : "top"}
             align="end"
             sideOffset={4}
           >
@@ -61,7 +63,6 @@ export const NavUser: FunctionComponent<NavUserProps> = ({ user }) => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
@@ -73,11 +74,18 @@ export const NavUser: FunctionComponent<NavUserProps> = ({ user }) => {
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+
             <DropdownMenuItem>
               <LogOut />
               Log out
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <div className="flex items-center justify-between gap-2 px-2">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-400">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

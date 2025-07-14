@@ -9,10 +9,10 @@ import {
 } from "@mr/components/ui/DropdownMenu";
 import { Ellipsis } from "lucide-react";
 import { FunctionComponent } from "react";
-import { Scheduler } from "./useScheduler";
 import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
-import { SubmitScheduleAlertDialog } from "./SubmitScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
+import { Scheduler } from "./useScheduler";
 
 type CalendarSettingDropdownProps = {
   scheduler: Scheduler;
@@ -20,6 +20,7 @@ type CalendarSettingDropdownProps = {
 
 export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
   const calendarScheduleDropdownIsOpen = useSchedulesStore((state) => state.calendarScheduleDropdownIsOpen);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
   );
@@ -38,11 +39,11 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
         <DropdownMenuItem asChild>
-          <ResetScheduleAlertDialog scheduler={scheduler} />
+          <ResetScheduleAlertDialog />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <SubmitScheduleAlertDialog />
+          <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

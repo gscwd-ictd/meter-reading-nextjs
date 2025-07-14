@@ -12,19 +12,19 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@mr/components/ui/Sidebar";
-import { DropletsIcon } from "lucide-react";
+import { GaugeCircleIcon } from "lucide-react";
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <DropletsIcon className="text-primary size-10" />
-          <div className="flex flex-col">
-            <span className="text-primary flex text-xl font-black">
-              Me
-              <span className="text-slate-500">To</span>Car
-            </span>
+          <GaugeCircleIcon className="text-primary size-10" />
+          <div className="flex flex-col items-start">
+            <div className="flex items-center gap-0">
+              <span className="text-primary flex text-xl font-black">Metra</span>
+              <span className="text-xl font-black text-slate-500">X</span>
+            </div>
             <span className="text-xs text-gray-500">Meter Reading Application</span>
           </div>
         </div>

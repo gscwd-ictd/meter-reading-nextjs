@@ -61,8 +61,8 @@ export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ loadi
               id="mobileNumber"
               label="Contact Number"
               isRequired
-              minLength={10}
-              maxLength={10}
+              minLength={9}
+              maxLength={9}
               controller={{
                 ...register("mobileNumber", {
                   value: mobileNumber,
