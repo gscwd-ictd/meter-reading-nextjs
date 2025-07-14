@@ -53,15 +53,15 @@ export const mainNav: NavItem[] = [
     icon: Users2Icon,
   },
   {
-    title: "Schedule",
-    url: "/schedule",
+    title: "Schedules",
+    url: "/schedules",
     icon: Calendar,
   },
   {
     title: "Zonebooks",
     icon: MapPinned,
     children: [
-      { title: "List", url: "/list", icon: Book },
+      { title: "List", url: "/zonebooks-list", icon: Book },
       { title: "Areas", url: "/areas", icon: Scan },
     ],
   },
