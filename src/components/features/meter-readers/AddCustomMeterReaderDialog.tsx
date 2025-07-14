@@ -5,7 +5,7 @@ import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { FunctionComponent, useMemo, useState } from "react";
 import { MeterReaderPopover } from "./MeterReaderPopover";
 
 export const AddCustomMeterReaderDialog: FunctionComponent = () => {
@@ -16,7 +16,7 @@ export const AddCustomMeterReaderDialog: FunctionComponent = () => {
     {} as MeterReaderWithZonebooks,
   );
 
-  const { data: assignedMeterReaders, isLoading } = useQuery({
+  const { data: assignedMeterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
       try {

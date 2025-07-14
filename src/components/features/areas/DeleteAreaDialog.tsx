@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { Area } from "@mr/lib/types/zonebook";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { TrashIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";
@@ -24,7 +24,6 @@ type DeleteAreaDialogProps = {
 export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ area }) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const queryClient = useQueryClient();
   const refetchAreas = useZonebookStore((state) => state.refetchAreas);
 
   const deleteAreaMutation = useMutation({

@@ -10,7 +10,6 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusCircleIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";
-import { AddCustomMeterReaderDialog } from "./AddCustomMeterReaderDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
 export const AddCustomMeterReaderDropdown: FunctionComponent = () => {
