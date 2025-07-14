@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import { Skeleton } from "@mr/components/ui/Skeleton";
 import { MonthYearPicker } from "../calendar/MonthYearPicker";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
+import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
@@ -343,6 +344,7 @@ export const Scheduler: FunctionComponent = () => {
         </main>
       </div>
       <ScheduleEntryDialog />
+      <AddCustomMeterReaderDialog />
     </>
   );
 };

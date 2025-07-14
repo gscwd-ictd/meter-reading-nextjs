@@ -45,6 +45,8 @@ type SchedulesStore = {
   setHasPopulatedMeterReaders: (hasPopulatedMeterReaders: boolean) => void;
   lastFetchedMonthYear: string | null;
   setLastFetchedMonthYear: (monthYear: string | null) => void;
+  addCustomMeterReaderDialogIsOpen: boolean;
+  setAddCustomMeterReaderDialogIsOpen: (addCustomMeterReaderDialogIsOpen: boolean) => void;
   refetchData?: () => void;
   setRefetchData: (fn: () => void) => void;
   refetchEntry?: () => void;
@@ -94,6 +96,9 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setRefetchData: (fn) => set({ refetchData: fn }),
   refetchEntry: undefined,
   setRefetchEntry: (fn) => set({ refetchEntry: fn }),
+  addCustomMeterReaderDialogIsOpen: false,
+  setAddCustomMeterReaderDialogIsOpen: (addCustomMeterReaderDialogIsOpen) =>
+    set({ addCustomMeterReaderDialogIsOpen }),
 
   reset: () => {
     set({

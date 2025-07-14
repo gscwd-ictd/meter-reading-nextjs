@@ -21,7 +21,7 @@ import axios from "axios";
 import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { CirclePlusIcon } from "lucide-react";
+import { AddCustomMeterReaderDropdown } from "../meter-readers/AddCustomMeterReaderDropdown";
 
 export const ScheduleEntryDialog: FunctionComponent = () => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
@@ -105,11 +105,14 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
       <DialogContent className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[65%]">
         <DialogHeader className="space-y-0">
           <DialogTitle className="flex flex-col gap-0 text-start">
-            <div className="text-lg font-bold text-gray-800 dark:text-white">
-              Reading Date:{" "}
-              {selectedScheduleEntry && selectedScheduleEntry.readingDate
-                ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
-                : null}
+            <div className="flex items-center gap-0">
+              <div className="text-lg font-bold text-gray-800 dark:text-white">
+                Reading Date:{" "}
+                {selectedScheduleEntry && selectedScheduleEntry.readingDate
+                  ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
+                  : null}
+              </div>
+              <AddCustomMeterReaderDropdown />
             </div>
 
             <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
@@ -130,12 +133,6 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
                   />
                 )}
             </div>
-
-            <div className="flex w-full justify-end">
-              <button className="text-primary flex items-center gap-2 rounded border bg-slate-200 px-3 py-2 text-sm font-normal hover:brightness-95">
-                <CirclePlusIcon className="size-4" /> Add Meter Reader
-              </button>
-            </div>
           </DialogTitle>
           <DialogDescription className="text-start">
             <span className="text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
@@ -149,11 +146,9 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
             Loading Meter Readers <LoadingSpinner className="text-primary" />
           </div>
         ) : (
-          <div className="relative">
-            <MeterReaderEntryDataTable
-              meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
-            />
-          </div>
+          <MeterReaderEntryDataTable
+            meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
+          />
         )}
         <DialogFooter></DialogFooter>
       </DialogContent>
