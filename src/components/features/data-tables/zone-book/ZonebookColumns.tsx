@@ -3,7 +3,6 @@
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { PlusIcon, SquarePenIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ZonebookRowActions } from "./ZonebookRowActions";
 

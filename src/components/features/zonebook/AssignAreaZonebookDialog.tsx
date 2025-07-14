@@ -112,10 +112,10 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
             className="dark:text-white"
             onClick={async () => {
               await postAreaToZonebookMutation.mutateAsync({
-                zone: selectedZonebook?.zone!,
-                book: selectedZonebook?.book!,
+                zone: selectedZonebook!.zone!,
+                book: selectedZonebook!.book!,
                 areaId: selectedArea.areaId,
-                zoneBook: selectedZonebook?.zoneBook!,
+                zoneBook: selectedZonebook!.zoneBook!,
                 area: selectedArea.area,
               });
             }}

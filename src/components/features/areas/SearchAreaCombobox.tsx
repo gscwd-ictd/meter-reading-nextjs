@@ -11,13 +11,12 @@ import {
 } from "@mr/components/ui/Command";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
-import { useDebounce } from "@mr/hooks/use-debounce";
 import { Area } from "@mr/lib/types/zonebook";
 import { cn } from "@mr/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Book, Check, ScanSearchIcon } from "lucide-react";
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useRef, useState } from "react";
 
 export const SearchAreaCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);

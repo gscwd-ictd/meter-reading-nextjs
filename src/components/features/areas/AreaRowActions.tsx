@@ -1,5 +1,5 @@
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { SquarePenIcon, TrashIcon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { DeleteAreaDialog } from "./DeleteAreaDialog";
 
