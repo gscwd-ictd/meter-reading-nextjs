@@ -1,7 +1,7 @@
-import { rates } from "@/server/db/schemas/rates";
+import { rates } from "@mr/server/db/schemas/rates";
 import { I_Crud } from "../interfaces/crud";
 import { Rate } from "../validators/rate-schema";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 

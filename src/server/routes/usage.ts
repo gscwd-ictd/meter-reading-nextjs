@@ -1,6 +1,6 @@
-import { UsageRepository } from "@/lib/repositories/UsageRepository";
-import { UsageService } from "@/lib/services/UsageService";
-import { CreateUsageSchema, UpdateUsageSchema } from "@/lib/validators/usage-schema";
+import { UsageRepository } from "@mr/lib/repositories/UsageRepository";
+import { UsageService } from "@mr/lib/services/UsageService";
+import { CreateUsageSchema, UpdateUsageSchema } from "@mr/lib/validators/usage-schema";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 

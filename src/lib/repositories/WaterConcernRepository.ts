@@ -1,7 +1,7 @@
-import { waterConcerns } from "@/server/db/schemas/water-concerns";
+import { waterConcerns } from "@mr/server/db/schemas/water-concerns";
 import { I_Crud } from "../interfaces/crud";
 import { WaterConcern } from "../validators/water-concerns-schema";
-import db from "@/server/db/connections";
+import db from "@mr/server/db/connections";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
