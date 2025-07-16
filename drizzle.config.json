@@ -5,9 +5,9 @@
   "dbCredentials": {
     "host": "172.20.110.85",
     "port": 5432,
-    "user": "admin",
-    "password": "5tFCjtd5Y2PDq31zAc9smEn4WLmAG9u8BT9b2cG8I3qeAscQeH",
-    "database": "meter_reading",
+    "user": "postgres",
+    "password": "postgres",
+    "database": "meter_reading_db",
     "ssl": false
   }
 }

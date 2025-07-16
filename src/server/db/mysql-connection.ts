@@ -8,11 +8,9 @@ const hrmsPool = mysql.createPool({
   user: env.HRMS_DB_USER,
   password: env.HRMS_DB_PASS,
   database: env.HRMS_DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 1000,
-  queueLimit: 0,
 });
 
-export const hrmsDb = drizzle(hrmsPool, {
+export const hrmsDb = drizzle({
+  client: hrmsPool,
   logger: true,
 });

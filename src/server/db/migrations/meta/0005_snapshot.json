@@ -1,0 +1,776 @@
+{
+  "id": "f8262e5f-2453-4aba-8727-0e350ab62b07",
+  "prevId": "463a8196-ee8c-43c5-ad98-bb5425eb9d90",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.area": {
+      "name": "area",
+      "schema": "",
+      "columns": {
+        "area_id": {
+          "name": "area_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "area": {
+          "name": "area",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "area_area_unique": {
+          "name": "area_area_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "area"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.meter_reader_zone_book": {
+      "name": "meter_reader_zone_book",
+      "schema": "",
+      "columns": {
+        "meter_reader_zone_book_id": {
+          "name": "meter_reader_zone_book_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zone": {
+          "name": "zone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "book": {
+          "name": "book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_meter_reader_zone_book": {
+          "name": "idx_meter_reader_zone_book",
+          "columns": [
+            {
+              "expression": "zone",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "book",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "meter_reader_zone_book_meter_reader_id_meter_readers_meter_reader_id_fk": {
+          "name": "meter_reader_zone_book_meter_reader_id_meter_readers_meter_reader_id_fk",
+          "tableFrom": "meter_reader_zone_book",
+          "tableTo": "meter_readers",
+          "columnsFrom": [
+            "meter_reader_id"
+          ],
+          "columnsTo": [
+            "meter_reader_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_meter_reader_zone_book": {
+          "name": "unique_meter_reader_zone_book",
+          "nullsNotDistinct": false,
+          "columns": [
+            "zone",
+            "book"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.meter_readers": {
+      "name": "meter_readers",
+      "schema": "",
+      "columns": {
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "employee_id": {
+          "name": "employee_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mobile_number": {
+          "name": "mobile_number",
+          "type": "varchar(13)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'password'"
+        },
+        "rest_day": {
+          "name": "rest_day",
+          "type": "rest_day_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "meter_readers_employee_id_unique": {
+          "name": "meter_readers_employee_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "employee_id"
+          ]
+        },
+        "meter_readers_mobile_number_unique": {
+          "name": "meter_readers_mobile_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mobile_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.schedule_meter_readers": {
+      "name": "schedule_meter_readers",
+      "schema": "",
+      "columns": {
+        "schedule_meter_reader_id": {
+          "name": "schedule_meter_reader_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "schedule_id": {
+          "name": "schedule_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_smr_schedule": {
+          "name": "idx_smr_schedule",
+          "columns": [
+            {
+              "expression": "schedule_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "schedule_meter_readers_schedule_id_schedules_schedule_id_fk": {
+          "name": "schedule_meter_readers_schedule_id_schedules_schedule_id_fk",
+          "tableFrom": "schedule_meter_readers",
+          "tableTo": "schedules",
+          "columnsFrom": [
+            "schedule_id"
+          ],
+          "columnsTo": [
+            "schedule_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "schedule_meter_readers_meter_reader_id_meter_readers_meter_reader_id_fk": {
+          "name": "schedule_meter_readers_meter_reader_id_meter_readers_meter_reader_id_fk",
+          "tableFrom": "schedule_meter_readers",
+          "tableTo": "meter_readers",
+          "columnsFrom": [
+            "meter_reader_id"
+          ],
+          "columnsTo": [
+            "meter_reader_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_schedule_meter_reader": {
+          "name": "unique_schedule_meter_reader",
+          "nullsNotDistinct": false,
+          "columns": [
+            "schedule_id",
+            "meter_reader_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.schedule_zone_books": {
+      "name": "schedule_zone_books",
+      "schema": "",
+      "columns": {
+        "schedule_zone_book_id": {
+          "name": "schedule_zone_book_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "schedule_meter_reader_id": {
+          "name": "schedule_meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zone": {
+          "name": "zone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "book": {
+          "name": "book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disconnection_date": {
+          "name": "disconnection_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_schedule_zone_book_meter_reader": {
+          "name": "idx_schedule_zone_book_meter_reader",
+          "columns": [
+            {
+              "expression": "schedule_meter_reader_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "schedule_zone_books_schedule_meter_reader_id_schedule_meter_readers_schedule_meter_reader_id_fk": {
+          "name": "schedule_zone_books_schedule_meter_reader_id_schedule_meter_readers_schedule_meter_reader_id_fk",
+          "tableFrom": "schedule_zone_books",
+          "tableTo": "schedule_meter_readers",
+          "columnsFrom": [
+            "schedule_meter_reader_id"
+          ],
+          "columnsTo": [
+            "schedule_meter_reader_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_schedule_zone_book": {
+          "name": "unique_schedule_zone_book",
+          "nullsNotDistinct": false,
+          "columns": [
+            "schedule_meter_reader_id",
+            "zone",
+            "book"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.schedules": {
+      "name": "schedules",
+      "schema": "",
+      "columns": {
+        "schedule_id": {
+          "name": "schedule_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "reading_date": {
+          "name": "reading_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disconnection_date": {
+          "name": "disconnection_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_schedule_reading_date": {
+          "name": "idx_schedule_reading_date",
+          "columns": [
+            {
+              "expression": "reading_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "schedules_reading_date_unique": {
+          "name": "schedules_reading_date_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "reading_date"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.zone_book": {
+      "name": "zone_book",
+      "schema": "",
+      "columns": {
+        "zone_book_id": {
+          "name": "zone_book_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "area_id": {
+          "name": "area_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zone": {
+          "name": "zone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "book": {
+          "name": "book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_zone_book": {
+          "name": "idx_zone_book",
+          "columns": [
+            {
+              "expression": "zone",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "book",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "zone_book_area_id_area_area_id_fk": {
+          "name": "zone_book_area_id_area_area_id_fk",
+          "tableFrom": "zone_book",
+          "tableTo": "area",
+          "columnsFrom": [
+            "area_id"
+          ],
+          "columnsTo": [
+            "area_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_zone_book": {
+          "name": "unique_zone_book",
+          "nullsNotDistinct": false,
+          "columns": [
+            "zone",
+            "book"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.rest_day_enum": {
+      "name": "rest_day_enum",
+      "schema": "public",
+      "values": [
+        "6",
+        "0"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.view_consumer_details": {
+      "columns": {
+        "reading_date": {
+          "name": "reading_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zoneBooks": {
+          "name": "zoneBooks",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n      SELECT\n  sc.reading_date AS \"reading_date\",\n  smr.meter_reader_id AS \"meter_reader_id\",\n  json_agg(\n    jsonb_build_object(\n      'zone', szb.zone,\n      'book', szb.book,\n      'dueDate', szb.due_date,\n      'disconnectionDate', szb.disconnection_date,\n      'accounts', (\n        SELECT json_agg(\n          jsonb_build_object(\n            'accountNumber', vmr.account_no,\n            'checkDigit', vmr.check_digit,\n            'consumerName', vmr.consumer_name,\n            'isSenior', vmr.\"isSenior\",\n            'contactNumber', vmr.contact_no,\n            'address', vmr.address,\n            'classification', vmr.classification,\n            'consumerType', vmr.consumer_type,\n            'zone', vmr.zone_code,\n            'book', vmr.book_code,\n            'sequenceNumber', vmr.\"SeqNo\",\n            'meterNumber', vmr.meter_no,\n            'meterCode', vmr.meter_code,\n            'meterSize', vmr.meter_size,\n            'isConnected', vmr.is_connected,\n            'dateConnected', vmr.date_connected,\n            'disconnectionDate', vmr.disconnect_date,\n            'averageUsage', vmr.\"AverageUsage\",\n            'waterBalance', vmr.water_balance,\n            'otherBalance', vmr.other_balance,\n            'previousReading', vmr.previous_reading,\n            'usage', jsonb_build_object(\n              'firstMonth', vcu.month1_usage,\n              'secondMonth', vcu.month2_usage,\n              'thirdMonth', vcu.month3_usage,\n              'fourthMonth', vcu.month4_usage\n            ),\n            'history', jsonb_build_object(\n              'firstService', vls.services1,\n              'secondService', vls.services2,\n              'thirdService', vls.services3\n            )\n          )\n        )\n        FROM \"viewMeterReading\" vmr\n        LEFT JOIN \"viewConsumer_previous_4_months\" vcu ON vmr.account_no = vcu.account_no\n        LEFT JOIN \"viewCustomer_ledger_services\" vls ON vmr.account_no = vls.account_no\n        WHERE vmr.zone_code::text = szb.zone AND vmr.book_code::text = szb.book\n      )\n    )\n  ) AS \"zoneBooks\"\nFROM schedules sc\nLEFT JOIN schedule_meter_readers smr ON sc.schedule_id = smr.schedule_id\nLEFT JOIN schedule_zone_books szb ON smr.schedule_meter_reader_id = szb.schedule_meter_reader_id\nGROUP BY sc.reading_date, smr.meter_reader_id",
+      "name": "view_consumer_details",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.view_meter_reader_zone_book": {
+      "columns": {
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "employee_id": {
+          "name": "employee_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mobile_number": {
+          "name": "mobile_number",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rest_day": {
+          "name": "rest_day",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zoneBooks": {
+          "name": "zoneBooks",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n  select \n    mr.meter_reader_id,\n    mr.employee_id,\n    mr.mobile_number,\n    mr.rest_day,\n    coalesce(  \n      jsonb_agg(\n        distinct jsonb_build_object(\n          'zone', mrzb.zone,\n          'book', mrzb.book,\n          'zoneBook', mrzb.zone || '-' || mrzb.book,\n          'area', vzbwa.area\n        )\n      ) filter (where mrzb.zone is not null and mrzb.book is not  null),\n      '[]'::jsonb\n    ) as \"zoneBooks\"\n  from \n    meter_readers mr\n  left join \n    meter_reader_zone_book mrzb on mr.meter_reader_id = mrzb.meter_reader_id\n  left join \n    view_zone_book_with_area vzbwa on mrzb.zone = vzbwa.zone and  mrzb.book = vzbwa.book\n  group by \n    mr.meter_reader_id, \n    mr.employee_id, \n    mr.mobile_number, \n    mr.rest_day\n  ",
+      "name": "view_meter_reader_zone_book",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.schedule_reader_zone_book_view": {
+      "columns": {
+        "schedule_meter_reader_id": {
+          "name": "schedule_meter_reader_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "definition": "select \"schedule_meter_readers\".\"schedule_meter_reader_id\", \"schedule_meter_readers\".\"meter_reader_id\", \n        COALESCE(\n          json_agg(\n            json_build_object(\n              'zone', \"schedule_zone_books\".\"zone\",\n              'book', \"schedule_zone_books\".\"book\",\n              'zoneBook', \"schedule_zone_books\".\"zone\" || '-' || \"schedule_zone_books\".\"book\",\n              'dueDate', \"schedule_zone_books\".\"due_date\",\n              'disconnectionDate', \"schedule_zone_books\".\"disconnection_date\"\n            )\n          ) FILTER (WHERE \"schedule_zone_books\".\"zone\" IS NOT NULL),\n          '[]'::json\n        )\n       as \"zoneBooks\" from \"schedule_meter_readers\" left join \"schedule_zone_books\" on \"schedule_meter_readers\".\"schedule_meter_reader_id\" = \"schedule_zone_books\".\"schedule_meter_reader_id\" group by \"schedule_meter_readers\".\"schedule_meter_reader_id\", \"schedule_meter_readers\".\"schedule_meter_reader_id\"",
+      "name": "schedule_reader_zone_book_view",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.schedule_zone_book_view": {
+      "columns": {
+        "reading_date": {
+          "name": "reading_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disconnection_date": {
+          "name": "disconnection_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "definition": "select \"reading_date\", \"due_date\", \"disconnection_date\",   (\n    SELECT json_agg(\n      jsonb_build_object(\n        'scheduleMeterReaderId', \"schedule_meter_reader_id\",\n        'meterReaderId', \"meter_reader_id\",\n        'zoneBooks', COALESCE((\n          SELECT json_agg(\n            jsonb_build_object(\n              'zone', \"zone\",\n              'book', \"book\",\n              'zoneBook', \"zone\" || '-' || \"book\"\n            )\n          )\n          FROM \"schedule_zone_books\"\n          WHERE \"schedule_meter_reader_id\" = \"schedule_meter_reader_id\"\n        ), '[]'::json)\n      )\n    )\n    FROM \"schedule_meter_readers\"\n    WHERE schedule_meter_readers.schedule_id = \"schedule_id\"\n  )  as \"meterReaders\" from \"schedules\" order by \"schedules\".\"reading_date\"",
+      "name": "schedule_zone_book_view",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.view_zone_book_with_area": {
+      "columns": {
+        "zone_book_id": {
+          "name": "zone_book_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone": {
+          "name": "zone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "book": {
+          "name": "book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zoneBook": {
+          "name": "zoneBook",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area_id": {
+          "name": "area_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area": {
+          "name": "area",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n  SELECT \n    coalesce(zb.zone_book_id, '') as zone_book_id,\n    v.zone_code as zone,\n    v.book_code::varchar as book,\n    v.zone_code || '-' || v.book_code as \"zoneBook\",\n    coalesce(a.area_id, '') as area_id,\n    coalesce(a.area,'') as area\n  FROM \"viewZoneBook\" v\n  LEFT JOIN\n    zone_book zb ON v.zone_code = zb.zone AND v.book_code::varchar = zb.book\n  LEFT JOIN\n    area a ON a.area_id = zb.area_id\n  ORDER BY v.zone_code, v.book_code",
+      "name": "view_zone_book_with_area",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
