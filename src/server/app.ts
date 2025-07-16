@@ -29,6 +29,15 @@ function createApp() {
     consumerHandler,
   ] as const;
 
+  app.use(
+    cors({
+      origin: [env.APP_HOST, "http://172.20.10.57:3000", "http://172.20.10.63:3000"],
+      allowMethods: ["POST", "GET", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      maxAge: 600,
+      credentials: true,
+    }),
+  );
+
   routes.forEach((route) => app.route("/", route));
 
   return app;

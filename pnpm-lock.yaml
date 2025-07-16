@@ -44,15 +44,19 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pg:
-        specifier: ^8.16.0
-        version: 8.16.0
+        specifier: ^8.16.3
+        version: 8.16.3
       react:
+        specifier: ^19.1.0
         specifier: ^19.1.0
         version: 19.1.0
       react-dom:
         specifier: ^19.1.0
+        specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
       tailwind-merge:
+        specifier: ^3.3.1
+        version: 3.3.1
         specifier: ^3.3.1
         version: 3.3.1
       zod:
@@ -93,8 +97,8 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(vite@6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1))
       drizzle-kit:
-        specifier: ^0.31.1
-        version: 0.31.1
+        specifier: ^0.31.4
+        version: 0.31.4
       eslint:
         specifier: ^9.29.0
         version: 9.29.0(jiti@2.4.2)
@@ -105,8 +109,8 @@ importers:
         specifier: ^26.1.0
         version: 26.1.0
       prettier:
-        specifier: ^3.5.3
-        version: 3.5.3
+        specifier: ^3.6.2
+        version: 3.6.2
       prettier-plugin-tailwindcss:
         specifier: ^0.6.12
         version: 0.6.12(prettier@3.5.3)
@@ -117,6 +121,7 @@ importers:
         specifier: ^1.3.4
         version: 1.3.4
       typescript:
+        specifier: ^5.8.3
         specifier: ^5.8.3
         version: 5.8.3
       vite-tsconfig-paths:
@@ -2339,6 +2344,7 @@ packages:
     engines: { node: ^14.18.0 || >=16.0.0 }
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0-beta.0
+      vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0-beta.0
 
   "@vitest/expect@3.2.3":
     resolution:
@@ -2353,6 +2359,7 @@ packages:
       }
     peerDependencies:
       msw: ^2.4.9
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0-0
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0-0
     peerDependenciesMeta:
       msw:
@@ -5731,7 +5738,6 @@ snapshots:
       "@babel/template": 7.27.2
       "@babel/types": 7.27.6
       debug: 4.4.1
-      globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
 
@@ -5958,6 +5964,7 @@ snapshots:
     dependencies:
       ajv: 6.12.6
       debug: 4.4.1
+      espree: 10.4.0
       espree: 10.4.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -6279,6 +6286,7 @@ snapshots:
       aria-hidden: 1.2.6
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+      react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.1.0)
       react-remove-scroll: 2.7.1(@types/react@19.1.8)(react@19.1.0)
     optionalDependencies:
       "@types/react": 19.1.8
@@ -6656,6 +6664,7 @@ snapshots:
       eslint: 9.29.0(jiti@2.4.2)
       graphemer: 1.4.0
       ignore: 7.0.5
+      ignore: 7.0.5
       natural-compare: 1.4.0
       ts-api-utils: 2.1.0(typescript@5.8.3)
       typescript: 5.8.3
@@ -6679,6 +6688,7 @@ snapshots:
       "@typescript-eslint/tsconfig-utils": 8.34.1(typescript@5.8.3)
       "@typescript-eslint/types": 8.34.1
       debug: 4.4.1
+      typescript: 5.8.3
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
@@ -6833,6 +6843,7 @@ snapshots:
       "@vitest/utils": 3.2.3
       pathe: 2.0.3
       strip-literal: 3.0.0
+      strip-literal: 3.0.0
 
   "@vitest/snapshot@3.2.3":
     dependencies:
@@ -6842,6 +6853,7 @@ snapshots:
 
   "@vitest/spy@3.2.3":
     dependencies:
+      tinyspy: 4.0.3
       tinyspy: 4.0.3
 
   "@vitest/utils@3.2.3":
@@ -6855,8 +6867,9 @@ snapshots:
       acorn: 8.15.0
 
   acorn@8.15.0: {}
+  acorn@8.15.0: {}
 
-  agent-base@7.1.3: {}
+  agent-base@7.1.4: {}
 
   ajv@6.12.6:
     dependencies:
@@ -6891,14 +6904,17 @@ snapshots:
       is-array-buffer: 3.0.5
 
   array-includes@3.1.9:
+  array-includes@3.1.9:
     dependencies:
       call-bind: 1.0.8
+      call-bound: 1.0.4
       call-bound: 1.0.4
       define-properties: 1.2.1
       es-abstract: 1.24.0
       es-object-atoms: 1.1.1
       get-intrinsic: 1.3.0
       is-string: 1.1.1
+      math-intrinsics: 1.1.0
       math-intrinsics: 1.1.0
 
   array.prototype.findlast@1.2.5:
@@ -6964,6 +6980,8 @@ snapshots:
 
   aws-ssl-profiles@1.1.2: {}
 
+  aws-ssl-profiles@1.1.2: {}
+
   axe-core@4.10.3: {}
 
   axobject-query@4.1.0: {}
@@ -6976,6 +6994,7 @@ snapshots:
       concat-map: 0.0.1
 
   brace-expansion@2.0.2:
+  brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
 
@@ -6983,7 +7002,7 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  browserslist@4.25.0:
+  browserslist@4.25.1:
     dependencies:
       caniuse-lite: 1.0.30001723
       electron-to-chromium: 1.5.169
@@ -7019,7 +7038,7 @@ snapshots:
 
   caniuse-lite@1.0.30001723: {}
 
-  chai@5.2.0:
+  chai@5.2.1:
     dependencies:
       assertion-error: 2.0.1
       check-error: 2.1.1
@@ -7112,7 +7131,7 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  decimal.js@10.5.0: {}
+  decimal.js@10.6.0: {}
 
   deep-eql@5.0.2: {}
 
@@ -7132,6 +7151,8 @@ snapshots:
 
   denque@2.1.0: {}
 
+  denque@2.1.0: {}
+
   dequal@2.0.3: {}
 
   detect-libc@2.0.4: {}
@@ -7144,7 +7165,7 @@ snapshots:
 
   dom-accessibility-api@0.5.16: {}
 
-  drizzle-kit@0.31.1:
+  drizzle-kit@0.31.4:
     dependencies:
       "@drizzle-team/brocli": 0.10.2
       "@esbuild-kit/esm-loader": 2.6.5
@@ -7169,11 +7190,12 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  enhanced-resolve@5.18.1:
+  enhanced-resolve@5.18.2:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.2
 
+  entities@6.0.1: {}
   entities@6.0.1: {}
 
   es-abstract@1.24.0:
@@ -7279,10 +7301,10 @@ snapshots:
       is-date-object: 1.1.0
       is-symbol: 1.1.1
 
-  esbuild-register@3.6.0(esbuild@0.25.5):
+  esbuild-register@3.6.0(esbuild@0.25.6):
     dependencies:
       debug: 4.4.1
-      esbuild: 0.25.5
+      esbuild: 0.25.6
     transitivePeerDependencies:
       - supports-color
 
@@ -7311,7 +7333,7 @@ snapshots:
       "@esbuild/win32-ia32": 0.18.20
       "@esbuild/win32-x64": 0.18.20
 
-  esbuild@0.25.5:
+  esbuild@0.25.6:
     optionalDependencies:
       "@esbuild/aix-ppc64": 0.25.5
       "@esbuild/android-arm": 0.25.5
@@ -7430,6 +7452,7 @@ snapshots:
     dependencies:
       aria-query: 5.3.2
       array-includes: 3.1.9
+      array-includes: 3.1.9
       array.prototype.flatmap: 1.3.3
       ast-types-flow: 0.0.8
       axe-core: 4.10.3
@@ -7452,6 +7475,7 @@ snapshots:
   eslint-plugin-react@7.37.5(eslint@9.29.0(jiti@2.4.2)):
     dependencies:
       array-includes: 3.1.9
+      array-includes: 3.1.9
       array.prototype.findlast: 1.2.5
       array.prototype.flatmap: 1.3.3
       array.prototype.tosorted: 1.1.4
@@ -7472,12 +7496,14 @@ snapshots:
       string.prototype.repeat: 1.0.0
 
   eslint-scope@8.4.0:
+  eslint-scope@8.4.0:
     dependencies:
       esrecurse: 4.3.0
       estraverse: 5.3.0
 
   eslint-visitor-keys@3.4.3: {}
 
+  eslint-visitor-keys@4.2.1: {}
   eslint-visitor-keys@4.2.1: {}
 
   eslint@9.29.0(jiti@2.4.2):
@@ -7503,6 +7529,9 @@ snapshots:
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
+      eslint-scope: 8.4.0
+      eslint-visitor-keys: 4.2.1
+      espree: 10.4.0
       esquery: 1.6.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
@@ -7523,7 +7552,11 @@ snapshots:
       - supports-color
 
   espree@10.4.0:
+  espree@10.4.0:
     dependencies:
+      acorn: 8.15.0
+      acorn-jsx: 5.3.2(acorn@8.15.0)
+      eslint-visitor-keys: 4.2.1
       acorn: 8.15.0
       acorn-jsx: 5.3.2(acorn@8.15.0)
       eslint-visitor-keys: 4.2.1
@@ -7574,7 +7607,7 @@ snapshots:
 
   fdir@6.4.6(picomatch@4.0.2):
     optionalDependencies:
-      picomatch: 4.0.2
+      picomatch: 4.0.3
 
   file-entry-cache@8.0.0:
     dependencies:
@@ -7620,6 +7653,10 @@ snapshots:
     dependencies:
       is-property: 1.0.2
 
+  generate-function@2.3.1:
+    dependencies:
+      is-property: 1.0.2
+
   gensync@1.0.0-beta.2: {}
 
   get-intrinsic@1.3.0:
@@ -7659,8 +7696,6 @@ snapshots:
   glob-parent@6.0.2:
     dependencies:
       is-glob: 4.0.3
-
-  globals@11.12.0: {}
 
   globals@14.0.0: {}
 
@@ -7707,14 +7742,14 @@ snapshots:
 
   http-proxy-agent@7.0.2:
     dependencies:
-      agent-base: 7.1.3
+      agent-base: 7.1.4
       debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.6:
     dependencies:
-      agent-base: 7.1.3
+      agent-base: 7.1.4
       debug: 4.4.1
     transitivePeerDependencies:
       - supports-color
@@ -7725,6 +7760,7 @@ snapshots:
 
   ignore@5.3.2: {}
 
+  ignore@7.0.5: {}
   ignore@7.0.5: {}
 
   import-fresh@3.3.1:
@@ -7819,6 +7855,8 @@ snapshots:
 
   is-property@1.0.2: {}
 
+  is-property@1.0.2: {}
+
   is-regex@1.2.1:
     dependencies:
       call-bound: 1.0.4
@@ -7877,6 +7915,8 @@ snapshots:
 
   js-tokens@9.0.1: {}
 
+  js-tokens@9.0.1: {}
+
   js-yaml@4.1.0:
     dependencies:
       argparse: 2.0.1
@@ -7885,7 +7925,7 @@ snapshots:
     dependencies:
       cssstyle: 4.4.0
       data-urls: 5.0.0
-      decimal.js: 10.5.0
+      decimal.js: 10.6.0
       html-encoding-sniffer: 4.0.0
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -7901,7 +7941,7 @@ snapshots:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-      ws: 8.18.2
+      ws: 8.18.3
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -7924,6 +7964,7 @@ snapshots:
 
   jsx-ast-utils@3.3.5:
     dependencies:
+      array-includes: 3.1.9
       array-includes: 3.1.9
       array.prototype.flat: 1.3.3
       object.assign: 4.1.7
@@ -8002,6 +8043,7 @@ snapshots:
       js-tokens: 4.0.0
 
   loupe@3.1.4: {}
+  loupe@3.1.4: {}
 
   lru-cache@10.4.3: {}
 
@@ -8035,9 +8077,11 @@ snapshots:
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.12
+      brace-expansion: 1.1.12
 
   minimatch@9.0.5:
     dependencies:
+      brace-expansion: 2.0.2
       brace-expansion: 2.0.2
 
   minimist@1.2.8: {}
@@ -8180,6 +8224,7 @@ snapshots:
   parse5@7.3.0:
     dependencies:
       entities: 6.0.1
+      entities: 6.0.1
 
   path-exists@4.0.0: {}
 
@@ -8189,20 +8234,20 @@ snapshots:
 
   pathe@2.0.3: {}
 
-  pathval@2.0.0: {}
+  pathval@2.0.1: {}
 
-  pg-cloudflare@1.2.5:
+  pg-cloudflare@1.2.7:
     optional: true
 
-  pg-connection-string@2.9.0: {}
+  pg-connection-string@2.9.1: {}
 
   pg-int8@1.0.1: {}
 
   pg-pool@3.10.0(pg@8.16.0):
     dependencies:
-      pg: 8.16.0
+      pg: 8.16.3
 
-  pg-protocol@1.10.0: {}
+  pg-protocol@1.10.3: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -8220,7 +8265,7 @@ snapshots:
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
-      pg-cloudflare: 1.2.5
+      pg-cloudflare: 1.2.7
 
   pgpass@1.0.5:
     dependencies:
@@ -8230,7 +8275,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  picomatch@4.0.2: {}
+  picomatch@4.0.3: {}
 
   possible-typed-array-names@1.1.0: {}
 
@@ -8240,6 +8285,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  postcss@8.5.6:
   postcss@8.5.6:
     dependencies:
       nanoid: 3.3.11
@@ -8260,9 +8306,9 @@ snapshots:
 
   prettier-plugin-tailwindcss@0.6.12(prettier@3.5.3):
     dependencies:
-      prettier: 3.5.3
+      prettier: 3.6.2
 
-  prettier@3.5.3: {}
+  prettier@3.6.2: {}
 
   pretty-format@27.5.1:
     dependencies:
@@ -8292,24 +8338,32 @@ snapshots:
   react-refresh@0.17.0: {}
 
   react-remove-scroll-bar@2.3.8(@types/react@19.1.8)(react@19.1.0):
+  react-remove-scroll-bar@2.3.8(@types/react@19.1.8)(react@19.1.0):
     dependencies:
       react: 19.1.0
+      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
       react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
       tslib: 2.8.1
     optionalDependencies:
       "@types/react": 19.1.8
 
   react-remove-scroll@2.7.1(@types/react@19.1.8)(react@19.1.0):
+  react-remove-scroll@2.7.1(@types/react@19.1.8)(react@19.1.0):
     dependencies:
       react: 19.1.0
+      react-remove-scroll-bar: 2.3.8(@types/react@19.1.8)(react@19.1.0)
+      react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
       react-remove-scroll-bar: 2.3.8(@types/react@19.1.8)(react@19.1.0)
       react-style-singleton: 2.2.3(@types/react@19.1.8)(react@19.1.0)
       tslib: 2.8.1
       use-callback-ref: 1.3.3(@types/react@19.1.8)(react@19.1.0)
       use-sidecar: 1.1.3(@types/react@19.1.8)(react@19.1.0)
+      use-callback-ref: 1.3.3(@types/react@19.1.8)(react@19.1.0)
+      use-sidecar: 1.1.3(@types/react@19.1.8)(react@19.1.0)
     optionalDependencies:
       "@types/react": 19.1.8
 
+  react-style-singleton@2.2.3(@types/react@19.1.8)(react@19.1.0):
   react-style-singleton@2.2.3(@types/react@19.1.8)(react@19.1.0):
     dependencies:
       get-nonce: 1.0.1
@@ -8423,6 +8477,8 @@ snapshots:
 
   seq-queue@0.0.5: {}
 
+  seq-queue@0.0.5: {}
+
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -8445,7 +8501,7 @@ snapshots:
       es-errors: 1.3.0
       es-object-atoms: 1.1.1
 
-  sharp@0.34.2:
+  sharp@0.34.3:
     dependencies:
       color: 4.2.3
       detect-libc: 2.0.4
@@ -8539,8 +8595,6 @@ snapshots:
       es-errors: 1.3.0
       internal-slot: 1.1.0
 
-  streamsearch@1.1.0: {}
-
   string.prototype.includes@2.0.1:
     dependencies:
       call-bind: 1.0.8
@@ -8615,6 +8669,7 @@ snapshots:
   symbol-tree@3.2.4: {}
 
   tailwind-merge@3.3.1: {}
+  tailwind-merge@3.3.1: {}
 
   tailwindcss@4.1.10: {}
 
@@ -8639,9 +8694,11 @@ snapshots:
       picomatch: 4.0.2
 
   tinypool@1.1.1: {}
+  tinypool@1.1.1: {}
 
   tinyrainbow@2.0.0: {}
 
+  tinyspy@4.0.3: {}
   tinyspy@4.0.3: {}
 
   tldts-core@6.1.86: {}
@@ -8731,7 +8788,7 @@ snapshots:
 
   unrs-resolver@1.9.0:
     dependencies:
-      napi-postinstall: 0.2.4
+      napi-postinstall: 0.3.0
     optionalDependencies:
       "@unrs/resolver-binding-android-arm-eabi": 1.9.0
       "@unrs/resolver-binding-android-arm64": 1.9.0
@@ -8753,9 +8810,9 @@ snapshots:
       "@unrs/resolver-binding-win32-ia32-msvc": 1.9.0
       "@unrs/resolver-binding-win32-x64-msvc": 1.9.0
 
-  update-browserslist-db@1.1.3(browserslist@4.25.0):
+  update-browserslist-db@1.1.3(browserslist@4.25.1):
     dependencies:
-      browserslist: 4.25.0
+      browserslist: 4.25.1
       escalade: 3.2.0
       picocolors: 1.1.1
 
@@ -8764,12 +8821,14 @@ snapshots:
       punycode: 2.3.1
 
   use-callback-ref@1.3.3(@types/react@19.1.8)(react@19.1.0):
+  use-callback-ref@1.3.3(@types/react@19.1.8)(react@19.1.0):
     dependencies:
       react: 19.1.0
       tslib: 2.8.1
     optionalDependencies:
       "@types/react": 19.1.8
 
+  use-sidecar@1.1.3(@types/react@19.1.8)(react@19.1.0):
   use-sidecar@1.1.3(@types/react@19.1.8)(react@19.1.0):
     dependencies:
       detect-node-es: 1.1.0
@@ -8836,7 +8895,7 @@ snapshots:
       "@vitest/utils": 3.2.3
       chai: 5.2.0
       debug: 4.4.1
-      expect-type: 1.2.1
+      expect-type: 1.2.2
       magic-string: 0.30.17
       pathe: 2.0.3
       picomatch: 4.0.2
@@ -8844,6 +8903,7 @@ snapshots:
       tinybench: 2.9.0
       tinyexec: 0.3.2
       tinyglobby: 0.2.14
+      tinypool: 1.1.1
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
       vite: 6.3.5(@types/node@20.19.1)(jiti@2.4.2)(lightningcss@1.30.1)
@@ -8935,7 +8995,7 @@ snapshots:
 
   word-wrap@1.2.5: {}
 
-  ws@8.18.2: {}
+  ws@8.18.3: {}
 
   xml-name-validator@5.0.0: {}
 
