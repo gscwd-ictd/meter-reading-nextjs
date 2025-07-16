@@ -5,6 +5,8 @@ import { cors } from "hono/cors";
 import env from "@/lib/env";
 import { zoneBookHandler } from "./routes/zone-book";
 import { areaHandler } from "./routes/area";
+import { scheduleHandler } from "./routes/schedule";
+import { consumerHandler } from "./routes/consumer";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -18,7 +20,14 @@ function createApp() {
     }),
   );
 
-  const routes = [healthcheckHandler, meterReaderHandler, zoneBookHandler, areaHandler] as const;
+  const routes = [
+    healthcheckHandler,
+    meterReaderHandler,
+    zoneBookHandler,
+    areaHandler,
+    scheduleHandler,
+    consumerHandler,
+  ] as const;
 
   routes.forEach((route) => app.route("/", route));
 

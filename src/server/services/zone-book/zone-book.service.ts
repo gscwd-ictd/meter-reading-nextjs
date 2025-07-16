@@ -1,23 +1,35 @@
 import { IZoneBookRepository } from "@/server/interfaces/zone-book/zone-book.interface.repository";
 import { IZoneBookService } from "@/server/interfaces/zone-book/zone-book.interface.service";
-import { AssignedAreaZoneBook, CreateAssignedAreaZoneBook, ZoneBook } from "@/server/types/zone-book.type";
+import { AssignZoneBookArea, UpdateZoneBookArea, ZoneBook } from "@/server/types/zone-book.type";
 
 export class ZoneBookService implements IZoneBookService {
   constructor(private readonly repository: IZoneBookRepository) {}
 
-  async getZoneBook(): Promise<ZoneBook[]> {
-    return await this.repository.findZoneBook();
+  async getAllZoneBooksWithArea(): Promise<ZoneBook[]> {
+    return this.repository.findAllZoneBooksWithArea();
   }
 
-  async getUnassignedAreaZoneBook(): Promise<ZoneBook[]> {
-    return await this.repository.findUnassignedAreaZoneBook();
+  async getZoneBookAreaById(zoneBookId: string): Promise<ZoneBook> {
+    return this.repository.findZoneBookWithAreaById(zoneBookId);
   }
 
-  async getAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]> {
-    return await this.repository.findAssignedAreaZoneBook();
+  async assignZoneBookArea(data: AssignZoneBookArea): Promise<ZoneBook> {
+    return this.repository.assignZoneBookArea(data);
   }
 
-  async addAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook> {
-    return await this.repository.createAssignedAreaZoneBook(data);
+  async updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook> {
+    return this.repository.updateZoneBookArea(zoneBookId, data);
   }
+
+  // async getUnassignedAreaZoneBook(): Promise<ZoneBook[]> {
+  //   return await this.repository.findUnassignedAreaZoneBook();
+  // }
+
+  // async getAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]> {
+  //   return await this.repository.findAssignedAreaZoneBook();
+  // }
+
+  // async addAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook> {
+  //   return await this.repository.createAssignedAreaZoneBook(data);
+  // }
 }

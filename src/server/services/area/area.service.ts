@@ -5,23 +5,23 @@ import { Area, CreateArea, UpdateArea } from "@/server/types/area.type";
 export class AreaService implements IAreaService {
   constructor(private readonly repository: IAreaRepository) {}
 
-  async addArea(data: CreateArea): Promise<Area> {
-    return await this.repository.createArea(data);
+  async createArea(data: CreateArea): Promise<Area> {
+    return this.repository.createArea(data);
   }
 
-  async getArea(): Promise<Area[]> {
-    return await this.repository.findArea();
+  async getAllAreas(): Promise<Area[]> {
+    return this.repository.findAllAreas();
   }
 
   async getAreaById(id: string): Promise<Area> {
-    return await this.repository.findAreaById(id);
+    return this.repository.findAreaById(id);
   }
 
-  async updateAreaById(id: string, data: UpdateArea): Promise<Area> {
-    return await this.repository.updateAreaById(id, data);
+  async updateArea(id: string, data: UpdateArea): Promise<Area> {
+    return this.repository.updateArea(id, data);
   }
 
-  async deleteAreaById(id: string): Promise<Area> {
-    return await this.repository.removeAreaById(id);
+  async deleteArea(id: string): Promise<Area> {
+    return this.repository.deleteArea(id);
   }
 }

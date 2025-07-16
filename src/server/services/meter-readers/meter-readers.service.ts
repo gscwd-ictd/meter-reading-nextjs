@@ -1,54 +1,55 @@
 import { IMeterReaderRepository } from "@/server/interfaces/meter-readers/meter-readers.interface.repository";
 import { IMeterReaderService } from "@/server/interfaces/meter-readers/meter-readers.interface.service";
 import {
-  AssignedMeterReader,
   CreateAssignedMeterReader,
+  EmployeeDetails,
   MeterReader,
-  PaginatedAssignedMeterReader,
-  PaginatedUnassignedMeterReader,
-  UnassignedMeterReader,
+  MeterReaderEnhance,
+  PaginatedMeterReaderEnhance,
+  PaginatedEmployeeDetails,
+  AssignMeterReader,
 } from "@/server/types/meter-reader.type";
 
 export class MeterReaderService implements IMeterReaderService {
   constructor(private readonly repository: IMeterReaderRepository) {}
 
-  async getUnassignedMeterReader(
+  async getEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]> {
+    return this.repository.findEmployeeDetailsByName(query);
+  }
+
+  async getEmployeeDetailsById(employeeId: string): Promise<EmployeeDetails> {
+    return this.repository.findEmployeeDetailsById(employeeId);
+  }
+
+  async getUnassignedMeterReaders(
     page: number,
     limit: number,
     query: string,
-  ): Promise<UnassignedMeterReader[] | PaginatedUnassignedMeterReader> {
-    return await this.repository.findUnassignedMeterReader(page, limit, query);
+  ): Promise<EmployeeDetails[] | PaginatedEmployeeDetails> {
+    return await this.repository.findUnassignedMeterReaders(page, limit, query);
   }
 
-  async getAssignedMeterReader(
+  async getAssignedMeterReaders(
     page: number,
     limit: number,
     query: string,
-  ): Promise<AssignedMeterReader[] | PaginatedAssignedMeterReader> {
-    return await this.repository.findAssignedMeterReader(page, limit, query);
+  ): Promise<MeterReaderEnhance[] | PaginatedMeterReaderEnhance> {
+    return await this.repository.findAssignedMeterReaders(page, limit, query);
   }
 
-  async addMeterReader(data: CreateAssignedMeterReader): Promise<MeterReader> {
-    return await this.repository.createMeterReader(data);
+  async assignMeterReader(data: AssignMeterReader): Promise<MeterReaderEnhance> {
+    return await this.repository.assignMeterReader(data);
   }
 
-  // async getPersonnel(): Promise<PersonnelAssignable[]> {
-  //   return await this.repository.findPersonnel();
-  // }
-
-  // async getAllPersonnel(
-  //   page: number,
-  //   limit: number,
-  //   query: string,
-  // ): Promise<Personnel[] | PaginatedPersonnel> {
-  //   return await this.repository.findAllPersonnel(page, limit, query);
-  // }
-
-  async getMeterReaderById(id: string): Promise<AssignedMeterReader> {
-    return await this.repository.findMeterReaderById(id);
+  async getMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
+    return await this.repository.findMeterReaderById(meterReaderId);
   }
 
-  /* async updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader> {
+  async updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader> {
     return await this.repository.updateMeterReaderById(id, data);
-  } */
+  }
+
+  async deleteMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
+    return await this.repository.removeMeterReaderById(meterReaderId);
+  }
 }

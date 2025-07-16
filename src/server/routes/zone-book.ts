@@ -1,50 +1,34 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { meterReadingContext } from "../context";
-import { CreateAssignedZoneBookSchema } from "../types/zone-book.type";
+import { AssignZoneBookAreaSchema, UpdateZoneBookAreaSchema } from "../types/zone-book.type";
 
 const zoneBookService = meterReadingContext.getZoneBookService();
 
 const zoneBookRoutes = new Hono()
   .get("/", async (c) => {
-    const result = await zoneBookService.getZoneBook();
+    const result = await zoneBookService.getAllZoneBooksWithArea();
     return c.json(result);
   })
 
-  .get("/unassigned", async (c) => {
-    const result = await zoneBookService.getUnassignedAreaZoneBook();
+  .get("/:zoneBookId", async (c) => {
+    const zoneBookId = c.req.param("zoneBookId");
+    const result = await zoneBookService.getZoneBookAreaById(zoneBookId);
     return c.json(result);
   })
 
-  .get("/assigned", async (c) => {
-    const result = await zoneBookService.getAssignedAreaZoneBook();
-    return c.json(result);
-  })
-
-  .post("/", zValidator("json", CreateAssignedZoneBookSchema), async (c) => {
+  .post("/", zValidator("json", AssignZoneBookAreaSchema), async (c) => {
     const body = c.req.valid("json");
-    const result = await zoneBookService.addAssignedAreaZoneBook(body);
+    const result = await zoneBookService.assignZoneBookArea(body);
     return c.json(result, 201);
+  })
+
+  .patch("/:zoneBookId", zValidator("json", UpdateZoneBookAreaSchema), async (c) => {
+    const zoneBookId = c.req.param("zoneBookId");
+    const body = c.req.valid("json");
+
+    const result = await zoneBookService.updateZoneBookArea(zoneBookId, body);
+    return c.json(result);
   });
 
-// Export a handler with prefix /zone-book
 export const zoneBookHandler = new Hono().route("/zone-book", zoneBookRoutes);
-
-/* 
-  # get method
-  # all zone book 
-  /zone-book
-
-  # get method
-  # unassigned zone book area
-  /zone-book/unassigned
-
-  # get method
-  # assigned zone book area
-  /zone-book/assigned
-
-  # post method
-  # assigned zone book an area
-  /zone-book
-
-*/
