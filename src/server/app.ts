@@ -11,6 +11,11 @@ import { waterConcernsHandler } from "./routes/waterConcerns";
 import { zoneBookAddressHandler } from "./routes/zoneBookAddress";
 import { webhookHandler } from "./routes/webhook";
 import { readingDetailsHandler } from "./routes/readingDetails";
+import { meterReaderHandler } from "./routes/meter-readers";
+import { zoneBookHandler } from "./routes/zone-book";
+import { areaHandler } from "./routes/area";
+import { scheduleHandler } from "./routes/schedule";
+import { consumerHandler } from "./routes/consumer";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -28,6 +33,13 @@ function createApp() {
     waterConcernsHandler,
     zoneBookAddressHandler,
     webhookHandler,
+
+    healthcheckHandler,
+    meterReaderHandler,
+    zoneBookHandler,
+    areaHandler,
+    scheduleHandler,
+    consumerHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
