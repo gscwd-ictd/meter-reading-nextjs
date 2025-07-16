@@ -13,6 +13,7 @@ const hrmsPool = mysql.createPool({
   queueLimit: 0,
 });
 
-export const hrmsDb = drizzle(hrmsPool, {
+export const hrmsDb = drizzle({
+  client: hrmsPool,
   logger: true,
 });
