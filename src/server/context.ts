@@ -1,10 +1,16 @@
 import { IAreaRepository } from "./interfaces/area/area.interface.repository";
+import { IConsumerRepository } from "./interfaces/consumer/consumer.interface.repository";
 import { IMeterReaderRepository } from "./interfaces/meter-readers/meter-readers.interface.repository";
+import { IScheduleRepository } from "./interfaces/schedule/schedule.interface.repository";
 import { IZoneBookRepository } from "./interfaces/zone-book/zone-book.interface.repository";
 import { AreaRepository } from "./services/area/area.repository";
 import { AreaService } from "./services/area/area.service";
+import { ConsumerRepository } from "./services/consumer/consumer.repository";
+import { ConsumerService } from "./services/consumer/consumer.service";
 import { MeterReaderRepository } from "./services/meter-readers/meter-readers.repository";
 import { MeterReaderService } from "./services/meter-readers/meter-readers.service";
+import { ScheduleRepository } from "./services/schedule/schedule.repository";
+import { ScheduleService } from "./services/schedule/schedule.service";
 import { ZoneBookRepository } from "./services/zone-book/zone-book.repository";
 import { ZoneBookService } from "./services/zone-book/zone-book.service";
 
@@ -15,11 +21,15 @@ export class MeterReadingContext {
   private _meterReaderRepository?: IMeterReaderRepository;
   private _areaRepository?: IAreaRepository;
   private _zoneBookRepository?: IZoneBookRepository;
+  private _scheduleRepository?: IScheduleRepository;
+  private _consumerRepository?: IConsumerRepository;
 
   // Services
   private _meterReaderService?: MeterReaderService;
   private _areaService?: AreaService;
   private _zoneBookService?: ZoneBookService;
+  private _scheduleService?: ScheduleService;
+  private _consumerService?: ConsumerService;
 
   private constructor() {}
 
@@ -52,6 +62,21 @@ export class MeterReadingContext {
     return this._zoneBookRepository;
   }
 
+  public getScheduleRepository(): IScheduleRepository {
+    if (!this._scheduleRepository) {
+      this._scheduleRepository = new ScheduleRepository();
+    }
+    return this._scheduleRepository;
+  }
+
+  public getConsumerRepository(): IConsumerRepository {
+    if (!this._consumerRepository) {
+      this._consumerRepository = new ConsumerRepository();
+    }
+
+    return this._consumerRepository;
+  }
+
   // Services
   public getMeterReaderService(): MeterReaderService {
     if (!this._meterReaderService) {
@@ -72,6 +97,20 @@ export class MeterReadingContext {
       this._zoneBookService = new ZoneBookService(this.getZoneBookRepository());
     }
     return this._zoneBookService;
+  }
+
+  public getScheduleService(): ScheduleService {
+    if (!this._scheduleService) {
+      this._scheduleService = new ScheduleService(this.getScheduleRepository());
+    }
+    return this._scheduleService;
+  }
+
+  public getConsumerService(): ConsumerService {
+    if (!this._consumerService) {
+      this._consumerService = new ConsumerService(this.getConsumerRepository());
+    }
+    return this._consumerService;
   }
 }
 

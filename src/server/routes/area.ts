@@ -1,20 +1,20 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { meterReadingContext } from "../context";
-import { CreateArea, CreateAreaSchema, UpdateArea, UpdateAreaSchema } from "../types/area.type";
+import { CreateAreaSchema, UpdateAreaSchema } from "../types/area.type";
 
 const areaService = meterReadingContext.getAreaService();
 
 const areaRoutes = new Hono()
 
   .post("/", zValidator("json", CreateAreaSchema), async (c) => {
-    const body: CreateArea = c.req.valid("json");
-    const result = await areaService.addArea(body);
+    const body = c.req.valid("json");
+    const result = await areaService.createArea(body);
     return c.json(result, 201);
   })
 
   .get("/", async (c) => {
-    const result = await areaService.getArea();
+    const result = await areaService.getAllAreas();
     return c.json(result);
   })
 
@@ -26,14 +26,14 @@ const areaRoutes = new Hono()
 
   .put(":id", zValidator("json", UpdateAreaSchema), async (c) => {
     const id = c.req.param("id");
-    const body: UpdateArea = c.req.valid("json");
-    const result = await areaService.updateAreaById(id, body);
+    const body = c.req.valid("json");
+    const result = await areaService.updateArea(id, body);
     return c.json(result);
   })
 
   .delete(":id", async (c) => {
     const id = c.req.param("id");
-    const result = await areaService.deleteAreaById(id);
+    const result = await areaService.deleteArea(id);
     return c.json(result);
   });
 

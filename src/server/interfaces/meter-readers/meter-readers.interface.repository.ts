@@ -1,30 +1,38 @@
 import {
-  AssignedMeterReader,
   CreateAssignedMeterReader,
+  EmployeeDetails,
   MeterReader,
-  PaginatedAssignedMeterReader,
-  PaginatedUnassignedMeterReader,
-  UnassignedMeterReader,
+  MeterReaderEnhance,
+  PaginatedMeterReaderEnhance,
+  PaginatedEmployeeDetails,
+  AssignMeterReader,
 } from "@/server/types/meter-reader.type";
 
 export interface IMeterReaderRepository {
-  findUnassignedMeterReader(
+  findEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]>;
+
+  findEmployeeDetailsById(employeeId: string): Promise<EmployeeDetails>;
+
+  findUnassignedMeterReaders(
     page: number,
     limit: number,
     query: string,
-  ): Promise<UnassignedMeterReader[] | PaginatedUnassignedMeterReader>;
+  ): Promise<EmployeeDetails[] | PaginatedEmployeeDetails>;
 
-  findAssignedMeterReader(
+  findAssignedMeterReaders(
     page: number,
     limit: number,
     query: string,
-  ): Promise<AssignedMeterReader[] | PaginatedAssignedMeterReader>;
+  ): Promise<MeterReaderEnhance[] | PaginatedMeterReaderEnhance>;
 
-  createMeterReader(data: CreateAssignedMeterReader): Promise<MeterReader>;
+  assignMeterReader(data: AssignMeterReader): Promise<MeterReaderEnhance>;
 
-  findMeterReaderById(id: string): Promise<AssignedMeterReader>;
+  findMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance>;
 
-  //updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader>;
+  updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader>;
+
+  removeMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance>;
+
   /* 
   updateById
   removeById

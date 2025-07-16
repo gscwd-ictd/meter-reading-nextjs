@@ -1,9 +1,16 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import env from "@/lib/env";
-import { meterReaders, meterReaderZoneBook, meterReaderZoneBookView } from "./schemas/meter-readers";
-import { zoneBook } from "./schemas/zone-book";
+import { meterReaders, meterReaderZoneBook, viewMeterReaderZoneBook } from "./schemas/meter-readers";
+import { viewZoneBookArea, zoneBook } from "./schemas/zone-book";
 import { area } from "./schemas/area";
+import {
+  scheduleReaderZoneBookView,
+  schedules,
+  scheduleZoneBooks,
+  scheduleZoneBookView,
+} from "./schemas/schedules";
+import { consumerDetailsView } from "./schemas/consumer";
 
 const pool = new Pool({
   host: env.DB_HOST,
@@ -22,6 +29,12 @@ export const db = drizzle({
     zoneBook,
     meterReaders,
     meterReaderZoneBook,
-    meterReaderZoneBookView,
+    schedules,
+    scheduleZoneBooks,
+    scheduleReaderZoneBookView,
+    scheduleZoneBookView,
+    consumerDetailsView,
+    viewZoneBookArea,
+    viewMeterReaderZoneBook,
   },
 });

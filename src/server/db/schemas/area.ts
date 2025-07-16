@@ -4,7 +4,7 @@ import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { zoneBook } from "./zone-book";
 
 export const area = pgTable("area", {
-  id: varchar("id")
+  areaId: varchar("area_id")
     .primaryKey()
     .$defaultFn(() => generateCuid())
     .notNull(),

@@ -1,80 +1,73 @@
 import { db } from "@/server/db/postgres-connection";
-import { area } from "@/server/db/schemas/area";
-import { zoneBook } from "@/server/db/schemas/zone-book";
+import { viewZoneBookArea, zoneBook } from "@/server/db/schemas/zone-book";
 import { IZoneBookRepository } from "@/server/interfaces/zone-book/zone-book.interface.repository";
 import {
-  AssignedAreaZoneBook,
-  CreateAssignedAreaZoneBook,
+  AssignZoneBookArea,
+  UpdateZoneBookArea,
   ZoneBook,
   ZoneBookSchema,
 } from "@/server/types/zone-book.type";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { HTTPException } from "hono/http-exception";
 
 export class ZoneBookRepository implements IZoneBookRepository {
-  async findZoneBook(): Promise<ZoneBook[]> {
-    const stmt = await db.execute(
-      sql`select zone_code as zone, book_code as book, zone_code || '-' || book_code as "zoneBook" from "viewZoneBook" order by zone_code, book_code`,
-    );
-
-    const result = ZoneBookSchema.array().parse(stmt.rows);
-
-    return result;
-  }
-
-  async findUnassignedAreaZoneBook(): Promise<ZoneBook[]> {
-    const stmt = await db.execute(
-      sql`select zone_code as zone, book_code as book, zone_code || '-' || book_code as "zoneBook" from "viewZoneBook" order by zone_code, book_code`,
-    );
-
-    const allZoneBooks = ZoneBookSchema.array().parse(stmt.rows);
-
-    // Fetch already assigned zone-book entries
-    const allAssignedAreaZoneBook = db.select().from(zoneBook).prepare("get_assigned_zone_book");
-    const assignedZoneBooks = await allAssignedAreaZoneBook.execute();
-
-    // Create a Set of assigned zone-book keys for fast lookup
-    const assignedSet = new Set(assignedZoneBooks.map(({ zone, book }) => `${zone}-${book}`));
-
-    // Filter out assigned zone-book combinations
-    const unassignedZoneBooks = allZoneBooks.filter(({ zone, book }) => !assignedSet.has(`${zone}-${book}`));
-
-    // Return only unassigned zone-book entries
-    return unassignedZoneBooks;
-  }
-
-  async findAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]> {
-    const stmt = db
-      .select({
-        id: zoneBook.id,
-        zone: zoneBook.zone,
-        book: zoneBook.book,
-        zoneBook: sql<string>`${zoneBook.zone} || '-' || ${zoneBook.book}`.as("zoneBook"),
-        areaId: zoneBook.areaId,
-        area: area.area,
-        createdAt: zoneBook.createdAt,
-        updatedAt: zoneBook.updatedAt,
-      })
-      .from(zoneBook)
-      .innerJoin(area, eq(zoneBook.areaId, area.id))
-      .prepare("get_all_assigned_zone_book");
-
+  async findAllZoneBooksWithArea(): Promise<ZoneBook[]> {
+    const stmt = db.select().from(viewZoneBookArea).prepare("get_all_zone_books_with_area");
     const result = await stmt.execute();
-
-    return result;
+    return ZoneBookSchema.array().parse(result);
   }
 
-  async createAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook> {
-    const stmt = db.insert(zoneBook).values(data).returning().prepare("add_zone_book");
-    const [inserted] = await stmt.execute();
+  async findZoneBookWithAreaById(zoneBookId: string): Promise<ZoneBook> {
+    const stmt = db
+      .select()
+      .from(viewZoneBookArea)
+      .where(eq(viewZoneBookArea.zoneBookId, zoneBookId))
+      .prepare("get_zone_book_area_by_id");
 
-    const findAreaStmt = db.select().from(area).where(eq(area.id, inserted.areaId)).prepare("get_area_by_id");
+    const [zoneBookAreaFound] = await stmt.execute();
 
-    const [areaFound] = await findAreaStmt.execute();
+    if (!zoneBookAreaFound) {
+      throw new HTTPException(404, { message: `zone book area with id ${zoneBookId} not found.` });
+    }
 
-    return {
-      ...inserted,
-      zoneBook: `${inserted.zone}-${inserted.book}`,
-      area: areaFound.area,
-    };
+    return ZoneBookSchema.parse(zoneBookAreaFound);
+  }
+
+  async assignZoneBookArea(data: AssignZoneBookArea): Promise<ZoneBook> {
+    try {
+      const stmt = db.insert(zoneBook).values(data).returning().prepare("assign_zone_book_area");
+      const [assignedZoneBookArea] = await stmt.execute();
+
+      if (!assignedZoneBookArea) {
+        throw new HTTPException(500, { message: "failed to assigned zone book area." });
+      }
+
+      return this.findZoneBookWithAreaById(assignedZoneBookArea.zoneBookId);
+    } catch (err) {
+      throw new HTTPException(500, {
+        message: err instanceof Error ? err.message : "unexpected server error",
+      });
+    }
+  }
+
+  async updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook> {
+    const zoneBookAreaFound = await this.findZoneBookWithAreaById(zoneBookId);
+
+    const stmtUpdate = db
+      .update(zoneBook)
+      .set(data)
+      .where(eq(zoneBook.zoneBookId, zoneBookAreaFound.zoneBookId))
+      .returning()
+      .prepare("update_zone_book_area");
+
+    const [updatedZoneBookArea] = await stmtUpdate.execute();
+
+    if (!updatedZoneBookArea) {
+      throw new HTTPException(500, {
+        message: `failed to update zone book area with zone book id ${zoneBookId}.`,
+      });
+    }
+
+    return await this.findZoneBookWithAreaById(updatedZoneBookArea.zoneBookId);
   }
 }

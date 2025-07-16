@@ -1,10 +1,13 @@
-import { AssignedAreaZoneBook, CreateAssignedAreaZoneBook, ZoneBook } from "@/server/types/zone-book.type";
+import { AssignZoneBookArea, UpdateZoneBookArea, ZoneBook } from "@/server/types/zone-book.type";
 
 export interface IZoneBookRepository {
-  findZoneBook(): Promise<ZoneBook[]>;
-  findUnassignedAreaZoneBook(): Promise<ZoneBook[]>;
-  findAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]>;
-  createAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook>;
+  findAllZoneBooksWithArea(): Promise<ZoneBook[]>;
+  findZoneBookWithAreaById(zoneBookId: string): Promise<ZoneBook>;
+  assignZoneBookArea(data: AssignZoneBookArea): Promise<ZoneBook>;
+  updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook>;
+  // findUnassignedAreaZoneBook(): Promise<ZoneBook[]>;
+  // findAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]>;
+  //createAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook>;
   /* 
   updateById
   removeById

@@ -1,17 +1,17 @@
 import { generateCuid } from "@/server/helpers/generateCuid";
-import { pgTable, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, pgView, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 import { area } from "./area";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const zoneBook = pgTable(
   "zone_book",
   {
-    id: varchar("id")
+    zoneBookId: varchar("zone_book_id")
       .primaryKey()
       .$defaultFn(() => generateCuid())
       .notNull(),
     areaId: varchar("area_id")
-      .references(() => area.id, {
+      .references(() => area.areaId, {
         onDelete: "cascade",
       })
       .notNull(),
@@ -22,9 +22,34 @@ export const zoneBook = pgTable(
       .defaultNow()
       .$onUpdateFn(() => new Date()),
   },
-  (table) => [unique("unique_zone_book").on(table.zone, table.book)],
+  (table) => [
+    unique("unique_zone_book").on(table.zone, table.book),
+    index("idx_zone_book").on(table.zone, table.book),
+  ],
 );
 
 export const zoneBookRelations = relations(zoneBook, ({ one }) => ({
-  area: one(area, { fields: [zoneBook.areaId], references: [area.id] }),
+  area: one(area, { fields: [zoneBook.areaId], references: [area.areaId] }),
 }));
+
+export const viewZoneBookArea = pgView("view_zone_book_with_area", {
+  zoneBookId: varchar("zone_book_id"),
+  zone: varchar("zone"),
+  book: varchar("book"),
+  zoneBook: varchar("zoneBook"),
+  areaId: varchar("area_id"),
+  area: varchar("area"),
+}).as(sql`
+  select 
+    coalesce(zb.zone_book_id, '') as zone_book_id,
+    v.zone_code as zone,
+    v.book_code::varchar as book,
+    v.zone_code || '-' || v.book_code as "zoneBook",
+    coalesce(a.area_id, '') as area_id,
+    coalesce(a.area,'') as area
+  from "viewZoneBook" v
+  left join
+    zone_book zb ON v.zone_code = zb.zone AND v.book_code::varchar = zb.book
+  left join
+    area a ON a.area_id = zb.area_id
+  order by v.zone_code, v.book_code`);
