@@ -6,11 +6,6 @@ import { newMetersHandler } from "./routes/new-meters";
 import { ratesHandler } from "./routes/rates";
 import { readingDetailsHandler } from "./routes/reading-details";
 import { waterConcernsHandler } from "./routes/water-concerns";
-import { meterReaderHandler } from "./routes/meter-readers";
-import { zoneBookHandler } from "./routes/zone-book";
-import { areaHandler } from "./routes/area";
-import { scheduleHandler } from "./routes/schedule";
-import { consumerHandler } from "./routes/consumer";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -23,11 +18,6 @@ function createApp() {
     readingDetailsHandler,
     waterConcernsHandler,
     webhookHandler,
-    meterReaderHandler,
-    zoneBookHandler,
-    areaHandler,
-    scheduleHandler,
-    consumerHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
