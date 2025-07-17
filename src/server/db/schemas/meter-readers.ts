@@ -21,8 +21,6 @@ export const meterReaders = pgTable("meter_readers", {
     .$defaultFn(() => generateCuid())
     .notNull(),
   employeeId: varchar("employee_id").unique().notNull(),
-  mobileNumber: varchar("mobile_number", { length: 13 }).unique().notNull(),
-  password: text("password").notNull().default("password"),
   restDay: restDayEnum("rest_day").notNull(),
   createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })

@@ -1,11 +1,13 @@
 import { pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 import z4 from "zod/v4";
+import { meterReaders } from "./meter-readers";
 
 export const loginAccounts = pgTable("login_accounts", {
   id: varchar("id")
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
+  meterReaderId: varchar("meter_reader_id").references(() => meterReaders.meterReaderId),
   username: varchar("username").notNull().unique(),
   password: varchar("password").notNull(),
   positionTitle: varchar("position_title").notNull(),
