@@ -11,12 +11,16 @@ import { zoneBookHandler } from "./routes/zone-book";
 import { areaHandler } from "./routes/area";
 import { scheduleHandler } from "./routes/schedule";
 import { consumerHandler } from "./routes/consumer";
+import { authHandler } from "./routes/auth";
+import { leakageHandler } from "./routes/leakages";
 
 function createApp() {
   const app = new Hono().basePath("/api");
 
   const routes = [
     healthcheckHandler,
+    authHandler,
+    leakageHandler,
     accountHistoryHandler,
     newMetersHandler,
     ratesHandler,
