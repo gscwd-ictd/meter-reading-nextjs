@@ -50,7 +50,11 @@ export const authHandler = new Hono()
 
     const tokenService = new TokenService();
 
-    const { token } = await tokenService.issueToken({ sub: user.id, avatar: user.image });
+    const { token } = await tokenService.issueToken({
+      sub: user.id,
+      meterReaderId: user.meterReaderId,
+      avatar: user.image,
+    });
 
     return c.json({ token });
   });
