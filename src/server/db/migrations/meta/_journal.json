@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752114130789,
-      "tag": "0000_fine_cerise",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752115681285,
-      "tag": "0001_lively_mimic",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752718761221,
-      "tag": "0002_shiny_firebrand",
+      "when": 1752799101566,
+      "tag": "0000_eager_mikhail_rasputin",
       "breakpoints": true
     }
   ]

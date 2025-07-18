@@ -17,7 +17,11 @@ export const authHandler = new Hono()
     const result = await db.pgConn
       .insert(loginAccounts)
       .values({ ...data, password: hashedPw })
-      .returning({ userId: loginAccounts.id, username: loginAccounts.username });
+      .returning({
+        meterReaderId: loginAccounts.meterReaderId,
+        userId: loginAccounts.id,
+        username: loginAccounts.username,
+      });
 
     return c.json(result[0]);
   })
