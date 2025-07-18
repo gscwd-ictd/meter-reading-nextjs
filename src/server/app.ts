@@ -13,6 +13,7 @@ import { scheduleHandler } from "./routes/schedule";
 import { consumerHandler } from "./routes/consumer";
 import { authHandler } from "./routes/auth";
 import { leakageHandler } from "./routes/leakages";
+import { tokensHandler } from "./routes/tokens";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -32,6 +33,7 @@ function createApp() {
     areaHandler,
     scheduleHandler,
     consumerHandler,
+    tokensHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
