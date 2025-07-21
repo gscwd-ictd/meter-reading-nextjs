@@ -37,14 +37,10 @@ type SubmitEmployeeType = {
   employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
-  mobileNumber: string;
 };
 
 const meterReaderSchema = z.object({
   employeeId: z.string().optional(),
-  mobileNumber: z.string().regex(/^\d{9}$/, {
-    message: "Mobile number must be exactly 9 digits",
-  }),
   zoneBooks: z.array(
     z.object({
       zone: z.string(),
@@ -78,7 +74,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
     reValidateMode: "onChange",
-    defaultValues: { employeeId: undefined, mobileNumber: "", restDay: undefined, zoneBooks: [] },
+    defaultValues: { employeeId: undefined, restDay: undefined, zoneBooks: [] },
   });
 
   const { handleSubmit, reset } = methods;
@@ -97,7 +93,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       try {
         return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
-        toast.error("Error", { description: JSON.stringify(error) });
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
     enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
@@ -108,7 +104,6 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   ): Promise<SubmitEmployeeType> => {
     return {
       employeeId: employee.employeeId!,
-      mobileNumber: `+639${employee.mobileNumber}`,
       restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReaderZonebooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -149,7 +144,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     },
     onError: (error: unknown) => {
       setIsSubmitting(false);
-      toast.error("Error", { description: JSON.stringify(error) });
+      toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
     },
   });
 

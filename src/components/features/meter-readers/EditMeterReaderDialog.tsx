@@ -33,9 +33,6 @@ import { Zonebook } from "@mr/lib/types/zonebook";
 
 const meterReaderSchema = z.object({
   employeeId: z.string(),
-  mobileNumber: z.string().regex(/^\d{9}$/, {
-    message: "Mobile number must be exactly 9 digits",
-  }),
   zoneBooks: z.array(
     z.object({
       zone: z.string(),
@@ -53,7 +50,6 @@ type SubmitMeterReaderType = {
   employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
-  mobileNumber: string;
 };
 
 export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps> = ({
@@ -74,7 +70,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
     reValidateMode: "onChange",
-    defaultValues: { mobileNumber: "", restDay: undefined, zoneBooks: [] },
+    defaultValues: { restDay: undefined, zoneBooks: [] },
   });
 
   const { handleSubmit, setValue, reset } = methods;
@@ -93,7 +89,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   ): Promise<SubmitMeterReaderType> => {
     return {
       employeeId: meterReader.employeeId,
-      mobileNumber: `+639${meterReader.mobileNumber}`,
       restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReader.zoneBooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -113,7 +108,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         );
       } catch (error) {
         console.log(error);
-        toast.error("Error", { description: JSON.stringify(error) });
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
     onSuccess: async () => {
@@ -167,13 +162,16 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
-      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(4) });
+      setSelectedMeterReader({
+        ...meterReader,
+        mobileNumber: meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4),
+      });
 
-      setMobileNumber(meterReader.mobileNumber.slice(4));
+      setMobileNumber(meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
 
       setValue("employeeId", meterReader.employeeId);
 
-      setValue("mobileNumber", meterReader.mobileNumber.slice(4));
+      // setValue("mobileNumber", meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
 
       setValue("restDay", meterReader.restDay);
 

@@ -57,15 +57,16 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
             <ContactNumberInput
               id="mobileNumber"
               label="Contact Number"
-              isRequired
               minLength={9}
               maxLength={9}
-              controller={{
-                ...register("mobileNumber", {
-                  value: mobileNumber,
-                  onChange: (e) => setMobileNumber(e.target.value),
-                }),
-              }}
+              value={mobileNumber}
+              // controller={{
+              //   ...register("mobileNumber", {
+              //     value: mobileNumber,
+              //     onChange: (e) => setMobileNumber(e.target.value),
+              //   }),
+              // }}
+              disabled
               isError={errors.mobileNumber ? true : false}
               errorMessage={errors.mobileNumber?.message?.toString()}
             />

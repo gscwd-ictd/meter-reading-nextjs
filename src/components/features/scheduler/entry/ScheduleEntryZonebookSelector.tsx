@@ -121,34 +121,43 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
           `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/zone-books`,
           meterReaderWithZonebooks,
         );
-        return res.data;
+        return res;
       } catch (error) {
         console.log(error);
+        toast.error("Error", {
+          description: "Something went wrong. Please try again later.",
+          position: "top-right",
+        });
+        return error;
       }
     },
     onSuccess: async () => {
-      queryClient.removeQueries({
-        queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
-      });
-      // refetch
-      await queryClient.invalidateQueries({
-        queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
-        refetchType: "active",
-      });
-      setEntryZonebookSelectorIsOpen(false);
-      setSelectedZonebook(null);
-      setAssignedZonebooks([]);
-      setUnassignedZonebooks([]);
-      setHasFetchedZonebooks(false);
-      reset();
+      try {
+        queryClient.removeQueries({
+          queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
+        });
+        // refetch
+        await queryClient.invalidateQueries({
+          queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
+          refetchType: "active",
+        });
+        setEntryZonebookSelectorIsOpen(false);
+        setSelectedZonebook(null);
+        setAssignedZonebooks([]);
+        setUnassignedZonebooks([]);
+        setHasFetchedZonebooks(false);
+        reset();
 
-      refetchEntry!();
-      refetchData!();
-      setSelectedMeterReader(null);
-      toast.success("Success", {
-        description: "Successfully updated the meter reader zonebooks!",
-        position: "top-right",
-      });
+        refetchEntry!();
+        refetchData!();
+        setSelectedMeterReader(null);
+        toast.success("Success", {
+          description: "Successfully updated the meter reader zonebooks!",
+          position: "top-right",
+        });
+      } catch (error) {
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+      }
     },
     onError: () => {
       toast.error("Error", {
@@ -264,7 +273,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
   useEffect(() => {
     if (entryZonebookSelectorIsOpen) {
-      console.log("HAS EMPTY: ", hasEmptyDueDate(assignedZonebooks));
       setHasAnEmptyDueDate(hasEmptyDueDate(assignedZonebooks));
     }
   }, [assignedZonebooks, entryZonebookSelectorIsOpen]);

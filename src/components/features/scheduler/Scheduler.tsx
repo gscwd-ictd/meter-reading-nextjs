@@ -64,7 +64,10 @@ export const Scheduler: FunctionComponent = () => {
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
-        toast.error("Cannot find schedule");
+        toast.error("Error", {
+          description: "Cannot find schedule.",
+          position: "top-right",
+        });
       }
     },
     retry: false,

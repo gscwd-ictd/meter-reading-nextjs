@@ -55,6 +55,7 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
     onSuccess: () => {
       toast.success("Success", {
         description: `You have successfully assigned area ${selectedArea.area} to zone book ${selectedZonebook?.zoneBook}`,
+        position: "top-right",
       });
 
       setSelectedArea({} as Area);

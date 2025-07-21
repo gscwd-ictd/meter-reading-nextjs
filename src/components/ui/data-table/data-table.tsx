@@ -88,7 +88,7 @@ export function DataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="static w-full space-y-4 overflow-auto">
+    <div className="flex h-full flex-col space-y-4">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
         <div className="grid items-start gap-2 sm:grid sm:grid-cols-1 sm:grid-rows-2 md:grid md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
           {enableGlobalFilter && (
@@ -104,8 +104,8 @@ export function DataTable<T>({
         </div>
       </ColumnVisibilityToggleContext.Provider>
 
-      <div className="rounded-md border px-2">
-        <Table>
+      <div className="flex-1 overflow-auto rounded-md border">
+        <Table className="min-w-[640px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
