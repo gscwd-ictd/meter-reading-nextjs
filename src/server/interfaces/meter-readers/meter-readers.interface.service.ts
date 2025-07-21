@@ -1,17 +1,19 @@
 import {
-  CreateAssignedMeterReader,
   EmployeeDetails,
   MeterReader,
-  MeterReaderEnhance,
-  PaginatedMeterReaderEnhance,
+  PaginatedMeterReader,
   PaginatedEmployeeDetails,
   AssignMeterReader,
+  MeterReaderDetails,
 } from "@mr/server/types/meter-reader.type";
+import { ZoneBook } from "@mr/server/types/zone-book.type";
 
 export interface IMeterReaderService {
   getEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]>;
 
   getEmployeeDetailsById(employeeId: string): Promise<EmployeeDetails>;
+
+  getZoneBookByStatus(status: string): Promise<ZoneBook[]>;
 
   getUnassignedMeterReaders(
     page: number,
@@ -23,35 +25,15 @@ export interface IMeterReaderService {
     page: number,
     limit: number,
     query: string,
-  ): Promise<MeterReaderEnhance[] | PaginatedMeterReaderEnhance>;
+  ): Promise<MeterReader[] | PaginatedMeterReader>;
 
-  assignMeterReader(data: AssignMeterReader): Promise<MeterReaderEnhance>;
+  assignMeterReader(data: AssignMeterReader): Promise<MeterReader>;
 
-  getMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance>;
+  getMeterReaderDetailsById(meterReaderId: string): Promise<MeterReaderDetails>;
 
-  updateMeterReaderById(meterReaderId: string, data: CreateAssignedMeterReader): Promise<MeterReader>;
+  getMeterReaderWithZoneBookById(meterReaderId: string): Promise<MeterReader>;
 
-  deleteMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance>;
-  /* 
-  updateById
-  deleteById
-  */
+  updateMeterReaderById(meterReaderId: string, data: AssignMeterReader): Promise<MeterReader>;
+
+  deleteMeterReaderById(meterReaderId: string): Promise<MeterReader>;
 }
-
-/* 
-
-  meter login -> meter reader id -> schedule (zone-book based date today)
-
-  filter 3 tables
-  
-  lib_consumers
-  viewMeterReading
-
-  usage
-  viewConsumer_previouse_4_months
-
-  history
-  viewCustomer_ledger_services
-
-
-*/

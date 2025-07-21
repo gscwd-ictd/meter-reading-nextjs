@@ -50,6 +50,7 @@ export const scheduleMeterReaders = pgTable(
   },
   (table) => [
     index("idx_smr_schedule").on(table.scheduleId),
+    index("idx_smr_meter_reader").on(table.meterReaderId),
     unique("unique_schedule_meter_reader").on(table.scheduleId, table.meterReaderId),
   ],
 );
@@ -86,6 +87,7 @@ export const scheduleZoneBooks = pgTable(
   },
   (table) => [
     index("idx_schedule_zone_book_meter_reader").on(table.scheduleMeterReaderId),
+    index("idx_schedule_zone_book_zone_book").on(table.zone, table.book),
     unique("unique_schedule_zone_book").on(table.scheduleMeterReaderId, table.zone, table.book),
   ],
 );
@@ -96,6 +98,43 @@ export const scheduleZoneBooksRelations = relations(scheduleZoneBooks, ({ one })
     references: [scheduleMeterReaders.scheduleMeterReaderId],
   }),
 }));
+
+export const viewScheduleReading = pgView("view_schedule_reading", {
+  readingDate: varchar("reading_date"),
+  dueDate: jsonb("due_date"),
+  disconnectionDate: jsonb("disconnection_date"),
+  meterReaders: jsonb("meter_readers"),
+}).as(sql`
+  select
+    s.reading_date,
+    s.due_date,
+    s.disconnection_date,
+    coalesce(
+        jsonb_agg(
+            jsonb_build_object(
+                'scheduleMeterReaderId', smr.schedule_meter_reader_id,
+                'meterReaderId', smr.meter_reader_id,
+                'zoneBooks', COALESCE((
+                    SELECT jsonb_agg(
+                        jsonb_build_object(
+                            'zone', szb.zone,
+                            'book', szb.book,
+                            'zoneBook', vzbwa.zone_book,
+                            'area', vzbwa.area
+                        )
+                    )
+                    from schedule_zone_books szb
+                    left join view_zone_book_with_area vzbwa on szb.zone = vzbwa.zone and szb.book = vzbwa.book
+                    where szb.schedule_meter_reader_id = smr.schedule_meter_reader_id
+                ), '[]'::jsonb)
+            )
+        ) filter (where smr.schedule_meter_reader_id is not null),
+        '[]'::jsonb
+    ) as meter_readers
+  from schedules s
+  left join schedule_meter_readers smr on s.schedule_id = smr.schedule_id
+  group by s.reading_date, s.due_date, s.disconnection_date
+  order by s.reading_date`);
 
 // export const scheduleZoneBookView = pgView("schedule_zone_book_view").as((view) =>
 //   view

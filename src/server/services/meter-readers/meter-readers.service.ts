@@ -1,14 +1,14 @@
 import { IMeterReaderRepository } from "@mr/server/interfaces/meter-readers/meter-readers.interface.repository";
 import { IMeterReaderService } from "@mr/server/interfaces/meter-readers/meter-readers.interface.service";
 import {
-  CreateAssignedMeterReader,
   EmployeeDetails,
   MeterReader,
-  MeterReaderEnhance,
-  PaginatedMeterReaderEnhance,
+  PaginatedMeterReader,
   PaginatedEmployeeDetails,
   AssignMeterReader,
+  MeterReaderDetails,
 } from "@mr/server/types/meter-reader.type";
+import { ZoneBook } from "@mr/server/types/zone-book.type";
 
 export class MeterReaderService implements IMeterReaderService {
   constructor(private readonly repository: IMeterReaderRepository) {}
@@ -19,6 +19,10 @@ export class MeterReaderService implements IMeterReaderService {
 
   async getEmployeeDetailsById(employeeId: string): Promise<EmployeeDetails> {
     return this.repository.findEmployeeDetailsById(employeeId);
+  }
+
+  async getZoneBookByStatus(status: string): Promise<ZoneBook[]> {
+    return this.repository.findZoneBookByStatus(status);
   }
 
   async getUnassignedMeterReaders(
@@ -33,23 +37,27 @@ export class MeterReaderService implements IMeterReaderService {
     page: number,
     limit: number,
     query: string,
-  ): Promise<MeterReaderEnhance[] | PaginatedMeterReaderEnhance> {
+  ): Promise<MeterReader[] | PaginatedMeterReader> {
     return await this.repository.findAssignedMeterReaders(page, limit, query);
   }
 
-  async assignMeterReader(data: AssignMeterReader): Promise<MeterReaderEnhance> {
+  async assignMeterReader(data: AssignMeterReader): Promise<MeterReader> {
     return await this.repository.assignMeterReader(data);
   }
 
-  async getMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
-    return await this.repository.findMeterReaderById(meterReaderId);
+  async getMeterReaderDetailsById(meterReaderId: string): Promise<MeterReaderDetails> {
+    return await this.repository.findMeterReaderDetailsById(meterReaderId);
   }
 
-  async updateMeterReaderById(id: string, data: CreateAssignedMeterReader): Promise<MeterReader> {
+  async getMeterReaderWithZoneBookById(meterReaderId: string): Promise<MeterReader> {
+    return await this.repository.findMeterReaderWithZoneBookById(meterReaderId);
+  }
+
+  async updateMeterReaderById(id: string, data: AssignMeterReader): Promise<MeterReader> {
     return await this.repository.updateMeterReaderById(id, data);
   }
 
-  async deleteMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
+  async deleteMeterReaderById(meterReaderId: string): Promise<MeterReader> {
     return await this.repository.removeMeterReaderById(meterReaderId);
   }
 }

@@ -14,9 +14,21 @@ import { consumerHandler } from "./routes/consumer";
 import { authHandler } from "./routes/auth";
 import { leakageHandler } from "./routes/leakages";
 import { tokensHandler } from "./routes/tokens";
+import { cors } from "hono/cors";
 
 function createApp() {
   const app = new Hono().basePath("/api");
+
+  app.use(
+    "*",
+    cors({
+      origin: ["http://localhost:3000", "http://172.20.10.57:3000", "http://172.20.10.53:3000"],
+      allowMethods: ["GET", "POST", "PUT", "DELETE"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      maxAge: 600,
+      credentials: true,
+    }),
+  );
 
   const routes = [
     healthcheckHandler,

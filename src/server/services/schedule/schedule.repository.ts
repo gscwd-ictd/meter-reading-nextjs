@@ -7,6 +7,7 @@ import {
   schedules,
   scheduleZoneBooks,
   scheduleZoneBookView,
+  viewScheduleReading,
 } from "@mr/server/db/schemas/schedules";
 import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.interface.repository";
 import {
@@ -14,78 +15,81 @@ import {
   CreateSchedule,
   MeterReaderZoneBook,
   Schedule,
+  ScheduleReading,
+  ScheduleReadingSchema,
   ScheduleSchema,
 } from "@mr/server/types/schedule.type";
 import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
-  async findScheduleByMonthYear(month: string, year: string): Promise<Schedule[]> {
-    const stmt = await db.pgConn.execute(sql`
-      SELECT * FROM schedule_month_year_schedule
-      WHERE EXTRACT(MONTH FROM schedule_month_year_schedule."readingDate") = ${Number(month)}
-        AND EXTRACT(YEAR FROM schedule_month_year_schedule."readingDate") = ${Number(year)}
-    `);
+  async findScheduleByMonthYear(month: string, year: string): Promise<ScheduleReading[]> {
+    // Step 1: Query schedule readings by month & year
+    const stmt = await db.pgConn
+      .select()
+      .from(viewScheduleReading)
+      .where(
+        sql`
+      EXTRACT(MONTH FROM ${viewScheduleReading.readingDate}) = ${Number(month)} 
+      AND EXTRACT(YEAR FROM ${viewScheduleReading.readingDate}) = ${Number(year)}
+    `,
+      );
 
-    const parsedResult = ScheduleSchema.array().parse(stmt.rows);
+    // Step 2: Validate top-level schedules structure (initial parse)
+    const schedules = ScheduleSchema.array().parse(stmt);
 
-    // Now enrich meterReaders with detailed info
-    const enrichedResult = await Promise.all(
-      parsedResult.map(async (schedule) => {
-        const enrichedMeterReaders = await Promise.all(
-          schedule.meterReaders.map(async (reader) => {
-            // Fetch extra meter reader details by ID
-            const meterReaderDetails = await meterReadingContext
+    // Step 3: Enrich each schedule’s meterReaders with full details
+    return await Promise.all(
+      schedules.map(async (schedule) => {
+        const meterReaders = await Promise.all(
+          schedule.meterReaders.map(async (readers) => {
+            const details = await meterReadingContext
               .getMeterReaderService()
-              .getMeterReaderById(reader.meterReaderId);
-
-            // Merge details into meterReader object
+              .getMeterReaderDetailsById(readers.meterReaderId);
             return {
-              ...meterReaderDetails,
-              ...reader,
+              ...readers,
+              ...details,
             };
           }),
         );
 
-        // Return schedule with enriched meterReaders
-        return {
-          ...schedule,
-          meterReaders: enrichedMeterReaders,
-        };
+        // Step 4: Re-validate the full enriched schedule
+        return ScheduleReadingSchema.parse({ ...schedule, meterReaders });
       }),
     );
-
-    return enrichedResult;
   }
 
-  async findScheduleByExactDate(query: string): Promise<Schedule | object> {
-    const stmtQuery = await db.pgConn.execute(
-      sql`SELECT * FROM schedule_month_year_schedule where "readingDate" = ${query}`,
-    );
+  async findScheduleByExactDate(query: string): Promise<ScheduleReading | object> {
+    // Step 1: Query the viewScheduleReading table for a specific reading date
+    const stmt = await db.pgConn
+      .select()
+      .from(viewScheduleReading)
+      .where(eq(viewScheduleReading.readingDate, query));
 
-    if (!stmtQuery || stmtQuery.rows.length === 0) {
+    // Step 2: If no schedule is found for that date, return an empty object
+    if (stmt.length === 0) {
       return {};
     }
 
-    const parseResult = ScheduleSchema.parse(stmtQuery.rows[0]);
+    // Step 3: Parse the first (and expected only) result into a strongly-typed schedule object
+    const schedule = ScheduleSchema.parse(stmt[0]);
 
-    const enrichedMeterReaders = await Promise.all(
-      parseResult.meterReaders.map(async (reader) => {
-        const meterReaderDetails = await meterReadingContext
+    // Step 4: For each meter reader in the schedule, fetch their full details
+    const result = await Promise.all(
+      schedule.meterReaders.map(async (reader) => {
+        const details = await meterReadingContext
           .getMeterReaderService()
-          .getMeterReaderById(reader.meterReaderId);
+          .getMeterReaderDetailsById(reader.meterReaderId);
 
         return {
-          ...meterReaderDetails,
           ...reader,
+          ...details,
         };
       }),
     );
 
-    return {
-      ...parseResult,
-      meterReaders: enrichedMeterReaders,
-    };
+    // Step 6: Replace the original meterReaders with the enriched list and validate the full structure
+    return ScheduleReadingSchema.parse({ ...schedule, meterReaders: result });
   }
 
   async createMonthYearSchedule(data: CreateSchedule[]): Promise<Schedule[]> {

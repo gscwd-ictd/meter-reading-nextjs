@@ -36,7 +36,7 @@ export const viewZoneBookArea = pgView("view_zone_book_with_area", {
   zoneBookId: varchar("zone_book_id"),
   zone: varchar("zone"),
   book: varchar("book"),
-  zoneBook: varchar("zoneBook"),
+  zoneBook: varchar("zone_book"),
   areaId: varchar("area_id"),
   area: varchar("area"),
 }).as(sql`
@@ -44,7 +44,7 @@ export const viewZoneBookArea = pgView("view_zone_book_with_area", {
     coalesce(zb.zone_book_id, '') as zone_book_id,
     v.zone_code as zone,
     v.book_code::varchar as book,
-    v.zone_code || '-' || v.book_code as "zoneBook",
+    v.zone_code || '-' || v.book_code as zone_book,
     coalesce(a.area_id, '') as area_id,
     coalesce(a.area,'') as area
   from "viewZoneBook" v

@@ -4,12 +4,18 @@ import env from "@mr/lib/env";
 import sql from "mssql";
 import { area } from "./schemas/area";
 import { viewZoneBookArea, zoneBook } from "./schemas/zone-book";
-import { meterReaders, meterReaderZoneBook, viewMeterReaderZoneBook } from "./schemas/meter-readers";
+import {
+  meterReaders,
+  meterReaderZoneBook,
+  viewMeterReaderZoneBook,
+  viewZoneBookAssignment,
+} from "./schemas/meter-readers";
 import {
   scheduleReaderZoneBookView,
   schedules,
   scheduleZoneBooks,
   scheduleZoneBookView,
+  viewScheduleReading,
 } from "./schemas/schedules";
 import { consumerDetailsView } from "./schemas/consumer";
 
@@ -32,11 +38,15 @@ const pgConn = drizzle({
     meterReaderZoneBook,
     schedules,
     scheduleZoneBooks,
-    scheduleReaderZoneBookView,
-    scheduleZoneBookView,
-    consumerDetailsView,
+
     viewZoneBookArea,
     viewMeterReaderZoneBook,
+    viewScheduleReading,
+    viewZoneBookAssignment,
+
+    // scheduleReaderZoneBookView,
+    // scheduleZoneBookView,
+    // consumerDetailsView,
   },
 });
 
