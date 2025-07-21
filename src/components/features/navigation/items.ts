@@ -16,6 +16,8 @@ import {
   FileText,
   Book,
   Scan,
+  User2,
+  UserCog2,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -79,6 +81,11 @@ export const mainNav: NavItem[] = [
     title: "Notifications",
     url: "/notifications",
     icon: Megaphone,
+  },
+  {
+    title: "Users",
+    url: "/users",
+    icon: UserCog2,
   },
   {
     title: "Settings",

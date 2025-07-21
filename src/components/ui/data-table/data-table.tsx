@@ -88,9 +88,9 @@ export function DataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="flex h-full flex-col space-y-4">
+    <div className="flex h-full min-h-[22rem] flex-col space-y-4">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
-        <div className="grid items-start gap-2 sm:grid sm:grid-cols-1 sm:grid-rows-2 md:grid md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
+        <div className="grid items-start gap-2 sm:grid-cols-1 sm:grid-rows-2 md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
           {enableGlobalFilter && (
             <Input
               placeholder="Search from table..."
@@ -104,28 +104,41 @@ export function DataTable<T>({
         </div>
       </ColumnVisibilityToggleContext.Provider>
 
-      <div className="flex-1 overflow-auto rounded-md border">
-        <Table className="min-w-[640px]">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-
-          <TableBody>
-            {!loading ? (
-              table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+      <div className="flex min-h-0 flex-1 flex-col overflow-auto rounded-md border">
+        {loading || !table.getRowModel().rows?.length ? (
+          <div className="flex flex-1 items-center justify-center">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <LoadingSpinner className="text-primary" />
+                <span className="text-primary text-lg">Loading data...</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                  No Results
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-full overflow-x-auto">
+            <Table className="min-w-full sm:min-w-[640px]">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="max-w-[30rem] truncate">
@@ -133,31 +146,11 @@ export function DataTable<T>({
                       </TableCell>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    <div className="flex w-full items-center justify-center gap-2">
-                      <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
-                      <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
-                        No Results
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  <div className="flex w-full items-center justify-center gap-2">
-                    <LoadingSpinner className="text-primary" />{" "}
-                    <span className="text-primary text-lg">Loading data...</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {enablePagination && (

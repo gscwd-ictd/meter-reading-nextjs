@@ -63,12 +63,14 @@ export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ loadi
               isRequired
               minLength={9}
               maxLength={9}
-              controller={{
-                ...register("mobileNumber", {
-                  value: mobileNumber,
-                  onChange: (e) => setMobileNumber(e.target.value),
-                }),
-              }}
+              // controller={{
+              //   ...register("mobileNumber", {
+              //     value: mobileNumber,
+              //     onChange: (e) => setMobileNumber(e.target.value),
+              //   }),
+              // }}
+              value={mobileNumber}
+              disabled
               isError={errors.mobileNumber ? true : false}
               errorMessage={errors.mobileNumber?.message?.toString()}
             />

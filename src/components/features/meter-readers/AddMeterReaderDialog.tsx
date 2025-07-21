@@ -25,6 +25,7 @@ import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 type AddMeterReaderDialogProps = {
   addMeterReaderDialogIsOpen: boolean;
@@ -85,13 +86,21 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     setSelectedEmployee(undefined);
     setSelectedRestDay(undefined);
     setMeterReaderZonebooks([]);
+    setHasSetInitialZonebookPool(false);
+    setFilteredZonebooks([]);
+    setTempFilteredZonebooks([]);
+    refetch();
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["get-all-unassigned-zoneBooks"],
     queryFn: async () => {
       try {
-        return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/zone-books?status=unassigned`,
+        );
+        return res.data;
+        // return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
         toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
@@ -157,11 +166,17 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
 
   useEffect(() => {
     if (data && !hasSetInitialZonebookPool) {
-      setFilteredZonebooks(data.data);
-      setTempFilteredZonebooks(data.data);
+      setFilteredZonebooks(data);
+      setTempFilteredZonebooks(data);
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
+  }, [
+    data,
+    hasSetInitialZonebookPool,
+    setFilteredZonebooks,
+    setTempFilteredZonebooks,
+    setHasSetInitialZonebookPool,
+  ]);
 
   return (
     <Dialog
