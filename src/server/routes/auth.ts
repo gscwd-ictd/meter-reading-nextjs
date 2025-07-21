@@ -17,7 +17,11 @@ export const authHandler = new Hono()
     const result = await db.pgConn
       .insert(loginAccounts)
       .values({ ...data, password: hashedPw })
-      .returning({ userId: loginAccounts.id, username: loginAccounts.username });
+      .returning({
+        meterReaderId: loginAccounts.meterReaderId,
+        userId: loginAccounts.id,
+        username: loginAccounts.username,
+      });
 
     return c.json(result[0]);
   })
@@ -46,7 +50,11 @@ export const authHandler = new Hono()
 
     const tokenService = new TokenService();
 
-    const { token } = await tokenService.issueToken({ sub: user.id, avatar: user.image });
+    const { token } = await tokenService.issueToken({
+      sub: user.id,
+      meterReaderId: user.meterReaderId,
+      avatar: user.image,
+    });
 
     return c.json({ token });
   });

@@ -24,6 +24,7 @@ export const LoginSchema = z4.object({
 });
 
 export const AuthSchema = z4.object({
+  meterReaderId: z4.string(),
   username: z4.string(),
   password: z4.string(),
   positionTitle: z4.string(),

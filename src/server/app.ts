@@ -11,6 +11,9 @@ import { zoneBookHandler } from "./routes/zone-book";
 import { areaHandler } from "./routes/area";
 import { scheduleHandler } from "./routes/schedule";
 import { consumerHandler } from "./routes/consumer";
+import { authHandler } from "./routes/auth";
+import { leakageHandler } from "./routes/leakages";
+import { tokensHandler } from "./routes/tokens";
 import { cors } from "hono/cors";
 
 function createApp() {
@@ -29,6 +32,8 @@ function createApp() {
 
   const routes = [
     healthcheckHandler,
+    authHandler,
+    leakageHandler,
     accountHistoryHandler,
     newMetersHandler,
     ratesHandler,
@@ -40,6 +45,7 @@ function createApp() {
     areaHandler,
     scheduleHandler,
     consumerHandler,
+    tokensHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
