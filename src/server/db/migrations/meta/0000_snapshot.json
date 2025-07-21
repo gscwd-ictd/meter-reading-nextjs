@@ -1,5 +1,5 @@
 {
-  "id": "53f631f5-2e8e-45e1-9011-48706efd717b",
+  "id": "e1bf3023-bac7-4fb7-ab6b-f739f097d05f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -901,6 +901,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "idx_smr_meter_reader": {
+          "name": "idx_smr_meter_reader",
+          "columns": [
+            {
+              "expression": "meter_reader_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -1007,6 +1022,27 @@
           "columns": [
             {
               "expression": "schedule_meter_reader_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_schedule_zone_book_zone_book": {
+          "name": "idx_schedule_zone_book_zone_book",
+          "columns": [
+            {
+              "expression": "zone",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "book",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1312,7 +1348,7 @@
       "isExisting": false,
       "materialized": false
     },
-    "public.view_meter_reader_zone_book": {
+    "public.view_meter_reader_with_zone_book": {
       "columns": {
         "meter_reader_id": {
           "name": "meter_reader_id",
@@ -1326,27 +1362,72 @@
           "primaryKey": false,
           "notNull": true
         },
-        "mobile_number": {
-          "name": "mobile_number",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
         "rest_day": {
           "name": "rest_day",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "zoneBooks": {
-          "name": "zoneBooks",
+        "zone_books": {
+          "name": "zone_books",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         }
       },
-      "definition": "\n  select \n    mr.meter_reader_id,\n    mr.employee_id,\n    mr.mobile_number,\n    mr.rest_day,\n    coalesce(  \n      jsonb_agg(\n        distinct jsonb_build_object(\n          'zone', mrzb.zone,\n          'book', mrzb.book,\n          'zoneBook', mrzb.zone || '-' || mrzb.book,\n          'area', vzbwa.area\n        )\n      ) filter (where mrzb.zone is not null and mrzb.book is not  null),\n      '[]'::jsonb\n    ) as \"zoneBooks\"\n  from \n    meter_readers mr\n  left join \n    meter_reader_zone_book mrzb on mr.meter_reader_id = mrzb.meter_reader_id\n  left join \n    view_zone_book_with_area vzbwa on mrzb.zone = vzbwa.zone and  mrzb.book = vzbwa.book\n  group by \n    mr.meter_reader_id, \n    mr.employee_id, \n    mr.mobile_number, \n    mr.rest_day\n  ",
-      "name": "view_meter_reader_zone_book",
+      "definition": "\n  select \n    mr.meter_reader_id,\n    mr.employee_id,\n    mr.rest_day,\n    coalesce(  \n      jsonb_agg(\n        distinct jsonb_build_object(\n          'zone', mrzb.zone,\n          'book', mrzb.book,\n          'zoneBook', mrzb.zone || '-' || mrzb.book,\n          'area', vzbwa.area\n        )\n      ) filter (where mrzb.zone is not null and mrzb.book is not  null),\n      '[]'::jsonb\n    ) as zone_books\n  from \n    meter_readers mr\n  left join \n    meter_reader_zone_book mrzb on mr.meter_reader_id = mrzb.meter_reader_id\n  left join \n    view_zone_book_with_area vzbwa on mrzb.zone = vzbwa.zone and  mrzb.book = vzbwa.book\n  group by \n    mr.meter_reader_id, \n    mr.employee_id, \n    mr.rest_day\n  ",
+      "name": "view_meter_reader_with_zone_book",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
+    "public.view_zone_book_assignment": {
+      "columns": {
+        "meter_reader_id": {
+          "name": "meter_reader_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone_book_id": {
+          "name": "zone_book_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone": {
+          "name": "zone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "book": {
+          "name": "book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "zone_book": {
+          "name": "zone_book",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area_id": {
+          "name": "area_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area": {
+          "name": "area",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n    select\n      mrzb.meter_reader_id,\n      vzb.zone_book_id,\n      vzb.zone,\n      vzb.book,\n      vzb.zone_book,\n      vzb.area_id,\n      vzb.area\n    from view_zone_book_with_area vzb\n    left join (\n      select distinct zone, book, meter_reader_id\n      from meter_reader_zone_book\n    ) mrzb\n      on vzb.zone = mrzb.zone and vzb.book = mrzb.book\n    order by vzb.zone, vzb.book\n  ",
+      "name": "view_zone_book_assignment",
       "schema": "public",
       "isExisting": false,
       "materialized": false
@@ -1399,6 +1480,39 @@
       "isExisting": false,
       "materialized": false
     },
+    "public.view_schedule_reading": {
+      "columns": {
+        "reading_date": {
+          "name": "reading_date",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disconnection_date": {
+          "name": "disconnection_date",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meter_readers": {
+          "name": "meter_readers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "definition": "\n  select\n    s.reading_date,\n    s.due_date,\n    s.disconnection_date,\n    coalesce(\n        jsonb_agg(\n            jsonb_build_object(\n                'scheduleMeterReaderId', smr.schedule_meter_reader_id,\n                'meterReaderId', smr.meter_reader_id,\n                'zoneBooks', COALESCE((\n                    SELECT jsonb_agg(\n                        jsonb_build_object(\n                            'zone', szb.zone,\n                            'book', szb.book,\n                            'zoneBook', vzbwa.zone_book,\n                            'area', vzbwa.area\n                        )\n                    )\n                    from schedule_zone_books szb\n                    left join view_zone_book_with_area vzbwa on szb.zone = vzbwa.zone and szb.book = vzbwa.book\n                    where szb.schedule_meter_reader_id = smr.schedule_meter_reader_id\n                ), '[]'::jsonb)\n            )\n        ) filter (where smr.schedule_meter_reader_id is not null),\n        '[]'::jsonb\n    ) as meter_readers\n  from schedules s\n  left join schedule_meter_readers smr on s.schedule_id = smr.schedule_id\n  group by s.reading_date, s.due_date, s.disconnection_date\n  order by s.reading_date",
+      "name": "view_schedule_reading",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    },
     "public.view_zone_book_with_area": {
       "columns": {
         "zone_book_id": {
@@ -1419,8 +1533,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "zoneBook": {
-          "name": "zoneBook",
+        "zone_book": {
+          "name": "zone_book",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -1438,7 +1552,7 @@
           "notNull": false
         }
       },
-      "definition": "\n  select \n    coalesce(zb.zone_book_id, '') as zone_book_id,\n    v.zone_code as zone,\n    v.book_code::varchar as book,\n    v.zone_code || '-' || v.book_code as \"zoneBook\",\n    coalesce(a.area_id, '') as area_id,\n    coalesce(a.area,'') as area\n  from \"viewZoneBook\" v\n  left join\n    zone_book zb ON v.zone_code = zb.zone AND v.book_code::varchar = zb.book\n  left join\n    area a ON a.area_id = zb.area_id\n  order by v.zone_code, v.book_code",
+      "definition": "\n  select \n    coalesce(zb.zone_book_id, '') as zone_book_id,\n    v.zone_code as zone,\n    v.book_code::varchar as book,\n    v.zone_code || '-' || v.book_code as zone_book,\n    coalesce(a.area_id, '') as area_id,\n    coalesce(a.area,'') as area\n  from \"viewZoneBook\" v\n  left join\n    zone_book zb ON v.zone_code = zb.zone AND v.book_code::varchar = zb.book\n  left join\n    area a ON a.area_id = zb.area_id\n  order by v.zone_code, v.book_code",
       "name": "view_zone_book_with_area",
       "schema": "public",
       "isExisting": false,
