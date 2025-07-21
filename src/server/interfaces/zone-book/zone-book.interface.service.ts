@@ -5,11 +5,4 @@ export interface IZoneBookService {
   getZoneBookAreaById(zoneBookId: string): Promise<ZoneBook>;
   assignZoneBookArea(data: AssignZoneBookArea): Promise<ZoneBook>;
   updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook>;
-  //getUnassignedAreaZoneBook(): Promise<ZoneBook[]>;
-  //getAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]>;
-  //addAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook>;
-  /* 
-  updateById
-  removeById
-  */
 }

@@ -3,11 +3,13 @@ import {
   CreateSchedule,
   MeterReaderZoneBook,
   Schedule,
+  ScheduleReading,
 } from "@mr/server/types/schedule.type";
 
 export interface IScheduleRepository {
-  findScheduleByMonthYear(month: string, year: string): Promise<Schedule[]>;
-  findScheduleByExactDate(query: string): Promise<Schedule | object>;
+  findScheduleByMonthYear(month: string, year: string): Promise<ScheduleReading[]>;
+  findScheduleByExactDate(query: string): Promise<ScheduleReading | object>;
+
   createMonthYearSchedule(input: CreateSchedule[]): Promise<Schedule[]>;
 
   removeScheduleByMonthYear(month: string, year: string): Promise<Schedule[]>;

@@ -1,11 +1,7 @@
 import { Hono } from "hono";
 import { meterReadingContext } from "../context";
 import { zValidator } from "@hono/zod-validator";
-import {
-  AssignMeterReaderSchema,
-  CreateAssignedMeterReaderSchema,
-  MeterReaderQuerySchema,
-} from "../types/meter-reader.type";
+import { AssignMeterReaderSchema, MeterReaderQuerySchema } from "../types/meter-reader.type";
 import { z } from "zod";
 
 const meterReaderService = meterReadingContext.getMeterReaderService();
@@ -35,9 +31,19 @@ const meterReaderRoutes = new Hono()
     return c.json(meterReaders);
   })
 
+  .get(
+    "/zone-books",
+    zValidator("query", z.object({ status: z.enum(["assigned", "unassigned", "all"]).default("all") })),
+    async (c) => {
+      const { status } = c.req.valid("query");
+      const zoneBooks = await meterReaderService.getZoneBookByStatus(status);
+      return c.json(zoneBooks);
+    },
+  )
+
   .get("/:id", async (c) => {
     const id = c.req.param("id");
-    const meterReader = await meterReaderService.getMeterReaderById(id);
+    const meterReader = await meterReaderService.getMeterReaderWithZoneBookById(id);
     if (!meterReader) return c.json({ error: "Meter reader not found" }, 404);
     return c.json(meterReader);
   })
@@ -48,7 +54,7 @@ const meterReaderRoutes = new Hono()
     return c.json(result);
   })
 
-  .put("/:id", zValidator("json", CreateAssignedMeterReaderSchema), async (c) => {
+  .put("/:id", zValidator("json", AssignMeterReaderSchema), async (c) => {
     const id = c.req.param("id");
     const body = c.req.valid("json");
     const result = await meterReaderService.updateMeterReaderById(id, body);

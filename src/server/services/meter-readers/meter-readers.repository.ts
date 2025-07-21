@@ -4,21 +4,26 @@ import {
   meterReaders,
   meterReaderZoneBook,
   viewMeterReaderZoneBook,
+  viewZoneBookAssignment,
 } from "@mr/server/db/schemas/meter-readers";
 import { paginate } from "@mr/server/helpers/paginate";
 import { IMeterReaderRepository } from "@mr/server/interfaces/meter-readers/meter-readers.interface.repository";
 import {
   EmployeeDetails,
   EmployeeDetailsSchema,
-  MeterReaderEnhance,
-  MeterReaderSchemaEnhance,
-  PaginatedMeterReaderEnhance,
+  MeterReader,
+  MeterReaderSchema,
+  PaginatedMeterReader,
   PaginatedEmployeeDetails,
   AssignMeterReader,
+  MeterReaderDetails,
+  MeterReaderDetailsSchema,
 } from "@mr/server/types/meter-reader.type";
-import { eq, sql } from "drizzle-orm";
+import { eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { MySqlQueryResult } from "drizzle-orm/mysql2";
 import { HTTPException } from "hono/http-exception";
+import { Zonebook } from "@mr/lib/types/zonebook";
+import { ZoneBook, ZoneBookSchema } from "@mr/server/types/zone-book.type";
 
 export class MeterReaderRepository implements IMeterReaderRepository {
   async findEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]> {
@@ -35,6 +40,28 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     );
 
     return EmployeeDetailsSchema.parse(rawEmployees);
+  }
+
+  async findZoneBookByStatus(status: string): Promise<ZoneBook[]> {
+    if (status === "assigned") {
+      const stmt = await db.pgConn
+        .select()
+        .from(viewZoneBookAssignment)
+        .where(isNotNull(viewZoneBookAssignment.meterReaderId));
+      return ZoneBookSchema.array().parse(stmt);
+    }
+
+    if (status === "unassigned") {
+      const stmt = await db.pgConn
+        .select()
+        .from(viewZoneBookAssignment)
+        .where(isNull(viewZoneBookAssignment.meterReaderId));
+      return ZoneBookSchema.array().parse(stmt);
+    }
+
+    // default: all
+    const stmt = await db.pgConn.select().from(viewZoneBookAssignment);
+    return ZoneBookSchema.array().parse(stmt);
   }
 
   async findUnassignedMeterReaders(
@@ -69,7 +96,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     page: number,
     limit: number,
     query: string,
-  ): Promise<MeterReaderEnhance[] | PaginatedMeterReaderEnhance> {
+  ): Promise<MeterReader[] | PaginatedMeterReader> {
     const isPaginated = page !== 0 && limit !== 0;
 
     // Step 1: Query all meter readers that have zone book assignments
@@ -96,19 +123,42 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       }));
 
     // Step 5: Validate against schema
-    const parsed = MeterReaderSchemaEnhance.array().parse(enriched);
+    const parsed = MeterReaderSchema.array().parse(enriched);
 
     return isPaginated ? paginate(parsed, page, limit) : parsed;
   }
 
-  async findMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
+  async findMeterReaderDetailsById(meterReaderId: string): Promise<MeterReaderDetails> {
+    const stmt = db.pgConn
+      .select()
+      .from(meterReaders)
+      .where(eq(meterReaders.meterReaderId, meterReaderId))
+      .$dynamic()
+      .prepare("get_meter_reader_details_by_id");
+
+    const [meterReader] = await stmt.execute();
+
+    if (!meterReader) {
+      throw new HTTPException(404, { message: `meter reader with id ${meterReaderId} not found` });
+    }
+
+    // Step 3: Fetch employee details using employeeId
+    const employeeDetails = await this.findEmployeeDetailsById(meterReader.employeeId);
+
+    // Step 4: Merge and validate using Zod
+    const parsed = MeterReaderDetailsSchema.parse({ ...employeeDetails, ...meterReader });
+
+    return parsed;
+  }
+
+  async findMeterReaderWithZoneBookById(meterReaderId: string): Promise<MeterReader> {
     // Step 1: Query the view by meterReaderId
     const stmt = db.pgConn
       .select()
       .from(viewMeterReaderZoneBook)
       .where(eq(viewMeterReaderZoneBook.meterReaderId, meterReaderId))
       .$dynamic()
-      .prepare("get_meter_reader_zone_book_view_by_meter_id");
+      .prepare("get_meter_reader_with_zone_book_by_meter_id");
 
     const [meterReader] = await stmt.execute();
 
@@ -121,12 +171,12 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     const employeeDetails = await this.findEmployeeDetailsById(meterReader.employeeId);
 
     // Step 4: Merge and validate using Zod
-    const parsed = MeterReaderSchemaEnhance.parse({ ...employeeDetails, ...meterReader });
+    const parsed = MeterReaderSchema.parse({ ...employeeDetails, ...meterReader });
 
     return parsed;
   }
 
-  async assignMeterReader(data: AssignMeterReader): Promise<MeterReaderEnhance> {
+  async assignMeterReader(data: AssignMeterReader): Promise<MeterReader> {
     // Destructure zoneBooks from input, and keep the rest of the fields for insertion
     const { zoneBooks, ...meterReaderData } = data;
 
@@ -153,14 +203,14 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       return insertedMeterReader.meterReaderId;
     });
 
-    return await this.findMeterReaderById(result);
+    return await this.findMeterReaderWithZoneBookById(result);
   }
 
-  async updateMeterReaderById(meterReaderId: string, data: AssignMeterReader): Promise<MeterReaderEnhance> {
+  async updateMeterReaderById(meterReaderId: string, data: AssignMeterReader): Promise<MeterReader> {
     const { zoneBooks, ...rest } = data;
 
     // Step 1: Ensure the meter reader exists
-    await this.findMeterReaderById(meterReaderId);
+    await this.findMeterReaderWithZoneBookById(meterReaderId);
 
     // Step 2: Perform update and re-assignment in a transaction
     await db.pgConn.transaction(async (tx) => {
@@ -193,12 +243,12 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     });
 
     // Step 3: Return the updated and enriched meter reader
-    return await this.findMeterReaderById(meterReaderId);
+    return await this.findMeterReaderWithZoneBookById(meterReaderId);
   }
 
-  async removeMeterReaderById(meterReaderId: string): Promise<MeterReaderEnhance> {
+  async removeMeterReaderById(meterReaderId: string): Promise<MeterReader> {
     // Step 1: Check if meter reader exists
-    const findMeterReader = await this.findMeterReaderById(meterReaderId);
+    const findMeterReader = await this.findMeterReaderWithZoneBookById(meterReaderId);
 
     if (!findMeterReader) {
       throw new HTTPException(404, { message: `meter reader with id ${meterReaderId} not found.` });

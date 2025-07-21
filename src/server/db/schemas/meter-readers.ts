@@ -72,17 +72,15 @@ export const meterReaderZoneBookRelations = relations(meterReaderZoneBook, ({ on
   }),
 }));
 
-export const viewMeterReaderZoneBook = pgView("view_meter_reader_zone_book", {
+export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book", {
   meterReaderId: varchar("meter_reader_id").notNull(),
   employeeId: varchar("employee_id").notNull(),
-  mobileNumber: varchar("mobile_number").notNull(),
   restDay: varchar("rest_day").notNull(),
-  zoneBooks: jsonb("zoneBooks"),
+  zoneBooks: jsonb("zone_books"),
 }).as(sql`
   select 
     mr.meter_reader_id,
     mr.employee_id,
-    mr.mobile_number,
     mr.rest_day,
     coalesce(  
       jsonb_agg(
@@ -94,7 +92,7 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_zone_book", {
         )
       ) filter (where mrzb.zone is not null and mrzb.book is not  null),
       '[]'::jsonb
-    ) as "zoneBooks"
+    ) as zone_books
   from 
     meter_readers mr
   left join 
@@ -104,6 +102,31 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_zone_book", {
   group by 
     mr.meter_reader_id, 
     mr.employee_id, 
-    mr.mobile_number, 
     mr.rest_day
+  `);
+
+export const viewZoneBookAssignment = pgView("view_zone_book_assignment", {
+  meterReaderId: varchar("meter_reader_id"),
+  zoneBookId: varchar("zone_book_id"),
+  zone: varchar("zone"),
+  book: varchar("book"),
+  zoneBook: varchar("zone_book"),
+  areaId: varchar("area_id"),
+  area: varchar("area"),
+}).as(sql`
+    select
+      mrzb.meter_reader_id,
+      vzb.zone_book_id,
+      vzb.zone,
+      vzb.book,
+      vzb.zone_book,
+      vzb.area_id,
+      vzb.area
+    from view_zone_book_with_area vzb
+    left join (
+      select distinct zone, book, meter_reader_id
+      from meter_reader_zone_book
+    ) mrzb
+      on vzb.zone = mrzb.zone and vzb.book = mrzb.book
+    order by vzb.zone, vzb.book
   `);

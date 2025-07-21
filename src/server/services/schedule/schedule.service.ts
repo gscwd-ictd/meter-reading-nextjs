@@ -5,16 +5,17 @@ import {
   CreateSchedule,
   MeterReaderZoneBook,
   Schedule,
+  ScheduleReading,
 } from "@mr/server/types/schedule.type";
 
 export class ScheduleService implements IScheduleService {
   constructor(private readonly repository: IScheduleRepository) {}
 
-  async getScheduleByMonthYear(month: string, year: string): Promise<Schedule[]> {
+  async getScheduleByMonthYear(month: string, year: string): Promise<ScheduleReading[]> {
     return await this.repository.findScheduleByMonthYear(month, year);
   }
 
-  async getScheduleByExactDate(query: string): Promise<Schedule | object> {
+  async getScheduleByExactDate(query: string): Promise<ScheduleReading | object> {
     return await this.repository.findScheduleByExactDate(query);
   }
 

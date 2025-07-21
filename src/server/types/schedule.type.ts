@@ -14,6 +14,30 @@ export const ScheduleQuerySchema = z.object({
 
 export const DateValueSchema = z.union([z.string(), z.string().array()]);
 
+export const ScheduleReadingSchema = z.object({
+  readingDate: z.string(),
+  dueDate: DateValueSchema,
+  disconnectionDate: DateValueSchema,
+  meterReaders: z
+    .object({
+      scheduleMeterReaderId: z.string(),
+      meterReaderId: z.string(),
+      employeeId: z.string(),
+      companyId: z.string(),
+      name: z.string(),
+      positionTitle: z.string(),
+      assignment: z.string(),
+      photoUrl: z.string(),
+      zoneBooks: ZoneBookSchema.pick({
+        zone: true,
+        book: true,
+        zoneBook: true,
+        area: true,
+      }).array(),
+    })
+    .array(),
+});
+
 export const ScheduleSchema = z.object({
   readingDate: z.string(),
   dueDate: DateValueSchema,
@@ -22,10 +46,20 @@ export const ScheduleSchema = z.object({
     .object({
       scheduleMeterReaderId: z.string(),
       meterReaderId: z.string(),
-      zoneBooks: ZoneBookSchema.array().nullable(),
+      zoneBooks: ZoneBookSchema.pick({
+        zone: true,
+        book: true,
+        zoneBook: true,
+        area: true,
+      }).array(),
     })
     .array(),
 });
+
+export type ScheduleQuery = z.infer<typeof ScheduleQuerySchema>;
+export type ScheduleReading = z.infer<typeof ScheduleReadingSchema>;
+
+/*  */
 
 export const ScheduleZoneBookSchema = z.object({
   scheduleZoneBookId: z.string(),
@@ -62,7 +96,6 @@ export const CreateMeterReaderScheduleZoneBookSchema = z.object({
     .array(),
 });
 
-export type ScheduleQeury = z.infer<typeof ScheduleQuerySchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type ScheduleZoneBook = z.infer<typeof ScheduleZoneBookSchema>;
 
