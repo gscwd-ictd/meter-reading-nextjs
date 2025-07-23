@@ -19,7 +19,6 @@
 
 # migrations
 /src/server/db/migrations/meta/*.json
-
 /src/server/db/migrations/*.sql
 
 # production
