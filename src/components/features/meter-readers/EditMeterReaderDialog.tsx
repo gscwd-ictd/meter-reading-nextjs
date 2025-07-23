@@ -30,6 +30,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { Zonebook } from "@mr/lib/types/zonebook";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 const meterReaderSchema = z.object({
   employeeId: z.string(),
@@ -70,6 +71,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   const setMobileNumber = useMeterReadersStore((state) => state.setMobileNumber);
   const queryClient = useQueryClient();
   const [hasSetInitialZonebookPool, setHasSetInitialZonebookPool] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
@@ -78,14 +80,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   });
 
   const { handleSubmit, setValue, reset } = methods;
-
-  const resetToDefaults = () => {
-    reset();
-    setMobileNumber(undefined);
-    setSelectedMeterReader(undefined);
-    setSelectedRestDay(undefined);
-    setMeterReaderZonebooks([]);
-  };
 
   // transform the meterReader object
   const transformSelectedPersonnelToSubmit = async (
@@ -106,7 +100,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     mutationFn: async (meterReader: MeterReaderType) => {
       try {
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
-
+        console.log(transformedEmployee);
         return await axios.put(
           `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
           transformedEmployee,
@@ -116,9 +110,13 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
+    onMutate: () => {
+      setIsSubmitting(true);
+    },
     onSuccess: async () => {
       setEditMeterReaderDialogIsOpen(false);
       resetToDefaults();
+      setIsSubmitting(false);
 
       const fetchMeterReaders = await axios.get(
         `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`,
@@ -130,6 +128,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         description: "You have successfully updated this meter reader!",
         position: "top-right",
       });
+    },
+    onError: () => {
+      setIsSubmitting(false);
     },
   });
 
@@ -150,33 +151,51 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     enabled: !!editMeterReaderDialogIsOpen,
   });
 
-  //! get the filtered zonebooks
-  const { data: zoneBooks, isLoading: zonebookIsLoading } = useQuery({
-    queryKey: ["get-all-zoneBooks"],
+  // updated filtered zonebooks
+  const {
+    data: zoneBooks,
+    isLoading: zonebookIsLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["get-all-unassigned-zoneBooks"],
     queryFn: async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/zone-books?status=unassigned`,
+        );
         return res.data as Zonebook[];
       } catch (error) {
         console.log(error);
       }
     },
-    enabled: !hasSetInitialZonebookPool,
+    enabled: !hasSetInitialZonebookPool && editMeterReaderDialogIsOpen,
   });
+
+  const resetToDefaults = () => {
+    reset();
+    setMobileNumber(undefined);
+    setSelectedMeterReader(undefined);
+    setSelectedRestDay(undefined);
+    setMeterReaderZonebooks([]);
+    setHasSetInitialZonebookPool(false);
+    setFilteredZonebooks([]);
+    setTempFilteredZonebooks([]);
+    refetch();
+  };
 
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
       setSelectedMeterReader({
         ...meterReader,
-        mobileNumber: meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4),
+        mobileNumber: meterReader && meterReader.mobileNumber,
       });
 
-      setMobileNumber(meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
+      setMobileNumber(meterReader && meterReader.mobileNumber);
 
       setValue("employeeId", meterReader.employeeId);
 
-      setValue("mobileNumber", meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
+      setValue("mobileNumber", meterReader && meterReader.mobileNumber);
 
       setValue("restDay", meterReader.restDay);
 
@@ -201,12 +220,12 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   //! this will be the zonebooks unassigned pool
   useEffect(() => {
     if (zoneBooks && !hasSetInitialZonebookPool && meterReader) {
-      const filteredZonebooks = zoneBooks.filter(
-        (orig) => !meterReader.zoneBooks.some((current) => current.zoneBook === orig.zoneBook),
-      );
+      // const filteredZonebooks = zoneBooks.filter(
+      //   (orig) => !meterReader.zoneBooks.some((current) => current.zoneBook === orig.zoneBook),
+      // );
 
-      setFilteredZonebooks(filteredZonebooks); // this refers to the unassigned pool
-      setTempFilteredZonebooks(filteredZonebooks); // this refers to the copied unassigned pool
+      setFilteredZonebooks(zoneBooks); // this refers to the unassigned pool
+      setTempFilteredZonebooks(zoneBooks); // this refers to the copied unassigned pool
       setHasSetInitialZonebookPool(true);
     }
   }, [zoneBooks, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks, meterReader]);
@@ -268,7 +287,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             form="edit-meter-reader-form"
             className="dark:text-white"
           >
-            Update
+            Update {isSubmitting && <LoadingSpinner />}
           </Button>
         </DialogFooter>
       </DialogContent>

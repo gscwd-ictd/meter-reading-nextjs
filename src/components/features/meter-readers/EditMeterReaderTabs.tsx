@@ -45,6 +45,7 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
           <Input
             id="name"
             className="col-span-3"
+            disabled
             defaultValue={selectedMeterReader !== undefined ? selectedMeterReader.name : ""}
           />
         </div>

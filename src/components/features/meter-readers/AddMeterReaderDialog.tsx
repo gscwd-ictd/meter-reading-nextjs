@@ -238,7 +238,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
             disabled={!selectedEmployee ? true : isSubmitting ? true : false}
             type="submit"
             form="add-meter-reader-form"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 dark:text-white"
           >
             Add {isSubmitting && <LoadingSpinner />}
           </Button>

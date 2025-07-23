@@ -19,11 +19,7 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginCard: FunctionComponent = () => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
+  const { register, handleSubmit } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
