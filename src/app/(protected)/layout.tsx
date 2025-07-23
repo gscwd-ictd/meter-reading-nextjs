@@ -6,8 +6,8 @@ export default function ProtectedPageLayout({ children }: Readonly<PropsWithChil
   return (
     <SidebarProvider>
       <AppSidebar className="z-50" />
-      <SidebarInset className="h-screen">
-        <div className="h-full overflow-y-auto">{children}</div>
+      <SidebarInset className="flex flex-1 flex-col">
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

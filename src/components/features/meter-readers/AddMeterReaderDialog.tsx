@@ -42,8 +42,8 @@ type SubmitEmployeeType = {
 
 const meterReaderSchema = z.object({
   employeeId: z.string().optional(),
-  mobileNumber: z.string().regex(/^\d{9}$/, {
-    message: "Mobile number must be exactly 9 digits",
+  mobileNumber: z.string().regex(/^\d{11}$/, {
+    message: "Mobile number must be exactly 11 digits",
   }),
   zoneBooks: z.array(
     z.object({
@@ -78,7 +78,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
     reValidateMode: "onChange",
-    defaultValues: { employeeId: undefined, mobileNumber: "", restDay: undefined, zoneBooks: [] },
+    defaultValues: { employeeId: undefined, restDay: undefined, zoneBooks: [], mobileNumber: "" },
   });
 
   const { handleSubmit, reset } = methods;
@@ -89,15 +89,23 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     setSelectedEmployee(undefined);
     setSelectedRestDay(undefined);
     setMeterReaderZonebooks([]);
+    setHasSetInitialZonebookPool(false);
+    setFilteredZonebooks([]);
+    setTempFilteredZonebooks([]);
+    refetch();
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["get-all-unassigned-zoneBooks"],
     queryFn: async () => {
       try {
-        return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/zone-books?status=unassigned`,
+        );
+        return res.data;
+        // return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
-        toast.error("Error", { description: JSON.stringify(error) });
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
     enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
@@ -108,7 +116,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   ): Promise<SubmitEmployeeType> => {
     return {
       employeeId: employee.employeeId!,
-      mobileNumber: `+639${employee.mobileNumber}`,
+      mobileNumber: employee.mobileNumber,
       restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReaderZonebooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -149,7 +157,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     },
     onError: (error: unknown) => {
       setIsSubmitting(false);
-      toast.error("Error", { description: JSON.stringify(error) });
+      toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
     },
   });
 
@@ -162,11 +170,17 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
 
   useEffect(() => {
     if (data && !hasSetInitialZonebookPool) {
-      setFilteredZonebooks(data.data);
-      setTempFilteredZonebooks(data.data);
+      setFilteredZonebooks(data);
+      setTempFilteredZonebooks(data);
       setHasSetInitialZonebookPool(true);
     }
-  }, [data, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks]);
+  }, [
+    data,
+    hasSetInitialZonebookPool,
+    setFilteredZonebooks,
+    setTempFilteredZonebooks,
+    setHasSetInitialZonebookPool,
+  ]);
 
   return (
     <Dialog
@@ -194,7 +208,9 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
             <Users2Icon className="size-5" /> New Meter Reader
           </DialogTitle>
 
-          <DialogDescription className="text-gray-500">Add employee as a meter reader</DialogDescription>
+          <DialogDescription className="text-gray-500">
+            Assign meter reader role to an employee
+          </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(submitPersonnel)} id="add-meter-reader-form">

@@ -33,8 +33,8 @@ import { Zonebook } from "@mr/lib/types/zonebook";
 
 const meterReaderSchema = z.object({
   employeeId: z.string(),
-  mobileNumber: z.string().regex(/^\d{9}$/, {
-    message: "Mobile number must be exactly 9 digits",
+  mobileNumber: z.string().regex(/^\d{11}$/, {
+    message: "Mobile number must be exactly 11 digits",
   }),
   zoneBooks: z.array(
     z.object({
@@ -74,7 +74,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
     reValidateMode: "onChange",
-    defaultValues: { mobileNumber: "", restDay: undefined, zoneBooks: [] },
+    defaultValues: { restDay: undefined, zoneBooks: [], mobileNumber: "" },
   });
 
   const { handleSubmit, setValue, reset } = methods;
@@ -93,7 +93,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   ): Promise<SubmitMeterReaderType> => {
     return {
       employeeId: meterReader.employeeId,
-      mobileNumber: `+639${meterReader.mobileNumber}`,
+      mobileNumber: meterReader.mobileNumber,
       restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReader.zoneBooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -113,7 +113,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         );
       } catch (error) {
         console.log(error);
-        toast.error("Error", { description: JSON.stringify(error) });
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
     onSuccess: async () => {
@@ -138,7 +138,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   };
 
   // get meter reader by id
-  const { data: meterReader } = useQuery({
+  const { data: meterReader, isLoading: meterReaderIsLoading } = useQuery({
     queryKey: ["get-meter-reader-by-id", selectedMeterReader.meterReaderId],
     queryFn: async () => {
       const res = await axios.get(
@@ -151,7 +151,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   });
 
   //! get the filtered zonebooks
-  const { data: zoneBooks, isLoading } = useQuery({
+  const { data: zoneBooks, isLoading: zonebookIsLoading } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       try {
@@ -167,13 +167,16 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   // set the selected employee to undefined when the modal is closed
   useEffect(() => {
     if (editMeterReaderDialogIsOpen && meterReader) {
-      setSelectedMeterReader({ ...meterReader, mobileNumber: meterReader.mobileNumber.slice(4) });
+      setSelectedMeterReader({
+        ...meterReader,
+        mobileNumber: meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4),
+      });
 
-      setMobileNumber(meterReader.mobileNumber.slice(4));
+      setMobileNumber(meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
 
       setValue("employeeId", meterReader.employeeId);
 
-      setValue("mobileNumber", meterReader.mobileNumber.slice(4));
+      setValue("mobileNumber", meterReader && meterReader.mobileNumber && meterReader.mobileNumber.slice(4));
 
       setValue("restDay", meterReader.restDay);
 
@@ -238,7 +241,10 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         {selectedMeterReader && (
           <FormProvider {...methods}>
             <form id="edit-meter-reader-form" onSubmit={handleSubmit(submitMeterReader)}>
-              <EditMeterReaderTabs loading={isLoading} />
+              <EditMeterReaderTabs
+                meterReaderIsLoading={meterReaderIsLoading}
+                zonebookIsLoading={zonebookIsLoading}
+              />
             </form>
           </FormProvider>
         )}

@@ -8,12 +8,17 @@ import { useFormContext } from "react-hook-form";
 import { EditSelectRestDayCombobox } from "./EditSelectRestDayCombobox";
 import { ContactNumberInput } from "@mr/components/ui/input/ContactNumberInput";
 import EditZonebookSelector from "../zonebook/EditZonebookSelector";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type EditMeterReaderTabsProps = {
-  loading: boolean;
+  zonebookIsLoading: boolean;
+  meterReaderIsLoading: boolean;
 };
 
-export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = ({ loading }) => {
+export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = ({
+  zonebookIsLoading,
+  meterReaderIsLoading,
+}) => {
   const selectedMeterReader = useMeterReadersStore((state) => state.selectedMeterReader);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
@@ -27,6 +32,11 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
 
   return (
     <div>
+      {meterReaderIsLoading && (
+        <div className="flex w-full justify-center">
+          <LoadingSpinner />
+        </div>
+      )}
       <div className="grid gap-4 py-4">
         <div className="flex flex-col items-start gap-0">
           <Label htmlFor="name" className="text-left text-sm font-medium text-gray-700">
@@ -35,7 +45,6 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
           <Input
             id="name"
             className="col-span-3"
-            disabled
             defaultValue={selectedMeterReader !== undefined ? selectedMeterReader.name : ""}
           />
         </div>
@@ -57,9 +66,9 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
             <ContactNumberInput
               id="mobileNumber"
               label="Contact Number"
-              isRequired
-              minLength={9}
-              maxLength={9}
+              minLength={11}
+              maxLength={11}
+              disabled={meterReaderIsLoading ? true : false}
               controller={{
                 ...register("mobileNumber", {
                   value: mobileNumber,
@@ -86,11 +95,13 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
 
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col items-start gap-0">
-            <EditZonebookSelector loading={loading} />
+            <EditZonebookSelector loading={zonebookIsLoading} />
+
             <Input
               id="meterReaderZonebooks"
               className="w-full cursor-default truncate hover:cursor-pointer"
               readOnly
+              disabled={meterReaderIsLoading ? true : false}
               onClick={() => setZonebookSelectorIsOpen(true)}
               value={
                 meterReaderZonebooks !== undefined
