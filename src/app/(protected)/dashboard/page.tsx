@@ -1,3 +1,4 @@
+import { DashboardComponent } from "@mr/components/features/dashboard/DashboardComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,11 +6,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@mr/components/ui/Breadcrumb";
 
 export default function DashboardPage() {
   return (
-    <div className="h-full">
+    <div className="flex h-full flex-col p-5">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -21,6 +22,8 @@ export default function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      <DashboardComponent />
     </div>
   );
 }

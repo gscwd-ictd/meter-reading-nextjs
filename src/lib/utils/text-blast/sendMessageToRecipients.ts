@@ -1,4 +1,4 @@
-import { TextMessage } from "@/lib/types/text-blast/TextMessage";
+import { TextMessage } from "@mr/lib/types/text-blast/TextMessage";
 import { toast } from "sonner";
 
 export async function sendMessageToRecipients(

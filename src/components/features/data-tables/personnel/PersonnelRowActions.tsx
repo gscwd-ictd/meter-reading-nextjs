@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
+} from "@mr/components/ui/DropdownMenu";
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { FunctionComponent } from "react";
 

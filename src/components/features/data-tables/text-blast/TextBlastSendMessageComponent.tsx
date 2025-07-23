@@ -1,11 +1,11 @@
 "use client";
 
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
-import { Button } from "@/components/ui/Button";
-import { Textarea } from "@/components/ui/Textarea";
-import { TextMessage, TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
-import { createTextMessageTemplate } from "@/lib/utils/text-blast/createTextMessageTemplate";
-import { sendMessageToRecipients } from "@/lib/utils/text-blast/sendMessageToRecipients";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
+import { Button } from "@mr/components/ui/Button";
+import { Textarea } from "@mr/components/ui/Textarea";
+import { TextMessage, TextMessageStatus } from "@mr/lib/types/text-blast/TextMessage";
+import { createTextMessageTemplate } from "@mr/lib/utils/text-blast/createTextMessageTemplate";
+import { sendMessageToRecipients } from "@mr/lib/utils/text-blast/sendMessageToRecipients";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";

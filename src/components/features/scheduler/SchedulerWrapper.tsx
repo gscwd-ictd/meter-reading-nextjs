@@ -1,24 +1,26 @@
-/* This component is created due to SSR issues*/
 "use client";
 
-import dynamic from "next/dynamic";
-import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
-import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
+// import { ZonebookDialog } from "../data-tables/zone-book/ZonebookDialog";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
-
-const Scheduler = dynamic(() => import("@/components/features/scheduler/Scheduler"), { ssr: false });
+import { Suspense } from "react";
+import { Scheduler } from "./Scheduler";
 
 export default function SchedulerWrapper() {
+  //! fetch the holidays and pass it as a prop to the scheduler
   return (
     <div>
-      <div className="flex justify-end">
-        <ScheduleEntryDialog />
-        <ZonebookDialog />
-        <SubmitScheduleSuccessDialog />
-      </div>
-      <div className="m-5 border rounded">
+      <SubmitScheduleSuccessDialog />
+
+      <Suspense
+        fallback={
+          <div className="text-primary flex h-full w-full items-center justify-center gap-2">
+            <LoadingSpinner size={50} /> Loading Calendar...
+          </div>
+        }
+      >
         <Scheduler />
-      </div>
+      </Suspense>
     </div>
   );
 }

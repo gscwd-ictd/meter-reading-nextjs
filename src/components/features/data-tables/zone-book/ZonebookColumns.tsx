@@ -1,9 +1,10 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { Zonebook } from "@/lib/types/zonebook";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
+import { Zonebook } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { ZonebookRowActions } from "./ZonebookRowActions";
 
 export const useZonebookColumns = (data: Zonebook[] | undefined) => {
   const [areaColumns, setAreaColumns] = useState<ColumnDef<Zonebook>[]>([]);
@@ -16,10 +17,10 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
   useEffect(() => {
     const cols: ColumnDef<Zonebook>[] = [
       {
-        accessorKey: "zonebook",
+        accessorKey: "zoneBook",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Book" />,
         enableColumnFilter: false,
-        cell: ({ row }) => <span>{row.original.zonebook}</span>,
+        cell: ({ row }) => <span>{row.original.zoneBook}</span>,
       },
       {
         accessorKey: "zone",
@@ -45,23 +46,27 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
         accessorKey: "area",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Area" />,
         filterFn: filterFn,
-        cell: ({ row }) => <span>{row.original.area}</span>,
+        cell: ({ row }) => <span>{row.original.area ?? "-"}</span>,
         meta: {
           exportLabel: "Area",
         },
       },
-      // {
-      //   accessorKey: "totalConsumers",
-      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Total Consumers" />,
-      //   enableColumnFilter: false,
-      //   cell: ({ row }) => <span>{row.original.totalConsumers}</span>,
-      // },
-      // {
-      //   accessorKey: "active",
-      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Active" />,
-      //   enableColumnFilter: false,
-      //   cell: ({ row }) => <span>{row.original.active}</span>,
-      // },
+
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <ZonebookRowActions
+            zonebook={{
+              area: row.original.area,
+              book: row.original.book,
+              zone: row.original.zone,
+              zoneBook: row.original.zoneBook,
+              zoneBookId: row.original.zoneBookId,
+              areaId: row.original.areaId,
+            }}
+          />
+        ),
+      },
     ];
 
     setAreaColumns(cols);

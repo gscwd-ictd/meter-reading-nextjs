@@ -1,11 +1,11 @@
 import { FunctionComponent, useMemo } from "react";
-import { Button } from "@/components/ui/Button";
-import { MonthPicker } from "@/components/ui/MonthPicker";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
+import { Button } from "@mr/components/ui/Button";
+import { MonthPicker } from "@mr/components/ui/MonthPicker";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import { format, parse } from "date-fns";
-import { Form, FormField, FormItem, FormControl, FormLabel } from "@/components/ui/Form";
+import { Form, FormField, FormItem, FormControl, FormLabel } from "@mr/components/ui/Form";
 import * as z from "zod";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,12 +16,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+} from "@mr/components/ui/Command";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Account, AccountWithDates, Zonebook } from "@/lib/types/text-blast/ReadingDetails";
+import { Account, AccountWithDates, Zonebook } from "@mr/lib/types/text-blast/ReadingDetails";
 
 const FormSchema = z.object({
   zone: z.string().nonempty({ message: "This field is required" }),

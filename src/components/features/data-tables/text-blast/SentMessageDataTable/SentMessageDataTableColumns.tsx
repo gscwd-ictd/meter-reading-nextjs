@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { TextMessage as SentMessageColumn } from "@/lib/types/text-blast/TextMessage";
+import { TextMessage as SentMessageColumn } from "@mr/lib/types/text-blast/TextMessage";
 
 export const useSentMessageColumns = () => {
   const columns = useMemo(

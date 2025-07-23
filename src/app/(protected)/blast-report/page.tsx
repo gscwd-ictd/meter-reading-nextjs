@@ -1,4 +1,4 @@
-import { TextBlastReportTableComponent } from "@/components/features/data-tables/text-blast/TextBlastReportDataTable/TextBlastReportTableComponent";
+import { TextBlastReportTableComponent } from "@mr/components/features/data-tables/text-blast/TextBlastReportDataTable/TextBlastReportTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,7 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@mr/components/ui/Breadcrumb";
 import React from "react";
 
 export default function TextBlastReportPage() {

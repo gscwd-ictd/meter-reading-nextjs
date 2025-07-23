@@ -1,5 +1,5 @@
-// import { Scheduler } from "@/components/features/scheduler/Scheduler";
-import SchedulerWrapper from "@/components/features/scheduler/SchedulerWrapper";
+// import { Scheduler } from "@mr/components/features/scheduler/Scheduler";
+import SchedulerWrapper from "@mr/components/features/scheduler/SchedulerWrapper";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,11 +7,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@mr/components/ui/Breadcrumb";
 
 export default function SchedulePage() {
   return (
-    <div className="h-full grid grid-rows-[auto_1fr] pt-5">
+    <div className="grid h-full grid-rows-[auto_1fr] pt-5">
       <div className="px-5 pb-5">
         <Breadcrumb>
           <BreadcrumbList>

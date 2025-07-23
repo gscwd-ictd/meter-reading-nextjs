@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
+import { cn } from "@mr/lib/utils";
+import { Button } from "@mr/components/ui/Button";
 import {
   Command,
   CommandEmpty,
@@ -12,9 +12,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { Label } from "@/components/ui/Label";
+} from "@mr/components/ui/Command";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { Label } from "@mr/components/ui/Label";
 
 type LabelValue = {
   label: string;

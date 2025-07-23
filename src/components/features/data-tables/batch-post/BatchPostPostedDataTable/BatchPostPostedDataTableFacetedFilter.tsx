@@ -1,12 +1,12 @@
 import * as React from "react";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { Column } from "@tanstack/react-table";
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import { useMemo } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { Button } from "@/components/ui/Button";
-import { Separator } from "@/components/ui/Separator";
-import { Badge } from "@/components/ui/Badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { Button } from "@mr/components/ui/Button";
+import { Separator } from "@mr/components/ui/Separator";
+import { Badge } from "@mr/components/ui/Badge";
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/Command";
+} from "@mr/components/ui/Command";
 
 interface BatchPostListDataTableFacetedFilterProps<TData, TValue> {
   column: Column<TData, TValue>;

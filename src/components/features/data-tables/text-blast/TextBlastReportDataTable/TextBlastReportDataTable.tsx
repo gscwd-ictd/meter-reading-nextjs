@@ -11,11 +11,11 @@ import {
   getSortedRowModel,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { Heading } from "@/components/features/typography/Heading";
-import { Badge } from "@/components/ui/Badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+import { Heading } from "@mr/components/features/typography/Heading";
+import { Badge } from "@mr/components/ui/Badge";
 import { createContext, useEffect, useState } from "react";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@mr/components/ui/Input";
 import { FileX2, SearchIcon } from "lucide-react";
 import { TextBlastReportDataTableToolbar } from "./TextBlastReportDataTableToolbar";
 

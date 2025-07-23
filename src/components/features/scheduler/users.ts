@@ -1,4 +1,4 @@
-import { AvatarUser } from "@/components/ui/StackedAvatars";
+import { AvatarUser } from "@mr/components/ui/StackedAvatars";
 
 export const users: AvatarUser[] = [
   {

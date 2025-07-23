@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import { HomeIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +23,9 @@ export default function NotFoundPage() {
                 <h1 className="text-2xl font-bold">Page Not Found</h1>
               </div>
             </div>
-            <p className="text-xl font-semibold">It looks like we don&apos;t have water connection here yet.</p>
+            <p className="text-xl font-semibold">
+              It looks like we don&apos;t have water connection here yet.
+            </p>
             <Link href={"/dashboard"}>
               <Button className="mt-4">
                 <HomeIcon />

@@ -3,10 +3,10 @@
 import { FunctionComponent, Suspense, useCallback, useState } from "react";
 import { BatchPostPostedDataTable } from "./BatchPostPostedDataTable";
 import { useBatchPostPostedColumns } from "./BatchPostPostedDataTableColumns";
-import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
-import { Dialog } from "@/components/ui/Dialog";
-import ViewMeterReadingDetails from "@/components/features/batch-post/ViewMeterReadingDetails";
-import { ReadingDetails } from "@/lib/types/text-blast/ReadingDetails";
+import { useBatchPostStore } from "@mr/components/stores/useBatchPostStore";
+import { Dialog } from "@mr/components/ui/Dialog";
+import ViewMeterReadingDetails from "@mr/components/features/batch-post/ViewMeterReadingDetails";
+import { ReadingDetails } from "@mr/lib/types/text-blast/ReadingDetails";
 
 export const BatchPostPostedTableComponent: FunctionComponent = () => {
   const postedReadConsumers = useBatchPostStore((state) => state.postedReadConsumers);

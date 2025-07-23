@@ -2,8 +2,8 @@
 
 import { FunctionComponent, Suspense } from "react";
 import { usePersonnelColumns } from "./PersonnelColumns";
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
-import { DataTable } from "@/components/ui/data-table/data-table";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
+import { DataTable } from "@mr/components/ui/data-table/data-table";
 
 export const PersonnelDataTable: FunctionComponent = () => {
   const meterReaders = usePersonnelStore((state) => state.meterReaders);

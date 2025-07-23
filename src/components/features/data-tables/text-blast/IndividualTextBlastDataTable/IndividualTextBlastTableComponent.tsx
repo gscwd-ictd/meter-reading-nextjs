@@ -3,12 +3,12 @@ import { useIndividualTextBlastColumns } from "./IndividualTextBlastDataTableCol
 import { IndividualTextBlastDataTable } from "./IndividualTextBlastDataTable";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { ReadingDetails, Zonebook } from "@/lib/types/text-blast/ReadingDetails";
+import { Account } from "@mr/lib/types/text-blast/ReadingDetails";
 
 export const IndividualTextBlastTableComponent: FunctionComponent = () => {
   const individualTextBlastColumns = useIndividualTextBlastColumns();
 
-  const { data } = useQuery<Zonebook>({
+  const { data } = useQuery<Account>({
     queryKey: ["get-all-read-accounts-by-current-date"],
     queryFn: async () => {
       const response = await axios.get(

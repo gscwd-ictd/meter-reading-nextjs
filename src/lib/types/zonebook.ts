@@ -1,8 +1,18 @@
 export type Zonebook = {
-  zonebook: string;
-  zone: number;
-  book: number;
+  zoneBook: string;
+  zone: string;
+  book: string;
   area: string;
-  // totalConsumers?: number;
-  // active?: number;
+  areaId?: string;
+  zoneBookId?: string;
+};
+
+export type ZonebookWithDates = Zonebook & {
+  dueDate: Date | undefined;
+  disconnectionDate: Date | undefined;
+};
+
+export type Area = {
+  areaId?: string;
+  area: string;
 };

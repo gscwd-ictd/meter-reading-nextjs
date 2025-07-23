@@ -5,7 +5,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@mr/components/ui/Breadcrumb";
 
 export default function SettingsPage() {
   return (

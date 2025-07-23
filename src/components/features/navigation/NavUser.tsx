@@ -1,8 +1,8 @@
 "use client";
 
 import { type FunctionComponent } from "react";
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/Sidebar";
+} from "@mr/components/ui/DropdownMenu";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@mr/components/ui/Sidebar";
 import { NavItemUser } from "./items";
+import { ThemeSwitcher } from "../tabs/ThemeSwitcher";
 
 type NavUserProps = {
   user: NavItemUser;
@@ -44,7 +46,7 @@ export const NavUser: FunctionComponent<NavUserProps> = ({ user }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? "bottom" : "top"}
             align="end"
             sideOffset={4}
           >
@@ -63,30 +65,26 @@ export const NavUser: FunctionComponent<NavUserProps> = ({ user }) => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+                Profile
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
+
               <DropdownMenuItem>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut />
               Log out
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <div className="flex items-center justify-between gap-2 px-2">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-400">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

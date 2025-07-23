@@ -1,7 +1,7 @@
-import { MeterReader } from "@/lib/types/personnel";
+import { MeterReader } from "@mr/lib/types/personnel";
 import { useCallback } from "react";
 import { getDay, isValid } from "date-fns";
-import { MeterReadingSchedule } from "@/lib/types/schedule";
+import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 
 export type ScheduleMeterReaders = ReturnType<typeof useScheduleMeterReaders>;
 

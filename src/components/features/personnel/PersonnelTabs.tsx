@@ -1,8 +1,8 @@
 "use client";
-import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/Input";
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@mr/components/ui/Label";
+import { Input } from "@mr/components/ui/Input";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
+import { Tabs, TabsContent } from "@mr/components/ui/tabs";
 import { SelectRestDayCombobox } from "./SelectRestDayCombobox";
 
 export const PersonnelTabs = () => {

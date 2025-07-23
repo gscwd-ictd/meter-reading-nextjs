@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
-import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+} from "@mr/components/ui/DropdownMenu";
+import { Button } from "@mr/components/ui/Button";
+import { cn } from "@mr/lib/utils";
 
 type DataTableColumnHeaderProps<T, K> = HTMLAttributes<HTMLDivElement> & {
   column: Column<T, K>;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useSchedulesStore } from "@/components/stores/useSchedulesStore";
-import { useZonebookStore } from "@/components/stores/useZonebookStore";
-import { Button } from "@/components/ui/Button";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
+import { Button } from "@mr/components/ui/Button";
 import {
   Command,
   CommandEmpty,
@@ -10,9 +10,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { Zonebook } from "@/lib/types/zonebook";
+} from "@mr/components/ui/Command";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { Zonebook } from "@mr/lib/types/zonebook";
 import { FunctionComponent, useEffect, useState } from "react";
 
 export const ZonebookCombobox: FunctionComponent = () => {
@@ -23,42 +23,42 @@ export const ZonebookCombobox: FunctionComponent = () => {
   const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const zonebookDialogIsOpen = useSchedulesStore((state) => state.zonebookDialogIsOpen);
-  const zonebooks = useZonebookStore((state) => state.zonebooks);
+  const zoneBooks = useZonebookStore((state) => state.zoneBooks);
 
   useEffect(() => {
     if (zonebookDialogIsOpen && zonebooksPool.length === 0) {
-      setZonebooksPool(zonebooks);
+      setZonebooksPool(zoneBooks);
     }
-  }, [zonebookDialogIsOpen, zonebooksPool, zonebooks]);
+  }, [zonebookDialogIsOpen, zonebooksPool, zoneBooks]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="justify-between flex">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="flex justify-between">
           {selectedZonebook && selectedZonebook !== null
-            ? zonebooks.find((zb) => zb.zonebook === selectedZonebook.zonebook)?.zonebook
-            : "Search zonebook"}
+            ? zoneBooks.find((zb) => zb.zoneBook === selectedZonebook.zoneBook)?.zoneBook
+            : "Search zoneBook"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px]" onWheel={(e) => e.stopPropagation()}>
         <Command>
-          <CommandInput placeholder="Search for a zonebook..." />
+          <CommandInput placeholder="Search for a zoneBook..." />
           <CommandList>
-            <CommandEmpty>No zonebooks found.</CommandEmpty>
+            <CommandEmpty>No zoneBooks found.</CommandEmpty>
             <CommandGroup>
               {zonebooksPool &&
                 zonebooksPool.map((zb) => (
                   <CommandItem
-                    key={zb.zonebook}
-                    value={zb.zonebook}
+                    key={zb.zoneBook}
+                    value={zb.zoneBook}
                     onSelect={(currentValue) => {
                       setSearchZonebook(currentValue === searchZonebook ? "" : currentValue);
-                      setSelectedZonebook(zb);
+                      setSelectedZonebook({ ...zb, dueDate: undefined!, disconnectionDate: undefined! });
                       setOpen(false);
                     }}
                   >
                     <div className="grid grid-cols-2">
-                      <span>{zb.zonebook}</span>
+                      <span>{zb.zoneBook}</span>
                       <span>{zb.area}</span>
                     </div>
                   </CommandItem>

@@ -1,5 +1,5 @@
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
-import { Button } from "@/components/ui/Button";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
+import { Button } from "@mr/components/ui/Button";
 import {
   Command,
   CommandEmpty,
@@ -7,12 +7,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/Form";
-import { Input } from "@/components/ui/Input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { TextBlastSentMessageStatus } from "@/lib/mock/SampleTextBlastReportData";
-import { cn } from "@/lib/utils";
+} from "@mr/components/ui/Command";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mr/components/ui/Form";
+import { Input } from "@mr/components/ui/Input";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { TextBlastSentMessageStatus } from "@mr/lib/mock/SampleTextBlastReportData";
+import { cn } from "@mr/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -70,7 +70,7 @@ export const GenerateTextBlastReportForm: FunctionComponent = () => {
         description: `Found data from ${data.dateFrom} to ${data.dateTo}`,
       });
     }
-    
+
     form.reset({
       dateFrom: "",
       dateTo: "",

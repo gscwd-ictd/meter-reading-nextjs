@@ -1,7 +1,7 @@
 import { FunctionComponent, Suspense } from "react";
 import { useAreaTextBlastColumns } from "./AreaTextBlastDataTableColumns";
 import { AreaTextBlastDataTable } from "./AreaTextBlastDataTable";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 
 export const AreaTextBlastTableComponent: FunctionComponent = () => {
   const areaTextBlastColumns = useAreaTextBlastColumns();

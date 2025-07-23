@@ -3,8 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
-import { AccountWithDates as AreaTextBlastColumn } from "@/lib/types/text-blast/ReadingDetails";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
+import { AccountWithDates as AreaTextBlastColumn } from "@mr/lib/types/text-blast/ReadingDetails";
 
 export const useAreaTextBlastColumns = () => {
   const columns = useMemo(

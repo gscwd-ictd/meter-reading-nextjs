@@ -1,11 +1,11 @@
 "use client";
 
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { ReadingDetails as IndividualTextBlastColumn } from "@/lib/types/text-blast/ReadingDetails";
-import { Checkbox } from "@/components/ui/Checkbox";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+import { ReadingDetails as IndividualTextBlastColumn } from "@mr/lib/types/text-blast/ReadingDetails";
+import { Checkbox } from "@mr/components/ui/Checkbox";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 import { format } from "date-fns";
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { useMemo } from "react";
 
 export const useIndividualTextBlastColumns = () => {

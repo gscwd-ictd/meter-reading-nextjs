@@ -1,84 +1,191 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
 import { holidays } from "./holidays";
-import {
-  compareAsc,
-  endOfMonth,
-  format,
-  formatDate,
-  getDate,
-  isSameMonth,
-  isSaturday,
-  isSunday,
-  startOfMonth,
-} from "date-fns";
-import { Button } from "@/components/ui/Button";
-import {
-  CalendarPlus,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  EllipsisIcon,
-  LogsIcon,
-  SeparatorVerticalIcon,
-  UsersRoundIcon,
-} from "lucide-react";
-import { ButtonGroup } from "@/components/ui/ButtonGroup";
-import { StackedAvatars } from "@/components/ui/StackedAvatars";
-import { Badge } from "@/components/ui/Badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
-import { toast } from "sonner";
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
-import { useSchedulesStore } from "@/components/stores/useSchedulesStore";
-import { useScheduleMeterReaders } from "./useScheduleMeterReaders";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { Button } from "@mr/components/ui/Button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
-import {
-  ContextMenu,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@/components/ui/ContextMenu";
-import { ContextMenuContent } from "@radix-ui/react-context-menu";
+import { ScheduleEntryContextMenu } from "./ScheduleEntryContextMenu";
+import { useSearchParams } from "next/navigation";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
+import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
+import { motion } from "framer-motion";
+import { Skeleton } from "@mr/components/ui/Skeleton";
+import { MonthYearPicker } from "../calendar/MonthYearPicker";
+import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
+import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 
-export default function Scheduler() {
-  const [datesToSplit, setDatesToSplit] = useState<Date[]>([]);
-  const schedule = useSchedulesStore((state) => state.schedule);
-  const setSchedule = useSchedulesStore((state) => state.setSchedule);
+export const Scheduler: FunctionComponent = () => {
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const searchParams = useSearchParams();
+  const monthYear = searchParams.get("date");
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
+
+  //!!!!! remove
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
-  const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
-  const setScheduleEntryDialogIsOpen = useSchedulesStore((state) => state.setScheduleEntryDialogIsOpen);
+  const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
+  const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
+  const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
+  const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
+  const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
+  const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
+  const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
+  const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
+  const scheduler = useScheduler(holidays);
+  const [activeContext, setActiveContext] = useState<number | null>(null);
 
-  const meterReaders = usePersonnelStore((state) => state.meterReaders);
-  const scheduleMeterReaders = useScheduleMeterReaders(schedule, meterReaders);
+  // these are derived states
+  const hasFetched = lastFetchedMonthYear === currentMonthYear;
 
-  // console.log(schedule);
+  scheduler.addSundayReadings(currentSchedule);
 
-  const scheduler = useScheduler(holidays, []);
+  const {
+    data: schedule,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["get-schedule", currentMonthYear],
+    enabled: calendarIsSet && !hasFetched && currentSchedule.length > 0 && currentMonthYear !== null,
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${currentMonthYear}`);
+        return res.data as MeterReadingEntryWithZonebooks[];
+      } catch (error) {
+        console.log(error);
+        toast.error("Error", {
+          description: "Cannot find schedule.",
+          position: "top-right",
+        });
+      }
+    },
+    retry: false,
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
-  // add sunday readings
-  scheduler.addSundayReadings(schedule!);
+  // these are derived loading states, it should be below the useQuery since loading is derived
+  const isInitializingCalendar = !calendarIsSet && currentSchedule.length === 0;
+  const isFetchingSchedule = calendarIsSet && currentSchedule.length > 0 && isLoading;
+  const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading;
 
-  // scheduleMeterReaders.assignReadersToSchedules();
-
-  // console.log(sundayReadings);
-
+  // this ensures that monthYear does not go null
   useEffect(() => {
-    if (!calendarIsSet) {
-      setSchedule(scheduler.calculateSchedule());
+    if (monthYear) setCurrentMonthYear(monthYear);
+  }, [monthYear]);
+
+  // this should populate the calendar first #1
+  useEffect(() => {
+    if (!calendarIsSet && currentMonthYear) {
+      const initialDates = scheduler.splitDates(datesToSplit);
+      setCurrentSchedule(
+        initialDates.map((sched) => {
+          return { ...sched, meterReaders: [] };
+        }),
+      );
       setCalendarIsSet(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheduler.currentDate, calendarIsSet]);
+  }, [calendarIsSet, currentMonthYear, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
+
+  // run this state setter if the there is a fetched schedule for the month
+  const hasScheduleOption = () => {
+    // this should be true since this function is executed
+    setHasSchedule(true);
+
+    // this would turn true since you cannot submit without submitting
+    setScheduleHasSplittedDates(true);
+
+    // this should turn true since populating of meter readers is only allowed when the schedule is empty for the month
+    setHasPopulatedMeterReaders(true);
+  };
+
+  // run this state setter if there is no fetched schedule for the month
+  const hasNoScheduleOption = () => {
+    // this should be false since this function is executed
+    setHasSchedule(false);
+
+    // this would turn false since schedule has not yet been submitted
+    setScheduleHasSplittedDates(false);
+
+    // this should turn false since schedule has not yet been submitted
+    setHasPopulatedMeterReaders(false);
+  };
+
+  // this is the reset state button when from one month to another
+  const resetOnChange = () => {
+    // set the calendar populate state to false
+    setCalendarIsSet(false);
+
+    // set dates to split to empty
+    setDatesToSplit([]);
+
+    // reset the populate meter readers observer
+    setHasPopulatedMeterReaders(false);
+
+    // reset the splittedDates observer
+    setScheduleHasSplittedDates(false);
+
+    // reset the observer
+    setHasSchedule(false);
+
+    setCurrentSchedule([]);
+
+    setLastFetchedMonthYear(null);
+  };
+
+  // update the state of currentSchedule based on the fetched schedule
+  useEffect(() => {
+    if (!calendarIsSet || hasFetched || !currentMonthYear || isFetching || isLoading) return;
+
+    if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && currentMonthYear) {
+      setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
+      hasScheduleOption();
+      setRefetchData(() => refetch);
+      setLastFetchedMonthYear(currentMonthYear);
+    } else if (
+      calendarIsSet &&
+      !isLoading &&
+      schedule &&
+      schedule.length === 0 &&
+      !isFetching &&
+      currentMonthYear
+    ) {
+      hasNoScheduleOption();
+      setLastFetchedMonthYear(currentMonthYear);
+      setRefetchData(refetch);
+    }
+  }, [
+    schedule,
+    isLoading,
+    isFetching,
+    currentMonthYear,
+    scheduler,
+    hasFetched,
+    calendarIsSet,
+    currentSchedule,
+    refetch,
+    setRefetchData,
+    setCurrentSchedule,
+    hasNoScheduleOption,
+    setLastFetchedMonthYear,
+    hasScheduleOption,
+  ]);
+
+  // this sets the global state of the current month's fetch
+  useEffect(() => {
+    setHasFetchedThisMonthsSchedule(hasFetched);
+  }, [setHasFetchedThisMonthsSchedule, hasFetched]);
 
   // Calculate number of rows needed for the calendar
   const numberOfWeeks = Math.ceil(scheduler.calculateSchedule().length / 7);
@@ -90,280 +197,157 @@ export default function Scheduler() {
     gridTemplateRows: `repeat(${numberOfWeeks}, minmax(0, 1fr))`,
   };
 
-  // useEffect(() => {
-  //   const newDates = scheduler.splitDates(datesToSplit);
-  //   // setSchedule(newDates);
-  //   console.log(newDates);
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [datesToSplit, schedule]);
-
   return (
-    <div className="flex h-full flex-col ">
-      <header className="flex items-center justify-between p-4">
-        <section className="flex items-center gap-4">
-          <div className="flex size-14 flex-col overflow-clip rounded-lg border">
-            <div className="bg-secondary text-secondary-foreground/70 flex flex-1 items-center justify-center border-b text-xs font-semibold tracking-wider uppercase">
-              {format(new Date(), "MMM")}
-            </div>
-
-            <div className="flex flex-1 items-center justify-center text-lg font-bold">
-              {format(new Date(), "dd")}
-            </div>
-          </div>
-
-          <div>
-            <h1 className="text-lg font-bold">{format(scheduler.currentDate, "MMMM yyyy")}</h1>
-
-            <section className="text-muted-foreground flex items-center gap-1 text-sm">
-              <p>{format(startOfMonth(scheduler.currentDate), "MMM dd, yyyy")}</p>
-              <p>{`-`}</p>
-              <p>{format(endOfMonth(scheduler.currentDate), "MMM dd, yyyy")}</p>
-            </section>
-          </div>
-        </section>
-
-        <ButtonGroup>
-          <Button
-            variant="outline"
-            onClick={() => {
-              scheduler.goToPreviousMonth();
-              setDatesToSplit([]);
-              setCalendarIsSet(false);
-            }}
-          >
-            <ChevronLeft />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              scheduler.today();
-              setDatesToSplit([]);
-              setCalendarIsSet(false);
-            }}
-          >
-            Today
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              scheduler.goToNextMonth();
-              setDatesToSplit([]);
-              setCalendarIsSet(false);
-            }}
-          >
-            <ChevronRight />
-          </Button>
-        </ButtonGroup>
-
-        <section className="flex items-center gap-0">
+    <>
+      <div className="bg-background mx-3 flex h-full flex-col overflow-hidden">
+        <header className="flex items-center justify-between px-2">
           <section className="flex items-center gap-4">
-            <div className="space-x-2">
+            <div className="flex size-14 flex-col overflow-clip rounded-lg border">
+              <div className="bg-secondary text-secondary-foreground/70 flex flex-1 items-center justify-center border-b text-xs font-semibold tracking-wider uppercase">
+                {format(new Date(), "MMM")}
+              </div>
+
+              <div className="flex flex-1 items-center justify-center text-lg font-bold">
+                {format(new Date(), "dd")}
+              </div>
+            </div>
+
+            <div>
+              <h1 className="text-lg font-bold">{format(scheduler.currentDate, "yyyy MMMM")}</h1>
+
+              <section className="text-muted-foreground flex items-center gap-1 text-sm">
+                <p>{format(startOfMonth(scheduler.currentDate), "MMM dd, yyyy")}</p>
+                <p>{`-`}</p>
+                <p>{format(endOfMonth(scheduler.currentDate), "MMM dd, yyyy")}</p>
+              </section>
+            </div>
+          </section>
+
+          <section className="hidden sm:hidden md:block lg:block">
+            <ButtonGroup>
               <Button
                 variant="outline"
                 onClick={() => {
-                  console.log(schedule);
+                  resetOnChange();
+                  scheduler.goToPreviousMonth();
                 }}
               >
-                <LogsIcon />
-                Log Current Schedule
+                <ChevronLeft />
               </Button>
-              {/* <Button
-                variant="default"
-                onClick={() => {
-                  // console.log(scheduleMeterReaders.allReadingDates());
-                  console.log(schedule);
-                }}
-              >
-                <LockIcon />
-                Lock Calendar
-              </Button> */}
               <Button
-                disabled={meterReaders.length < 1 ? true : false}
+                variant="outline"
                 onClick={() => {
-                  setSchedule(scheduleMeterReaders.assignReadersToSchedules());
+                  resetOnChange();
+                  scheduler.today();
                 }}
               >
-                <CalendarPlus />
-                Populate schedule
+                Today
               </Button>
-              <CalendarSettingDropdown scheduler={scheduler} />
-            </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetOnChange();
+                  scheduler.goToNextMonth();
+                }}
+              >
+                <ChevronRight />
+              </Button>
+            </ButtonGroup>
           </section>
-        </section>
-      </header>
 
-      <main className="flex flex-1 flex-col overflow-hidden h-full">
-        <section className="grid grid-cols-7 border-y">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
-            <div
-              key={index}
-              className="border-l py-2 text-center text-xs font-semibold uppercase first:border-l-0"
-            >
-              {day}
+          <section className="flex items-center gap-4">
+            <MonthYearPicker
+              currentMonthYear={currentMonthYear}
+              setCurrentMonthYear={setCurrentMonthYear}
+              resetOnChange={resetOnChange}
+              scheduler={scheduler}
+            />
+
+            <CalendarSettingDropdown scheduler={scheduler} />
+          </section>
+        </header>
+        <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
+          {isInitializingCalendar ? (
+            <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-xl">
+              <LoadingSpinner className="size-12" /> Loading Calendar...
             </div>
-          ))}
-        </section>
+          ) : (
+            <>
+              {/* Calendar Header Section */}
+              <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase dark:text-white">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+                  <div key={index} className="border-none py-2 text-center">
+                    {day}
+                  </div>
+                ))}
+              </section>
 
-        <section className="flex-1" style={gridStyle}>
-          {schedule &&
-            schedule.map((entry, idx) => {
-              const isWithinMonth = isSameMonth(entry.readingDate, startOfMonth(scheduler.currentDate));
-              const dateIsSunday = isSunday(entry.readingDate);
-              const dateIsSaturday = isSaturday(entry.readingDate);
-              const hasSchedule = entry.meterReaders?.find(
-                (mr) => Array.isArray(mr.zonebooks) && mr.zonebooks.length > 0
-              );
+              {/* Calendar Body Section */}
+              <section className="relative flex-1 overflow-hidden border-t" style={gridStyle}>
+                {/* Overlay loading indicator while fetching schedules */}
+                {isFetchingSchedule && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-slate-900/70">
+                    <div className="text-primary flex items-center gap-2 text-xl">
+                      <LoadingSpinner className="size-10 animate-spin" /> Getting Schedules...
+                    </div>
+                  </div>
+                )}
 
-              return (
-                <ContextMenu key={idx}>
-                  <ContextMenuTrigger asChild>
-                    <button
-                      onClick={() => {
-                        setScheduleEntryDialogIsOpen(true);
-                        setSelectedScheduleEntry(entry);
-                      }}
-                      className="grid grid-rows-5 gap-0 hover:cursor-pointer relative group overflow-hidden border-t border-l p-0 text-sm [&:nth-child(-n+7)]:border-t-0 [&:nth-child(7n+1)]:border-l-0 h-full hover:brightness-90"
-                    >
-                      {/* Date Number */}
+                {/* Skeleton grid cells during fetch */}
+                {isFetchingSchedule && !isReady && (
+                  <div className="absolute inset-0 z-10 grid grid-cols-7 gap-px p-1">
+                    {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
                       <div
-                        className={`flex justify-center items-center font-bold ${
-                          isWithinMonth ? "" : "text-gray-300"
-                        } items-center text-center group-hover:text-primary`}
+                        key={idx}
+                        className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
                       >
-                        {formatDate(entry.readingDate, "dd")}
-                      </div>
-
-                      {/* Meter Readers */}
-                      <div className="col-span-1 flex justify-center">
-                        {entry.meterReaders && entry.meterReaders.length > 0 && (
-                          <StackedAvatars
-                            users={entry.meterReaders
-                              .map((meterReader) => ({
-                                id: meterReader.companyId,
-                                image: `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${meterReader.photoUrl}`,
-                                name: meterReader.name,
-                              }))
-                              .sort((a, b) => (a.name > b.name ? 1 : -1))}
-                          />
-                        )}
-                      </div>
-
-                      <div className="absolute top-0 right-1">
-                        {hasSchedule && (
-                          <div className="flex justify-center items-center">
-                            <CheckCircle2 className="fill-green-500 text-white" />
-                            {/* <span className="text-sm text-green-600">Assigned</span> */}
+                        <div className="flex justify-end">
+                          <Skeleton className="size-6 rounded-full p-2" />
+                        </div>
+                        <div className="flex w-full justify-center">
+                          <div className="flex w-1/3 justify-center">
+                            <Skeleton className="size-6 rounded-full" />
+                            <Skeleton className="-ml-2 size-6 rounded-full" />
+                            <Skeleton className="-ml-2 size-6 rounded-full" />
                           </div>
-                        )}
+                        </div>
+                        <Skeleton className="w-full" />
+                        <Skeleton className="w-full" />
+                        <div></div>
                       </div>
+                    ))}
+                  </div>
+                )}
 
-                      {/* Due Date */}
-                      {Array.isArray(entry.dueDate) ? (
-                        <div className=" flex justify-center items-center">
-                          <Badge className="rounded-none bg-blue-200 w-full gap-0">
-                            <span className="text-blue-600">
-                              {entry.dueDate.sort(compareAsc).map((day, idx) => (
-                                <span className="font-bold" key={idx}>
-                                  {idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "dd")}
-                                </span>
-                              ))}
-                            </span>
-                          </Badge>
-                        </div>
-                      ) : entry.dueDate ? (
-                        <div className="flex justify-center items-center">
-                          <Badge className="rounded-none w-full bg-blue-200 gap-0">
-                            <span className="text-blue-600 font-bold ">
-                              {scheduler.formatDate(entry.dueDate, "MMM dd")}
-                            </span>
-                          </Badge>
-                        </div>
-                      ) : null}
-
-                      {/* Disconnection Date */}
-                      {Array.isArray(entry.disconnectionDate) ? (
-                        <div className="flex justify-center items-center">
-                          <Badge className="rounded-none w-full bg-red-200 gap-0">
-                            <span className="text-red-600">
-                              {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
-                                <span className="font-bold" key={idx}>
-                                  {idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "dd")}
-                                </span>
-                              ))}
-                            </span>
-                          </Badge>
-                        </div>
-                      ) : entry.disconnectionDate ? (
-                        <div className="flex justify-center items-center">
-                          <Badge className="rounded-none bg-red-200 w-full gap-0">
-                            <span className="text-red-600 font-bold">
-                              {scheduler.formatDate(entry.disconnectionDate, "MMM dd")}
-                            </span>
-                          </Badge>
-                        </div>
-                      ) : null}
-
-                      {/* Rest Day Indicator */}
-                      {(dateIsSunday || dateIsSaturday) &&
-                        isWithinMonth &&
-                        entry.dueDate &&
-                        entry.meterReaders?.length === 0 && (
-                          <div className="flex justify-center items-center">
-                            <Badge className=" rounded-none font-medium bg-gray-200 gap-0 w-full text-[5px] sm:text-[5px] lg:text-xs tracking-wide text-gray-600">
-                              Applicable Rest Day
-                            </Badge>
-                          </div>
-                        )}
-                    </button>
-                  </ContextMenuTrigger>
-
-                  <ContextMenuContent className="w-full z-[100] bg-white rounded border-black ring ring-primary">
-                    <ContextMenuItem
-                      className="hover:cursor-pointer"
-                      onClick={() => {
-                        if (
-                          getDate(schedule[idx].readingDate) > 1 &&
-                          entry.dueDate !== undefined &&
-                          entry.disconnectionDate !== undefined &&
-                          !Array.isArray(schedule[idx - 1]?.dueDate) &&
-                          !Array.isArray(schedule[idx + 1]?.dueDate)
-                        ) {
-                          const newSplitDates = [...datesToSplit];
-                          newSplitDates.push(entry.readingDate);
-                          setDatesToSplit(newSplitDates);
-                          setSchedule(scheduler.splitDates(newSplitDates));
-                        } else if (
-                          getDate(schedule[idx].readingDate) === 1 &&
-                          entry.dueDate !== undefined &&
-                          entry.disconnectionDate !== undefined &&
-                          !Array.isArray(schedule[idx + 1]?.dueDate)
-                        ) {
-                          toast.error("Error", {
-                            description: "Cannot split dates on the beginning of the month!",
-                            position: "top-right",
-                            duration: 1500,
-                          });
-                        } else {
-                          toast.error("Error", {
-                            description:
-                              "Cannot split entry, multiple same-day reading dates are not allowed!",
-                            position: "top-right",
-                            duration: 1500,
-                          });
-                        }
-                      }}
+                {/* Render actual calendar only when ready */}
+                {!isFetchingSchedule &&
+                  isReady &&
+                  currentSchedule.map((entry, idx) => (
+                    <motion.div
+                      key={idx}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                      className={`group relative flex flex-col border-b border-l ${idx + 1 !== 1 && (idx + 1) % 7 === 0 ? "border-r" : "border-r-0"} p-0 transition-colors duration-150 ease-in-out`}
                     >
-                      <SeparatorVerticalIcon className="text-primary" />
-                      <span>Split Dates</span>
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            })}
-        </section>
-      </main>
-    </div>
+                      <ScheduleEntryContextMenu
+                        activeContext={activeContext}
+                        currentDate={scheduler.currentDate}
+                        entry={entry}
+                        setActiveContext={setActiveContext}
+                        idx={idx}
+                        scheduler={scheduler}
+                      />
+                    </motion.div>
+                  ))}
+              </section>
+            </>
+          )}
+        </main>
+      </div>
+      <ScheduleEntryDialog />
+      <AddCustomMeterReaderDialog />
+    </>
   );
-}
+};

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import { ComponentProps, type FunctionComponent } from "react";
 
 type TextProps = ComponentProps<"p"> & {

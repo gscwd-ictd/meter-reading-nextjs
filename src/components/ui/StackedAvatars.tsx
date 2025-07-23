@@ -59,7 +59,7 @@ export const StackedAvatars: FunctionComponent<StackedAvatarsProps> = ({ users, 
                 </Avatar>
               </TooltipTrigger>
               <TooltipContent>
-                <span>{user.name}</span>
+                <span className="dark:text-white">{user.name}</span>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

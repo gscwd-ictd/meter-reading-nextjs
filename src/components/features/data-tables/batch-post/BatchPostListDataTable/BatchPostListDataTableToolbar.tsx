@@ -2,12 +2,12 @@
 
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import { BatchPostListDataTableFacetedFilter } from "./BatchPostListDataTableFacetedFilter";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@mr/components/ui/Input";
 import { useContext, useEffect, useState } from "react";
-import { Label } from "@/components/ui/Label";
-import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { Label } from "@mr/components/ui/Label";
+import { DataTableViewOptions } from "@mr/components/ui/data-table/data-table-view-options";
 import { ColumnVisibilityToggleContext } from "./BatchPostListDataTable";
 
 interface BatchPostListDataTableToolbarProps<TData> {

@@ -1,5 +1,5 @@
 import { Table } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Checkbox } from "@mr/components/ui/Checkbox";
 
 type DataTbaleSelectableHeaderProps<T> = {
   table: Table<T>;

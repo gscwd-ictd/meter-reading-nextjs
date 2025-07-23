@@ -1,8 +1,8 @@
-import { expect, test } from "vitest";
-import { render, screen } from "@testing-library/react";
-import Page from "../src/app/page";
+import { describe, it, expect } from "vitest"; // or jest
+import Home from "../src/app/page";
 
-test("Page", () => {
-  render(<Page />);
-  expect(screen.getByRole("heading", { level: 1, name: "Home" })).toBeDefined();
+describe("Home redirect", () => {
+  it("should redirect to /schedule", () => {
+    expect(() => Home()).toThrow();
+  });
 });

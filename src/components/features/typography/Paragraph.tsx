@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import { ComponentProps, FunctionComponent } from "react";
 
 export const Paragraph: FunctionComponent<ComponentProps<"p">> = ({ children, className, ...props }) => {

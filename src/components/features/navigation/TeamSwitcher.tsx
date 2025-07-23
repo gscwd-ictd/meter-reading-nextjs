@@ -10,8 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/DropdownMenu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/Sidebar";
+} from "@mr/components/ui/DropdownMenu";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@mr/components/ui/Sidebar";
 import { NavItemTeam } from "./items";
 
 type TeamSwitcherProps = {

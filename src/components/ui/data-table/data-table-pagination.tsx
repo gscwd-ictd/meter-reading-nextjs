@@ -7,8 +7,8 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
-import { Button } from "@/components/ui/Button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mr/components/ui/Select";
+import { Button } from "@mr/components/ui/Button";
 
 type DataTablePaginationProps<T> = {
   table: Table<T>;
@@ -23,7 +23,9 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
           row(s) selected.
         </div>
       ) : (
-        <p className="text-muted-foreground flex-1 text-sm">No rows selected.</p>
+        <p className="text-muted-foreground hidden flex-1 text-sm sm:hidden md:flex lg:flex">
+          No rows selected.
+        </p>
       )}
 
       <div className="flex items-center space-x-6 lg:space-x-8">

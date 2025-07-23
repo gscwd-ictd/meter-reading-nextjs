@@ -2,12 +2,12 @@
 
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import { useContext, useEffect, useState } from "react";
-import { DataTableFacetedFilter } from "@/components/ui/data-table/data-table-faceted-filter";
-import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/Input";
-import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { DataTableFacetedFilter } from "@mr/components/ui/data-table/data-table-faceted-filter";
+import { Label } from "@mr/components/ui/Label";
+import { Input } from "@mr/components/ui/Input";
+import { DataTableViewOptions } from "@mr/components/ui/data-table/data-table-view-options";
 import { ColumnVisibilityToggleContext } from "./IndividualTextBlastDataTable";
 
 interface IndividualTextBlastDataTableToolbarProps<TData> {

@@ -1,71 +1,85 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
-import { useSchedulesStore } from "@/components/stores/useSchedulesStore";
-import { Button } from "@/components/ui/Button";
-import { MeterReader } from "@/lib/types/personnel";
-import { User2Icon, XIcon } from "lucide-react";
-import { FunctionComponent } from "react";
+import { Button } from "@mr/components/ui/Button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@mr/components/ui/DropdownMenu";
+import { MoreHorizontal, MoreVertical } from "lucide-react";
+import { FunctionComponent, useState } from "react";
+import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
+import { MeterReader } from "@mr/lib/types/personnel";
+import { DeleteMeterReaderDialog } from "../../meter-readers/DeleteMeterReaderDialog";
+import { ViewAssignedZonebooksDialog } from "../../meter-readers/ViewAssignedZonebooksDialog";
 
-type PersonnelRowActionsProps = {
+type MeterReaderRowActionsProps = {
   meterReader: MeterReader;
 };
 
-// zone 8-63
-
-export const MeterReaderRowActions: FunctionComponent<PersonnelRowActionsProps> = ({ meterReader }) => {
-  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
-  const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
-  const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
-  const setZonebookDialogIsOpen = useSchedulesStore((state) => state.setZonebookDialogIsOpen);
-
-  const assignZonebook = (meterReader: MeterReader) => {
-    setSelectedMeterReader(meterReader);
-    setZonebookDialogIsOpen(true);
-  };
-
-  const removeMeterReader = (companyId: string) => {
-    const temporaryMeterReaders = [...selectedScheduleEntry!.meterReaders!];
-
-    setSelectedScheduleEntry({
-      ...selectedScheduleEntry,
-      readingDate: selectedScheduleEntry?.readingDate!,
-      disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
-      dueDate: selectedScheduleEntry?.dueDate!,
-      meterReaders: temporaryMeterReaders.filter((mr) => mr.companyId !== companyId),
-    });
-  };
+export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps> = ({ meterReader }) => {
+  const [editMeterReaderDialogIsOpen, setEditMeterReaderDialogIsOpen] = useState<boolean>(false);
+  const [viewAssignedZonebooksDialogIsOpen, setViewAssignedZonebooksDialogIsOpen] = useState<boolean>(false);
+  const [deleteMeterReaderDialogIsOpen, setDeleteMeterReaderDialogIsOpen] = useState<boolean>(false);
+  const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
 
   return (
-    <>
-      <div className="flex grid-cols-2 gap-2">
-        <div className="col-span-1">
-          <Button className="w-full px-2" size="sm" onClick={() => assignZonebook(meterReader)}>
-            <User2Icon className="size-2 sm:size-2 lg:size-4" />
-            <span className="text-xs"> Assign</span>
-          </Button>
-        </div>
-        <div className="col-span-1">
-          <Button
-            variant="destructive"
-            className="w-full px-2"
-            size="sm"
-            onClick={() => removeMeterReader(meterReader.companyId)}
-          >
-            <XIcon className="size-2 sm:size-2 lg:size-4" /> <span className="text-xs">Remove</span>
-          </Button>
-        </div>
-        {/* <div className="col-span-1">
-          <Button
-            variant="outline"
-            className="w-full px-2"
-            size="sm"
-            onClick={() => console.log(selectedScheduleEntry)}
-          >
-            <XIcon className="size-2 sm:size-2 lg:size-4" /> <span className="text-xs">Log Meter Reader</span>
-          </Button>
-        </div> */}
-      </div>
-    </>
+    <DropdownMenu open={dropdownIsOpen} onOpenChange={setDropdownIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="data-[state=open]:bg-muted flex h-8 w-8 p-0">
+          <div className="hidden sm:hidden md:block lg:block">
+            <MoreHorizontal />
+          </div>
+          <div className="block sm:block md:hidden lg:hidden">
+            <MoreVertical />
+          </div>
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[200px]">
+        <DropdownMenuItem
+          onSelect={() => {
+            setDropdownIsOpen(false);
+          }}
+          className="cursor-pointer"
+          asChild
+        >
+          {/* Update personnel */}
+          <EditMeterReaderDialog
+            editMeterReaderDialogIsOpen={editMeterReaderDialogIsOpen}
+            setEditMeterReaderDialogIsOpen={setEditMeterReaderDialogIsOpen}
+            selectedMeterReader={meterReader}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={() => {
+            setDropdownIsOpen(false);
+          }}
+          asChild
+        >
+          <ViewAssignedZonebooksDialog
+            meterReader={meterReader}
+            open={viewAssignedZonebooksDialogIsOpen}
+            setOpen={setViewAssignedZonebooksDialogIsOpen}
+          />
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          asChild
+          onSelect={() => {
+            setDropdownIsOpen(false);
+          }}
+        >
+          <DeleteMeterReaderDialog
+            selectedMeterReader={meterReader}
+            open={deleteMeterReaderDialogIsOpen}
+            setOpen={setDeleteMeterReaderDialogIsOpen}
+          />
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

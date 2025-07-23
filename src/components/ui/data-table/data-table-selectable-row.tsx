@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Checkbox } from "@mr/components/ui/Checkbox";
 
 export type DataTableSelectableRowProps<T> = {
   row: Row<T>;

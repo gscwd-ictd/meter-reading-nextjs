@@ -14,12 +14,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { Input } from "@/components/ui/Input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+import { Input } from "@mr/components/ui/Input";
 import { createContext, useEffect, useState } from "react";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
-import { DataTablePagination } from "@/components/ui/data-table/data-table-pagination";
+import { DataTablePagination } from "@mr/components/ui/data-table/data-table-pagination";
 import { BatchPostListDataTableToolbar } from "./BatchPostListDataTableToolbar";
 
 type BatchPostListDataTableProps<T> = {

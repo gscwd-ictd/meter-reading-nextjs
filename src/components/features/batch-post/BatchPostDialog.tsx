@@ -1,4 +1,4 @@
-// import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
+// import { DialogContent, DialogHeader, DialogTitle } from "@mr/components/ui/Dialog";
 // import { FunctionComponent } from "react";
 // import { BatchPostListTableComponent } from "../data-tables/batch-post/BatchPostListDataTable/BatchPostListTableComponent";
 

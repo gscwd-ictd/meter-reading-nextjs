@@ -14,24 +14,21 @@ import {
   Users2Icon,
   MessageCircleWarning,
   FileText,
+  Book,
+  Scan,
+  UserCog2,
   BookPlus,
 } from "lucide-react";
 
+import UserIcon from "@images/user-icon.svg";
+
 export type NavItem = {
   title: string;
-  url: string;
+  url?: string;
   icon?: LucideIcon;
   isActive?: boolean;
   count?: number;
-  items?: NavSubItem[];
-};
-
-export type NavSubItem = {
-  title: string;
-  url: string;
-  icon?: LucideIcon;
-  isActive?: boolean;
-  count?: number;
+  children?: NavItem[];
 };
 
 export type NavItemTeam = {
@@ -53,25 +50,28 @@ export const mainNav: NavItem[] = [
     icon: Package,
   },
   {
-    title: "Personnel",
-    url: "/personnel",
+    title: "Meter Readers",
+    url: "/meter-readers",
     icon: Users2Icon,
   },
   {
-    title: "Schedule",
-    url: "/schedule",
+    title: "Schedules",
+    url: "/schedules",
     icon: Calendar,
   },
   {
-    title: "Zone - Book",
-    url: "/zone-book",
+    title: "Zonebooks",
     icon: MapPinned,
+    children: [
+      { title: "List", url: "/zonebooks-list", icon: Book },
+      { title: "Areas", url: "/areas", icon: Scan },
+    ],
   },
   {
     title: "Text Blast",
     url: "#",
     icon: MessageCircleWarning,
-    items: [
+    children: [
       {
         title: "Send Message",
         url: "/text-blast",
@@ -93,6 +93,11 @@ export const mainNav: NavItem[] = [
     title: "Notifications",
     url: "/notifications",
     icon: Megaphone,
+  },
+  {
+    title: "User Accounts",
+    url: "/user-accounts",
+    icon: UserCog2,
   },
   {
     title: "Settings",
@@ -138,7 +143,7 @@ export const teams: NavItemTeam[] = [
 ];
 
 export const user: NavItemUser = {
-  name: "shadcn",
-  email: "m@example.com",
-  avatar: "https://github.com/shadcn.png",
+  name: "admin",
+  email: "admin@gscwd.com",
+  avatar: UserIcon.src,
 };

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Employee } from "@/lib/types/personnel";
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
+import { Employee } from "@mr/lib/types/personnel";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
 
 type EmployeesResponse = {
   items: Employee[];

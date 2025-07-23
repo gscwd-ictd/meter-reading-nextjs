@@ -1,11 +1,11 @@
-import { useSchedulesStore } from "@/components/stores/useSchedulesStore";
-import { Button } from "@/components/ui/Button";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/Dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { Button } from "@mr/components/ui/Button";
+import { Dialog, DialogContent, DialogHeader } from "@mr/components/ui/Dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { FunctionComponent, useEffect, useState } from "react";
 import { ZonebookCombobox } from "./ZonebookCombobox";
-import { Zonebook } from "@/lib/types/zonebook";
+import { Zonebook } from "@mr/lib/types/zonebook";
 import { XCircleIcon } from "lucide-react";
 
 export const ZonebookDialog: FunctionComponent = () => {
@@ -30,7 +30,7 @@ export const ZonebookDialog: FunctionComponent = () => {
       setSelectedMeterReader({
         ...selectedMeterReader,
         zonebooks: selectedScheduleEntry.meterReaders.find(
-          (mr) => mr.companyId === selectedMeterReader?.companyId
+          (mr) => mr.companyId === selectedMeterReader?.companyId,
         )!.zonebooks,
       });
 
@@ -102,7 +102,7 @@ export const ZonebookDialog: FunctionComponent = () => {
                     <button
                       onClick={() => {
                         const newMeterReaderZonebooks = selectedMeterReader.zonebooks.filter(
-                          (zb) => zb.zonebook !== entry.zonebook
+                          (zb) => zb.zonebook !== entry.zonebook,
                         );
 
                         setMeterReaderZonebooks(newMeterReaderZonebooks);
@@ -118,7 +118,7 @@ export const ZonebookDialog: FunctionComponent = () => {
                 </TableRow>
               ))
             ) : (
-              <TableRow className="w-full justify-center flex border">
+              <TableRow className="flex w-full justify-center border">
                 <TableCell colSpan={4}>No zonebooks found</TableCell>
               </TableRow>
             )}
@@ -127,7 +127,7 @@ export const ZonebookDialog: FunctionComponent = () => {
 
         <Button
           variant="secondary"
-          className="bg-green-500 hover:bg-green-600 text-white"
+          className="bg-green-500 text-white hover:bg-green-600"
           disabled={selectedMeterReader?.zonebooks.length === 0 ? true : false}
           onClick={() => {
             if (selectedScheduleEntry && selectedMeterReader) {

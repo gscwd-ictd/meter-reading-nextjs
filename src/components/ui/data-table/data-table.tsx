@@ -14,12 +14,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { DataTablePagination } from "./data-table-pagination";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@mr/components/ui/Input";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { createContext, useEffect, useState } from "react";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
 
 type DataTableProps<T> = {
@@ -82,92 +82,82 @@ export function DataTable<T>({
   useEffect(() => {
     const timeout = setTimeout(() => {
       setGlobalFilter(debounceValue);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-full min-h-[22rem] flex-col space-y-4">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
-        <div className="flex items-center gap-2">
+        <div className="grid items-start gap-2 sm:grid-cols-1 sm:grid-rows-2 md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
           {enableGlobalFilter && (
-            <div className="relative flex w-96 items-center">
-              <Input
-                placeholder="Search from table..."
-                value={debounceValue ?? ""}
-                onChange={(event) => setDebounceValue(event.target.value)}
-                className="min-w-96"
-              />
-            </div>
+            <Input
+              placeholder="Search from table..."
+              value={debounceValue ?? ""}
+              onChange={(event) => setDebounceValue(event.target.value)}
+              className="lg:w-[25%]"
+            />
           )}
 
           <DataTableToolbar table={table} />
         </div>
       </ColumnVisibilityToggleContext.Provider>
 
-      <div>
-        <div className="rounded-md border px-2">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-auto rounded-md border">
+        {loading || !table.getRowModel().rows?.length ? (
+          <div className="flex flex-1 items-center justify-center">
+            {loading ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner className="text-primary" />
+                <span className="text-primary text-lg">Loading data...</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2">
+                <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                  No Results
+                </span>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-full overflow-x-auto">
+            <Table className="min-w-full [&_td]:px-4 [&_th]:px-4">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-
-            <TableBody>
-              {!loading ? (
-                table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="max-w-[30rem] truncate">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      <div className="flex w-full items-center justify-center gap-2">
-                        <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
-                        <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
-                          No Results
-                        </span>
-                      </div>
-                    </TableCell>
+                    ))}
                   </TableRow>
-                )
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    <div className="flex w-full items-center justify-center gap-2">
-                      <LoadingSpinner /> <span className="text-lg">Loading data...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {enablePagination && (
-          <div className="pt-4 pb-10">
-            <DataTablePagination table={table} />
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="max-w-[30rem] truncate">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
+
+      {enablePagination && (
+        <div className="pt-4">
+          <DataTablePagination table={table} />
+        </div>
+      )}
     </div>
   );
 }

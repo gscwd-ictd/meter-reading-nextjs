@@ -2,10 +2,10 @@
 
 import { Table } from "@tanstack/react-table";
 import { useContext } from "react";
-import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { DataTableViewOptions } from "@mr/components/ui/data-table/data-table-view-options";
 import { ColumnVisibilityToggleContext } from "./TextBlastReportDataTable";
 import { DateRangeFilter } from "../../DateRangeFilter";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import { Cross2Icon } from "@radix-ui/react-icons";
 
 interface TextBlastReportDataTableToolbarProps<TData> {

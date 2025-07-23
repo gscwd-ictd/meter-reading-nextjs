@@ -1,27 +1,37 @@
-import { type PropsWithChildren } from "react";
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { type PropsWithChildren } from "react";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/Sonner";
-import { QueryClientProvider } from "@/components/providers/QueryClientProvider";
+import { ReactQueryProvider } from "@mr/components/providers/ReactQueryProvider";
+import { ThemeProvider } from "@mr/components/providers/ThemeProvider";
+import { Toaster } from "@mr/components/ui/Sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Meter Reading",
+  title: "MetraX",
+  description: "Meter Reading Application",
 };
 
 export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
-        <QueryClientProvider>
-          <Toaster richColors position="top-right" />
-          <main className="h-screen overflow-x-hidden">{children}</main>
-        </QueryClientProvider>
+      <body className={`${inter.className} antialiased`}>
+        <ReactQueryProvider>
+          <Toaster richColors />
+          {/* prettier-ignore */}
+          <ThemeProvider 
+            attribute="class" 
+            defaultTheme="system" 
+            enableSystem 
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

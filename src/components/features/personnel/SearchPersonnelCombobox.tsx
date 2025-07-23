@@ -1,7 +1,7 @@
 "use client";
 
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
-import { Button } from "@/components/ui/Button";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
+import { Button } from "@mr/components/ui/Button";
 import {
   Command,
   CommandEmpty,
@@ -9,17 +9,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { cn } from "@/lib/utils";
+} from "@mr/components/ui/Command";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { cn } from "@mr/lib/utils";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Check, User2Icon } from "lucide-react";
 import { FunctionComponent, useEffect, useState } from "react";
 import axios from "axios";
-import { Employee } from "@/lib/types/personnel";
-import { useDebounce } from "@/hooks/useDebounce";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
+import { Employee } from "@mr/lib/types/personnel";
+import { useDebounce } from "@mr/hooks/useDebounce";
+import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 
 export const SearchPersonnelCombobox: FunctionComponent = () => {
   const [open, setOpen] = useState<boolean>(false);

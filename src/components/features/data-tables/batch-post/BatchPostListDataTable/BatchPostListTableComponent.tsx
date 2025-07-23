@@ -2,13 +2,13 @@
 
 // import { FunctionComponent, Suspense, useCallback, useState } from "react";
 // import { useBatchPostColumns } from "./BatchPostListDataTableColumns";
-// import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
+// import { useBatchPostStore } from "@mr/components/stores/useBatchPostStore";
 // import { BatchPostListDataTable } from "./BatchPostListDataTable";
-// import { Dialog } from "@/components/ui/Dialog";
-// import ViewMeterReadingDetails from "@/components/features/batch-post/ViewMeterReadingDetails";
-// import { Button } from "@/components/ui/Button";
+// import { Dialog } from "@mr/components/ui/Dialog";
+// import ViewMeterReadingDetails from "@mr/components/features/batch-post/ViewMeterReadingDetails";
+// import { Button } from "@mr/components/ui/Button";
 // import { toast } from "sonner";
-// import { ReadingDetails, ReadingDetailsStatus } from "@/lib/types/text-blast/ReadingDetails";
+// import { ReadingDetails, ReadingDetailsStatus } from "@mr/lib/types/text-blast/ReadingDetails";
 
 // export const BatchPostListTableComponent: FunctionComponent = () => {
 //   const consumers = useBatchPostStore((state) => state.consumers);

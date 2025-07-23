@@ -1,4 +1,4 @@
-import { PersonnelTableComponent } from "@/components/features/data-tables/personnel/PersonnelTableComponent";
+import { PersonnelTableComponent } from "@mr/components/features/data-tables/personnel/PersonnelTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,11 +6,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
+} from "@mr/components/ui/Breadcrumb";
 
 export default function PersonnelPage() {
   return (
-    <div className="h-full flex flex-col p-5">
+    <div className="flex h-full flex-col p-5">
       <div className="">
         <Breadcrumb>
           <BreadcrumbList>
@@ -25,8 +25,8 @@ export default function PersonnelPage() {
         </Breadcrumb>
       </div>
 
-      <h3 className="font-bold text-xl mt-5">Personnel</h3>
-      <div className="font-medium text-base text-gray-400">List of Meter Readers</div>
+      <h3 className="mt-5 text-xl font-bold">Personnel</h3>
+      <div className="text-base font-medium text-gray-400">List of Meter Readers</div>
       <PersonnelTableComponent />
     </div>
   );

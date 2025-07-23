@@ -1,10 +1,10 @@
 "use client";
 
 import { FunctionComponent, Suspense } from "react";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 import { TextBlastReportDataTable } from "./TextBlastReportDataTable";
 import { useTextBlastReportColumns } from "./TextBlastReportDataTableColumns";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 
 export const TextBlastReportTableComponent: FunctionComponent = () => {
   const textBlastReports = useTextBlastStore((state) => state.textBlastReports);

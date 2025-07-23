@@ -1,4 +1,4 @@
-import { TextMessageData, TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
+import { TextMessageData, TextMessageStatus } from "@mr/lib/types/text-blast/TextMessage";
 
 export const SampleTextBlastReportData: TextMessageData[] = [
   {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@mr/components/ui/Button";
 import {
   Dialog,
   DialogContent,
@@ -10,13 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/Dialog";
+} from "@mr/components/ui/Dialog";
 import { FunctionComponent, useEffect } from "react";
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
 import { PlusCircleIcon } from "lucide-react";
 import { PersonnelTabs } from "./PersonnelTabs";
 import { SearchPersonnelCombobox } from "./SearchPersonnelCombobox";
-import { Employee } from "@/lib/types/personnel";
+import { Employee } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 
 export const AddPersonnelDialog: FunctionComponent = () => {

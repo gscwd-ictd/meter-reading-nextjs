@@ -2,7 +2,7 @@
 
 import { Table } from "@tanstack/react-table";
 import { useContext, } from "react";
-import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { DataTableViewOptions } from "@mr/components/ui/data-table/data-table-view-options";
 import { ColumnVisibilityToggleContext } from "./AreaTextBlastDataTable";
 import { ZoneBookMonthDropdown } from "./ZoneBookMonthDropdown";
 

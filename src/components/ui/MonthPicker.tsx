@@ -2,7 +2,7 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buttonVariants } from "./Button";
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 
 type Month = {
   number: number;

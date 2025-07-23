@@ -1,5 +1,5 @@
-import { SampleBatchPostData } from "@/lib/mock/SampleBatchPostData";
-import { ReadingDetails, ReadingDetailsStatus } from "@/lib/types/text-blast/ReadingDetails";
+import { SampleBatchPostData } from "@mr/lib/mock/SampleBatchPostData";
+import { ReadingDetails, ReadingDetailsStatus } from "@mr/lib/types/text-blast/ReadingDetails";
 import { create } from "zustand";
 
 type BatchPostStore = {

@@ -1,10 +1,10 @@
 "use client";
 
-import { usePersonnelStore } from "@/components/stores/usePersonnelStore";
-import { Button } from "@/components/ui/Button";
-import { Command, CommandItem } from "@/components/ui/Command";
-import { Label } from "@/components/ui/Label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
+import { usePersonnelStore } from "@mr/components/stores/usePersonnelStore";
+import { Button } from "@mr/components/ui/Button";
+import { Command, CommandItem } from "@mr/components/ui/Command";
+import { Label } from "@mr/components/ui/Label";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { CommandList } from "cmdk";
 import { Check, CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";

@@ -2,16 +2,16 @@
 
 // import { ColumnDef, FilterFn } from "@tanstack/react-table";
 // import { useEffect, useState } from "react";
-// import { Checkbox } from "@/components/ui/Checkbox";
+// import { Checkbox } from "@mr/components/ui/Checkbox";
 // import {
 //   ReadingDetails as BatchPostColumn,
 //   ReadingDetailsStatus,
-// } from "@/lib/types/text-blast/ReadingDetails";
-// import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
+// } from "@mr/lib/types/text-blast/ReadingDetails";
+// import { useBatchPostStore } from "@mr/components/stores/useBatchPostStore";
 // import { format } from "date-fns";
-// import { Button } from "@/components/ui/Button";
+// import { Button } from "@mr/components/ui/Button";
 // import { Eye } from "lucide-react";
-// import { Badge } from "@/components/ui/Badge";
+// import { Badge } from "@mr/components/ui/Badge";
 
 // export const useBatchPostColumns = (
 //   data: BatchPostColumn[] | undefined,

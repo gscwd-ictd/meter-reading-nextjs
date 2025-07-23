@@ -1,7 +1,7 @@
 "use client";
 
-// import { BatchPostDialog } from "@/components/features/batch-post/BatchPostDialog";
-// import { BatchPostPostedTableComponent } from "@/components/features/data-tables/batch-post/BatchPostPostedDataTable/BatchPostPostedTableComponent";
+// import { BatchPostDialog } from "@mr/components/features/batch-post/BatchPostDialog";
+// import { BatchPostPostedTableComponent } from "@mr/components/features/data-tables/batch-post/BatchPostPostedDataTable/BatchPostPostedTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,9 +9,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
-import { Button } from "@/components/ui/Button";
-import { Dialog, DialogTrigger } from "@/components/ui/Dialog";
+} from "@mr/components/ui/Breadcrumb";
+import { Button } from "@mr/components/ui/Button";
+import { Dialog, DialogTrigger } from "@mr/components/ui/Dialog";
 
 export default function BatchPostingPage() {
   return (

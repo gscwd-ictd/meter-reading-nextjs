@@ -1,7 +1,7 @@
-// import { SampleReadingDetailsData } from "@/lib/mock/text-blast/SampleReadingDetailsData";
-import { SampleTextBlastReportData } from "@/lib/mock/text-blast/SampleTextBlastReportData";
-import { AccountWithDates } from "@/lib/types/text-blast/ReadingDetails";
-import { TextMessage, TextMessageData } from "@/lib/types/text-blast/TextMessage";
+// import { SampleReadingDetailsData } from "@mr/lib/mock/text-blast/SampleReadingDetailsData";
+import { SampleTextBlastReportData } from "@mr/lib/mock/text-blast/SampleTextBlastReportData";
+import { AccountWithDates } from "@mr/lib/types/text-blast/ReadingDetails";
+import { TextMessage, TextMessageData } from "@mr/lib/types/text-blast/TextMessage";
 import { create } from "zustand";
 
 type TextBlastStore = {
@@ -25,7 +25,7 @@ type TextBlastStore = {
   setSelectedBillMonthYear: (date: string | null) => void;
 
   addSelectedConsumer: (consumer: AccountWithDates) => void;
-  removeSelectedConsumer: (consumerReadingDetailsId: string) => void;
+  removeSelectedConsumer: (consumerAccountNumber: string) => void;
 
   clearSelectedConsumers: () => void;
 

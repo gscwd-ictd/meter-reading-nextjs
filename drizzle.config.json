@@ -3,11 +3,11 @@
   "schema": "./src/server/db/schemas/*.ts",
   "out": "./src/server/db/migrations",
   "dbCredentials": {
-    "host": "localhost",
+    "host": "172.20.110.85",
     "port": 5432,
     "user": "admin",
-    "password": "my_password",
-    "database": "authn",
+    "password": "5tFCjtd5Y2PDq31zAc9smEn4WLmAG9u8BT9b2cG8I3qeAscQeH",
+    "database": "meter_reading",
     "ssl": false
   }
 }

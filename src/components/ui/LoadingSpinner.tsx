@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import React from "react";
 
 export interface ISVGProps extends React.SVGProps<SVGSVGElement> {

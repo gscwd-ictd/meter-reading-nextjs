@@ -1,12 +1,12 @@
 import * as React from "react";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { Column } from "@tanstack/react-table";
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import { useMemo } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { Button } from "@/components/ui/Button";
-import { Separator } from "@/components/ui/Separator";
-import { Badge } from "@/components/ui/Badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import { Button } from "@mr/components/ui/Button";
+import { Separator } from "@mr/components/ui/Separator";
+import { Badge } from "@mr/components/ui/Badge";
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/Command";
+} from "@mr/components/ui/Command";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column: Column<TData, TValue>;
@@ -34,7 +34,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-10 border-dashed">
+        <Button variant="outline" size="sm" className="h-9 border-dashed">
           <PlusCircledIcon className="mr-2 h-4 w-4" />
           {title}
           {selectedValues?.size > 0 && (
@@ -91,7 +91,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <div
                         className={cn(
                           "border-primary mr-2 flex h-4 w-4 items-center justify-center rounded-sm border",
-                          isSelected ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible"
+                          isSelected ? "bg-primary text-primary-foreground" : "opacity-50 [&_svg]:invisible",
                         )}
                       >
                         <CheckIcon className={cn("h-4 w-4")} />

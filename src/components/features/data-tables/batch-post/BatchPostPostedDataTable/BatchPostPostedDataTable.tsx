@@ -13,12 +13,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { createContext, useEffect, useState } from "react";
-import { Input } from "@/components/ui/Input";
-import { DataTablePagination } from "@/components/ui/data-table/data-table-pagination";
+import { Input } from "@mr/components/ui/Input";
+import { DataTablePagination } from "@mr/components/ui/data-table/data-table-pagination";
 import { BatchPostPostedDataTableToolbar } from "./BatchPostPostedDataTableToolbar";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
 
 interface BatchPostPostedDataTableProps<TData, TValue> {

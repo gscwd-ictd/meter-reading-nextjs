@@ -1,25 +1,26 @@
 "use client";
 
 import { FunctionComponent, Suspense } from "react";
-import { DataTable } from "@/components/ui/data-table/data-table";
 import { useMeterReaderColumns } from "./MeterReaderColumns";
-import { useSchedulesStore } from "@/components/stores/useSchedulesStore";
-import { MeterReader } from "@/lib/types/personnel";
+import { DataTable } from "@mr/components/ui/data-table/data-table";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-type MeterReaderDataTableProps = {
-  meterReaders: MeterReader[];
-};
+export const MeterReaderDataTable: FunctionComponent = () => {
+  const { data: meterReaders, isFetching } = useQuery({
+    queryKey: ["get-all-meter-readers"],
+    queryFn: async () => {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
 
-export const MeterReaderDataTable: FunctionComponent<MeterReaderDataTableProps> = ({ meterReaders }) => {
-  // const [meterReaders, setMeterReaders] = useState<MeterReader[]>([]);
+      return res.data;
+    },
+  });
 
-  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
-
-  const meterReaderColumns = useMeterReaderColumns(selectedScheduleEntry?.meterReaders);
+  const meterReaderColumns = useMeterReaderColumns(meterReaders);
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={meterReaders ? meterReaders : []} columns={meterReaderColumns} />
+      <DataTable data={meterReaders ?? []} columns={meterReaderColumns} loading={isFetching} />
     </Suspense>
   );
 };

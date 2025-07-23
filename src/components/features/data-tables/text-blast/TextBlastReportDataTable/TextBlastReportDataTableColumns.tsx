@@ -1,12 +1,12 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { ColumnDef, FilterFnOption } from "@tanstack/react-table";
 import {
   TextMessageData as TextBlastReportColumn,
   TextMessageStatus,
-} from "@/lib/types/text-blast/TextMessage";
-import { Badge } from "@/components/ui/Badge";
+} from "@mr/lib/types/text-blast/TextMessage";
+import { Badge } from "@mr/components/ui/Badge";
 import { format } from "date-fns";
 
 export const useTextBlastReportColumns = () => {

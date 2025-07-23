@@ -7,9 +7,9 @@ import {
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mr/components/ui/Select";
+import { Button } from "@mr/components/ui/Button";
+import { Badge } from "@mr/components/ui/Badge";
 
 type IndividualTextBlastDataTablePaginationProps<T> = {
   table: Table<T>;

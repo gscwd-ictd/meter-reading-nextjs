@@ -1,7 +1,7 @@
-// import { Badge } from "@/components/ui/Badge";
-// import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-// import { ReadingDetails, ReadingDetailsStatus } from "@/lib/types/text-blast/ReadingDetails";
+// import { Badge } from "@mr/components/ui/Badge";
+// import { DialogContent, DialogHeader, DialogTitle } from "@mr/components/ui/Dialog";
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+// import { ReadingDetails, ReadingDetailsStatus } from "@mr/lib/types/text-blast/ReadingDetails";
 // import { format } from "date-fns";
 
 // type ViewMeterReadingDetailsProps = {

@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import { Input } from "@mr/components/ui/Input";
+import { Label } from "@mr/components/ui/Label";
 import { Column } from "@tanstack/react-table";
 
 export function DateRangeFilter<TData>({ column }: { column: Column<TData, unknown> }) {

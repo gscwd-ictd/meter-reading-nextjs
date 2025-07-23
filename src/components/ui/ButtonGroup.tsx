@@ -2,7 +2,7 @@ import { Children, ReactElement, cloneElement } from "react";
 
 import { VariantProps } from "class-variance-authority";
 import { ButtonVariants } from "./Button";
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 
 interface ButtonGroupProps {
   className?: string;
@@ -28,7 +28,7 @@ export const ButtonGroup = ({ className, orientation = "horizontal", children }:
           "flex-col": isVertical,
           "w-fit": isVertical,
         },
-        className
+        className,
       )}
     >
       {Children.map(children, (child, index) => {
@@ -46,7 +46,7 @@ export const ButtonGroup = ({ className, orientation = "horizontal", children }:
               "rounded-b-none": isVertical && !isLast,
               "border-t-0": isVertical && !isFirst,
             },
-            child.props.className
+            child.props.className,
           ),
         });
       })}

@@ -1,8 +1,8 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
-import { Heading } from "@/components/features/typography/Heading";
-import { Badge } from "@/components/ui/Badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+import { Heading } from "@mr/components/features/typography/Heading";
+import { Badge } from "@mr/components/ui/Badge";
 import { FileX2 } from "lucide-react";
 
 interface SentMessageDataTableProps<TData, TValue> {

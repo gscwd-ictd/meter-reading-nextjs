@@ -1,10 +1,10 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { PersonnelRowActions } from "./PersonnelRowActions";
-import { MeterReader as PersonnelColumn } from "@/lib/types/personnel";
+import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 
 export const usePersonnelColumns = (data: PersonnelColumn[] | undefined) => {
   const [personnelColumns, setPersonnelColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);

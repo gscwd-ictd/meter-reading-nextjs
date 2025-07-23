@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@mr/lib/utils";
 import type { PropsWithChildren, FunctionComponent, ComponentProps } from "react";
 
 type HeadingProps = ComponentProps<"h1" | "h2" | "h3" | "h4"> &

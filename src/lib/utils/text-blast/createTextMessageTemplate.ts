@@ -1,5 +1,5 @@
-import { AccountWithDates } from "@/lib/types/text-blast/ReadingDetails";
-import { TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
+import { AccountWithDates } from "@mr/lib/types/text-blast/ReadingDetails";
+import { TextMessageStatus } from "@mr/lib/types/text-blast/TextMessage";
 import { format } from "date-fns";
 
 export function createTextMessageTemplate(readingDetails: AccountWithDates): {

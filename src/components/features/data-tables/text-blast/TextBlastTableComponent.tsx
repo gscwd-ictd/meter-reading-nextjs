@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mr/components/ui/tabs";
 import { Heading } from "../../typography/Heading";
 import { AreaTextBlastTableComponent } from "./AreaTextBlastDataTable/AreaTextBlastTableComponent";
 import { IndividualTextBlastTableComponent } from "./IndividualTextBlastDataTable/IndividualTextBlastTableComponent";

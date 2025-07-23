@@ -1,9 +1,9 @@
 "use client";
 
-import { SentMessageTableComponent } from "@/components/features/data-tables/text-blast/SentMessageDataTable/SentMessageTableComponent";
-import { NotSentMessageTableComponent } from "@/components/features/data-tables/text-blast/NotSentMessageDataTable/NotSentMessageTableComponent";
-import { TextBlastSendMessageComponent } from "@/components/features/data-tables/text-blast/TextBlastSendMessageComponent";
-import TextBlastTableComponent from "@/components/features/data-tables/text-blast/TextBlastTableComponent";
+import { SentMessageTableComponent } from "@mr/components/features/data-tables/text-blast/SentMessageDataTable/SentMessageTableComponent";
+import { NotSentMessageTableComponent } from "@mr/components/features/data-tables/text-blast/NotSentMessageDataTable/NotSentMessageTableComponent";
+import { TextBlastSendMessageComponent } from "@mr/components/features/data-tables/text-blast/TextBlastSendMessageComponent";
+import TextBlastTableComponent from "@mr/components/features/data-tables/text-blast/TextBlastTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,12 +11,12 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/Breadcrumb";
-import { Button } from "@/components/ui/Button";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+} from "@mr/components/ui/Breadcrumb";
+import { Button } from "@mr/components/ui/Button";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 import { toast } from "sonner";
-import { sendMessageToRecipients } from "@/lib/utils/text-blast/sendMessageToRecipients";
-import { TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
+import { sendMessageToRecipients } from "@mr/lib/utils/text-blast/sendMessageToRecipients";
+import { TextMessageStatus } from "@mr/lib/types/text-blast/TextMessage";
 
 export default function TextBlastPage() {
   const notSentTextMessages = useTextBlastStore((state) => state.notSentTextMessages);

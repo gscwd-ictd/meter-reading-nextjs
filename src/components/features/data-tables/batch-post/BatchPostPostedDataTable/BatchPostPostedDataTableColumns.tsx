@@ -2,12 +2,12 @@
 
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { ReadingDetails as BatchPostPostedColumn } from "@/lib/types/text-blast/ReadingDetails";
-import { Button } from "@/components/ui/Button";
+import { ReadingDetails as BatchPostPostedColumn } from "@mr/lib/types/text-blast/ReadingDetails";
+import { Button } from "@mr/components/ui/Button";
 import { Eye } from "lucide-react";
-import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@mr/components/ui/Badge";
 
 export const useBatchPostPostedColumns = (
   data: BatchPostPostedColumn[] | undefined,

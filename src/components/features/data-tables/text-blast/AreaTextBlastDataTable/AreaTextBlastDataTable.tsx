@@ -8,12 +8,12 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { createContext, useState } from "react";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@mr/components/ui/Badge";
 import { AreaTextBlastDataTableToolbar } from "./AreaTextBlastDataTableToolbar";
 import { FileX2 } from "lucide-react";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
+import { useTextBlastStore } from "@mr/components/stores/useTextBlastStore";
 
 interface AreaTextBlastDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

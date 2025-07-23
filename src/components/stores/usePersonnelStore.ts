@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { Employee, MeterReader } from "@/lib/types/personnel";
+import { Employee, MeterReader } from "@mr/lib/types/personnel";
 
 type PersonnelStore = {
   meterReaders: MeterReader[];
