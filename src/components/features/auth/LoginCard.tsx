@@ -33,7 +33,7 @@ export const LoginCard: FunctionComponent = () => {
   };
 
   return (
-    <Card className="w-full max-w-md rounded-xl bg-white/80 shadow-xl backdrop-blur-md">
+    <Card className="w-full max-w-md rounded-xl bg-white/80 shadow-xl backdrop-blur-md dark:bg-slate-900">
       {/* <Card className="w-full max-w-md rounded-2xl border shadow-xl"></Card> */}
       <CardContent className="space-y-4 p-8">
         <div className="flex flex-col items-center space-y-2 text-center">
@@ -41,7 +41,9 @@ export const LoginCard: FunctionComponent = () => {
           {/* <Image src={metrax_logo.src} alt="Logo" width={80} height={80} className="rounded-full" /> */}
           <GaugeCircleIcon className="text-primary size-18" />
           <h1 className="text-primary text-3xl font-bold">MetraX</h1>
-          <h2 className="text-base font-semibold text-gray-700">Meter Reading Application</h2>
+          <h2 className="text-base font-semibold text-gray-700 dark:text-gray-400">
+            Meter Reading Application
+          </h2>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -73,7 +75,7 @@ export const LoginCard: FunctionComponent = () => {
             </div>
           </div>
 
-          <Button className="w-full">Sign In</Button>
+          <Button className="w-full dark:text-white">Sign In</Button>
         </form>
       </CardContent>
     </Card>

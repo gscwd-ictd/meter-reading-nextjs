@@ -108,12 +108,12 @@ export function DataTable<T>({
         {loading || !table.getRowModel().rows?.length ? (
           <div className="flex flex-1 items-center justify-center">
             {loading ? (
-              <div className="flex flex-col items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <LoadingSpinner className="text-primary" />
                 <span className="text-primary text-lg">Loading data...</span>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
                 <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
                   No Results
@@ -123,7 +123,7 @@ export function DataTable<T>({
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
-            <Table className="min-w-full sm:min-w-[640px]">
+            <Table className="min-w-full [&_td]:px-4 [&_th]:px-4">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
@@ -154,7 +154,7 @@ export function DataTable<T>({
       </div>
 
       {enablePagination && (
-        <div className="pt-4 pb-10">
+        <div className="pt-4">
           <DataTablePagination table={table} />
         </div>
       )}

@@ -10,7 +10,7 @@ import {
 
 export default function DashboardPage() {
   return (
-    <div className="mb-5 flex h-full flex-col p-5">
+    <div className="flex h-full flex-col p-5">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

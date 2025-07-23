@@ -38,10 +38,14 @@ type SubmitEmployeeType = {
   employeeId: string;
   restDay: string;
   zoneBooks: Array<ZonebookToSubmit>;
+  mobileNumber: string;
 };
 
 const meterReaderSchema = z.object({
   employeeId: z.string().optional(),
+  mobileNumber: z.string().regex(/^\d{11}$/, {
+    message: "Mobile number must be exactly 11 digits",
+  }),
   zoneBooks: z.array(
     z.object({
       zone: z.string(),
@@ -75,7 +79,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   const methods = useForm<MeterReaderType>({
     resolver: zodResolver(meterReaderSchema),
     reValidateMode: "onChange",
-    defaultValues: { employeeId: undefined, restDay: undefined, zoneBooks: [] },
+    defaultValues: { employeeId: undefined, restDay: undefined, zoneBooks: [], mobileNumber: "" },
   });
 
   const { handleSubmit, reset } = methods;
@@ -113,6 +117,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
   ): Promise<SubmitEmployeeType> => {
     return {
       employeeId: employee.employeeId!,
+      mobileNumber: employee.mobileNumber,
       restDay: selectedRestDay ? (selectedRestDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReaderZonebooks.map((zb) => {
         return { zone: zb.zone, book: zb.book };
@@ -204,7 +209,9 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
             <Users2Icon className="size-5" /> New Meter Reader
           </DialogTitle>
 
-          <DialogDescription className="text-gray-500">Add employee as a meter reader</DialogDescription>
+          <DialogDescription className="text-gray-500">
+            Assign meter reader role to an employee
+          </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(submitPersonnel)} id="add-meter-reader-form">

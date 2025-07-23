@@ -14,7 +14,7 @@ type UsersStore = {
   reset: () => void;
 };
 
-export const useUsersStore = create<UsersStore>((set) => ({
+export const useUserAccountsStore = create<UsersStore>((set) => ({
   users: [],
   setUsers: (users) => set({ users }),
 

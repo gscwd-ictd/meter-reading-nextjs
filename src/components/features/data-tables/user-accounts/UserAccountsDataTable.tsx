@@ -1,16 +1,16 @@
 "use client";
 
-import { FunctionComponent, Suspense, useEffect, useState } from "react";
+import { FunctionComponent, Suspense, useEffect } from "react";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { useUserColumns } from "./UserColumns";
-import { useUsersStore } from "@mr/components/stores/useUsersStore";
+import { useUserAccountsColumns } from "./UserAccountsColumns";
+import { useUserAccountsStore } from "@mr/components/stores/useUserAccountsStore";
 
-export const UserDataTable: FunctionComponent = () => {
-  const users = useUsersStore((state) => state.users);
-  const setUsers = useUsersStore((state) => state.setUsers);
+export const UserAccountsDataTable: FunctionComponent = () => {
+  const userAccounts = useUserAccountsStore((state) => state.users);
+  const setUserAccounts = useUserAccountsStore((state) => state.setUsers);
 
   const { data, refetch } = useQuery({
     queryKey: ["get-all-users"],
@@ -21,24 +21,24 @@ export const UserDataTable: FunctionComponent = () => {
     },
   });
 
-  const userColumns = useUserColumns(users);
+  const userAccountsColumns = useUserAccountsColumns(userAccounts);
 
   useEffect(() => {
     if (data) {
-      setUsers(data);
+      setUserAccounts(data);
       // setRefetchZonebooks(refetch);
     }
-  }, [data, setUsers, refetch]);
+  }, [data, setUserAccounts, refetch]);
 
   if (!data)
     return (
       <div className="text-primary flex h-full w-full items-center justify-center gap-2">
-        <LoadingSpinner size={50} /> Loading Zonebooks...
+        <LoadingSpinner size={50} /> Loading Users...
       </div>
     );
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={users ? users : []} columns={userColumns} />
+      <DataTable data={userAccounts ? userAccounts : []} columns={userAccountsColumns} />
     </Suspense>
   );
 };

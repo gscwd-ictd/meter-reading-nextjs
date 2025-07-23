@@ -83,8 +83,8 @@ export const mainNav: NavItem[] = [
     icon: Megaphone,
   },
   {
-    title: "Users",
-    url: "/users",
+    title: "User Accounts",
+    url: "/user-accounts",
     icon: UserCog2,
   },
   {
