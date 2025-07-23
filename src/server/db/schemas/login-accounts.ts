@@ -7,11 +7,15 @@ export const loginAccounts = pgTable("login_accounts", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  meterReaderId: varchar("meter_reader_id").references(() => meterReaders.meterReaderId),
+  meterReaderId: varchar("meter_reader_id")
+    .references(() => meterReaders.meterReaderId, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   username: varchar("username").notNull().unique(),
   password: varchar("password").notNull(),
-  positionTitle: varchar("position_title").notNull(),
-  image: text("image"),
+  //positionTitle: varchar("position_title").notNull(),
+  //image: text("image"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" })
     .defaultNow()

@@ -26,6 +26,7 @@ export const ScheduleReadingSchema = z.object({
       companyId: z.string(),
       name: z.string(),
       positionTitle: z.string(),
+      mobileNumber: z.string(),
       assignment: z.string(),
       photoUrl: z.string(),
       zoneBooks: ZoneBookSchema.pick({

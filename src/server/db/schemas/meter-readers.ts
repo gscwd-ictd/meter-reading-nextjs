@@ -75,6 +75,7 @@ export const meterReaderZoneBookRelations = relations(meterReaderZoneBook, ({ on
 export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book", {
   meterReaderId: varchar("meter_reader_id").notNull(),
   employeeId: varchar("employee_id").notNull(),
+  mobileNumber: varchar("username").notNull(),
   restDay: varchar("rest_day").notNull(),
   zoneBooks: jsonb("zone_books"),
 }).as(sql`
@@ -82,6 +83,7 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
     mr.meter_reader_id,
     mr.employee_id,
     mr.rest_day,
+    la.username,
     coalesce(  
       jsonb_agg(
         distinct jsonb_build_object(
@@ -95,6 +97,8 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
     ) as zone_books
   from 
     meter_readers mr
+  inner join 
+    login_accounts la on mr.meter_reader_id = la.meter_reader_id
   left join 
     meter_reader_zone_book mrzb on mr.meter_reader_id = mrzb.meter_reader_id
   left join 
@@ -102,7 +106,8 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
   group by 
     mr.meter_reader_id, 
     mr.employee_id, 
-    mr.rest_day
+    mr.rest_day,
+    la.username
   `);
 
 export const viewZoneBookAssignment = pgView("view_zone_book_assignment", {

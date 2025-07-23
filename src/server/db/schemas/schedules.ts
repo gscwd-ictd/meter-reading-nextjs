@@ -100,7 +100,7 @@ export const scheduleZoneBooksRelations = relations(scheduleZoneBooks, ({ one })
 }));
 
 export const viewScheduleReading = pgView("view_schedule_reading", {
-  readingDate: varchar("reading_date"),
+  readingDate: date("reading_date"),
   dueDate: jsonb("due_date"),
   disconnectionDate: jsonb("disconnection_date"),
   meterReaders: jsonb("meter_readers"),

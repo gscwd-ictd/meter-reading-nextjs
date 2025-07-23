@@ -6,7 +6,6 @@ import {
   scheduleReaderZoneBookView,
   schedules,
   scheduleZoneBooks,
-  scheduleZoneBookView,
   viewScheduleReading,
 } from "@mr/server/db/schemas/schedules";
 import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.interface.repository";
@@ -14,24 +13,23 @@ import {
   CreateMeterReaderScheduleZoneBook,
   CreateSchedule,
   MeterReaderZoneBook,
-  Schedule,
   ScheduleReading,
   ScheduleReadingSchema,
   ScheduleSchema,
 } from "@mr/server/types/schedule.type";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
-  async findScheduleByMonthYear(month: string, year: string): Promise<ScheduleReading[]> {
+  async findScheduleByMonthYear(month: number, year: number): Promise<ScheduleReading[]> {
     // Step 1: Query schedule readings by month & year
     const stmt = await db.pgConn
       .select()
       .from(viewScheduleReading)
       .where(
         sql`
-      EXTRACT(MONTH FROM ${viewScheduleReading.readingDate}) = ${Number(month)} 
-      AND EXTRACT(YEAR FROM ${viewScheduleReading.readingDate}) = ${Number(year)}
+      EXTRACT(MONTH FROM ${viewScheduleReading.readingDate}) = ${month} 
+      AND EXTRACT(YEAR FROM ${viewScheduleReading.readingDate}) = ${year}
     `,
       );
 
@@ -59,12 +57,12 @@ export class ScheduleRepository implements IScheduleRepository {
     );
   }
 
-  async findScheduleByExactDate(query: string): Promise<ScheduleReading | object> {
+  async findScheduleByDate(date: string): Promise<ScheduleReading | object> {
     // Step 1: Query the viewScheduleReading table for a specific reading date
     const stmt = await db.pgConn
       .select()
       .from(viewScheduleReading)
-      .where(eq(viewScheduleReading.readingDate, query));
+      .where(eq(viewScheduleReading.readingDate, date));
 
     // Step 2: If no schedule is found for that date, return an empty object
     if (stmt.length === 0) {
@@ -92,9 +90,21 @@ export class ScheduleRepository implements IScheduleRepository {
     return ScheduleReadingSchema.parse({ ...schedule, meterReaders: result });
   }
 
-  async createMonthYearSchedule(data: CreateSchedule[]): Promise<Schedule[]> {
-    const result = await db.pgConn.transaction(async (tx) => {
+  async createMonthYearSchedule(data: CreateSchedule[]): Promise<ScheduleReading[]> {
+    // Step 1: Extract the reading month and year from the first item in the input data
+    const { month, year } = (() => {
+      const date = new Date(data[0].readingDate); // Get the first reading date
+      return {
+        month: date.getMonth() + 1, // 0-based → 1-based (e.g. July = 7)
+        year: date.getFullYear(), // e.g. 2025
+      };
+    })();
+
+    // Step 2: Start a database transaction to ensure all inserts are atomic
+    await db.pgConn.transaction(async (tx) => {
+      // Step 3: Loop over each schedule input
       for (const item of data) {
+        // Step 4: Insert a schedule record and retrieve the inserted row
         const [schedule] = await tx
           .insert(schedules)
           .values({
@@ -102,75 +112,75 @@ export class ScheduleRepository implements IScheduleRepository {
             dueDate: item.dueDate,
             disconnectionDate: item.disconnectionDate,
           })
-          .returning();
+          .returning(); // Returns the inserted schedule, including scheduleId
 
+        // Step 5: If meter readers are assigned to this schedule, insert them
         if (item.meterReaders.length > 0) {
           await tx.insert(scheduleMeterReaders).values(
             item.meterReaders.map((reader) => ({
-              scheduleId: schedule.scheduleId,
-              meterReaderId: reader.meterReaderId,
+              scheduleId: schedule.scheduleId, // Link to the schedule
+              meterReaderId: reader.meterReaderId, // Reader assigned
             })),
           );
         }
       }
-
-      // Extract month and year from the first item's reading date
-      const firstDate = new Date(data[0].readingDate);
-      return {
-        month: (firstDate.getMonth() + 1).toString().padStart(2, "0"),
-        year: firstDate.getFullYear().toString(),
-      };
     });
 
-    // After transaction: retrieve records for that month and year
-    const findReading = await this.findScheduleByMonthYear(result.month, result.year);
-    return findReading;
+    // Step 6: After the transaction, retrieve schedules for the month and year we extracted
+    return await this.findScheduleByMonthYear(month, year);
   }
 
-  async removeScheduleByMonthYear(month: string, year: string): Promise<Schedule[]> {
+  async removeScheduleByMonthYear(month: number, year: number): Promise<ScheduleReading[]> {
+    // Step 1: Find schedules for the given month and year
     const scheduleFind = await this.findScheduleByMonthYear(month, year);
 
+    // Step 2: If no schedules found, throw a 404 error
     if (scheduleFind.length === 0) {
-      throw new HTTPException(404, { message: `No schedules found for ${month}-${year}` });
+      throw new HTTPException(404, {
+        message: `No schedules found for ${month}-${year}`,
+      });
     }
 
-    // Step 2: Delete from `schedules` table based on readingDate
-    const stmtDelete = db.pgConn
-      .delete(schedules) // ← this should be your actual table
-      .where(
-        sql`EXTRACT(MONTH FROM ${schedules.readingDate}) = ${Number(month)} 
-             AND EXTRACT(YEAR FROM ${schedules.readingDate}) = ${Number(year)}`,
-      )
-      .returning()
-      .prepare("delete_schedule_by_month_year");
+    // Step 3: Prepare start and end date strings for comparison
+    const paddedMonth = month.toString().padStart(2, "0");
+    const start = `${year}-${paddedMonth}-01`;
 
-    await stmtDelete.execute(); // return deleted rows
+    const endDate = new Date(year, month, 0); // last day of the given month
+    const end = `${year}-${paddedMonth}-${endDate.getDate().toString().padStart(2, "0")}`;
 
+    // Step 4: Run a transaction to delete all schedules within the date range
+    await db.pgConn.transaction(async (tx) => {
+      const stmtDelete = tx
+        .delete(schedules)
+        .where(
+          and(
+            gte(schedules.readingDate, start), // readingDate >= start
+            lte(schedules.readingDate, end), // readingDate <= end
+          ),
+        )
+        .prepare("delete_schedule_by_month_year");
+
+      await stmtDelete.execute();
+    });
+
+    // Step 5: Return the original schedules found (before deletion)
     return scheduleFind;
   }
 
-  async removeSchedueByExactDate(query: string): Promise<Schedule> {
-    const stmtFind = db.pgConn
-      .select()
-      .from(scheduleZoneBookView)
-      .where(eq(scheduleZoneBookView.readingDate, query))
-      .$dynamic()
-      .prepare("get_schedule_by_exact_date");
-    const [execute] = await stmtFind.execute();
+  async removeScheduleByDate(date: string): Promise<ScheduleReading | object> {
+    const scheduleFind = await this.findScheduleByDate(date);
 
-    if (!execute) {
-      throw new HTTPException(404, { message: `no schedule for the date of ${query}` });
+    if (!scheduleFind || Object.keys(scheduleFind).length === 0) {
+      throw new HTTPException(404, { message: `No schedule found for ${date}` });
     }
 
-    const stmtDelete = db.pgConn
+    await db.pgConn
       .delete(schedules)
-      .where(eq(scheduleZoneBookView.readingDate, query))
-      .returning()
-      .prepare("get_schedule_by_exact_date");
+      .where(eq(schedules.readingDate, date))
+      .prepare("get_schedule_by_exact_date")
+      .execute();
 
-    await stmtDelete.execute(); // return deleted rows
-
-    return ScheduleSchema.parse(execute);
+    return scheduleFind;
   }
 
   async findMeterReaderZoneBookByScheduleMeterReaderId(

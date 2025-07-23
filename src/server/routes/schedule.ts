@@ -18,13 +18,13 @@ const scheduleRoutes = new Hono()
     const isFullDate = /^\d{4}-\d{2}-\d{2}$/.test(date); // YYYY-MM-DD
 
     if (isMonthOnly) {
-      const [year, month] = date.split("-");
+      const [year, month] = date.split("-").map(Number);
       const result = await scheduleService.getScheduleByMonthYear(month, year);
       return c.json(result);
     }
 
     if (isFullDate) {
-      const result = await scheduleService.getScheduleByExactDate(date);
+      const result = await scheduleService.getScheduleByDate(date);
       return c.json(result);
     }
 
@@ -44,15 +44,15 @@ const scheduleRoutes = new Hono()
     const isFullDate = /^\d{4}-\d{2}-\d{2}$/.test(date); // YYYY-MM-DD
 
     if (isMonthOnly) {
-      const [year, month] = date.split("-");
+      const [year, month] = date.split("-").map(Number);
       const result = await scheduleService.deleteScheduleByMonthYear(month, year);
       return c.json(result);
     }
 
-    // if (isFullDate) {
-    //   const result = await scheduleService.getScheduleByExactDate(date);
-    //   return c.json(result);
-    // }
+    if (isFullDate) {
+      const result = await scheduleService.deleteScheduleByDate(date);
+      return c.json(result);
+    }
 
     return c.json({ error: "Invalid date format" }, 400);
   })

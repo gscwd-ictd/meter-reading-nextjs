@@ -11,24 +11,24 @@ import {
 export class ScheduleService implements IScheduleService {
   constructor(private readonly repository: IScheduleRepository) {}
 
-  async getScheduleByMonthYear(month: string, year: string): Promise<ScheduleReading[]> {
+  async getScheduleByMonthYear(month: number, year: number): Promise<ScheduleReading[]> {
     return await this.repository.findScheduleByMonthYear(month, year);
   }
 
-  async getScheduleByExactDate(query: string): Promise<ScheduleReading | object> {
-    return await this.repository.findScheduleByExactDate(query);
+  async getScheduleByDate(date: string): Promise<ScheduleReading | object> {
+    return await this.repository.findScheduleByDate(date);
   }
 
-  async addMonthYearSchedule(data: CreateSchedule[]): Promise<Schedule[]> {
+  async addMonthYearSchedule(data: CreateSchedule[]): Promise<ScheduleReading[]> {
     return await this.repository.createMonthYearSchedule(data);
   }
 
-  async deleteScheduleByMonthYear(month: string, year: string): Promise<Schedule[]> {
+  async deleteScheduleByMonthYear(month: number, year: number): Promise<ScheduleReading[]> {
     return await this.repository.removeScheduleByMonthYear(month, year);
   }
 
-  async deleteScheduelByExactYear(query: string): Promise<Schedule> {
-    return await this.repository.removeSchedueByExactDate(query);
+  async deleteScheduleByDate(date: string): Promise<ScheduleReading | object> {
+    return await this.repository.removeScheduleByDate(date);
   }
 
   async getMeterReaderZoneBookByScheduleMeterReaderId(
