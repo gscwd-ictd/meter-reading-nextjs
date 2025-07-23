@@ -10,14 +10,7 @@ import {
   viewMeterReaderZoneBook,
   viewZoneBookAssignment,
 } from "./schemas/meter-readers";
-import {
-  scheduleReaderZoneBookView,
-  schedules,
-  scheduleZoneBooks,
-  scheduleZoneBookView,
-  viewScheduleReading,
-} from "./schemas/schedules";
-import { consumerDetailsView } from "./schemas/consumer";
+import { schedules, scheduleZoneBooks, viewScheduleReading } from "./schemas/schedules";
 
 const pool = new Pool({
   host: env.POSTGRES_HOST,

@@ -9,6 +9,10 @@ export const MeterReaderQuerySchema = z.object({
   status: z.enum(["assigned", "unassigned"]),
 });
 
+export const MobileNumberSchema = z.string().refine((val) => /^09\d{9}$/.test(val), {
+  message: "Invalid Philippine mobile number. It must start with 09 and be exactly 11 digits.",
+});
+
 export const EmployeeDetailsSchema = z.object({
   employeeId: z.string(),
   companyId: z.string(),
@@ -25,6 +29,7 @@ export const MeterReaderDetailsSchema = z.object({
   name: z.string(),
   positionTitle: z.string(),
   assignment: z.string(),
+  mobileNumber: MobileNumberSchema,
   photoUrl: z.string(),
 });
 
@@ -53,6 +58,7 @@ export const PaginatedMeterReaderSchema = PaginatedSchema.extend({
 
 export const AssignMeterReaderSchema = MeterReaderSchema.pick({
   employeeId: true,
+  mobileNumber: true,
 }).extend({
   restDay: z.enum(RestDayType),
   zoneBooks: ZoneBookSchema.pick({

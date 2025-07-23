@@ -22,8 +22,9 @@ import {
 import { eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { MySqlQueryResult } from "drizzle-orm/mysql2";
 import { HTTPException } from "hono/http-exception";
-import { Zonebook } from "@mr/lib/types/zonebook";
 import { ZoneBook, ZoneBookSchema } from "@mr/server/types/zone-book.type";
+import { loginAccounts } from "@mr/server/db/schemas/login-accounts";
+import * as argon2 from "argon2";
 
 export class MeterReaderRepository implements IMeterReaderRepository {
   async findEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]> {
@@ -130,8 +131,14 @@ export class MeterReaderRepository implements IMeterReaderRepository {
 
   async findMeterReaderDetailsById(meterReaderId: string): Promise<MeterReaderDetails> {
     const stmt = db.pgConn
-      .select()
+      .select({
+        meterReaderId: meterReaders.meterReaderId,
+        employeeId: meterReaders.employeeId,
+        restDay: meterReaders.restDay,
+        mobileNumber: loginAccounts.username,
+      })
       .from(meterReaders)
+      .innerJoin(loginAccounts, eq(loginAccounts.meterReaderId, meterReaders.meterReaderId))
       .where(eq(meterReaders.meterReaderId, meterReaderId))
       .$dynamic()
       .prepare("get_meter_reader_details_by_id");
@@ -178,7 +185,10 @@ export class MeterReaderRepository implements IMeterReaderRepository {
 
   async assignMeterReader(data: AssignMeterReader): Promise<MeterReader> {
     // Destructure zoneBooks from input, and keep the rest of the fields for insertion
-    const { zoneBooks, ...meterReaderData } = data;
+    const { zoneBooks, mobileNumber, ...meterReaderData } = data;
+
+    // Set default password and hash it
+    const hashedPw = await argon2.hash("password");
 
     // Use a transaction to ensure all DB changes happen together
     const result = await db.pgConn.transaction(async (tx) => {
@@ -189,7 +199,14 @@ export class MeterReaderRepository implements IMeterReaderRepository {
         throw new HTTPException(500, { message: "failed to insert meter reader." });
       }
 
-      // Step 2: Insert assigned zone-books
+      // Step 2: Create the login account with default password
+      await tx.insert(loginAccounts).values({
+        meterReaderId: insertedMeterReader.meterReaderId,
+        username: mobileNumber,
+        password: hashedPw,
+      });
+
+      // Step 3: Insert assigned zone-books
       if (zoneBooks?.length) {
         await tx.insert(meterReaderZoneBook).values(
           zoneBooks.map((item) => ({
@@ -199,7 +216,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
         );
       }
 
-      // Step 3: Return only the ID — avoid mixing read concerns into transaction
+      // Step 4: Return only the ID — avoid mixing read concerns into transaction
       return insertedMeterReader.meterReaderId;
     });
 
@@ -207,7 +224,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
   }
 
   async updateMeterReaderById(meterReaderId: string, data: AssignMeterReader): Promise<MeterReader> {
-    const { zoneBooks, ...rest } = data;
+    const { zoneBooks, mobileNumber, ...rest } = data;
 
     // Step 1: Ensure the meter reader exists
     await this.findMeterReaderWithZoneBookById(meterReaderId);
@@ -224,6 +241,12 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       if (!update) {
         throw new HTTPException(500, { message: `failed to update meter reader with id ${meterReaderId}.` });
       }
+
+      await tx
+        .update(loginAccounts)
+        .set({ username: mobileNumber })
+        .where(eq(loginAccounts.meterReaderId, meterReaderId))
+        .returning();
 
       // Remove existing zone-book assignments
       await tx.delete(meterReaderZoneBook).where(eq(meterReaderZoneBook.meterReaderId, meterReaderId));
