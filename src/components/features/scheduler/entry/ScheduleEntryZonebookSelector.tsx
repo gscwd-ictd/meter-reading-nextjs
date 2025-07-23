@@ -600,7 +600,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
         </div>
 
         <Button
-          className="h-[3rem]"
+          className="h-[3rem] dark:text-white"
           onClick={handleApplyAllZonebooks}
           disabled={hasAnEmptyDueDate ? true : false}
         >
