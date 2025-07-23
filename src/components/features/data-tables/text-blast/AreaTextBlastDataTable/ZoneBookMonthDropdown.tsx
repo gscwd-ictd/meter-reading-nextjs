@@ -5,10 +5,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, parse } from "date-fns";
-
 import { Form, FormField, FormItem, FormControl, FormLabel } from "@/components/ui/Form";
 import * as z from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Command,
@@ -22,7 +21,7 @@ import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Zonebook } from "@/lib/types/zonebook";
+import { Account, AccountWithDates, Zonebook } from "@/lib/types/text-blast/ReadingDetails";
 
 const FormSchema = z.object({
   zone: z.string().nonempty({ message: "This field is required" }),
@@ -46,10 +45,7 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
   const setSelectedZone = useTextBlastStore((state) => state.setSelectedZone);
   const setSelectedBook = useTextBlastStore((state) => state.setSelectedBook);
   const setSelectedBillMonthYear = useTextBlastStore((state) => state.setSelectedBillMonthYear);
-  const setSelectedRecipients = useTextBlastStore((state) => state.setSelectedRecipients);
-
-  const concessionaires = useTextBlastStore((state) => state.concessionaires);
-  const sentTextMessages = useTextBlastStore((state) => state.sentTextMessages);
+  const setSelectedConsumers = useTextBlastStore((state) => state.setSelectedConsumers);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -63,21 +59,34 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
   const { data: zonebooks } = useQuery<Zonebook[]>({
     queryKey: ["get-all-zonebooks"],
     queryFn: async () => {
-      const response = await axios.get<Zonebook[]>(`${process.env.NEXT_PUBLIC_HOST}/zone-book`);
-      return response.data;
+      try {
+        const response = await axios.get<Zonebook[]>(`${process.env.NEXT_PUBLIC_HOST}/zone-book`);
+        if (response.data.length === 0) {
+          toast.info("Info", { description: "No zonebooks found" });
+        } else {
+          toast.success("Success", { description: "Zonebooks fetched successfully" });
+        }
+        return response.data;
+      } catch (error) {
+        toast.error("Error fetching zonebooks", { description: `${error}` });
+        return [];
+      }
     },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
+
+  const selectedZone = useWatch({ control: form.control, name: "zone" });
 
   const zones: ZoneOption[] = useMemo(() => {
     if (!zonebooks || zonebooks.length === 0) return [];
     const uniqueZones = [...new Set(zonebooks.map((zb) => zb.zone.toString()))];
     return uniqueZones.map((zone) => ({
       value: zone,
-      label: `Zone ${zone}`,
+      label: zone,
     }));
   }, [zonebooks]);
 
-  const selectedZone = form.watch("zone");
   const books: BookOption[] = useMemo(() => {
     if (!selectedZone || !zonebooks) return [];
     const booksForZone = zonebooks
@@ -86,7 +95,7 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
     const uniqueBooks = [...new Set(booksForZone)];
     return uniqueBooks.map((book) => ({
       value: book,
-      label: `Book ${book}`,
+      label: book,
     }));
   }, [selectedZone, zonebooks]);
 
@@ -99,6 +108,28 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
     form.setValue("book", book);
   };
 
+  const { data: accounts } = useQuery<AccountWithDates[]>({
+    queryKey: ["get-all-read-accounts-by-date"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_HOST}/meter-readers/cmcisxft004jmsy58bxkb03nf00bq/schedule-reading`,
+      );
+
+      const accounts = response.data.zoneBooks.flatMap((zoneBook: Zonebook) =>
+        zoneBook.accounts.map((account: Account) => ({
+          ...account,
+          book: zoneBook.book.toString(),
+          dueDate: zoneBook.dueDate,
+          disconnectionDate: zoneBook.disconnectionDate,
+          readingDate: format(response.data.readingDate, "yyyy-MM"),
+          contactNumber: account.contactNumber === null ? "" : account.contactNumber,
+        })),
+      );
+
+      return accounts;
+    },
+  });
+
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const { zone, book, billMonthYear } = data;
 
@@ -106,24 +137,25 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
     setSelectedBook(book);
     setSelectedBillMonthYear(billMonthYear);
 
-    const filtered = concessionaires.filter((concessionaire) => {
-      const alreadySent = sentTextMessages.some((msg) => msg.consumerId === concessionaire.consumerId);
+    if (!accounts) {
+      toast.error("Error fetching accounts", { description: "There is something wrong fetching accounts" });
+      return;
+    }
 
+    const filtered = accounts.filter((consumer) => {
       const matchesFilters =
-        concessionaire.zone === Number(zone) &&
-        concessionaire.book === Number(book) &&
-        concessionaire.billMonthYear === format(billMonthYear, "yyyy-MM");
+        consumer.zone === zone && consumer.book === book && consumer.readingDate === billMonthYear;
 
-      return !alreadySent && matchesFilters;
+      return matchesFilters;
     });
 
-    setSelectedRecipients(filtered);
+    setSelectedConsumers(filtered);
 
     if (filtered.length === 0) {
       toast.info("Info", { description: "No recipients found" });
     } else {
       toast.success("Success", {
-        description: `Found ${filtered.length} concessionaire/s matching your criteria`,
+        description: `Found ${filtered.length} consumer(s) matching your filters`,
       });
     }
 
@@ -267,17 +299,11 @@ export const ZoneBookMonthDropdown: FunctionComponent = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {/* {field.value ? format(field.value, "MMM yyyy") : <span>Select...</span>} */}
                         {field.value ? field.value : <span>Select...</span>}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
-                    {/* <MonthPicker
-                      onMonthSelect={field.onChange}
-                      selectedMonth={field.value}
-                      maxDate={new Date()}
-                    /> */}
                     <MonthPicker
                       onMonthSelect={(date) => {
                         const stringValue = format(date, "yyyy-MM");

@@ -3,6 +3,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Heading } from "@/components/features/typography/Heading";
 import { Badge } from "@/components/ui/Badge";
+import { FileX2 } from "lucide-react";
 
 interface NotSentMessageDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -60,7 +61,12 @@ export function NotSentMessageDataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                    <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                      No Results
+                    </span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

@@ -11,7 +11,7 @@ export default function TextBlastTableComponent() {
           <div className="p-3">
             <div className="flex flex-row items-center justify-between">
               <Heading variant={"h4"} className="text-primary">
-                Contacts
+                Consumers
               </Heading>
               <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="area">Area</TabsTrigger>

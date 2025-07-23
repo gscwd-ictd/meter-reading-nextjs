@@ -16,7 +16,7 @@ import { Heading } from "@/components/features/typography/Heading";
 import { Badge } from "@/components/ui/Badge";
 import { createContext, useEffect, useState } from "react";
 import { Input } from "@/components/ui/Input";
-import { SearchIcon } from "lucide-react";
+import { FileX2, SearchIcon } from "lucide-react";
 import { TextBlastReportDataTableToolbar } from "./TextBlastReportDataTableToolbar";
 
 interface TextBlastReportDataTableProps<TData, TValue> {
@@ -146,7 +146,12 @@ export function TextBlastReportDataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                    <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                      No Results
+                    </span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

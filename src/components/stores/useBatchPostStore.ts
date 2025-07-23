@@ -1,57 +1,57 @@
 import { SampleBatchPostData } from "@/lib/mock/SampleBatchPostData";
-import { BatchPost, BatchPostStatus } from "@/lib/types/batch-post";
+import { ReadingDetails, ReadingDetailsStatus } from "@/lib/types/text-blast/ReadingDetails";
 import { create } from "zustand";
 
 type BatchPostStore = {
-  concessionaires: BatchPost[];
-  setConcessionaires: (concessionaires: BatchPost[]) => void;
+  consumers: ReadingDetails[];
+  setConsumers: (consumers: ReadingDetails[]) => void;
 
-  selectedConcessionaires: BatchPost[];
-  setSelectedConcessionaires: (concessionaires: BatchPost[]) => void;
+  selectedConsumers: ReadingDetails[];
+  setSelectedConsumers: (consumers: ReadingDetails[]) => void;
 
-  addSelectedConcessionaire: (concessionaire: BatchPost) => void;
-  removeSelectedConcessionaire: (accountNo: string) => void;
-  clearSelectedConcessionaires: () => void;
+  addSelectedConsumer: (consumer: ReadingDetails) => void;
+  removeSelectedConsumer: (accountNumber: string) => void;
+  clearSelectedConsumers: () => void;
 
-  batchPostPostedConcessionaires: BatchPost[];
-  setBatchPostPostedConcessionaires: (batchPostPostedConcessionaires: BatchPost[]) => void;
+  postedReadConsumers: ReadingDetails[];
+  setPostedReadConsumers: (postedReadConsumers: ReadingDetails[]) => void;
 };
 
 export const useBatchPostStore = create<BatchPostStore>((set) => ({
-  concessionaires: SampleBatchPostData.filter(
-    (concessionaire) => concessionaire.status === BatchPostStatus.NOT_POSTED,
+  consumers: SampleBatchPostData.filter(
+    (consumer) => consumer.readingDetailsStatus === ReadingDetailsStatus.NOT_POSTED,
   ),
-  setConcessionaires: (concessionaires) => set({ concessionaires }),
+  setConsumers: (consumers) => set({ consumers }),
 
-  selectedConcessionaires: [],
-  setSelectedConcessionaires: (concessionaires) => set({ selectedConcessionaires: concessionaires }),
+  selectedConsumers: [],
+  setSelectedConsumers: (consumers) => set({ selectedConsumers: consumers }),
 
-  addSelectedConcessionaire: (concessionaire) =>
-    set((state) => ({ selectedConcessionaires: [...state.selectedConcessionaires, concessionaire] })),
-  removeSelectedConcessionaire: (accountNo) =>
+  addSelectedConsumer: (consumer) =>
+    set((state) => ({ selectedConsumers: [...state.selectedConsumers, consumer] })),
+  removeSelectedConsumer: (accountNumber) =>
     set((state) => ({
-      selectedConcessionaires: state.selectedConcessionaires.filter((r) => r.accountNo !== accountNo),
+      selectedConsumers: state.selectedConsumers.filter((r) => r.accountNumber !== accountNumber),
     })),
-  clearSelectedConcessionaires: () => set({ selectedConcessionaires: [] }),
+  clearSelectedConsumers: () => set({ selectedConsumers: [] }),
 
-  batchPostPostedConcessionaires: SampleBatchPostData.filter(
-    (concessionaire) => concessionaire.status === BatchPostStatus.POSTED,
+  postedReadConsumers: SampleBatchPostData.filter(
+    (consumer) => consumer.readingDetailsStatus === ReadingDetailsStatus.POSTED,
   ),
-  setBatchPostPostedConcessionaires: (newPosted) =>
+  setPostedReadConsumers: (newPosted) =>
     set((state) => {
       const filteredPosted = newPosted.filter(
         (item) =>
-          item.status === BatchPostStatus.POSTED &&
-          !state.batchPostPostedConcessionaires.some((existing) => existing.accountNo === item.accountNo),
+          item.readingDetailsStatus === ReadingDetailsStatus.POSTED &&
+          !state.postedReadConsumers.some((existing) => existing.accountNumber === item.accountNumber),
       );
 
-      const updatedConcessionaires = state.concessionaires.filter(
-        (item) => !filteredPosted.some((posted) => posted.accountNo === item.accountNo),
+      const updatedConcessionaires = state.consumers.filter(
+        (item) => !filteredPosted.some((posted) => posted.accountNumber === item.accountNumber),
       );
 
       return {
-        batchPostPostedConcessionaires: [...state.batchPostPostedConcessionaires, ...filteredPosted],
-        concessionaires: updatedConcessionaires,
+        postedReadConsumers: [...state.postedReadConsumers, ...filteredPosted],
+        consumers: updatedConcessionaires,
       };
     }),
 }));

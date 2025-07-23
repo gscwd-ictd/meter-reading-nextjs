@@ -2,7 +2,10 @@
 
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { ColumnDef, FilterFnOption } from "@tanstack/react-table";
-import { TextMessage as TextBlastReportColumn, TextMessageStatus } from "@/lib/types/text-message";
+import {
+  TextMessageData as TextBlastReportColumn,
+  TextMessageStatus,
+} from "@/lib/types/text-blast/TextMessage";
 import { Badge } from "@/components/ui/Badge";
 import { format } from "date-fns";
 
@@ -19,15 +22,15 @@ export const useTextBlastReportColumns = () => {
       filterFn: "dateBetween" as FilterFnOption<TextBlastReportColumn>,
     },
     {
-      accessorKey: "accountNo",
+      accessorKey: "accountNumber",
       header: "Account No.",
-      cell: ({ row }) => <span>{row.original.accountNo}</span>,
+      cell: ({ row }) => <span>{row.original.accountNumber}</span>,
       enableColumnFilter: false,
     },
     {
-      accessorKey: "concessionaireName",
-      header: "Concessionaire Name",
-      cell: ({ row }) => <span>{row.original.concessionaireName}</span>,
+      accessorKey: "consumerName",
+      header: "Account Name",
+      cell: ({ row }) => <span>{row.original.consumerName}</span>,
       enableColumnFilter: false,
     },
     {
@@ -48,9 +51,9 @@ export const useTextBlastReportColumns = () => {
       enableColumnFilter: false,
     },
     {
-      accessorKey: "primaryContactNumber",
-      header: "Contact Number",
-      cell: ({ row }) => <span>{row.original.primaryContactNumber}</span>,
+      accessorKey: "contactNumber",
+      header: "Contact No.",
+      cell: ({ row }) => <span>{row.original.contactNumber}</span>,
       enableColumnFilter: false,
     },
     {
@@ -62,7 +65,7 @@ export const useTextBlastReportColumns = () => {
 
         return (
           <span title={message}>
-            {message.length > maxLength ? `${message.substring(0, maxLength)}...` : message}
+            {message && message.length > maxLength ? `${message.substring(0, maxLength)}...` : message}
           </span>
         );
       },

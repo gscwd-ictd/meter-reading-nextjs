@@ -12,6 +12,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { createContext, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { AreaTextBlastDataTableToolbar } from "./AreaTextBlastDataTableToolbar";
+import { FileX2 } from "lucide-react";
+import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
 
 interface AreaTextBlastDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,6 +46,10 @@ export function AreaTextBlastDataTable<TData, TValue>({
       sorting,
     },
   });
+
+  const selectedZone = useTextBlastStore((state) => state.selectedZone);
+  const selectedBook = useTextBlastStore((state) => state.selectedBook);
+  const selectedBillMonthYear = useTextBlastStore((state) => state.selectedBillMonthYear);
 
   return (
     <div>
@@ -82,7 +88,12 @@ export function AreaTextBlastDataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
+                    <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                      No Results
+                    </span>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -99,6 +110,22 @@ export function AreaTextBlastDataTable<TData, TValue>({
               variant={`${table.getCoreRowModel().rows.length > 0 ? "default" : "outline"}`}
             >
               <p className="text-lg">{table.getCoreRowModel().rows.length ?? 0}</p>
+            </Badge>
+          </div>
+          <div className="flex flex-row items-center justify-end gap-2">
+            <p className="text-lg font-semibold">Bill Month/Year</p>
+            <Badge className="px-3" variant={`${selectedBillMonthYear ? "default" : "outline"}`}>
+              <p className={`text-lg ${!selectedBillMonthYear ? "text-gray-400" : ""}`}>
+                {selectedBillMonthYear ?? "YYYY-MM"}
+              </p>
+            </Badge>
+          </div>
+          <div className="flex flex-row items-center justify-end gap-2">
+            <p className="text-lg font-semibold">Zone & Book</p>
+            <Badge className="px-3" variant={`${selectedZone && selectedBook ? "default" : "outline"}`}>
+              <p className={`text-lg ${!selectedZone && !selectedBook ? "text-gray-400" : ""}`}>
+                {selectedZone ?? "Z"}-{selectedBook ?? "B"}
+              </p>
             </Badge>
           </div>
         </div>

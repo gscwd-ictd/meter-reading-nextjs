@@ -3,18 +3,18 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/Button";
-import { BatchPostListDataTableFacetedFilter } from "./BatchPostListDataTableFacetedFilter";
+import { BatchPostListDataTableFacetedFilter } from "./BatchPostPostedDataTableFacetedFilter";
 import { Input } from "@/components/ui/Input";
 import { useContext, useEffect, useState } from "react";
 import { Label } from "@/components/ui/Label";
 import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
-import { ColumnVisibilityToggleContext } from "./BatchPostListDataTable";
+import { ColumnVisibilityToggleContext } from "./BatchPostPostedDataTable";
 
-interface BatchPostListDataTableToolbarProps<TData> {
+interface BatchPostPostedDataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-export function BatchPostListDataTableToolbar<TData>({ table }: BatchPostListDataTableToolbarProps<TData>) {
+export function BatchPostPostedDataTableToolbar<TData>({ table }: BatchPostPostedDataTableToolbarProps<TData>) {
   const { enableColumnVisibilityToggle } = useContext(ColumnVisibilityToggleContext);
 
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -36,7 +36,12 @@ export function BatchPostListDataTableToolbar<TData>({ table }: BatchPostListDat
         {table.getAllColumns().map((col) => {
           if (col.getCanFilter()) {
             // Default faceted filter
-            if (col.id !== "dueDate" && col.id !== "disconnectionDate" && col.id !== "readingDate") {
+            if (
+              col.id !== "dueDate" &&
+              col.id !== "disconnectionDate" &&
+              col.id !== "readingDate" &&
+              col.id !== "datePosted"
+            ) {
               return (
                 <BatchPostListDataTableFacetedFilter
                   key={col.id}

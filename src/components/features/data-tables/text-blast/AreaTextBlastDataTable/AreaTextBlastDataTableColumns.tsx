@@ -1,85 +1,85 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
-import { Concessionaire as AreaTextBlastColumn } from "@/lib/types/concessionaire";
+import { useMemo } from "react";
 import { format } from "date-fns";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import { AccountWithDates as AreaTextBlastColumn } from "@/lib/types/text-blast/ReadingDetails";
 
-export const useAreaTextBlastColumns = (data: AreaTextBlastColumn[] | undefined) => {
-  const [areaTextBlastColumns, setAreaTextBlastColumns] = useState<ColumnDef<AreaTextBlastColumn>[]>([]);
+export const useAreaTextBlastColumns = () => {
+  const columns = useMemo(
+    () =>
+      [
+        {
+          accessorKey: "accountNumber",
+          header: "Account No.",
+          cell: ({ row }) => {
+            const accountNumber = row.original.accountNumber;
+            const consumerType = row.original.consumerType;
 
-  useEffect(() => {
-    const cols: ColumnDef<AreaTextBlastColumn>[] = [
-      {
-        accessorKey: "accountNo",
-        header: "Account No.",
-      },
-      {
-        accessorKey: "concessionaireName",
-        header: "Name",
-      },
-      {
-        accessorKey: "primaryContactNumber",
-        header: "Contact Number",
-        cell: ({ row }) => {
-          const number = row.getValue("primaryContactNumber") as string;
-          return number ? `+${number.slice(1, 3)}${number.slice(3, 6)}${number.slice(6)}` : "-";
+            return `${accountNumber}-${consumerType}`;
+          },
+          enableColumnFilter: false,
         },
-      },
-      {
-        accessorKey: "billedAmount",
-        header: "Current Bill",
-        cell: ({ row }) => {
-          const amount = parseFloat(row.getValue("billedAmount"));
-          return new Intl.NumberFormat("en-PH", {
-            style: "currency",
-            currency: "PHP",
-          }).format(amount);
+        {
+          accessorKey: "consumerName",
+          header: "Account Name",
+          cell: ({ row }) => (
+            <div className="max-w-[200px] truncate" title={row.original.consumerName}>
+              {row.original.consumerName}
+            </div>
+          ),
+          enableColumnFilter: false,
         },
-      },
-      {
-        accessorKey: "zone",
-        header: "Zone",
-      },
-      {
-        accessorKey: "book",
-        header: "Book",
-      },
-      {
-        accessorKey: "billMonthYear",
-        header: "Bill Month/Year",
-      },
-      {
-        accessorKey: "dueDate",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
-        cell: ({ row }) => {
-          const dueDate = new Date(row.original.dueDate);
-          return format(dueDate, "MM/dd/yyyy");
+        {
+          accessorKey: "contactNumber",
+          header: "Contact No.",
+          enableColumnFilter: false,
         },
-        sortingFn: (rowA, rowB, columnId) => {
-          const dateA = new Date(rowA.getValue(columnId)).getTime();
-          const dateB = new Date(rowB.getValue(columnId)).getTime();
-          return dateA - dateB;
+        {
+          accessorKey: "waterBalance",
+          header: "Billed Amount",
+          cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("waterBalance"));
+            return new Intl.NumberFormat("en-PH", {
+              style: "currency",
+              currency: "PHP",
+            }).format(amount);
+          },
+          enableColumnFilter: false,
         },
-      },
-      {
-        accessorKey: "disconnectionDate",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Disconnection Date" />,
-        cell: ({ row }) => {
-          const disconnectionDate = format(row.original.disconnectionDate, "MM/dd/yyyy");
-          return disconnectionDate;
+        {
+          accessorKey: "dueDate",
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
+          cell: ({ row }) => {
+            const dueDate = new Date(row.original.dueDate);
+            return format(dueDate, "MM/dd/yyyy");
+          },
+          sortingFn: (rowA, rowB, columnId) => {
+            const dateA = new Date(rowA.getValue(columnId)).getTime();
+            const dateB = new Date(rowB.getValue(columnId)).getTime();
+            return dateA - dateB;
+          },
+          enableColumnFilter: false,
         },
-        sortingFn: (rowA, rowB, columnId) => {
-          const dateA = new Date(rowA.getValue(columnId)).getTime();
-          const dateB = new Date(rowB.getValue(columnId)).getTime();
-          return dateA - dateB;
+        {
+          accessorKey: "disconnectionDate",
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Disconnection Date" />,
+          cell: ({ row }) => {
+            const date = row.original.disconnectionDate
+              ? format(row.original.disconnectionDate, "MM/dd/yyyy")
+              : "";
+            return date;
+          },
+          sortingFn: (rowA, rowB, columnId) => {
+            const dateA = new Date(rowA.getValue(columnId)).getTime();
+            const dateB = new Date(rowB.getValue(columnId)).getTime();
+            return dateA - dateB;
+          },
+          enableColumnFilter: false,
         },
-      },
-    ];
-
-    setAreaTextBlastColumns(cols);
-  }, [data]);
-
-  return areaTextBlastColumns;
+      ] satisfies ColumnDef<AreaTextBlastColumn>[],
+    [],
+  );
+  return columns;
 };

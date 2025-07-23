@@ -10,6 +10,8 @@ export const TextBlastReportTableComponent: FunctionComponent = () => {
   const textBlastReports = useTextBlastStore((state) => state.textBlastReports);
   const textBlastColumns = useTextBlastReportColumns();
 
+  console.log("textBlastReports", textBlastReports);
+
   return (
     <>
       <div className="p-4">

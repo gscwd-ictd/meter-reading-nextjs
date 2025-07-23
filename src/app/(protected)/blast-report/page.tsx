@@ -1,5 +1,4 @@
 import { TextBlastReportTableComponent } from "@/components/features/data-tables/text-blast/TextBlastReportDataTable/TextBlastReportTableComponent";
-import { Heading } from "@/components/features/typography/Heading";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -29,19 +28,10 @@ export default function TextBlastReportPage() {
         </div>
 
         <h3 className="mt-5 text-xl font-bold">Text Blast Report</h3>
-        <div className="text-base font-medium text-gray-400">Generate Reports from Text Blast</div>
+        <div className="text-muted-foreground text-base font-medium">Generate Reports from Text Blast</div>
 
-        <div className="mt-4 h-full w-full rounded-lg border-1 border-gray-300">
-          <div className="grid h-full grid-cols-3">
-            <div className="col-span-3">
-              <div className="p-4">
-                <Heading variant={"h4"} className="text-blue-700">
-                  Report
-                </Heading>
-              </div>
-              <TextBlastReportTableComponent />
-            </div>
-          </div>
+        <div>
+          <TextBlastReportTableComponent />
         </div>
       </div>
     </>

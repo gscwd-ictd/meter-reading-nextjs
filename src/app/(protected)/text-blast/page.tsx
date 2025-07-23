@@ -4,8 +4,6 @@ import { SentMessageTableComponent } from "@/components/features/data-tables/tex
 import { NotSentMessageTableComponent } from "@/components/features/data-tables/text-blast/NotSentMessageDataTable/NotSentMessageTableComponent";
 import { TextBlastSendMessageComponent } from "@/components/features/data-tables/text-blast/TextBlastSendMessageComponent";
 import TextBlastTableComponent from "@/components/features/data-tables/text-blast/TextBlastTableComponent";
-import { sendMessageToRecipients } from "@/lib/utils/sendMessageToRecipients";
-import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,7 +13,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/Breadcrumb";
 import { Button } from "@/components/ui/Button";
+import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
 import { toast } from "sonner";
+import { sendMessageToRecipients } from "@/lib/utils/text-blast/sendMessageToRecipients";
+import { TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
 
 export default function TextBlastPage() {
   const notSentTextMessages = useTextBlastStore((state) => state.notSentTextMessages);
@@ -29,41 +30,45 @@ export default function TextBlastPage() {
 
     try {
       const failedRecipients = notSentTextMessages.map((msg) => ({
-        consumerId: msg.consumerId,
-        accountNo: msg.accountNo,
-        concessionaireName: msg.concessionaireName,
-        primaryContactNumber: msg.primaryContactNumber,
-        billedAmount: msg.billedAmount,
-        billMonthYear: msg.billMonthYear,
-        dueDate: msg.dueDate,
-        disconnectionDate: msg.disconnectionDate,
-        dateCreated: new Date().toISOString(),
-        dateUpdated: new Date().toISOString(),
+        ...msg,
+        status: TextMessageStatus.FAILED,
       }));
 
-      const results = await sendMessageToRecipients(failedRecipients);
+      const result = await sendMessageToRecipients(failedRecipients);
 
-      setTextMessages(results.successful, results.failed);
+      const successful = result.successful.map((s) => ({
+        ...s,
+        status: TextMessageStatus.SENT,
+      }));
 
-      const processedIds = [
-        ...results.successful.map((r) => r.consumerId),
-        ...results.failed.map((r) => r.consumerId),
+      const failed = result.failed.map((f) => ({
+        ...f,
+        status: TextMessageStatus.FAILED,
+      }));
+
+      setTextMessages(successful, failed);
+
+      const processedContactNumbers = [
+        ...successful.map((r) => r.contactNumber),
+        ...failed.map((r) => r.contactNumber),
       ];
 
       useTextBlastStore.setState((state) => ({
-        concessionaires: state.concessionaires.filter((c) => !processedIds.includes(c.consumerId)),
-        selectedRecipients: state.selectedRecipients.filter((r) => !processedIds.includes(r.consumerId)),
+        consumers: state.consumers.filter((c) => !processedContactNumbers.includes(c.contactNumber)),
+        selectedConsumers: state.selectedConsumers.filter(
+          (r) => !processedContactNumbers.includes(r.contactNumber),
+        ),
       }));
 
-      if (results.successful.length > 0) {
+      if (successful.length > 0) {
         toast.success("Success", {
-          description: `Resent ${results.successful.length} ${results.successful.length > 1 ? "messages" : "message"}`,
+          description: `Resent ${successful.length} message(s)`,
         });
       }
 
-      if (results.failed.length > 0) {
+      if (failed.length > 0) {
         toast.error("Error", {
-          description: `${results.failed.length} ${results.failed.length > 1 ? "messages" : "message"} failed to send`,
+          description: `${failed.length} message(s) failed to send`,
         });
       }
     } catch (error) {
@@ -88,7 +93,7 @@ export default function TextBlastPage() {
           </Breadcrumb>
         </div>
         <h3 className="mt-5 text-xl font-bold">Text Blast</h3>
-        <div className="text-base font-medium text-gray-400">Send Water Bill to Concessionaires</div>
+        <div className="text-muted-foreground text-base font-medium">Send Water Bill to Consumers</div>
         <div className="mt-1 grid flex-1 grid-cols-3 border-1 border-gray-200">
           <div className="col-span-2 flex h-full flex-col justify-between border-1 border-t-0 border-b-0 border-l-0 border-gray-200">
             <div className="h-full">
@@ -110,7 +115,7 @@ export default function TextBlastPage() {
                     onClick={handleResend}
                     disabled={notSentTextMessages.length === 0}
                   >
-                    Resend ({notSentTextMessages.length})
+                    Resend
                   </Button>
                 </div>
               </div>

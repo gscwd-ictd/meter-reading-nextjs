@@ -3,119 +3,112 @@
 import { useTextBlastStore } from "@/components/stores/useTextBlastStore";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
-import { generateMessageTemplate } from "@/lib/utils/generateMessageTemplate";
-import { sendMessageToRecipients } from "@/lib/utils/sendMessageToRecipients";
-import { useEffect, useState } from "react";
+import { TextMessage, TextMessageStatus } from "@/lib/types/text-blast/TextMessage";
+import { createTextMessageTemplate } from "@/lib/utils/text-blast/createTextMessageTemplate";
+import { sendMessageToRecipients } from "@/lib/utils/text-blast/sendMessageToRecipients";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export const TextBlastSendMessageComponent = () => {
-  const [message, setMessage] = useState("");
-  const [hasSent, setHasSent] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const { register, handleSubmit, setValue, watch, reset } = useForm<Omit<TextMessage, "contactNumber">>();
 
-  const selectedRecipients = useTextBlastStore((state) => state.selectedRecipients);
-  const setTextMessages = useTextBlastStore((state) => state.setTextMessages);
+  const message = watch("message");
+
+  const selectedConsumers = useTextBlastStore((state) => state.selectedConsumers);
 
   const setSelectedZone = useTextBlastStore((state) => state.setSelectedZone);
   const setSelectedBook = useTextBlastStore((state) => state.setSelectedBook);
   const setSelectedBillMonthYear = useTextBlastStore((state) => state.setSelectedBillMonthYear);
 
-  useEffect(() => {
-    if (selectedRecipients.length > 0) {
-      const firstRecipient = selectedRecipients[0];
-      const defaultMessage = generateMessageTemplate(firstRecipient);
-      setMessage(defaultMessage);
-      setHasSent(false);
-    } else {
-      setMessage("");
-    }
-  }, [selectedRecipients]);
+  const clearSelectedConsumers = useTextBlastStore((state) => state.clearSelectedConsumers);
+  const setTextMessageRecipients = useTextBlastStore((state) => state.setTextMessageRecipients);
 
-  const handleSend = async () => {
-    if (!message.trim()) {
+  const setSentTextMessages = useTextBlastStore((state) => state.setSentTextMessages);
+  const setNotSentTextMessages = useTextBlastStore((state) => state.setNotSentTextMessages);
+
+  useEffect(() => {
+    if (selectedConsumers.length > 0) {
+      const firstRecipient = selectedConsumers[0];
+      const defaultMessage = createTextMessageTemplate(firstRecipient);
+      setValue("message", defaultMessage.message);
+    } else {
+      reset({ message: "" });
+    }
+  }, [reset, selectedConsumers, setValue]);
+
+  const onSubmit = async (data: Omit<TextMessage, "contactNumber">) => {
+    if (!data.message.trim()) {
       toast.error("Error", { description: "Please enter message first" });
       return;
     }
 
-    if (selectedRecipients.length === 0) {
+    if (selectedConsumers.length === 0) {
       toast.info("Info", { description: "No recipients selected" });
       return;
     }
 
-    setIsSending(true);
-
     try {
-      const failedRecipients = selectedRecipients.map((msg) => ({
-        consumerId: msg.consumerId,
-        accountNo: msg.accountNo,
-        concessionaireName: msg.concessionaireName,
-        primaryContactNumber: msg.primaryContactNumber,
-        billedAmount: msg.billedAmount,
-        billMonthYear: msg.billMonthYear,
-        dueDate: msg.dueDate,
-        disconnectionDate: msg.disconnectionDate,
-        zone: msg.zone,
-        book: msg.book,
-        dateCreated: msg.dateCreated,
-        dateUpdated: msg.dateUpdated,
+      const recipients = selectedConsumers
+        // .filter((consumer) => consumer.contactNumber)
+        .map((consumer) => createTextMessageTemplate(consumer));
+
+      setTextMessageRecipients(recipients);
+      const result = await sendMessageToRecipients(recipients);
+
+      const successful = result.successful.map((s) => ({
+        ...s,
+        status: TextMessageStatus.SENT,
       }));
 
-      const results = await sendMessageToRecipients(failedRecipients);
-
-      setTextMessages(results.successful, results.failed);
-
-      const processedIds = [
-        ...results.successful.map((r) => r.consumerId),
-        ...results.failed.map((r) => r.consumerId),
-      ];
-
-      useTextBlastStore.setState((state) => ({
-        concessionaires: state.concessionaires.filter((c) => !processedIds.includes(c.consumerId)),
-        selectedRecipients: state.selectedRecipients.filter((r) => !processedIds.includes(r.consumerId)),
+      const failed = result.failed.map((f) => ({
+        ...f,
+        status: TextMessageStatus.FAILED,
       }));
 
-      setHasSent(true);
-      setMessage("");
+      setSentTextMessages(successful);
+      setNotSentTextMessages(failed);
+
+      if (successful.length > 0) {
+        toast.success("Success", {
+          description: `Sent message to ${successful.length} consumer(s)`,
+        });
+      }
+
+      if (failed.length > 0) {
+        toast.error("Error", {
+          description: `${failed.length} message(s) failed to send`,
+        });
+      }
+
+      reset();
       setSelectedZone("");
       setSelectedBook("");
       setSelectedBillMonthYear(null);
-
-      if (results.successful.length > 0) {
-        toast.success("Success", {
-          description: `Sent ${results.successful.length} messages`,
-        });
-      }
-
-      if (results.failed.length > 0) {
-        toast.error("Error", {
-          description: `${results.failed.length} ${results.failed.length > 1 ? "messages" : "message"} failed to send`,
-        });
-      }
+      setTextMessageRecipients([]);
+      clearSelectedConsumers();
     } catch (error) {
-      toast.error("Error", { description: `Failed to send messages: ${error}` });
-    } finally {
-      setIsSending(false);
+      toast.error("Error", {
+        description: `Failed to send: ${error}`,
+      });
     }
   };
 
   return (
-    <div className="p-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="p-4">
       <Textarea
+        {...register("message")}
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder={"Type your message here..."}
+        placeholder={"Message here..."}
         rows={6}
         disabled={true}
         className="resize-none"
       />
       <div className="mt-2 flex items-center justify-end">
-        <Button
-          onClick={handleSend}
-          disabled={!message.trim() || selectedRecipients.length === 0 || hasSent || isSending}
-        >
-          {isSending ? "Sending..." : "Send Message"}
+        <Button type="submit" disabled={selectedConsumers.length === 0}>
+          Send Message
         </Button>
       </div>
-    </div>
+    </form>
   );
 };

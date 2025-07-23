@@ -1,33 +1,63 @@
-"use client";
+// "use client";
 
-import { FunctionComponent, Suspense, useCallback, useState } from "react";
-import { useBatchPostColumns } from "./BatchPostListDataTableColumns";
-import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
-import { BatchPostListDataTable } from "./BatchPostListDataTable";
-import { BatchPost } from "@/lib/types/batch-post";
-import { Dialog } from "@/components/ui/Dialog";
-import ViewMeterReadingDetails from "@/components/features/batch-post/ViewMeterReadingDetails";
+// import { FunctionComponent, Suspense, useCallback, useState } from "react";
+// import { useBatchPostColumns } from "./BatchPostListDataTableColumns";
+// import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
+// import { BatchPostListDataTable } from "./BatchPostListDataTable";
+// import { Dialog } from "@/components/ui/Dialog";
+// import ViewMeterReadingDetails from "@/components/features/batch-post/ViewMeterReadingDetails";
+// import { Button } from "@/components/ui/Button";
+// import { toast } from "sonner";
+// import { ReadingDetails, ReadingDetailsStatus } from "@/lib/types/text-blast/ReadingDetails";
 
-export const BatchPostTableComponent: FunctionComponent = () => {
-  const concessionaires = useBatchPostStore((state) => state.concessionaires);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<BatchPost | null>(null);
+// export const BatchPostListTableComponent: FunctionComponent = () => {
+//   const consumers = useBatchPostStore((state) => state.consumers);
+//   const [openDialog, setOpenDialog] = useState(false);
+//   const [selectedRow, setSelectedRow] = useState<ReadingDetails | null>(null);
 
-  const handleViewDetails = useCallback((row: BatchPost) => {
-    setSelectedRow(row);
-    setOpenDialog(true);
-  }, []);
+//   const selectedConsumers = useBatchPostStore((state) => state.selectedConsumers);
+//   const setPostedReadConsumers = useBatchPostStore((state) => state.setPostedReadConsumers);
+//   const clearSelectedConsumers = useBatchPostStore((state) => state.clearSelectedConsumers);
 
-  const batchPostColumns = useBatchPostColumns(concessionaires, handleViewDetails);
+//   function handleClick() {
+//     if (selectedConsumers.length === 0) {
+//       toast.info("Info", { description: "No failed messages to resend" });
+//       return;
+//     }
 
-  return (
-    <>
-      <Suspense fallback={<p>Loading...</p>}>
-        <BatchPostListDataTable data={concessionaires ?? []} columns={batchPostColumns} />
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <ViewMeterReadingDetails data={selectedRow} />
-        </Dialog>
-      </Suspense>
-    </>
-  );
-};
+//     const posted = selectedConsumers.map((item) => ({
+//       ...item,
+//       status: ReadingDetailsStatus.POSTED,
+//     }));
+
+//     setPostedReadConsumers(posted);
+//     clearSelectedConsumers();
+
+//     toast.success("Success", {
+//       description: `${posted.length} ${posted.length > 1 ? "accounts" : "account"} successfully posted.`,
+//     });
+//   }
+
+//   const handleViewDetails = useCallback((row: ReadingDetails) => {
+//     setSelectedRow(row);
+//     setOpenDialog(true);
+//   }, []);
+
+//   const batchPostColumns = useBatchPostColumns(consumers, handleViewDetails);
+
+//   return (
+//     <>
+//       <Suspense fallback={<p>Loading...</p>}>
+//         <BatchPostListDataTable data={consumers ?? []} columns={batchPostColumns} />
+//         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+//           <ViewMeterReadingDetails data={selectedRow} />
+//         </Dialog>
+//         <div className="flex justify-end">
+//           <Button onClick={handleClick} disabled={selectedConsumers.length === 0} className="w-fit">
+//             Send
+//           </Button>
+//         </div>
+//       </Suspense>
+//     </>
+//   );
+// };

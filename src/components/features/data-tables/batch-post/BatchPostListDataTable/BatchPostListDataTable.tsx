@@ -109,7 +109,7 @@ export function BatchPostListDataTable<T>({
       </ColumnVisibilityToggleContext.Provider>
 
       <div>
-        <div className="overflow-auto rounded-md border sm:h-60 md:h-80 lg:h-144">
+        <div className="overflow-auto rounded-md border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

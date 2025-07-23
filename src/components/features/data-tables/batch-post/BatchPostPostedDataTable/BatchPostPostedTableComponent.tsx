@@ -6,28 +6,25 @@ import { useBatchPostPostedColumns } from "./BatchPostPostedDataTableColumns";
 import { useBatchPostStore } from "@/components/stores/useBatchPostStore";
 import { Dialog } from "@/components/ui/Dialog";
 import ViewMeterReadingDetails from "@/components/features/batch-post/ViewMeterReadingDetails";
-import { BatchPost } from "@/lib/types/batch-post";
+import { ReadingDetails } from "@/lib/types/text-blast/ReadingDetails";
 
 export const BatchPostPostedTableComponent: FunctionComponent = () => {
-  const batchPostPostedConcessionaires = useBatchPostStore((state) => state.batchPostPostedConcessionaires);
+  const postedReadConsumers = useBatchPostStore((state) => state.postedReadConsumers);
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<BatchPost | null>(null);
+  const [selectedRow, setSelectedRow] = useState<ReadingDetails | null>(null);
 
-  const handleViewDetails = useCallback((row: BatchPost) => {
+  const handleViewDetails = useCallback((row: ReadingDetails) => {
     setSelectedRow(row);
     setOpenDialog(true);
   }, []);
 
-  const batchPostPostedColumns = useBatchPostPostedColumns(batchPostPostedConcessionaires, handleViewDetails);
+  const batchPostPostedColumns = useBatchPostPostedColumns(postedReadConsumers, handleViewDetails);
 
   return (
     <>
       <Suspense fallback={<p>Loading...</p>}>
-        <BatchPostPostedDataTable
-          data={batchPostPostedConcessionaires ?? []}
-          columns={batchPostPostedColumns}
-        />
+        <BatchPostPostedDataTable data={postedReadConsumers ?? []} columns={batchPostPostedColumns} />
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <ViewMeterReadingDetails data={selectedRow} />
         </Dialog>
