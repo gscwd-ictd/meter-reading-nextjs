@@ -84,7 +84,7 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
 
   useEffect(() => {
     if (area && editAssignAreaZonebookDialogIsOpen) setSelectedArea({ area: area.area, areaId: area.areaId });
-  }, [area, editAssignAreaZonebookDialogIsOpen]);
+  }, [area, editAssignAreaZonebookDialogIsOpen, setSelectedArea]);
 
   return (
     <Dialog

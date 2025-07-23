@@ -6,10 +6,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
+import { MeterReader } from "@mr/lib/types/personnel";
 import { Ellipsis } from "lucide-react";
-import { useState } from "react";
+import { FunctionComponent, useState } from "react";
 
-export const UserAccountsDropdownActions = () => {
+type UserAccountsDropdownActionsProps = {
+  meterReader: MeterReader;
+};
+
+export const UserAccountsDropdownActions: FunctionComponent<UserAccountsDropdownActionsProps> = ({
+  meterReader,
+}) => {
   const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
 
   return (
@@ -25,9 +32,9 @@ export const UserAccountsDropdownActions = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
-        <DropdownMenuItem>Change Password</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => console.log(meterReader)}>Change Password</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Reset Password</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => console.log(meterReader)}>Reset Password</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

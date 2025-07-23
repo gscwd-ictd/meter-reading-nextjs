@@ -16,7 +16,6 @@ import {
   FileText,
   Book,
   Scan,
-  User2,
   UserCog2,
 } from "lucide-react";
 

@@ -25,7 +25,6 @@ import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 type AddMeterReaderDialogProps = {
   addMeterReaderDialogIsOpen: boolean;

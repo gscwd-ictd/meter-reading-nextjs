@@ -40,7 +40,11 @@ export const useUserAccountsColumns = (data: MeterReader[]) => {
         cell: ({ row }) => <span>{row.original.mobileNumber}</span>,
         meta: { exportLabel: "Contact Number" },
       },
-      { accessorKey: "companyId", header: "Actions", cell: ({ row }) => <UserAccountsDropdownActions /> },
+      {
+        accessorKey: "companyId",
+        header: "Actions",
+        cell: ({ row }) => <UserAccountsDropdownActions meterReader={row.original} />,
+      },
     ];
 
     setUserAccountsColumns(cols);
