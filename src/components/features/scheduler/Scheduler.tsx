@@ -22,6 +22,7 @@ import { Skeleton } from "@mr/components/ui/Skeleton";
 import { MonthYearPicker } from "../calendar/MonthYearPicker";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 
 export const Scheduler: FunctionComponent = () => {
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
@@ -224,9 +225,10 @@ export const Scheduler: FunctionComponent = () => {
           </section>
 
           <section className="hidden sm:hidden md:block lg:block">
-            <ButtonGroup>
+            <ButtonGroup className="rounded border">
               <Button
                 variant="outline"
+                className="border-none dark:rounded-none"
                 onClick={() => {
                   resetOnChange();
                   scheduler.goToPreviousMonth();
@@ -234,17 +236,26 @@ export const Scheduler: FunctionComponent = () => {
               >
                 <ChevronLeft />
               </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="border-none dark:rounded-none"
+                    variant="outline"
+                    onClick={() => {
+                      resetOnChange();
+                      scheduler.today();
+                    }}
+                  >
+                    Month
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Jump to current month</p>
+                </TooltipContent>
+              </Tooltip>
               <Button
                 variant="outline"
-                onClick={() => {
-                  resetOnChange();
-                  scheduler.today();
-                }}
-              >
-                Today
-              </Button>
-              <Button
-                variant="outline"
+                className="border-none dark:rounded-none"
                 onClick={() => {
                   resetOnChange();
                   scheduler.goToNextMonth();

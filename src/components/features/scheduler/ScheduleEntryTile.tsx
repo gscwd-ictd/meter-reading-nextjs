@@ -6,7 +6,11 @@ import { ZonebookStatusIndicator } from "../zonebook/ZonebookStatusIndicator";
 import { getDayFromDate } from "@mr/lib/functions/handleDateArrayOrObject";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { Badge } from "@mr/components/ui/Badge";
-import { compareAsc, formatDate } from "date-fns";
+import { compareAsc, format, formatDate, isToday } from "date-fns";
+import { NormalDates } from "./entry/NormalDates";
+import { SplittedDates } from "./entry/SplittedDates";
+import { ShortSplittedDates } from "./entry/ShortSplittedDates";
+import { ShortNormalDates } from "./entry/ShortNormalDates";
 
 type ScheduleEntryTileProps = {
   activeContext: number | null;
@@ -47,7 +51,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
           e.preventDefault();
         }
       }}
-      className={`group relative grid h-full w-full grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800 ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} `}
+      className={`group ${isToday(entry.readingDate) ? "bg-blue-100 dark:bg-slate-900" : "bg-white dark:bg-black"} relative grid h-full w-full grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800 ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} `}
     >
       {isWithinMonth && (
         <>
@@ -78,7 +82,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
             )}
           </div>
           {/* Due Date */}
-          {Array.isArray(entry.dueDate) ? (
+          {/* {Array.isArray(entry.dueDate) ? (
             <div className="flex items-center justify-center">
               <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <span className="text-blue-600 dark:text-blue-600">
@@ -98,9 +102,9 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
                 </span>
               </Badge>
             </div>
-          ) : null}
+          ) : null} */}
           {/* Disconnection Date */}
-          {Array.isArray(entry.disconnectionDate) ? (
+          {/* {Array.isArray(entry.disconnectionDate) ? (
             <div className="flex items-center justify-center">
               <Badge className="w-full gap-0 rounded-none bg-transparent">
                 <div className="text-red-600 dark:text-rose-600">
@@ -120,7 +124,16 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
                 </span>
               </Badge>
             </div>
-          ) : null}
+          ) : null} */}
+
+          {Array.isArray(entry?.dueDate) && Array.isArray(entry.disconnectionDate) && (
+            <ShortSplittedDates dueDates={entry.dueDate} disconnectionDates={entry.disconnectionDate} />
+          )}
+
+          {entry && !Array.isArray(entry?.dueDate) && !Array.isArray(entry.disconnectionDate) && (
+            <ShortNormalDates dueDate={entry.dueDate!} disconnectionDate={entry.disconnectionDate!} />
+          )}
+
           {/* Rest Day Indicator */}
           {(dateIsSunday || dateIsSaturday) &&
             isWithinMonth &&
