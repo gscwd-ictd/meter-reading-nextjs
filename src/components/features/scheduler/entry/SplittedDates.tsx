@@ -32,7 +32,7 @@ export const SplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, disconne
         )}
         {due && disc && <span className="text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">/</span>}
         {disc && (
-          <div className="text-destructive flex items-center gap-1 text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
+          <div className="flex items-center gap-1 text-[0.5rem] text-red-500 sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
             <ScissorsLineDashedIcon className="size-2 shrink-0 sm:size-2 md:size-2 lg:size-4" />
             Disconnection: {format(disc, "MMM dd, yyyy")}
           </div>

@@ -38,69 +38,71 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
   return (
     <SidebarGroup {...props}>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item, index) => {
-          const isSubmenuOpen = openSubmenus[item.title];
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item, index) => {
+            const isSubmenuOpen = openSubmenus[item.title];
 
-          return (
-            <SidebarMenuItem key={index}>
-              {item.children ? (
-                <div className="flex w-full flex-col">
+            return (
+              <SidebarMenuItem key={index}>
+                {item.children ? (
+                  <div className="flex w-full flex-col">
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      isActive={
+                        Array.isArray(item.children) &&
+                        item.children.some((child) => pathname.startsWith(child.url!))
+                      }
+                      onClick={() => toggleSubmenu(item.title)}
+                    >
+                      {item.icon && <item.icon />}
+                      <span className="flex-1">{item.title}</span>
+                      {isSubmenuOpen ? (
+                        <ChevronDownIcon className="h-4 w-4 opacity-70" />
+                      ) : (
+                        <ChevronRightIcon className="h-4 w-4 opacity-70" />
+                      )}
+                    </SidebarMenuButton>
+
+                    {isSubmenuOpen && (
+                      <div className="border-muted mt-1 ml-2 flex flex-col gap-1 border-l pl-4">
+                        {Array.isArray(item.children) &&
+                          item.children.map((child) => (
+                            <SidebarMenuButton
+                              key={child.title}
+                              tooltip={child.title}
+                              size="sm"
+                              isActive={pathname.startsWith(child.url!)}
+                              onClick={() => router.push(child.url!)}
+                            >
+                              {child.icon && <child.icon />}
+                              <span className="text-sm">{child.title}</span>
+                            </SidebarMenuButton>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
                   <SidebarMenuButton
                     tooltip={item.title}
-                    isActive={
-                      Array.isArray(item.children) &&
-                      item.children.some((child) => pathname.startsWith(child.url!))
-                    }
-                    onClick={() => toggleSubmenu(item.title)}
+                    isActive={pathname.startsWith(item.url || "")}
+                    onClick={() => {
+                      if (item.title === "Schedule") reset();
+                      if (item.url) router.push(item.url);
+                    }}
                   >
                     {item.icon && <item.icon />}
-                    <span className="flex-1">{item.title}</span>
-                    {isSubmenuOpen ? (
-                      <ChevronDownIcon className="h-4 w-4 opacity-70" />
-                    ) : (
-                      <ChevronRightIcon className="h-4 w-4 opacity-70" />
+                    <span>{item.title}</span>
+                    {item.count && (
+                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
                     )}
                   </SidebarMenuButton>
-
-                  {isSubmenuOpen && (
-                    <div className="border-muted mt-1 ml-2 flex flex-col gap-1 border-l pl-4">
-                      {Array.isArray(item.children) &&
-                        item.children.map((child) => (
-                          <SidebarMenuButton
-                            key={child.title}
-                            tooltip={child.title}
-                            size="sm"
-                            isActive={pathname.startsWith(child.url!)}
-                            onClick={() => router.push(child.url!)}
-                          >
-                            {child.icon && <child.icon />}
-                            <span className="text-sm">{child.title}</span>
-                          </SidebarMenuButton>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  isActive={pathname.startsWith(item.url || "")}
-                  onClick={() => {
-                    if (item.title === "Schedule") reset();
-                    if (item.url) router.push(item.url);
-                  }}
-                >
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  {item.count && (
-                    <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
-                  )}
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          );
-        })}
-      </SidebarMenu>
+                )}
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroupContent>
     </SidebarGroup>
   );
 };
@@ -110,6 +112,9 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
   ...props
 }) => {
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+  const pathname = usePathname();
+  const router = useRouter();
+  const reset = useSchedulesStore((state) => state.reset);
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenus((prev) => ({
@@ -120,49 +125,65 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
 
   return (
     <SidebarGroup {...props}>
+      <SidebarGroupLabel>System</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => {
-            const hasChildren = Array.isArray(item.children);
-            const isOpen = openSubmenus[item.title];
+          {items.map((item, index) => {
+            const isSubmenuOpen = openSubmenus[item.title];
 
             return (
-              <SidebarMenuItem key={item.title}>
-                {hasChildren ? (
+              <SidebarMenuItem key={index}>
+                {item.children ? (
                   <div className="flex w-full flex-col">
                     <SidebarMenuButton
                       tooltip={item.title}
-                      size="sm"
+                      isActive={
+                        Array.isArray(item.children) &&
+                        item.children.some((child) => pathname.startsWith(child.url!))
+                      }
                       onClick={() => toggleSubmenu(item.title)}
                     >
                       {item.icon && <item.icon />}
                       <span className="flex-1">{item.title}</span>
-                      {isOpen ? (
+                      {isSubmenuOpen ? (
                         <ChevronDownIcon className="h-4 w-4 opacity-70" />
                       ) : (
                         <ChevronRightIcon className="h-4 w-4 opacity-70" />
                       )}
                     </SidebarMenuButton>
 
-                    {isOpen && (
+                    {isSubmenuOpen && (
                       <div className="border-muted mt-1 ml-2 flex flex-col gap-1 border-l pl-4">
                         {Array.isArray(item.children) &&
                           item.children.map((child) => (
-                            <SidebarMenuButton key={child.title} asChild size="sm">
-                              <a href={child.url}>
-                                <span>{child.title}</span>
-                              </a>
+                            <SidebarMenuButton
+                              key={child.title}
+                              tooltip={child.title}
+                              size="sm"
+                              isActive={pathname.startsWith(child.url!)}
+                              onClick={() => router.push(child.url!)}
+                            >
+                              {child.icon && <child.icon />}
+                              <span className="text-xs">{child.title}</span>
                             </SidebarMenuButton>
                           ))}
                       </div>
                     )}
                   </div>
                 ) : (
-                  <SidebarMenuButton asChild size="sm">
-                    <a href={item.url ?? "#"}>
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                    </a>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={pathname.startsWith(item.url || "")}
+                    onClick={() => {
+                      if (item.title === "Schedule") reset();
+                      if (item.url) router.push(item.url);
+                    }}
+                  >
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                    {item.count && (
+                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
+                    )}
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>

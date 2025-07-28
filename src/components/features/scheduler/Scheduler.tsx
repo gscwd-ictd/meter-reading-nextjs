@@ -225,7 +225,7 @@ export const Scheduler: FunctionComponent = () => {
           </section>
 
           <section className="hidden sm:hidden md:block lg:block">
-            <ButtonGroup className="rounded border">
+            <ButtonGroup className="rounded-md border">
               <Button
                 variant="outline"
                 className="border-none dark:rounded-none"
@@ -250,7 +250,7 @@ export const Scheduler: FunctionComponent = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Jump to current month</p>
+                  <p className="dark:text-white">Jump to current month</p>
                 </TooltipContent>
               </Tooltip>
               <Button
@@ -297,7 +297,7 @@ export const Scheduler: FunctionComponent = () => {
               <section className="relative flex-1 overflow-hidden border-t" style={gridStyle}>
                 {/* Overlay loading indicator while fetching schedules */}
                 {isFetchingSchedule && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-slate-900/70">
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-transparent">
                     <div className="text-primary flex items-center gap-2 text-xl">
                       <LoadingSpinner className="size-10 animate-spin" /> Getting Schedules...
                     </div>

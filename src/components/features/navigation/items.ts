@@ -85,6 +85,9 @@ export const mainNav: NavItem[] = [
     url: "/notifications",
     icon: Megaphone,
   },
+];
+
+export const secondaryNav: NavItem[] = [
   {
     title: "User Accounts",
     url: "/user-accounts",
@@ -94,24 +97,6 @@ export const mainNav: NavItem[] = [
     title: "Settings",
     url: "/settings",
     icon: Settings,
-  },
-];
-
-export const secondaryNav: NavItem[] = [
-  {
-    title: "Documentation",
-    url: "#",
-    icon: BookOpen,
-  },
-  {
-    title: "Feedback",
-    url: "#",
-    icon: Send,
-  },
-  {
-    title: "Help",
-    url: "#",
-    icon: CircleHelp,
   },
 ];
 
