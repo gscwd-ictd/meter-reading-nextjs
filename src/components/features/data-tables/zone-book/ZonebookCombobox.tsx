@@ -44,7 +44,7 @@ export const ZonebookCombobox: FunctionComponent = () => {
         <Command>
           <CommandInput placeholder="Search for a zoneBook..." />
           <CommandList>
-            <CommandEmpty>No zoneBooks found.</CommandEmpty>
+            <CommandEmpty>No zone books found.</CommandEmpty>
             <CommandGroup>
               {zonebooksPool &&
                 zonebooksPool.map((zb) => (
@@ -59,7 +59,7 @@ export const ZonebookCombobox: FunctionComponent = () => {
                   >
                     <div className="grid grid-cols-2">
                       <span>{zb.zoneBook}</span>
-                      <span>{zb.area}</span>
+                      <span>{zb.area.name}</span>
                     </div>
                   </CommandItem>
                 ))}

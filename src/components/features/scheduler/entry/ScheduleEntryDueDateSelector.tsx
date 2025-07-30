@@ -5,7 +5,7 @@ import { Command, CommandItem, CommandList } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { cn } from "@mr/lib/utils";
-import { compareAsc, format } from "date-fns";
+import { compareAsc, format, isSameDay } from "date-fns";
 import { CheckIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction, useState } from "react";
 
@@ -37,10 +37,14 @@ export const ScheduleEntryDueDateSelector: FunctionComponent<ScheduleEntryDueDat
   const formatDate = (date: Date) => format(date, "MMM dd, yyyy");
   const splittedDates = useSchedulesStore((state) => state.splittedDates);
 
+  const isEqualDate = (a: Date | string, b: Date | string): boolean => {
+    return isSameDay(new Date(a), new Date(b));
+  };
+
   const findOne = (value: SelectedDate) => {
-    const result = splittedDates?.find((date) => date.dueDate === value.dueDate)?.dueDate;
-    if (result) return formatDate(result);
-    return undefined;
+    const result = splittedDates?.find((date) => isEqualDate(date.dueDate, value.dueDate!))?.dueDate;
+
+    return result ? formatDate(result) : undefined;
   };
 
   return (
@@ -54,38 +58,40 @@ export const ScheduleEntryDueDateSelector: FunctionComponent<ScheduleEntryDueDat
         <Command>
           <CommandList>
             {splittedDates &&
-              splittedDates.map((date, idx) => (
-                <CommandItem
-                  key={idx}
-                  value={date.dueDate ? formatDate(date.dueDate!) : undefined}
-                  onSelect={(currentValue) => {
-                    const selectedZonebook = splittedDates.find(
-                      (x) => compareAsc(formatDate(x.dueDate), currentValue) === 0,
-                    )!;
+              splittedDates
+                .sort((a, b) => (a.dueDate > b.dueDate ? 1 : -1))
+                .map((date, idx) => (
+                  <CommandItem
+                    key={idx}
+                    value={date.dueDate ? formatDate(date.dueDate!) : undefined}
+                    onSelect={(currentValue) => {
+                      const selectedZonebook = splittedDates.find(
+                        (x) => compareAsc(formatDate(x.dueDate), currentValue) === 0,
+                      )!;
 
-                    setValue(selectedZonebook);
+                      setValue(selectedZonebook);
 
-                    const newZonebooks = zoneBooks.map((mr) => {
-                      if (mr.zoneBook === zonebook)
-                        return {
-                          ...mr,
-                          dueDate: selectedZonebook.dueDate,
-                          disconnectionDate: selectedZonebook.disconnectionDate,
-                        };
-                      return mr;
-                    });
+                      const newZonebooks = zoneBooks.map((mr) => {
+                        if (mr.zoneBook === zonebook)
+                          return {
+                            ...mr,
+                            dueDate: selectedZonebook.dueDate,
+                            disconnectionDate: selectedZonebook.disconnectionDate,
+                          };
+                        return mr;
+                      });
 
-                    setZonebooks(newZonebooks);
+                      setZonebooks(newZonebooks);
 
-                    setOpen(false);
-                  }}
-                >
-                  {format(date.dueDate!, "MMM dd, yyyy")}
-                  <CheckIcon
-                    className={cn("ml-auto", value.dueDate === date.dueDate ? "opacity-100" : "opacity-0")}
-                  />
-                </CommandItem>
-              ))}
+                      setOpen(false);
+                    }}
+                  >
+                    {format(date.dueDate!, "MMM dd, yyyy")}
+                    <CheckIcon
+                      className={cn("ml-auto", value.dueDate === date.dueDate ? "opacity-100" : "opacity-0")}
+                    />
+                  </CommandItem>
+                ))}
           </CommandList>
         </Command>
       </PopoverContent>

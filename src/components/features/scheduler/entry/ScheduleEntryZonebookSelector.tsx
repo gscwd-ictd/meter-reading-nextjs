@@ -476,7 +476,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   >
                     <MapPinIcon className="text-primary size-5" />
                     <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                    <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                    <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                   </CommandItem>
                 ))
               ) : selectedZone && !selectedBook && unassignedZonebooks && !isLoading ? (
@@ -491,7 +491,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     >
                       <MapPinIcon className="text-primary size-5" />
                       <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                      <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                     </CommandItem>
                   ))
               ) : selectedZone && selectedBook && unassignedZonebooks && !isLoading ? (
@@ -503,7 +503,9 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       <span className="col-span-2 font-medium text-gray-600 dark:text-white">
                         {zb.zoneBook}
                       </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black dark:text-white">
+                        {zb.area.name}
+                      </span>
                     </CommandItem>
                   ))
               ) : null}
@@ -537,7 +539,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       <TableCell>{entry.zoneBook}</TableCell>
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell className="w-[10rem]">{entry.area}</TableCell>
+                      <TableCell className="w-[10rem]">{entry.area.name}</TableCell>
                       <TableCell>
                         {selectedScheduleEntry?.dueDate &&
                         Array.isArray(selectedScheduleEntry.dueDate) &&
@@ -546,7 +548,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                             zonebook={entry.zoneBook}
                             zoneBooks={assignedZonebooks}
                             setZonebooks={setAssignedZonebooks}
-                            dueDate={entry.dueDate ?? undefined}
+                            dueDate={entry.dueDate}
                             disconnectionDate={entry.disconnectionDate}
                           />
                         ) : selectedScheduleEntry?.dueDate &&

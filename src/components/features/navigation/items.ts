@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
+import { format } from "date-fns";
 
 export type NavItem = {
   title: string;
@@ -42,6 +43,9 @@ export type NavItemUser = {
   avatar: string;
 };
 
+const dateToday = new Date();
+const currentYearMonth = format(dateToday, "yyyy-MM");
+
 export const mainNav: NavItem[] = [
   {
     title: "Dashboard",
@@ -55,7 +59,7 @@ export const mainNav: NavItem[] = [
   },
   {
     title: "Schedules",
-    url: "/schedules",
+    url: `/schedules?date=${currentYearMonth}`,
     icon: Calendar,
   },
   {
@@ -81,6 +85,9 @@ export const mainNav: NavItem[] = [
     url: "/notifications",
     icon: Megaphone,
   },
+];
+
+export const secondaryNav: NavItem[] = [
   {
     title: "User Accounts",
     url: "/user-accounts",
@@ -90,24 +97,6 @@ export const mainNav: NavItem[] = [
     title: "Settings",
     url: "/settings",
     icon: Settings,
-  },
-];
-
-export const secondaryNav: NavItem[] = [
-  {
-    title: "Documentation",
-    url: "#",
-    icon: BookOpen,
-  },
-  {
-    title: "Feedback",
-    url: "#",
-    icon: Send,
-  },
-  {
-    title: "Help",
-    url: "#",
-    icon: CircleHelp,
   },
 ];
 

@@ -17,10 +17,10 @@ export const useAreasColumns = (data: Area[] | undefined) => {
   useEffect(() => {
     const cols: ColumnDef<Area>[] = [
       {
-        accessorKey: "area",
+        accessorKey: "name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Areas" />,
         enableColumnFilter: true,
-        cell: ({ row }) => <span>{row.original.area}</span>,
+        cell: ({ row }) => <span>{row.original.name}</span>,
         filterFn: filterFn,
         meta: { exportLabel: "Areas" },
       },
@@ -29,9 +29,7 @@ export const useAreasColumns = (data: Area[] | undefined) => {
         accessorKey: "id",
         header: "Actions",
         enableColumnFilter: false,
-        cell: ({ row }) => (
-          <AreaRowActions details={{ area: row.original.area, areaId: row.original.areaId! }} />
-        ),
+        cell: ({ row }) => <AreaRowActions details={{ name: row.original.name, id: row.original.id! }} />,
       },
     ];
 

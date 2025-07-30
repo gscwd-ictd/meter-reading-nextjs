@@ -26,6 +26,8 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
               <span className="text-xl font-black text-slate-500">X</span>
             </div>
             <span className="text-xs text-gray-500">Meter Reading Application</span>
+
+            {/* Measures Daily Transactions  */}
           </div>
         </div>
       </SidebarHeader>

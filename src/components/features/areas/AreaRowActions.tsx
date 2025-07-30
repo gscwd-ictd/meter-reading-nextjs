@@ -2,12 +2,10 @@ import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 import { SquarePenIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { DeleteAreaDialog } from "./DeleteAreaDialog";
+import { Area } from "@mr/lib/types/zonebook";
 
 type AreaRowActionsProps = {
-  details: {
-    area: string;
-    areaId: string;
-  };
+  details: Area;
 };
 
 export const AreaRowActions: FunctionComponent<AreaRowActionsProps> = ({ details }) => {

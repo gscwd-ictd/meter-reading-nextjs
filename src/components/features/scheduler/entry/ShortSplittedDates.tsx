@@ -8,7 +8,7 @@ interface SplittedDatesProps {
   disconnectionDates: Date[];
 }
 
-export const SplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, disconnectionDates }) => {
+export const ShortSplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, disconnectionDates }) => {
   const maxLength = Math.max(dueDates.length, disconnectionDates.length);
   const pairs: React.ReactNode[] = [];
 
@@ -23,34 +23,27 @@ export const SplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, disconne
 
     if (!due && !disc) continue;
 
+    // change to unshift, puts the later date at the bottom
     pairs.push(
       <Badge
         key={i}
         variant="default"
-        className="bg-muted text-muted-foreground flex min-w-[14rem] items-center gap-1 p-2"
+        className="text-muted-foreground flex min-w-full items-center gap-0 bg-transparent p-0"
       >
         {due && (
-          <div className="text-primary flex items-center gap-1 text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
-            <CalendarClockIcon className="size-2 shrink-0 sm:size-2 md:size-2 lg:size-4" />
-            Due: {format(due, "MMM dd, yyyy")}
+          <div className="text-primary flex items-center gap-1 text-xs sm:text-[0.6rem] lg:text-xs">
+            {format(due, "MMM dd")}
           </div>
         )}
         {due && disc && <span className="text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">/</span>}
         {disc && (
-          <div className="flex items-center gap-1 text-[0.5rem] text-red-500 sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
-            <ScissorsLineDashedIcon className="size-2 shrink-0 sm:size-2 md:size-2 lg:size-4" />
-            Disconnection: {format(disc, "MMM dd, yyyy")}
+          <div className="flex items-center gap-1 text-xs text-red-500 sm:text-[0.6rem] lg:text-xs">
+            {format(disc, "MMM dd")}
           </div>
         )}
       </Badge>,
     );
   }
 
-  return (
-    <div className="flex w-full justify-start sm:justify-start md:justify-start lg:justify-start">
-      <div className="sm grid grid-rows-2 gap-2 sm:grid-cols-1 sm:grid-rows-2 md:grid-cols-1 md:grid-rows-2 lg:grid-cols-2 lg:grid-rows-1">
-        {pairs}
-      </div>
-    </div>
-  );
+  return <>{pairs}</>;
 };

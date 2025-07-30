@@ -1,0 +1,33 @@
+"use client";
+
+import { FunctionComponent } from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
+import { motion } from "framer-motion";
+
+type LoadingBadgeProps = {
+  text?: string;
+};
+
+export const LoadingBadge: FunctionComponent<LoadingBadgeProps> = ({ text = "" }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 z-[999] flex items-center justify-center bg-white/70 dark:bg-black/50"
+    >
+      <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border bg-white p-6 shadow-lg">
+        <LoadingSpinner className="text-primary size-20" />
+        <div className="text-center">
+          <div className="text-primary text-xl font-black">
+            Metra<span className="text-slate-500">X</span>
+          </div>
+          <div className="text-xs font-bold text-gray-500">
+            <i>Measure Transactions</i>
+          </div>
+          {text && <div className="mt-2 text-sm text-gray-600">{text}</div>}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
