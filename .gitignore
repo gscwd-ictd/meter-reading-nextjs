@@ -17,6 +17,13 @@
 /.next/
 /out/
 
+<<<<<<< HEAD
+=======
+# migrations
+/src/server/db/migrations/meta/*.json
+/src/server/db/migrations/*.sql
+
+>>>>>>> 8c08c6909acd7ad21822eb97f1b6fb62a80c87f6
 # production
 /build
 
