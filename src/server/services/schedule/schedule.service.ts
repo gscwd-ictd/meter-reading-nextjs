@@ -1,10 +1,9 @@
 import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.interface.repository";
 import { IScheduleService } from "@mr/server/interfaces/schedule/schedule.interface.service";
 import {
-  CreateMeterReaderScheduleZoneBook,
-  CreateSchedule,
-  MeterReaderZoneBook,
-  Schedule,
+  CreateMeterReaderScheduleReading,
+  CreateMonthSchedule,
+  ScheduleMeterReaderZoneBook,
   ScheduleReading,
 } from "@mr/server/types/schedule.type";
 
@@ -19,7 +18,7 @@ export class ScheduleService implements IScheduleService {
     return await this.repository.findScheduleByDate(date);
   }
 
-  async addMonthYearSchedule(data: CreateSchedule[]): Promise<ScheduleReading[]> {
+  async addMonthYearSchedule(data: CreateMonthSchedule[]): Promise<ScheduleReading[]> {
     return await this.repository.createMonthYearSchedule(data);
   }
 
@@ -33,13 +32,13 @@ export class ScheduleService implements IScheduleService {
 
   async getMeterReaderZoneBookByScheduleMeterReaderId(
     scheduleMeterReaderId: string,
-  ): Promise<MeterReaderZoneBook> {
+  ): Promise<ScheduleMeterReaderZoneBook> {
     return await this.repository.findMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReaderId);
   }
 
   async addMeterReaderScheduleZoneBook(
-    input: CreateMeterReaderScheduleZoneBook,
-  ): Promise<MeterReaderZoneBook> {
-    return await this.repository.createMeterReaderScheduleZoneBook(input);
+    data: CreateMeterReaderScheduleReading,
+  ): Promise<ScheduleMeterReaderZoneBook> {
+    return await this.repository.createMeterReaderScheduleZoneBook(data);
   }
 }

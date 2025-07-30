@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { meterReadingContext } from "../context";
-import { AssignZoneBookAreaSchema, UpdateZoneBookAreaSchema } from "../types/zone-book.type";
+import { AssignZoneBookAreaSchema } from "../types/zone-book.type";
 
 const zoneBookService = meterReadingContext.getZoneBookService();
 
@@ -23,7 +23,7 @@ const zoneBookRoutes = new Hono()
     return c.json(result, 201);
   })
 
-  .patch("/:zoneBookId", zValidator("json", UpdateZoneBookAreaSchema), async (c) => {
+  .patch("/:zoneBookId", zValidator("json", AssignZoneBookAreaSchema), async (c) => {
     const zoneBookId = c.req.param("zoneBookId");
     const body = c.req.valid("json");
 

@@ -29,7 +29,7 @@ export class AreaRepository implements IAreaRepository {
   }
 
   async findAreaById(id: string): Promise<Area> {
-    const stmt = db.pgConn.select().from(area).where(eq(area.areaId, id)).prepare("get_area_by_id");
+    const stmt = db.pgConn.select().from(area).where(eq(area.id, id)).prepare("get_area_by_id");
     const [areaFound] = await stmt.execute();
 
     if (!areaFound) {
@@ -45,7 +45,7 @@ export class AreaRepository implements IAreaRepository {
     const stmtUpdate = db.pgConn
       .update(area)
       .set(data)
-      .where(eq(area.areaId, areaFound.areaId))
+      .where(eq(area.id, areaFound.id))
       .returning()
       .prepare("update_area");
 
@@ -63,7 +63,7 @@ export class AreaRepository implements IAreaRepository {
 
     const stmtDelete = db.pgConn
       .delete(area)
-      .where(eq(area.areaId, areaFound.areaId))
+      .where(eq(area.id, areaFound.id))
       .returning()
       .prepare("delete_area_by_id");
 

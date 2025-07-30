@@ -132,14 +132,14 @@ export class MeterReaderRepository implements IMeterReaderRepository {
   async findMeterReaderDetailsById(meterReaderId: string): Promise<MeterReaderDetails> {
     const stmt = db.pgConn
       .select({
-        meterReaderId: meterReaders.meterReaderId,
+        id: meterReaders.id,
         employeeId: meterReaders.employeeId,
         restDay: meterReaders.restDay,
         mobileNumber: loginAccounts.username,
       })
       .from(meterReaders)
-      .innerJoin(loginAccounts, eq(loginAccounts.meterReaderId, meterReaders.meterReaderId))
-      .where(eq(meterReaders.meterReaderId, meterReaderId))
+      .innerJoin(loginAccounts, eq(loginAccounts.meterReaderId, meterReaders.id))
+      .where(eq(meterReaders.id, meterReaderId))
       .$dynamic()
       .prepare("get_meter_reader_details_by_id");
 
@@ -163,7 +163,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     const stmt = db.pgConn
       .select()
       .from(viewMeterReaderZoneBook)
-      .where(eq(viewMeterReaderZoneBook.meterReaderId, meterReaderId))
+      .where(eq(viewMeterReaderZoneBook.id, meterReaderId))
       .$dynamic()
       .prepare("get_meter_reader_with_zone_book_by_meter_id");
 
@@ -201,7 +201,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
 
       // Step 2: Create the login account with default password
       await tx.insert(loginAccounts).values({
-        meterReaderId: insertedMeterReader.meterReaderId,
+        meterReaderId: insertedMeterReader.id,
         username: mobileNumber,
         password: hashedPw,
       });
@@ -210,14 +210,14 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       if (zoneBooks?.length) {
         await tx.insert(meterReaderZoneBook).values(
           zoneBooks.map((item) => ({
-            meterReaderId: insertedMeterReader.meterReaderId,
+            meterReaderId: insertedMeterReader.id,
             ...item,
           })),
         );
       }
 
       // Step 4: Return only the ID — avoid mixing read concerns into transaction
-      return insertedMeterReader.meterReaderId;
+      return insertedMeterReader.id;
     });
 
     return await this.findMeterReaderWithZoneBookById(result);
@@ -235,7 +235,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
       const [update] = await tx
         .update(meterReaders)
         .set(rest)
-        .where(eq(meterReaders.meterReaderId, meterReaderId))
+        .where(eq(meterReaders.id, meterReaderId))
         .returning();
 
       if (!update) {
@@ -280,7 +280,7 @@ export class MeterReaderRepository implements IMeterReaderRepository {
     // Step 2: Delete the meter reader
     const stmtDelete = db.pgConn
       .delete(meterReaders)
-      .where(eq(meterReaders.meterReaderId, meterReaderId))
+      .where(eq(meterReaders.id, meterReaderId))
       .returning()
       .prepare("delete_meter_reader_by_id");
 

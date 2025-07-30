@@ -10,17 +10,13 @@ export class ConsumerRepository implements IConsumerRepository {
       timeZone: "Asia/Manila",
     });
 
-    const result = db.pgConn
+    const result = await db.pgConn
       .select()
       .from(consumerDetailsView)
       .where(
-        and(
-          eq(consumerDetailsView.meterReaderId, meterReaderId),
-          eq(consumerDetailsView.readingDate, "2025-03-20"),
-        ),
+        and(eq(consumerDetailsView.meterReaderId, meterReaderId), eq(consumerDetailsView.readingDate, today)),
       );
 
-    const [execute] = await result.execute();
-    return execute;
+    return result;
   }
 }

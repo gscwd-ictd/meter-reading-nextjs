@@ -14,18 +14,20 @@ import { z } from "zod";
  */
 
 export const AreaSchema = z.object({
-  areaId: z.string(),
-  area: z.string().min(1, "area name is required"),
+  id: z.string(),
+  name: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().nullable(),
 });
 
 export const CreateAreaSchema = AreaSchema.pick({
-  area: true,
+  name: true,
+}).extend({
+  name: z.string().min(1, "area name is required"),
 });
 
 export const UpdateAreaSchema = CreateAreaSchema.pick({
-  area: true,
+  name: true,
 });
 
 export type Area = z.infer<typeof AreaSchema>;

@@ -1,17 +1,13 @@
-import { index, pgTable, pgView, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { index, jsonb, pgTable, pgView, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { area } from "./area";
 import { relations, sql } from "drizzle-orm";
-import { generateCuid } from "@mr/server/helpers/generateCuid";
 
 export const zoneBook = pgTable(
   "zone_book",
   {
-    zoneBookId: varchar("zone_book_id")
-      .primaryKey()
-      .$defaultFn(() => generateCuid())
-      .notNull(),
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
     areaId: varchar("area_id")
-      .references(() => area.areaId, {
+      .references(() => area.id, {
         onDelete: "cascade",
       })
       .notNull(),
@@ -29,27 +25,28 @@ export const zoneBook = pgTable(
 );
 
 export const zoneBookRelations = relations(zoneBook, ({ one }) => ({
-  area: one(area, { fields: [zoneBook.areaId], references: [area.areaId] }),
+  area: one(area, { fields: [zoneBook.areaId], references: [area.id] }),
 }));
 
 export const viewZoneBookArea = pgView("view_zone_book_with_area", {
-  zoneBookId: varchar("zone_book_id"),
+  id: varchar("id"),
   zone: varchar("zone"),
   book: varchar("book"),
   zoneBook: varchar("zone_book"),
-  areaId: varchar("area_id"),
-  area: varchar("area"),
+  area: jsonb("area").$type<{ id: string; name: string }>(),
 }).as(sql`
   select 
-    coalesce(zb.zone_book_id, '') as zone_book_id,
+    coalesce(zb.id::text, '') as id,
     v.zone_code as zone,
     v.book_code::varchar as book,
     v.zone_code || '-' || v.book_code as zone_book,
-    coalesce(a.area_id, '') as area_id,
-    coalesce(a.area,'') as area
+    jsonb_build_object(
+        'id', coalesce(a.id::text,''),
+        'name', coalesce(a.name, '')
+    ) as area
   from "viewZoneBook" v
   left join
     zone_book zb ON v.zone_code = zb.zone AND v.book_code::varchar = zb.book
   left join
-    area a ON a.area_id = zb.area_id
+    area a ON a.id = zb.area_id
   order by v.zone_code, v.book_code`);

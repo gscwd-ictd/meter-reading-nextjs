@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import { meterReadingContext } from "../context";
 import { zValidator } from "@hono/zod-validator";
 import {
-  CreateMeterReaderScheduleZoneBookSchema,
-  CreateScheduleSchema,
+  CreateMeterReaderScheduleReadingSchema,
+  //CreateMeterReaderScheduleZoneBookSchema,
+  CreateMonthScheduleSchema,
   ScheduleQuerySchema,
 } from "../types/schedule.type";
 
@@ -31,7 +32,7 @@ const scheduleRoutes = new Hono()
     return c.json({ error: "Invalid date format" }, 400);
   })
 
-  .post("/", zValidator("json", CreateScheduleSchema.array()), async (c) => {
+  .post("/", zValidator("json", CreateMonthScheduleSchema.array()), async (c) => {
     const body = c.req.valid("json");
     const result = await scheduleService.addMonthYearSchedule(body);
     return c.json(result);
@@ -64,15 +65,11 @@ const scheduleRoutes = new Hono()
     return c.json(result);
   })
 
-  .post(
-    "/meter-reader/zone-books",
-    zValidator("json", CreateMeterReaderScheduleZoneBookSchema),
-    async (c) => {
-      const body = c.req.valid("json");
-      const result = await scheduleService.addMeterReaderScheduleZoneBook(body);
+  .post("/meter-reader/zone-books", zValidator("json", CreateMeterReaderScheduleReadingSchema), async (c) => {
+    const body = c.req.valid("json");
+    const result = await scheduleService.addMeterReaderScheduleZoneBook(body);
 
-      return c.json(result, 201);
-    },
-  );
+    return c.json(result, 201);
+  });
 
 export const scheduleHandler = new Hono().route("/schedules", scheduleRoutes);
