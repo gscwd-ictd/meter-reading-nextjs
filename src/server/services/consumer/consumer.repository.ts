@@ -14,7 +14,10 @@ export class ConsumerRepository implements IConsumerRepository {
       .select()
       .from(consumerDetailsView)
       .where(
-        and(eq(consumerDetailsView.meterReaderId, meterReaderId), eq(consumerDetailsView.readingDate, today)),
+        and(
+          eq(consumerDetailsView.meterReaderId, meterReaderId),
+          eq(consumerDetailsView.readingDate, "04-18-2025"),
+        ),
       );
 
     return result;
