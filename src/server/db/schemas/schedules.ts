@@ -1,7 +1,6 @@
-import { date, index, jsonb, pgTable, pgView, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { date, index, jsonb, pgTable, pgView, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
-import { eq, relations, sql } from "drizzle-orm";
-import { generateCuid } from "@mr/server/helpers/generateCuid";
+import { relations, sql } from "drizzle-orm";
 
 /**
  * A schedule represents a reading assignment for a specific meter reader on a given date.
@@ -11,10 +10,7 @@ import { generateCuid } from "@mr/server/helpers/generateCuid";
 export const schedules = pgTable(
   "schedules",
   {
-    scheduleId: varchar("schedule_id")
-      .primaryKey()
-      .$defaultFn(() => generateCuid())
-      .notNull(),
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
     readingDate: date("reading_date").unique().notNull(),
     dueDate: jsonb("due_date").notNull(),
     disconnectionDate: jsonb("disconnection_date").notNull(),
@@ -33,15 +29,12 @@ export const schedulesRelations = relations(schedules, ({ many }) => ({
 export const scheduleMeterReaders = pgTable(
   "schedule_meter_readers",
   {
-    scheduleMeterReaderId: varchar("schedule_meter_reader_id")
-      .primaryKey()
-      .$defaultFn(() => generateCuid())
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    scheduleId: uuid("schedule_id")
+      .references(() => schedules.id, { onDelete: "cascade" })
       .notNull(),
-    scheduleId: varchar("schedule_id")
-      .references(() => schedules.scheduleId, { onDelete: "cascade" })
-      .notNull(),
-    meterReaderId: varchar("meter_reader_id")
-      .references(() => meterReaders.meterReaderId, { onDelete: "cascade" })
+    meterReaderId: uuid("meter_reader_id")
+      .references(() => meterReaders.id, { onDelete: "cascade" })
       .notNull(),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
@@ -58,7 +51,7 @@ export const scheduleMeterReaders = pgTable(
 export const scheduleMeterReadersRelations = relations(scheduleMeterReaders, ({ one, many }) => ({
   schedule: one(schedules, {
     fields: [scheduleMeterReaders.scheduleId],
-    references: [schedules.scheduleId],
+    references: [schedules.id],
   }),
   scheduleZoneBooks: many(scheduleZoneBooks),
 }));
@@ -69,12 +62,9 @@ export const scheduleMeterReadersRelations = relations(scheduleMeterReaders, ({ 
 export const scheduleZoneBooks = pgTable(
   "schedule_zone_books",
   {
-    scheduleZoneBookId: varchar("schedule_zone_book_id")
-      .primaryKey()
-      .$defaultFn(() => generateCuid())
-      .notNull(),
-    scheduleMeterReaderId: varchar("schedule_meter_reader_id")
-      .references(() => scheduleMeterReaders.scheduleMeterReaderId, { onDelete: "cascade" })
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    scheduleMeterReaderId: uuid("schedule_meter_reader_id")
+      .references(() => scheduleMeterReaders.id, { onDelete: "cascade" })
       .notNull(),
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
@@ -95,7 +85,7 @@ export const scheduleZoneBooks = pgTable(
 export const scheduleZoneBooksRelations = relations(scheduleZoneBooks, ({ one }) => ({
   scheduleMeterReader: one(scheduleMeterReaders, {
     fields: [scheduleZoneBooks.scheduleMeterReaderId],
-    references: [scheduleMeterReaders.scheduleMeterReaderId],
+    references: [scheduleMeterReaders.id],
   }),
 }));
 
@@ -112,8 +102,8 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
     coalesce(
         jsonb_agg(
             jsonb_build_object(
-                'scheduleMeterReaderId', smr.schedule_meter_reader_id,
-                'meterReaderId', smr.meter_reader_id,
+                'scheduleMeterReaderId', smr.id,
+                'id', smr.meter_reader_id,
                 'zoneBooks', COALESCE((
                     SELECT jsonb_agg(
                         jsonb_build_object(
@@ -125,16 +115,59 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
                     )
                     from schedule_zone_books szb
                     left join view_zone_book_with_area vzbwa on szb.zone = vzbwa.zone and szb.book = vzbwa.book
-                    where szb.schedule_meter_reader_id = smr.schedule_meter_reader_id
+                    where szb.schedule_meter_reader_id = smr.id
                 ), '[]'::jsonb)
             )
-        ) filter (where smr.schedule_meter_reader_id is not null),
+        ) filter (where smr.id is not null),
         '[]'::jsonb
     ) as meter_readers
   from schedules s
-  left join schedule_meter_readers smr on s.schedule_id = smr.schedule_id
+  left join schedule_meter_readers smr on s.id = smr.schedule_id
   group by s.reading_date, s.due_date, s.disconnection_date
   order by s.reading_date`);
+
+export const viewScheduleMeterReadingZoneBook = pgView("view_schedule_meter_reading_with_zone_book", {
+  scheduleMeterReaderId: varchar("id"),
+  meterReaderId: varchar("meter_reader_id"),
+  month: varchar("month"),
+  year: varchar("year"),
+  zoneBooks: jsonb("zone_books"),
+}).as(sql`
+      select
+        smr.id,
+        smr.meter_reader_id,
+        extract(month from s.reading_date) as month,
+        extract(year from s.reading_date) as year,
+        coalesce(
+            jsonb_agg(
+                jsonb_build_object(
+                'zone', szb.zone,
+                'book', szb.book,
+                'zoneBook', vzba.zone_book,
+                'area', vzba.area,
+                'dueDate', szb.due_date,
+                'disconnectionDate', szb.disconnection_date
+            )
+          order by szb.zone, szb.book
+        )
+          FILTER ( WHERE szb.id is not null), '[]'
+        ) as zone_books
+      from
+        schedules s
+      left join
+        schedule_meter_readers smr
+            on s.id = smr.schedule_id
+      left join
+        schedule_zone_books szb
+        on smr.id = szb.schedule_meter_reader_id
+      left join
+        view_zone_book_with_area vzba
+        on szb.zone = vzba.zone and szb.book = vzba.book
+      group by
+        smr.id,
+        smr.meter_reader_id,
+        s.reading_date
+  `);
 
 // export const scheduleZoneBookView = pgView("schedule_zone_book_view").as((view) =>
 //   view
@@ -165,37 +198,37 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
 //     .orderBy(schedules.readingDate),
 // );
 
-export const scheduleZoneBookView = pgView("schedule_zone_book_view").as((view) =>
-  view
-    .select({
-      readingDate: schedules.readingDate,
-      dueDate: schedules.dueDate,
-      disconnectionDate: schedules.disconnectionDate,
-      meterReaders: sql`  (
-    SELECT json_agg(
-      jsonb_build_object(
-        'scheduleMeterReaderId', ${scheduleMeterReaders.scheduleMeterReaderId},
-        'meterReaderId', ${scheduleMeterReaders.meterReaderId},
-        'zoneBooks', COALESCE((
-          SELECT json_agg(
-            jsonb_build_object(
-              'zone', ${scheduleZoneBooks.zone},
-              'book', ${scheduleZoneBooks.book},
-              'zoneBook', ${scheduleZoneBooks.zone} || '-' || ${scheduleZoneBooks.book}
-            )
-          )
-          FROM ${scheduleZoneBooks}
-          WHERE ${scheduleZoneBooks.scheduleMeterReaderId} = ${scheduleMeterReaders.scheduleMeterReaderId}
-        ), '[]'::json)
-      )
-    )
-    FROM ${scheduleMeterReaders}
-    WHERE schedule_meter_readers.schedule_id = ${schedules.scheduleId}
-  ) `.as("meterReaders"),
-    })
-    .from(schedules)
-    .orderBy(schedules.readingDate),
-);
+// export const scheduleZoneBookView = pgView("schedule_zone_book_view").as((view) =>
+//   view
+//     .select({
+//       readingDate: schedules.readingDate,
+//       dueDate: schedules.dueDate,
+//       disconnectionDate: schedules.disconnectionDate,
+//       meterReaders: sql`  (
+//     SELECT json_agg(
+//       jsonb_build_object(
+//         'scheduleMeterReaderId', ${scheduleMeterReaders.scheduleMeterReaderId},
+//         'meterReaderId', ${scheduleMeterReaders.meterReaderId},
+//         'zoneBooks', COALESCE((
+//           SELECT json_agg(
+//             jsonb_build_object(
+//               'zone', ${scheduleZoneBooks.zone},
+//               'book', ${scheduleZoneBooks.book},
+//               'zoneBook', ${scheduleZoneBooks.zone} || '-' || ${scheduleZoneBooks.book}
+//             )
+//           )
+//           FROM ${scheduleZoneBooks}
+//           WHERE ${scheduleZoneBooks.scheduleMeterReaderId} = ${scheduleMeterReaders.scheduleMeterReaderId}
+//         ), '[]'::json)
+//       )
+//     )
+//     FROM ${scheduleMeterReaders}
+//     WHERE schedule_meter_readers.schedule_id = ${schedules.scheduleId}
+//   ) `.as("meterReaders"),
+//     })
+//     .from(schedules)
+//     .orderBy(schedules.readingDate),
+// );
 
 // export const scheduleZoneBookViewSample = pgView("schedule_zone_book_view").as((view) =>
 //   view
@@ -229,30 +262,30 @@ export const scheduleZoneBookView = pgView("schedule_zone_book_view").as((view) 
 //     .orderBy(schedules.readingDate),
 // );
 
-export const scheduleReaderZoneBookView = pgView("schedule_reader_zone_book_view").as((view) =>
-  view
-    .select({
-      scheduleMeterReaderId: scheduleMeterReaders.scheduleMeterReaderId,
-      meterReaderId: scheduleMeterReaders.meterReaderId,
-      zoneBooks: sql`
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'zone', ${scheduleZoneBooks.zone},
-              'book', ${scheduleZoneBooks.book},
-              'zoneBook', ${scheduleZoneBooks.zone} || '-' || ${scheduleZoneBooks.book},
-              'dueDate', ${scheduleZoneBooks.dueDate},
-              'disconnectionDate', ${scheduleZoneBooks.disconnectionDate}
-            )
-          ) FILTER (WHERE ${scheduleZoneBooks.zone} IS NOT NULL),
-          '[]'::json
-        )
-      `.as("zoneBooks"),
-    })
-    .from(scheduleMeterReaders)
-    .leftJoin(
-      scheduleZoneBooks,
-      eq(scheduleMeterReaders.scheduleMeterReaderId, scheduleZoneBooks.scheduleMeterReaderId),
-    )
-    .groupBy(scheduleMeterReaders.scheduleMeterReaderId, scheduleMeterReaders.scheduleMeterReaderId),
-);
+// export const scheduleReaderZoneBookView = pgView("schedule_reader_zone_book_view").as((view) =>
+//   view
+//     .select({
+//       scheduleMeterReaderId: scheduleMeterReaders.scheduleMeterReaderId,
+//       meterReaderId: scheduleMeterReaders.meterReaderId,
+//       zoneBooks: sql`
+//         COALESCE(
+//           json_agg(
+//             json_build_object(
+//               'zone', ${scheduleZoneBooks.zone},
+//               'book', ${scheduleZoneBooks.book},
+//               'zoneBook', ${scheduleZoneBooks.zone} || '-' || ${scheduleZoneBooks.book},
+//               'dueDate', ${scheduleZoneBooks.dueDate},
+//               'disconnectionDate', ${scheduleZoneBooks.disconnectionDate}
+//             )
+//           ) FILTER (WHERE ${scheduleZoneBooks.zone} IS NOT NULL),
+//           '[]'::json
+//         )
+//       `.as("zoneBooks"),
+//     })
+//     .from(scheduleMeterReaders)
+//     .leftJoin(
+//       scheduleZoneBooks,
+//       eq(scheduleMeterReaders.scheduleMeterReaderId, scheduleZoneBooks.scheduleMeterReaderId),
+//     )
+//     .groupBy(scheduleMeterReaders.scheduleMeterReaderId, scheduleMeterReaders.scheduleMeterReaderId),
+// );

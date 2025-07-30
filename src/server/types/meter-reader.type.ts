@@ -23,7 +23,7 @@ export const EmployeeDetailsSchema = z.object({
 });
 
 export const MeterReaderDetailsSchema = z.object({
-  meterReaderId: z.string(),
+  id: z.string(),
   employeeId: z.string(),
   companyId: z.string(),
   name: z.string(),
@@ -35,7 +35,7 @@ export const MeterReaderDetailsSchema = z.object({
 
 export const MeterReaderSchema = MeterReaderDetailsSchema.extend({
   restDay: z.enum(RestDayType).transform((val) => (val === "0" ? "sunday" : "saturday")),
-  zoneBooks: ZoneBookSchema.omit({ zoneBookId: true, areaId: true }).array(),
+  zoneBooks: ZoneBookSchema.omit({ id: true }).array(),
 });
 
 export const PaginatedSchema = z.object({

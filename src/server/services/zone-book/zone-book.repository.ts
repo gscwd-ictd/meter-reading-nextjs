@@ -12,37 +12,33 @@ import { HTTPException } from "hono/http-exception";
 
 export class ZoneBookRepository implements IZoneBookRepository {
   async findAllZoneBooksWithArea(): Promise<ZoneBook[]> {
-    const stmt = db.pgConn.select().from(viewZoneBookArea).prepare("get_all_zone_books_with_area");
-    const result = await stmt.execute();
-    return ZoneBookSchema.array().parse(result);
+    const stmt = await db.pgConn.select().from(viewZoneBookArea);
+    return ZoneBookSchema.array().parse(stmt);
   }
 
   async findZoneBookWithAreaById(zoneBookId: string): Promise<ZoneBook> {
-    const stmt = db.pgConn
-      .select()
-      .from(viewZoneBookArea)
-      .where(eq(viewZoneBookArea.zoneBookId, zoneBookId))
-      .prepare("get_zone_book_area_by_id");
+    const stmt = await db.pgConn.select().from(viewZoneBookArea).where(eq(viewZoneBookArea.id, zoneBookId));
 
-    const [zoneBookAreaFound] = await stmt.execute();
-
-    if (!zoneBookAreaFound) {
+    if (!stmt[0]) {
       throw new HTTPException(404, { message: `zone book area with id ${zoneBookId} not found.` });
     }
 
-    return ZoneBookSchema.parse(zoneBookAreaFound);
+    return ZoneBookSchema.parse(stmt[0]);
   }
 
   async assignZoneBookArea(data: AssignZoneBookArea): Promise<ZoneBook> {
     try {
-      const stmt = db.pgConn.insert(zoneBook).values(data).returning().prepare("assign_zone_book_area");
-      const [assignedZoneBookArea] = await stmt.execute();
+      const { area, ...rest } = data;
+      const stmt = await db.pgConn
+        .insert(zoneBook)
+        .values({ areaId: area.id, ...rest })
+        .returning();
 
-      if (!assignedZoneBookArea) {
+      if (!stmt[0]) {
         throw new HTTPException(500, { message: "failed to assigned zone book area." });
       }
 
-      return this.findZoneBookWithAreaById(assignedZoneBookArea.zoneBookId);
+      return this.findZoneBookWithAreaById(stmt[0].id);
     } catch (err) {
       throw new HTTPException(500, {
         message: err instanceof Error ? err.message : "unexpected server error",
@@ -53,10 +49,11 @@ export class ZoneBookRepository implements IZoneBookRepository {
   async updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook> {
     const zoneBookAreaFound = await this.findZoneBookWithAreaById(zoneBookId);
 
+    const { area, ...rest } = data;
     const stmtUpdate = db.pgConn
       .update(zoneBook)
-      .set(data)
-      .where(eq(zoneBook.zoneBookId, zoneBookAreaFound.zoneBookId))
+      .set({ areaId: area.id, ...rest })
+      .where(eq(zoneBook.id, zoneBookAreaFound.id))
       .returning()
       .prepare("update_zone_book_area");
 
@@ -68,6 +65,6 @@ export class ZoneBookRepository implements IZoneBookRepository {
       });
     }
 
-    return await this.findZoneBookWithAreaById(updatedZoneBookArea.zoneBookId);
+    return await this.findZoneBookWithAreaById(updatedZoneBookArea.id);
   }
 }

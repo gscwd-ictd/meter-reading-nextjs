@@ -25,7 +25,7 @@ export const readingDetails = pgTable(
     isConnected: boolean("is_connected").notNull(),
     meterSize: varchar("meter_size").notNull(),
     averageUsage: real("average_usage"),
-    otherBalance: real("average_balance"),
+    otherBalance: real("other_balance"),
     sequenceNumber: varchar("sequence_number").notNull(),
     address: text("address").notNull(),
     dateInstalled: timestamp("date_installed").notNull(),

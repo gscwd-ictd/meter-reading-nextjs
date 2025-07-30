@@ -1,7 +1,7 @@
 import { relations, sql } from "drizzle-orm";
-import { index, jsonb, pgEnum, pgTable, pgView, text, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import { index, jsonb, pgEnum, pgTable, pgView, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
 import { scheduleMeterReaders } from "./schedules";
-import { generateCuid } from "@mr/server/helpers/generateCuid";
+import { loginAccounts } from "./login-accounts";
 
 /**
  * Enum for rest days:
@@ -16,10 +16,7 @@ export const restDayEnum = pgEnum("rest_day_enum", RestDayType);
  */
 
 export const meterReaders = pgTable("meter_readers", {
-  meterReaderId: varchar("meter_reader_id")
-    .primaryKey()
-    .$defaultFn(() => generateCuid())
-    .notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   employeeId: varchar("employee_id").unique().notNull(),
   restDay: restDayEnum("rest_day").notNull(),
   createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
@@ -31,9 +28,13 @@ export const meterReaders = pgTable("meter_readers", {
 /**
  * Relations: One `meter readers` has many `meterReaderZoneBook` entries.
  */
-export const meterReaderRelations = relations(meterReaders, ({ many }) => ({
+export const meterReaderRelations = relations(meterReaders, ({ many, one }) => ({
   zoneBooks: many(meterReaderZoneBook),
   scheduleMeterReaders: many(scheduleMeterReaders),
+  loginAccount: one(loginAccounts, {
+    fields: [meterReaders.id],
+    references: [loginAccounts.meterReaderId],
+  }),
 }));
 
 /**
@@ -42,12 +43,9 @@ export const meterReaderRelations = relations(meterReaders, ({ many }) => ({
 export const meterReaderZoneBook = pgTable(
   "meter_reader_zone_book",
   {
-    meterReaderZoneBookId: varchar("meter_reader_zone_book_id")
-      .primaryKey()
-      .$defaultFn(() => generateCuid())
-      .notNull(),
-    meterReaderId: varchar("meter_reader_id")
-      .references(() => meterReaders.meterReaderId, { onDelete: "cascade" })
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    meterReaderId: uuid("meter_reader_id")
+      .references(() => meterReaders.id, { onDelete: "cascade" })
       .notNull(),
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
@@ -68,19 +66,24 @@ export const meterReaderZoneBook = pgTable(
 export const meterReaderZoneBookRelations = relations(meterReaderZoneBook, ({ one }) => ({
   meterReader: one(meterReaders, {
     fields: [meterReaderZoneBook.meterReaderId],
-    references: [meterReaders.meterReaderId],
+    references: [meterReaders.id],
   }),
 }));
 
 export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book", {
-  meterReaderId: varchar("meter_reader_id").notNull(),
+  id: uuid("id").notNull(),
   employeeId: varchar("employee_id").notNull(),
   mobileNumber: varchar("username").notNull(),
   restDay: varchar("rest_day").notNull(),
-  zoneBooks: jsonb("zone_books"),
+  zoneBooks: jsonb("zone_books").$type<{
+    zone: string;
+    book: string;
+    zoneBook: string;
+    area: { id: string; name: string };
+  }>(),
 }).as(sql`
   select 
-    mr.meter_reader_id,
+    mr.id,
     mr.employee_id,
     mr.rest_day,
     la.username,
@@ -98,40 +101,38 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
   from 
     meter_readers mr
   inner join 
-    login_accounts la on mr.meter_reader_id = la.meter_reader_id
+    login_accounts la on mr.id = la.meter_reader_id
   left join 
-    meter_reader_zone_book mrzb on mr.meter_reader_id = mrzb.meter_reader_id
+    meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
   left join 
     view_zone_book_with_area vzbwa on mrzb.zone = vzbwa.zone and  mrzb.book = vzbwa.book
   group by 
-    mr.meter_reader_id, 
+    mr.id, 
     mr.employee_id, 
     mr.rest_day,
     la.username
   `);
 
 export const viewZoneBookAssignment = pgView("view_zone_book_assignment", {
-  meterReaderId: varchar("meter_reader_id"),
-  zoneBookId: varchar("zone_book_id"),
+  meterReaderId: uuid("meter_reader_id"),
+  id: uuid("id"),
   zone: varchar("zone"),
   book: varchar("book"),
   zoneBook: varchar("zone_book"),
-  areaId: varchar("area_id"),
-  area: varchar("area"),
+  area: jsonb("area").$type<{ id: string; name: string }>(),
 }).as(sql`
     select
       mrzb.meter_reader_id,
-      vzb.zone_book_id,
-      vzb.zone,
-      vzb.book,
-      vzb.zone_book,
-      vzb.area_id,
-      vzb.area
-    from view_zone_book_with_area vzb
+      vzba.id,
+      vzba.zone,
+      vzba.book,
+      vzba.zone_book,
+      vzba.area
+    from view_zone_book_with_area vzba
     left join (
       select distinct zone, book, meter_reader_id
       from meter_reader_zone_book
     ) mrzb
-      on vzb.zone = mrzb.zone and vzb.book = mrzb.book
-    order by vzb.zone, vzb.book
+      on vzba.zone = mrzb.zone and vzba.book = mrzb.book
+    order by vzba.zone, vzba.book
   `);

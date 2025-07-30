@@ -6,15 +6,15 @@ import { newMetersHandler } from "./routes/new-meters";
 import { ratesHandler } from "./routes/rates";
 import { readingDetailsHandler } from "./routes/reading-details";
 import { waterConcernsHandler } from "./routes/water-concerns";
-import { meterReaderHandler } from "./routes/meter-readers";
 import { zoneBookHandler } from "./routes/zone-book";
 import { areaHandler } from "./routes/area";
-import { scheduleHandler } from "./routes/schedule";
 import { consumerHandler } from "./routes/consumer";
 import { authHandler } from "./routes/auth";
 import { leakageHandler } from "./routes/leakages";
 import { tokensHandler } from "./routes/tokens";
 import { cors } from "hono/cors";
+import { meterReaderHandler } from "./routes/meter-readers";
+import { scheduleHandler } from "./routes/schedule";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -22,8 +22,13 @@ function createApp() {
   app.use(
     "*",
     cors({
-      origin: ["http://localhost:3000", "http://172.20.10.57:3000", "http://172.20.10.53:3000"],
-      allowMethods: ["GET", "POST", "PUT", "DELETE"],
+      origin: [
+        "http://localhost:3000",
+        "http://172.20.10.57:3000",
+        "http://172.20.10.53:3000",
+        "http://172.20.10.63:3000",
+      ],
+      allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       allowHeaders: ["Content-Type", "Authorization"],
       maxAge: 600,
       credentials: true,
@@ -40,9 +45,9 @@ function createApp() {
     readingDetailsHandler,
     waterConcernsHandler,
     webhookHandler,
-    meterReaderHandler,
     zoneBookHandler,
     areaHandler,
+    meterReaderHandler,
     scheduleHandler,
     consumerHandler,
     tokensHandler,
