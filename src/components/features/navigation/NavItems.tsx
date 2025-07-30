@@ -78,7 +78,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash(`Loading ${child.title}...`);
+                                showSplash(`Loading ${child.title}...`, child.url);
                                 router.push(child.url!);
                               }}
                             >
@@ -95,12 +95,14 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                     isActive={pathname.startsWith(item.url || "")}
                     onClick={() => {
                       if (item.title === "Schedules") {
+                        showSplash(`Loading ${item.title}...`, item.url);
                         reset();
                         refetchData?.();
+
                         router.push(item.url!);
                       }
                       if (item.url) {
-                        showSplash(`Loading ${item.title}...`);
+                        showSplash(`Loading ${item.title}...`, item.url);
                         router.push(item.url);
                       }
                     }}
@@ -177,7 +179,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash(`Loading ${child.title}...`);
+                                showSplash(`Loading ${child.title}...`, child.url);
                                 router.push(child.url!);
                               }}
                             >
@@ -195,7 +197,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                     onClick={() => {
                       if (item.title === "Schedule") reset();
                       if (item.url) {
-                        showSplash(`Loading ${item.title}...`);
+                        showSplash(`Loading ${item.title}...`, item.url);
                         router.push(item.url);
                       }
                     }}

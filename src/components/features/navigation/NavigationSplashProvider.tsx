@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useCallback, createContext, useContext } from "react";
 
 type NavigationSplashContextType = {
-  showSplash: (text?: string) => void;
+  showSplash: (text?: string, newPath?: string) => void;
   hideSplash: () => void;
 };
 
@@ -25,16 +25,16 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastPathRef = useRef<string | null>(null);
-
   const manualTriggerRef = useRef(false);
+  const initialSplashShownRef = useRef(false); // 👈 added to track reload
 
   const showSplash = useCallback(
-    (msg?: string) => {
-      const currentPath = pathname;
+    (msg?: string, newPath?: string) => {
+      const currentPath = newPath ?? pathname;
       const previousPath = lastPathRef.current;
       const isSamePath = currentPath === previousPath;
 
-      const duration = isSamePath ? 300 : 1200;
+      const duration = isSamePath ? 600 : 1000;
 
       setText(msg ?? "Loading...");
       setVisible(true);
@@ -46,7 +46,6 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
         manualTriggerRef.current = false;
       }, duration);
 
-      // IMPORTANT: update the last path *now*
       lastPathRef.current = currentPath;
     },
     [pathname],
@@ -58,10 +57,17 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
     manualTriggerRef.current = false;
   }, []);
 
+  // 👇 Trigger splash once on initial page load
+  useEffect(() => {
+    if (!initialSplashShownRef.current) {
+      showSplash("Loading...", window.location.pathname);
+      initialSplashShownRef.current = true;
+    }
+  }, [showSplash]);
+
   useEffect(() => {
     if (!manualTriggerRef.current) return;
 
-    // only hide splash if route actually changed or fallback triggered
     if (lastPathRef.current !== pathname) {
       hideSplash();
     }

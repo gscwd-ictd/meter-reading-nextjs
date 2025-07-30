@@ -51,7 +51,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
           e.preventDefault();
         }
       }}
-      className={`group ${isToday(entry.readingDate) ? "bg-blue-100 dark:bg-slate-900" : "bg-white dark:bg-black"} relative grid h-full w-full grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800 ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} `}
+      className={`group ${isToday(entry.readingDate) ? "bg-blue-100 dark:bg-slate-900" : "bg-white dark:bg-transparent"} relative grid h-full w-full grid-rows-5 gap-0 overflow-hidden p-0 text-sm transition-all duration-200 ease-in-out hover:z-[30] hover:cursor-pointer hover:rounded-lg hover:border-none hover:bg-gray-50 hover:brightness-95 dark:hover:bg-slate-800 ${activeContext === idx ? "z-[30] scale-[1.05] rounded-lg border-none bg-gray-50 brightness-95 dark:bg-slate-800" : ""} `}
     >
       {isWithinMonth && (
         <>

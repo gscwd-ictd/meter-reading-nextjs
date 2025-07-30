@@ -4,6 +4,8 @@ import { Button } from "@mr/components/ui/Button";
 import { Card, CardContent } from "@mr/components/ui/Card";
 import { Input } from "@mr/components/ui/Input";
 import { Label } from "@mr/components/ui/Label";
+// import { useMutation } from "@tanstack/react-query";
+// import axios from "axios";
 import { GaugeCircleIcon, LockIcon, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
@@ -22,6 +24,21 @@ export const LoginCard: FunctionComponent = () => {
   const { register, handleSubmit } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  // const login = useMutation({
+  //   mutationFn: async (body: LoginFormData) => {
+  //     const res = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_MR}/login`,
+  //       { email: body.email, password: body.password },
+  //       { headers: { "Content-Type": "application/json" } },
+  //     );
+
+  //     return res;
+  //   },
+  //   onSuccess: () => {
+  //     // set the user here
+  //   },
+  // });
 
   const onSubmit = (credentials: LoginFormData) => {
     console.log(credentials);
