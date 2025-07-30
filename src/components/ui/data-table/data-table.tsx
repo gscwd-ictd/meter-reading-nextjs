@@ -21,6 +21,7 @@ import { DataTableToolbar } from "./data-table-toolbar";
 import { createContext, useEffect, useState } from "react";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
+import { LoadingBadge } from "../LoadingBadge";
 
 type DataTableProps<T> = {
   columns: Array<ColumnDef<T, unknown>>;
@@ -108,10 +109,7 @@ export function DataTable<T>({
         {loading || !table.getRowModel().rows?.length ? (
           <div className="flex flex-1 items-center justify-center">
             {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <LoadingSpinner className="text-primary" />
-                <span className="text-primary text-lg">Loading data...</span>
-              </div>
+              <LoadingSpinner className="text-primary size-20" />
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />

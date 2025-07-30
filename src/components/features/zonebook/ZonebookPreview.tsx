@@ -2,17 +2,11 @@ import { useEffect, useState } from "react";
 import { Badge } from "@mr/components/ui/Badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
-
-type Zonebook = {
-  area: string;
-  zone: string;
-  book: string;
-  zoneBook: string;
-};
+import { Zonebook } from "@mr/lib/types/zonebook";
 
 export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
   if (!zonebooks || zonebooks.length === 0) {
-    return <span className="text-muted-foreground text-sm">No zonebooks</span>;
+    return <span className="text-muted-foreground text-sm">No zone books</span>;
   }
 
   const previewCount = 3;
@@ -43,7 +37,7 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
               {zb.zone}-{zb.book}
             </Badge>
           </TooltipTrigger>
-          <TooltipContent className="dark:text-white">{zb.area || "N/A"}</TooltipContent>
+          <TooltipContent className="dark:text-white"> {zb.area.name ? zb.area.name : "N/A"}</TooltipContent>
         </Tooltip>
       ))}
       {remaining > 0 && (
@@ -63,7 +57,9 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
                         {zb.zone}-{zb.book}
                       </Badge>
                     </TooltipTrigger>
-                    <TooltipContent className="dark:text-white">{zb.area || "N/A"}</TooltipContent>
+                    <TooltipContent className="dark:text-white">
+                      {zb.area.name ? zb.area.name : "N/A"}
+                    </TooltipContent>
                   </Tooltip>
                 ))}
             </div>

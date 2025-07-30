@@ -31,6 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 const meterReaderSchema = z.object({
   employeeId: z.string(),
@@ -102,7 +103,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
         console.log(transformedEmployee);
         return await axios.put(
-          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
+          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.id}`,
           transformedEmployee,
         );
       } catch (error) {
@@ -140,11 +141,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
   // get meter reader by id
   const { data: meterReader, isLoading: meterReaderIsLoading } = useQuery({
-    queryKey: ["get-meter-reader-by-id", selectedMeterReader.meterReaderId],
+    queryKey: ["get-meter-reader-by-id", selectedMeterReader.id],
     queryFn: async () => {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.meterReaderId}`,
-      );
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.id}`);
 
       return res.data as MeterReaderWithZonebooks;
     },
@@ -224,8 +223,8 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       //   (orig) => !meterReader.zoneBooks.some((current) => current.zoneBook === orig.zoneBook),
       // );
 
-      setFilteredZonebooks(zoneBooks); // this refers to the unassigned pool
-      setTempFilteredZonebooks(zoneBooks); // this refers to the copied unassigned pool
+      setFilteredZonebooks(ZonebookFlatSorter(zoneBooks)); // this refers to the unassigned pool
+      setTempFilteredZonebooks(ZonebookFlatSorter(zoneBooks)); // this refers to the copied unassigned pool
       setHasSetInitialZonebookPool(true);
     }
   }, [zoneBooks, hasSetInitialZonebookPool, setFilteredZonebooks, setTempFilteredZonebooks, meterReader]);

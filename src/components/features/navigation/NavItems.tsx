@@ -14,6 +14,7 @@ import {
 import { NavItem } from "./items";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { useNavigationSplash } from "./NavigationSplashProvider";
 
 type NavProps = {
   items: NavItem[];
@@ -26,6 +27,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
   const pathname = usePathname();
   const router = useRouter();
   const reset = useSchedulesStore((state) => state.reset);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
 
   const toggleSubmenu = (title: string) => {
@@ -34,6 +36,8 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
       [title]: !prev[title],
     }));
   };
+
+  const { showSplash } = useNavigationSplash();
 
   return (
     <SidebarGroup {...props}>
@@ -73,7 +77,10 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                               tooltip={child.title}
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
-                              onClick={() => router.push(child.url!)}
+                              onClick={() => {
+                                showSplash(`Loading ${child.title}...`);
+                                router.push(child.url!);
+                              }}
                             >
                               {child.icon && <child.icon />}
                               <span className="text-sm">{child.title}</span>
@@ -87,8 +94,15 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                     tooltip={item.title}
                     isActive={pathname.startsWith(item.url || "")}
                     onClick={() => {
-                      if (item.title === "Schedule") reset();
-                      if (item.url) router.push(item.url);
+                      if (item.title === "Schedules") {
+                        reset();
+                        refetchData?.();
+                        router.push(item.url!);
+                      }
+                      if (item.url) {
+                        showSplash(`Loading ${item.title}...`);
+                        router.push(item.url);
+                      }
                     }}
                   >
                     {item.icon && <item.icon />}
@@ -115,6 +129,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
   const pathname = usePathname();
   const router = useRouter();
   const reset = useSchedulesStore((state) => state.reset);
+  const { showSplash } = useNavigationSplash();
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenus((prev) => ({
@@ -161,7 +176,10 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                               tooltip={child.title}
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
-                              onClick={() => router.push(child.url!)}
+                              onClick={() => {
+                                showSplash(`Loading ${child.title}...`);
+                                router.push(child.url!);
+                              }}
                             >
                               {child.icon && <child.icon />}
                               <span className="text-xs">{child.title}</span>
@@ -176,7 +194,10 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                     isActive={pathname.startsWith(item.url || "")}
                     onClick={() => {
                       if (item.title === "Schedule") reset();
-                      if (item.url) router.push(item.url);
+                      if (item.url) {
+                        showSplash(`Loading ${item.title}...`);
+                        router.push(item.url);
+                      }
                     }}
                   >
                     {item.icon && <item.icon />}

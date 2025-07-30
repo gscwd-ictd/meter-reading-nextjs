@@ -88,7 +88,7 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
           <AlertDialogAction
             className="w-[6rem] bg-red-600 text-white"
             onClick={() => {
-              deleteMeterReader.mutateAsync(selectedMeterReader.meterReaderId);
+              deleteMeterReader.mutateAsync(selectedMeterReader.id);
             }}
           >
             Delete

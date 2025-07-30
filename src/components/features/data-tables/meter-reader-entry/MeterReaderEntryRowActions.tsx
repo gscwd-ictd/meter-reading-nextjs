@@ -28,7 +28,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
     setEntryZonebookSelectorIsOpen(true);
   };
 
-  const removeMeterReader = (meterReaderId: string) => {
+  const removeMeterReader = (id: string) => {
     const temporaryMeterReaders = [...selectedScheduleEntry!.meterReaders!];
 
     setSelectedScheduleEntry({
@@ -36,7 +36,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       readingDate: selectedScheduleEntry?.readingDate!,
       disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
       dueDate: selectedScheduleEntry?.dueDate!,
-      meterReaders: temporaryMeterReaders.filter((mr) => mr.meterReaderId !== meterReaderId),
+      meterReaders: temporaryMeterReaders.filter((mr) => mr.id !== id),
     });
   };
 
@@ -67,7 +67,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
           </Button> */}
           <RemoveMeterReaderAlertDialog
             meterReader={meterReader}
-            onDelete={() => removeMeterReader(meterReader.meterReaderId)}
+            onDelete={() => removeMeterReader(meterReader.id)}
           />
         </div>
       </div>

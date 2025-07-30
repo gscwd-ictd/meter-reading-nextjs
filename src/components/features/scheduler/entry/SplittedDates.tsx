@@ -12,9 +12,14 @@ export const SplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, disconne
   const maxLength = Math.max(dueDates.length, disconnectionDates.length);
   const pairs: React.ReactNode[] = [];
 
+  const sortedDueDates = dueDates.map((d) => new Date(d)).sort((a, b) => a.getTime() - b.getTime());
+  const sortedDisconnectionDates = disconnectionDates
+    .map((d) => new Date(d))
+    .sort((a, b) => a.getTime() - b.getTime());
+
   for (let i = 0; i < maxLength; i++) {
-    const due = dueDates[i];
-    const disc = disconnectionDates[i];
+    const due = sortedDueDates[i];
+    const disc = sortedDisconnectionDates[i];
 
     if (!due && !disc) continue;
 

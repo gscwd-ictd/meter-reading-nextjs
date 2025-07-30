@@ -37,6 +37,9 @@ export const LoginCard: FunctionComponent = () => {
           {/* <Image src={metrax_logo.src} alt="Logo" width={80} height={80} className="rounded-full" /> */}
           <GaugeCircleIcon className="text-primary size-18" />
           <h1 className="text-primary text-3xl font-bold">MetraX</h1>
+          <div className="text-xs font-bold text-gray-500">
+            <i>Measure Transactions</i>
+          </div>
           <h2 className="text-base font-semibold text-gray-700 dark:text-gray-400">
             Meter Reading Application
           </h2>

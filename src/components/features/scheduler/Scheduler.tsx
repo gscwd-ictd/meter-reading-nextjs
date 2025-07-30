@@ -25,29 +25,34 @@ import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReade
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 
 export const Scheduler: FunctionComponent = () => {
+  const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
-  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
-
-  //!!!!! remove
+  const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
-  const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
   const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
-  const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
-  const scheduler = useScheduler(holidays);
   const [activeContext, setActiveContext] = useState<number | null>(null);
+  const scheduler = useScheduler(holidays);
+
+  const hasValidSchedule = (monthYear: string) => {
+    return currentSchedule.some(
+      (entry) => entry.readingDate && format(entry.readingDate, "yyyy-MM") === monthYear,
+    );
+  };
 
   // these are derived states
-  const hasFetched = lastFetchedMonthYear === currentMonthYear;
+  // const hasFetched = lastFetchedMonthYear === currentMonthYear;
+  const hasFetched = lastFetchedMonthYear === currentMonthYear && hasValidSchedule(currentMonthYear!);
 
   scheduler.addSundayReadings(currentSchedule);
 
@@ -74,6 +79,7 @@ export const Scheduler: FunctionComponent = () => {
     retry: false,
     retryOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   // these are derived loading states, it should be below the useQuery since loading is derived
@@ -278,28 +284,28 @@ export const Scheduler: FunctionComponent = () => {
           </section>
         </header>
         <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
+          {/* Calendar Header Section */}
+          <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase dark:text-white">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
+              <div key={index} className="border-none py-2 text-center">
+                {day}
+              </div>
+            ))}
+          </section>
           {isInitializingCalendar ? (
-            <div className="text-primary flex h-full w-full items-center justify-center gap-1 text-xl">
+            <div className="text-primary flex h-full w-full items-center justify-center gap-2 text-xl">
               <LoadingSpinner className="size-12" /> Loading Calendar...
+              {/* <LoadingBadge /> */}
             </div>
           ) : (
             <>
-              {/* Calendar Header Section */}
-              <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase dark:text-white">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
-                  <div key={index} className="border-none py-2 text-center">
-                    {day}
-                  </div>
-                ))}
-              </section>
-
               {/* Calendar Body Section */}
               <section className="relative flex-1 overflow-hidden border-t" style={gridStyle}>
                 {/* Overlay loading indicator while fetching schedules */}
                 {isFetchingSchedule && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-transparent">
                     <div className="text-primary flex items-center gap-2 text-xl">
-                      <LoadingSpinner className="size-10 animate-spin" /> Getting Schedules...
+                      <LoadingSpinner className="size-12 animate-spin" /> Getting Schedules...
                     </div>
                   </div>
                 )}
