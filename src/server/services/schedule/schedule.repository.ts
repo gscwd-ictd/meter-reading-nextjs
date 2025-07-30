@@ -198,7 +198,7 @@ export class ScheduleRepository implements IScheduleRepository {
     // );
 
     const unassigned = await db.pgConn.execute(
-      sql`select * from get_schedule_unassigned_zone_books( ${assigned.month},  ${assigned.year}, ${assigned.meterReaderId})`,
+      sql`select zone, book, zone_book as "zoneBook", area from get_schedule_unassigned_zone_books( ${assigned.month},  ${assigned.year}, ${assigned.meterReaderId})`,
     );
     // const preAssigned = await db.pgConn.execute(sql`select
     //                     szb.zone,
@@ -231,15 +231,10 @@ export class ScheduleRepository implements IScheduleRepository {
     //   (item: any) => !assignedZoneBookKeys.includes(`${item.zone}-${item.book}`),
     // );
 
-    // return ScheduleMeterReaderZoneBookSchema.parse({
-    //   assigned: assigned.zoneBooks,
-    //   unassigned: preAssigned,
-    // });
-
-    return {
+    return ScheduleMeterReaderZoneBookSchema.parse({
       assigned: assigned.zoneBooks,
       unassigned: unassigned.rows,
-    };
+    });
   }
 
   async createMeterReaderScheduleZoneBook(
@@ -276,12 +271,13 @@ export class ScheduleRepository implements IScheduleRepository {
 
   /* 
             sql function do not delete please
-create or replace function get_schedule_unassigned_zone_books(
+
+            create or replace function get_schedule_unassigned_zone_books(
   input_month int,
   input_year int,
   input_meter_reader_id uuid
 )
-returns table(zone varchar, book varchar, area jsonb) as $$
+returns table(zone text, book text) as $$
 begin
   return query
   with schedule_meter_reader_assigned_zone_books as (
@@ -299,29 +295,20 @@ begin
   predefault_meter_reader_zone_book as (
     select
       mrzb.zone,
-      mrzb.book,
-      vzbwa.area
+      mrzb.book
     from meter_readers mr
     inner join meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
-      left join view_zone_book_with_area vzbwa
-    on vzbwa.zone = mrzb.zone and vzbwa.book = mrzb.book
     where mr.id = input_meter_reader_id
   )
   select
     pmrzb.zone,
-    pmrzb.book,
-    pmrzb.area
+    pmrzb.book
   from predefault_meter_reader_zone_book pmrzb
   left join schedule_meter_reader_assigned_zone_books smrazb
     on pmrzb.zone = smrazb.zone and pmrzb.book = smrazb.book
   where smrazb.zone is null;
 end;
 $$ language plpgsql;
-
-select * from get_schedule_unassigned_zone_books(7,2025, 'b0156f0a-282c-4fe4-9e49-a22985a5b962');
-
-
-
 
     */
 }
