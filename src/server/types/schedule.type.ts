@@ -18,6 +18,7 @@ export const DateValueSchema = z.union([z.string(), z.string().array()]);
 
 /* partial details of reading schedule */
 export const ScheduleSchema = z.object({
+  id: z.string(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -37,6 +38,7 @@ export const ScheduleSchema = z.object({
 
 /* full details of reading schedule */
 export const ScheduleReadingSchema = z.object({
+  id: z.string(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -93,34 +95,15 @@ export const ScheduleMeterReaderZoneBookSchema = z.object({
   unassigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true }).array(),
 });
 
+export const CreateScheduleMeterReaderSchema = z.object({
+  id: z.string(),
+  meterReaderId: z.string(),
+});
+
 export type ScheduleQuery = z.infer<typeof ScheduleQuerySchema>;
 export type ScheduleReading = z.infer<typeof ScheduleReadingSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
 export type CreateMonthSchedule = z.infer<typeof CreateMonthScheduleSchema>;
 export type CreateMeterReaderScheduleReading = z.infer<typeof CreateMeterReaderScheduleReadingSchema>;
 export type ScheduleMeterReaderZoneBook = z.infer<typeof ScheduleMeterReaderZoneBookSchema>;
-
-/*  */
-
-/* export const ScheduleZoneBookSchema = z.object({
-  scheduleZoneBookId: z.string(),
-  scheduleMeterReaderId: z.string(),
-  zone: z.string(),
-  book: z.string(),
-  dueDate: z.coerce.date(),
-  disconnectionDate: z.coerce.date(),
-});
- */
-
-// export const CreateMeterReaderScheduleZoneBookSchema = z.object({
-//   scheduleMeterReaderId: z.string(),
-
-//   zoneBooks: ZoneBookSchema.omit({ zoneBook: true })
-//     .extend({
-//       dueDate: z.string(),
-//       disconnectionDate: z.string(),
-//     })
-//     .array(),
-// });
-
-//export type CreateMeterReaderScheduleZoneBook = z.infer<typeof CreateMeterReaderScheduleZoneBookSchema>;
+export type CreateScheduleMeterReader = z.infer<typeof CreateScheduleMeterReaderSchema>;

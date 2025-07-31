@@ -3,6 +3,7 @@ import { IScheduleService } from "@mr/server/interfaces/schedule/schedule.interf
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateScheduleMeterReader,
   ScheduleMeterReaderZoneBook,
   ScheduleReading,
 } from "@mr/server/types/schedule.type";
@@ -40,5 +41,13 @@ export class ScheduleService implements IScheduleService {
     data: CreateMeterReaderScheduleReading,
   ): Promise<ScheduleMeterReaderZoneBook> {
     return await this.repository.createMeterReaderScheduleZoneBook(data);
+  }
+
+  async deleteScheduleMeterReaderById(scheduleMeterReaderId: string): Promise<ScheduleMeterReaderZoneBook> {
+    return await this.repository.removeScheduleMeterReaderById(scheduleMeterReaderId);
+  }
+
+  async addScheduleMeterReader(data: CreateScheduleMeterReader): Promise<ScheduleMeterReaderZoneBook> {
+    return await this.repository.createScheduleMeterReader(data);
   }
 }
