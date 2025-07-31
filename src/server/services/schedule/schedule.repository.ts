@@ -310,5 +310,58 @@ begin
 end;
 $$ language plpgsql;
 
+
+
+create or replace function get_schedule_unassigned_zone_books(
+  input_month int,
+  input_year int,
+  input_meter_reader_id uuid
+)
+returns table(zone varchar, book varchar, zone_book text, area jsonb) as $$
+begin
+  return query
+  with schedule_meter_reader_assigned_zone_books as (
+    select
+      coalesce(szb.zone, '') as zone,
+      coalesce(szb.book, '') as book
+    from schedules s
+    left join schedule_meter_readers smr on s.id = smr.schedule_id
+    left join schedule_zone_books szb on smr.id = szb.schedule_meter_reader_id
+    where
+      extract(month from s.reading_date) = input_month and
+      extract(year from s.reading_date) = input_year and
+      smr.meter_reader_id = input_meter_reader_id
+  ),
+  predefault_meter_reader_zone_book as (
+    select
+      mrzb.zone,
+      mrzb.book,
+      vzbwa.zone_book,
+      vzbwa.area
+    from meter_readers mr
+    inner join meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
+      left join view_zone_book_with_area vzbwa
+    on vzbwa.zone = mrzb.zone and vzbwa.book = mrzb.book
+    where mr.id = input_meter_reader_id
+  )
+  select
+    pmrzb.zone,
+    pmrzb.book,
+    pmrzb.zone_book,
+    pmrzb.area
+  from predefault_meter_reader_zone_book pmrzb
+  left join schedule_meter_reader_assigned_zone_books smrazb
+    on pmrzb.zone = smrazb.zone and pmrzb.book = smrazb.book
+  where smrazb.zone is null;
+end;
+$$ language plpgsql;
+
+select * from get_schedule_unassigned_zone_books(7,2025, 'b0156f0a-282c-4fe4-9e49-a22985a5b962');
+
+select * from view_zone_book_with_area;
+
+
+
+
     */
 }
