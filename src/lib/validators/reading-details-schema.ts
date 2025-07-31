@@ -25,7 +25,7 @@ export const CreateReadingDetailsSchema = z4.object({
   disconnectionDate: z4.coerce.date().nullish(),
   reconnectionDate: z4.coerce.date().nullish(),
 
-  contactNumber: z4.string().nullable(),
+  contactNumber: z4.string().nullish(),
   classification: z4.string(),
   arrears: z4.number(),
   currentReading: z4.number().nullish(),
