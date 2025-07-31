@@ -19,7 +19,7 @@ export const CreateReadingDetailsSchema = z4.object({
   address: z4.string(),
   disconnectionType: z4.string(),
 
-  dateInstalled: z4.coerce.date(),
+  dateInstalled: z4.coerce.date().nullish(),
   readingDate: z4.coerce.date().nullish(),
   dueDate: z4.coerce.date().nullish(),
   disconnectionDate: z4.coerce.date().nullish(),

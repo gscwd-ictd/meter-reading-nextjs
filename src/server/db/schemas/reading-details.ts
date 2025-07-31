@@ -26,7 +26,7 @@ export const readingDetails = pgTable("reading_details", {
   otherBalance: real("other_balance"),
   sequenceNumber: varchar("sequence_number").notNull(),
   address: text("address").notNull(),
-  dateInstalled: timestamp("date_installed").notNull(),
+  dateInstalled: timestamp("date_installed"),
   disconnectionType: varchar("disconnection_type").notNull(),
   readingDate: timestamp("reading_date"),
   dueDate: timestamp("due_date"),
