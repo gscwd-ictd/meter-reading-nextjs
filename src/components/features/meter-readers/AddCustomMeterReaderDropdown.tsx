@@ -40,6 +40,7 @@ export const AddCustomMeterReaderDropdown: FunctionComponent = () => {
                   onSelect={() => {
                     setAddCustomMeterReaderDialogIsOpen(true);
                   }}
+                  className="dark:bg-black"
                 >
                   Add meter reader
                 </DropdownMenuItem>

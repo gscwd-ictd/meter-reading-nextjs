@@ -29,7 +29,9 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
             enableSystem 
             disableTransitionOnChange
           >
-            {children}
+       
+             {children}
+        
           </ThemeProvider>
         </ReactQueryProvider>
       </body>

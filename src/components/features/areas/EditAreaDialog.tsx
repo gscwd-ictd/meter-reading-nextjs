@@ -28,8 +28,9 @@ export const EditAreaDialog: FunctionComponent = () => {
   const postAreaMutation = useMutation({
     mutationKey: ["add-new-area"],
     mutationFn: async (area: Area) => {
-      const res = await axios.put(`${process.env.NEXT_PUBLIC_MR_BE}/area/${area.areaId}`, {
-        area: area.area,
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_MR_BE}/area/${area.id}`, {
+        //! area: area.area,
+        name: area.name,
       });
 
       return res.data;
@@ -37,7 +38,7 @@ export const EditAreaDialog: FunctionComponent = () => {
     onSuccess: async (area: Area) => {
       // refetch
       toast.success("Success", {
-        description: `You have successfully updated the area from ${selectedArea.area} to ${area.area}`,
+        description: `You have successfully updated the area from ${selectedArea.name} to ${area.name}`,
         position: "top-right",
       });
       setName("");
@@ -49,7 +50,7 @@ export const EditAreaDialog: FunctionComponent = () => {
 
   useEffect(() => {
     if (editAreaDialogIsOpen && selectedArea) {
-      setName(selectedArea.area);
+      setName(selectedArea.name);
     }
   }, [editAreaDialogIsOpen, selectedArea]);
 
@@ -82,9 +83,7 @@ export const EditAreaDialog: FunctionComponent = () => {
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button
-            onClick={async () =>
-              await postAreaMutation.mutateAsync({ area: name, areaId: selectedArea.areaId })
-            }
+            onClick={async () => await postAreaMutation.mutateAsync({ name: name, id: selectedArea.id })}
             disabled={!name.trim()}
             className="w-[5rem]"
           >

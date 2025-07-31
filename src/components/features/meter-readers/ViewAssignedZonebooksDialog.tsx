@@ -19,12 +19,10 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
   setOpen,
 }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["meterReaderDetails", meterReader.meterReaderId],
+    queryKey: ["meterReaderDetails", meterReader.id],
     queryFn: async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${meterReader.meterReaderId}`,
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${meterReader.id}`);
         return res.data as MeterReader;
       } catch (error) {
         console.log(error);
@@ -49,7 +47,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
         <DialogHeader>
           <DialogTitle>Assigned Zonebooks</DialogTitle>
           <p className="text-muted-foreground text-sm">
-            Meter Reader: <span className="font-medium">{meterReader.name || meterReader.meterReaderId}</span>
+            Meter Reader: <span className="font-medium">{meterReader.name || meterReader.id}</span>
           </p>
         </DialogHeader>
 
@@ -77,7 +75,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
                       <td className="px-4 py-2 font-medium">{zb.zoneBook}</td>
                       <td className="px-4 py-2">{zb.zone}</td>
                       <td className="px-4 py-2">{zb.book}</td>
-                      <td className="px-4 py-2">{zb.area ?? "N/A"}</td>
+                      <td className="px-4 py-2">{zb.area.name ?? "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>

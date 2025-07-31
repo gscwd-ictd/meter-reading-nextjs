@@ -2,9 +2,8 @@ export type Zonebook = {
   zoneBook: string;
   zone: string;
   book: string;
-  area: string;
-  areaId?: string;
-  zoneBookId?: string;
+  area: Area;
+  id?: string;
 };
 
 export type ZonebookWithDates = Zonebook & {
@@ -13,6 +12,6 @@ export type ZonebookWithDates = Zonebook & {
 };
 
 export type Area = {
-  areaId?: string;
-  area: string;
+  id: string;
+  name: string;
 };

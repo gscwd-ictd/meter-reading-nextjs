@@ -5,9 +5,7 @@ export const ZonebookFlatSorter = (zoneBooks: Zonebook[]) => {
     const [zoneA, bookA] = a.zoneBook.split("-").map(Number);
     const [zoneB, bookB] = b.zoneBook.split("-").map(Number);
 
-    if (zoneA !== zoneB) {
-      return zoneA - zoneB;
-    }
+    if (zoneA !== zoneB) return zoneA - zoneB;
     return bookA - bookB;
   });
 };

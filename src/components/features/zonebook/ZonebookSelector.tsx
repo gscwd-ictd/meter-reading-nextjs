@@ -302,7 +302,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                   >
                     <MapPinIcon className="text-primary size-5" />
                     <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                    <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                    <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                   </CommandItem>
                 ))
               ) : selectedZone && !selectedBook && tempFilteredZonebooks && !loading ? (
@@ -317,7 +317,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                     >
                       <MapPinIcon className="text-primary size-5" />
                       <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                      <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                     </CommandItem>
                   ))
               ) : selectedZone && selectedBook && tempFilteredZonebooks && !loading ? (
@@ -329,7 +329,9 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                       <span className="col-span-2 font-medium text-gray-600 dark:text-white">
                         {zb.zoneBook}
                       </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black dark:text-white">
+                        {zb.area.name}
+                      </span>
                     </CommandItem>
                   ))
               ) : null}
@@ -361,7 +363,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                       <TableCell>{entry.zoneBook}</TableCell>
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell>{entry.area}</TableCell>
+                      <TableCell>{entry.area.name}</TableCell>
                       <TableCell>
                         <button
                           onClick={() => {
@@ -386,7 +388,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center">
-                      No zoneBooks added
+                      No zone books added
                     </TableCell>
                   </TableRow>
                 )}

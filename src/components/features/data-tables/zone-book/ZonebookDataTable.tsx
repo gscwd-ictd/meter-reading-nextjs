@@ -13,7 +13,7 @@ export const ZonebookDataTable: FunctionComponent = () => {
   const setZonebooks = useZonebookStore((state) => state.setZonebooks);
   const setRefetchZonebooks = useZonebookStore((state) => state.setRefetchZonebooks);
 
-  const { data, refetch } = useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ["get-all-zoneBooks"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`);
@@ -31,15 +31,9 @@ export const ZonebookDataTable: FunctionComponent = () => {
     }
   }, [data, setZonebooks, setRefetchZonebooks, refetch]);
 
-  if (!data)
-    return (
-      <div className="text-primary flex h-full w-full items-center justify-center gap-2">
-        <LoadingSpinner size={50} /> Loading Zonebooks...
-      </div>
-    );
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} />
+      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} loading={isLoading} />
     </Suspense>
   );
 };

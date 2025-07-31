@@ -26,12 +26,10 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   const refetchZonebooks = useZonebookStore((state) => state.refetchZonebooks);
 
   const { data: area } = useQuery({
-    queryKey: ["get-area-by-zonebook-id", selectedZonebook?.zoneBookId],
+    queryKey: ["get-area-by-zonebook-id", selectedZonebook?.id],
     queryFn: async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${selectedZonebook?.zoneBookId}`,
-        );
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${selectedZonebook?.id}`);
 
         return res.data;
       } catch (error) {
@@ -39,7 +37,7 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
         return error;
       }
     },
-    enabled: editAssignAreaZonebookDialogIsOpen && selectedZonebook?.zoneBookId !== null,
+    enabled: editAssignAreaZonebookDialogIsOpen && selectedZonebook?.id !== null,
   });
 
   const {
@@ -56,11 +54,11 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   });
 
   const patchAreaToZonebookMutation = useMutation({
-    mutationKey: ["patch-area-mutation", selectedZonebook?.zoneBookId],
+    mutationKey: ["patch-area-mutation", selectedZonebook?.id],
     mutationFn: async (zonebook: Zonebook) => {
       try {
-        const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.zoneBookId}`, {
-          areaId: zonebook.areaId,
+        const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.id}`, {
+          area: zonebook.area,
         });
 
         return res.data;
@@ -71,7 +69,8 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
     },
     onSuccess: () => {
       toast.success("Success", {
-        description: `You have successfully reassigned the area to ${selectedArea.area} on zone book ${selectedZonebook?.zoneBook}`,
+        description: `You have successfully reassigned the area to ${selectedArea.name} on zone book ${selectedZonebook?.zoneBook}`,
+        position: "top-right",
       });
 
       setSelectedArea({} as Area);
@@ -82,8 +81,8 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (area && editAssignAreaZonebookDialogIsOpen) setSelectedArea({ area: area.area, areaId: area.areaId });
-  }, [area, editAssignAreaZonebookDialogIsOpen]);
+    if (area && editAssignAreaZonebookDialogIsOpen) setSelectedArea({ name: area.name, id: area.id });
+  }, [area, editAssignAreaZonebookDialogIsOpen, setSelectedArea]);
 
   return (
     <Dialog
@@ -148,10 +147,11 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
               await patchAreaToZonebookMutation.mutateAsync({
                 zone: selectedZonebook!.zone!,
                 book: selectedZonebook!.book!,
-                areaId: selectedArea.areaId,
+                // areaId: selectedArea.areaId,
                 zoneBook: selectedZonebook!.zoneBook!,
-                area: selectedArea.area,
-                zoneBookId: selectedZonebook?.zoneBookId,
+                area: selectedArea,
+                // zoneBookId: selectedZonebook?.zoneBookId,
+                id: selectedZonebook?.id,
               });
             }}
           >

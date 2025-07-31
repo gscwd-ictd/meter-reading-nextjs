@@ -121,34 +121,43 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
           `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/zone-books`,
           meterReaderWithZonebooks,
         );
-        return res.data;
+        return res;
       } catch (error) {
         console.log(error);
+        toast.error("Error", {
+          description: "Something went wrong. Please try again later.",
+          position: "top-right",
+        });
+        return error;
       }
     },
     onSuccess: async () => {
-      queryClient.removeQueries({
-        queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
-      });
-      // refetch
-      await queryClient.invalidateQueries({
-        queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
-        refetchType: "active",
-      });
-      setEntryZonebookSelectorIsOpen(false);
-      setSelectedZonebook(null);
-      setAssignedZonebooks([]);
-      setUnassignedZonebooks([]);
-      setHasFetchedZonebooks(false);
-      reset();
+      try {
+        queryClient.removeQueries({
+          queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
+        });
+        // refetch
+        await queryClient.invalidateQueries({
+          queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
+          refetchType: "active",
+        });
+        setEntryZonebookSelectorIsOpen(false);
+        setSelectedZonebook(null);
+        setAssignedZonebooks([]);
+        setUnassignedZonebooks([]);
+        setHasFetchedZonebooks(false);
+        reset();
 
-      refetchEntry!();
-      refetchData!();
-      setSelectedMeterReader(null);
-      toast.success("Success", {
-        description: "Successfully updated the meter reader zonebooks!",
-        position: "top-right",
-      });
+        refetchEntry!();
+        refetchData!();
+        setSelectedMeterReader(null);
+        toast.success("Success", {
+          description: "Successfully updated the meter reader zonebooks!",
+          position: "top-right",
+        });
+      } catch (error) {
+        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+      }
     },
     onError: () => {
       toast.error("Error", {
@@ -264,7 +273,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
   useEffect(() => {
     if (entryZonebookSelectorIsOpen) {
-      console.log("HAS EMPTY: ", hasEmptyDueDate(assignedZonebooks));
       setHasAnEmptyDueDate(hasEmptyDueDate(assignedZonebooks));
     }
   }, [assignedZonebooks, entryZonebookSelectorIsOpen]);
@@ -468,7 +476,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   >
                     <MapPinIcon className="text-primary size-5" />
                     <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                    <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                    <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                   </CommandItem>
                 ))
               ) : selectedZone && !selectedBook && unassignedZonebooks && !isLoading ? (
@@ -483,7 +491,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     >
                       <MapPinIcon className="text-primary size-5" />
                       <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                      <span className="col-span-9 font-medium text-black">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
                     </CommandItem>
                   ))
               ) : selectedZone && selectedBook && unassignedZonebooks && !isLoading ? (
@@ -495,7 +503,9 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       <span className="col-span-2 font-medium text-gray-600 dark:text-white">
                         {zb.zoneBook}
                       </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">{zb.area}</span>
+                      <span className="col-span-9 font-medium text-black dark:text-white">
+                        {zb.area.name}
+                      </span>
                     </CommandItem>
                   ))
               ) : null}
@@ -529,7 +539,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       <TableCell>{entry.zoneBook}</TableCell>
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell className="w-[10rem]">{entry.area}</TableCell>
+                      <TableCell className="w-[10rem]">{entry.area.name}</TableCell>
                       <TableCell>
                         {selectedScheduleEntry?.dueDate &&
                         Array.isArray(selectedScheduleEntry.dueDate) &&
@@ -538,7 +548,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                             zonebook={entry.zoneBook}
                             zoneBooks={assignedZonebooks}
                             setZonebooks={setAssignedZonebooks}
-                            dueDate={entry.dueDate ?? undefined}
+                            dueDate={entry.dueDate}
                             disconnectionDate={entry.disconnectionDate}
                           />
                         ) : selectedScheduleEntry?.dueDate &&
@@ -592,7 +602,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
         </div>
 
         <Button
-          className="h-[3rem]"
+          className="h-[3rem] dark:text-white"
           onClick={handleApplyAllZonebooks}
           disabled={hasAnEmptyDueDate ? true : false}
         >
