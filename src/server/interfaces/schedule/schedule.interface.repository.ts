@@ -1,6 +1,7 @@
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateScheduleMeterReader,
   ScheduleMeterReaderZoneBook,
   ScheduleReading,
 } from "@mr/server/types/schedule.type";
@@ -20,4 +21,8 @@ export interface IScheduleRepository {
   createMeterReaderScheduleZoneBook(
     data: CreateMeterReaderScheduleReading,
   ): Promise<ScheduleMeterReaderZoneBook>;
+
+  removeScheduleMeterReaderById(scheduleMeterReaderId: string): Promise<ScheduleMeterReaderZoneBook>;
+
+  createScheduleMeterReader(data: CreateScheduleMeterReader): Promise<ScheduleMeterReaderZoneBook>;
 }
