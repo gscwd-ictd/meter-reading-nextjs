@@ -15,6 +15,7 @@ import { tokensHandler } from "./routes/tokens";
 import { cors } from "hono/cors";
 import { meterReaderHandler } from "./routes/meter-readers";
 import { scheduleHandler } from "./routes/schedule";
+import { usage } from "./routes/usage";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -51,6 +52,7 @@ function createApp() {
     scheduleHandler,
     consumerHandler,
     tokensHandler,
+    usage,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
