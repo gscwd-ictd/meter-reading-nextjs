@@ -22,8 +22,8 @@ export function AddAreaDialog() {
 
   const postAreaMutation = useMutation({
     mutationKey: ["add-new-area"],
-    mutationFn: async (area: string) => {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/area`, { area });
+    mutationFn: async (name: string) => {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/area`, { name });
 
       return res.data;
     },

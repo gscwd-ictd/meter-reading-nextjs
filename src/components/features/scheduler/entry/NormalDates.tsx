@@ -22,7 +22,7 @@ export const NormalDates: React.FC<NormalDatesProps> = ({ dueDate, disconnection
       )}
       {dueDate && disconnectionDate && <span className="mx-1">/</span>}
       {disconnectionDate && (
-        <span className="text-destructive flex items-center gap-1">
+        <span className="flex items-center gap-1 text-red-500">
           <ScissorsLineDashedIcon className="h-4 w-4 shrink-0" />
           Disconnection: {format(disconnectionDate, "MMM dd, yyyy")}
         </span>

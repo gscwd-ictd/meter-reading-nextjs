@@ -41,9 +41,6 @@ export const ContactNumberInput: FunctionComponent<FormInputProps> = ({
 
       {/* Input wrapper with prefix */}
       <div className="flex w-full gap-2">
-        <div className="pointer-events-none left-3 flex items-center justify-end text-center text-sm leading-none font-normal text-gray-500">
-          (+639)
-        </div>
         <Input
           {...props}
           {...controller}

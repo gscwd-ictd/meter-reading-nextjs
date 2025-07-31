@@ -44,13 +44,13 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
           size="lg"
           className={`flex w-full justify-start`}
         >
-          {areaList && selectedArea && selectedArea.areaId ? (
+          {areaList && selectedArea && selectedArea.id ? (
             <span className="flex items-center gap-2 text-sm">
-              {areaList && areaList.find((area: Area) => area.area === selectedArea?.area)?.area}
+              {areaList && areaList.find((area: Area) => area.name === selectedArea?.name)?.name}
             </span>
           ) : (
             !areaList &&
-            !selectedArea?.areaId && (
+            !selectedArea?.id && (
               <span className="flex items-center gap-2 text-sm">
                 <ScanSearchIcon className="text-primary size-5" />
                 <span className="text-primary text-sm">Search from areas list...</span>
@@ -78,10 +78,10 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
                 {areaList &&
                   areaList.map((area: Area, index: number) => (
                     <CommandItem
-                      key={area.areaId}
-                      value={area.area}
+                      key={area.id}
+                      value={area.name}
                       onSelect={(currentValue) => {
-                        if (area.areaId === selectedArea?.areaId) setSelectedArea({} as Area);
+                        if (area.id === selectedArea?.id) setSelectedArea({} as Area);
                         else setSelectedArea(area);
 
                         setSearchArea(currentValue === searchArea ? "" : currentValue);
@@ -92,13 +92,13 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
                       <div className="flex items-center gap-2">
                         <Scan />
                         <div className="flex flex-col">
-                          <span className="font-medium">{area.area}</span>
+                          <span className="font-medium">{area.name}</span>
                         </div>
                       </div>
                       <Check
                         className={cn(
                           "ml-auto",
-                          searchArea.toLowerCase().includes(area.area.toLowerCase())
+                          searchArea.toLowerCase().includes(area.name.toLowerCase())
                             ? "opacity-100"
                             : "opacity-0",
                         )}

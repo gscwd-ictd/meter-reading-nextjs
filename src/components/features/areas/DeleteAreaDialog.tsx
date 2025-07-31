@@ -29,7 +29,7 @@ export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ are
   const deleteAreaMutation = useMutation({
     mutationFn: async (area: Area) => {
       try {
-        const res = await axios.delete(`${process.env.NEXT_PUBLIC_MR_BE}/area/${area.areaId}`);
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_MR_BE}/area/${area.id}`);
         return res.data;
       } catch (error) {
         console.log(error);
@@ -37,7 +37,7 @@ export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ are
     },
     onSuccess: async () => {
       toast.success("Success", {
-        description: `Successfully Removed ${area.area} from the list of Areas!`,
+        description: `Successfully Removed ${area.name} from the list of Areas!`,
         position: "top-right",
         duration: 1500,
       });
@@ -48,7 +48,7 @@ export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ are
     },
     onError: () => {
       toast.error("Error", {
-        description: `Cannot remove ${area.area}. Something went wrong. Please try again later`,
+        description: `Cannot remove ${area.name}. Something went wrong. Please try again later`,
         position: "top-right",
         duration: 1500,
       });
@@ -71,7 +71,7 @@ export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ are
         <AlertDialogHeader>
           <AlertDialogTitle>Delete meter reader</AlertDialogTitle>
           <AlertDialogDescription>
-            Do you want to remove <span className="text-primary font-bold">{area.area}</span> from the list of
+            Do you want to remove <span className="text-primary font-bold">{area.name}</span> from the list of
             Areas?
           </AlertDialogDescription>
         </AlertDialogHeader>

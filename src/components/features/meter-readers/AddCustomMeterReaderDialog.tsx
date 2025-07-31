@@ -33,8 +33,8 @@ export const AddCustomMeterReaderDialog: FunctionComponent = () => {
     b: MeterReaderWithZonebooks[] = [],
   ): MeterReaderWithZonebooks[] => {
     return [
-      ...a.filter((readerA) => !b.some((readerB) => readerB.meterReaderId === readerA.meterReaderId)),
-      ...b.filter((readerB) => !a.some((readerA) => readerA.meterReaderId === readerB.meterReaderId)),
+      ...a.filter((readerA) => !b.some((readerB) => readerB.id === readerA.id)),
+      ...b.filter((readerB) => !a.some((readerA) => readerA.id === readerB.id)),
     ];
   };
 
@@ -48,7 +48,9 @@ export const AddCustomMeterReaderDialog: FunctionComponent = () => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-primary text-xl font-bold">Add meter reader</DialogTitle>
-          <DialogDescription>Manually select from a list of meter readers</DialogDescription>
+          <DialogDescription className="dark:text-white">
+            Manually select from a list of meter readers
+          </DialogDescription>
           <MeterReaderPopover
             filteredMeterReaders={filteredMeterReaders}
             selectedMeterReader={selectedMeterReader}

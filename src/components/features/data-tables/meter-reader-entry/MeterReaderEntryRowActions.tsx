@@ -7,6 +7,7 @@ import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { CircleXIcon, MapPinnedIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { ScheduleEntryZonebookSelector } from "../../scheduler/entry/ScheduleEntryZonebookSelector";
+import { RemoveMeterReaderAlertDialog } from "../../scheduler/entry/RemoveMeterReaderAlertDialog";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -27,7 +28,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
     setEntryZonebookSelectorIsOpen(true);
   };
 
-  const removeMeterReader = (meterReaderId: string) => {
+  const removeMeterReader = (id: string) => {
     const temporaryMeterReaders = [...selectedScheduleEntry!.meterReaders!];
 
     setSelectedScheduleEntry({
@@ -35,7 +36,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       readingDate: selectedScheduleEntry?.readingDate!,
       disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
       dueDate: selectedScheduleEntry?.dueDate!,
-      meterReaders: temporaryMeterReaders.filter((mr) => mr.meterReaderId !== meterReaderId),
+      meterReaders: temporaryMeterReaders.filter((mr) => mr.id !== id),
     });
   };
 
@@ -55,7 +56,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
           </Button>
         </div>
         <div className="col-span-1">
-          <Button
+          {/* <Button
             variant="destructive"
             className="w-full px-2 hover:brightness-90"
             size="sm"
@@ -63,7 +64,11 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
           >
             <CircleXIcon className="size-2 fill-transparent text-white sm:size-4 lg:size-4" />
             <span className="hidden text-xs sm:hidden md:hidden lg:block">Remove</span>
-          </Button>
+          </Button> */}
+          <RemoveMeterReaderAlertDialog
+            meterReader={meterReader}
+            onDelete={() => removeMeterReader(meterReader.id)}
+          />
         </div>
       </div>
     </>

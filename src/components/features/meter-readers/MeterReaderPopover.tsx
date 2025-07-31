@@ -44,7 +44,7 @@ export function MeterReaderPopover({
             <div className="space-y-1 overflow-y-auto">
               {filteredMeterReaders.map((mr) => (
                 <div
-                  key={mr.meterReaderId}
+                  key={mr.id}
                   onClick={() => {
                     setSelectedMeterReader(mr);
                     setOpen(false);
@@ -65,7 +65,7 @@ export function MeterReaderPopover({
         )}
       </PopoverContent>
       <div className="flex w-full justify-center">
-        <Button className="w-full">Manually add this meter reader</Button>
+        <Button className="w-full dark:text-white">Manually add this meter reader</Button>
       </div>
     </Popover>
   );

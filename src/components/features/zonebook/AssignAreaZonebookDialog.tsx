@@ -37,13 +37,14 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
   });
 
   const postAreaToZonebookMutation = useMutation({
-    mutationKey: ["post-area-mutation", selectedArea.areaId],
+    mutationKey: ["post-area-mutation", selectedArea.id],
     mutationFn: async (zonebook: Zonebook) => {
       try {
         const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book`, {
           zone: zonebook.zone,
           book: zonebook.book,
-          areaId: zonebook.areaId,
+          // areaId: zonebook.areaId,
+          area: zonebook.area,
         });
 
         return res.data;
@@ -54,7 +55,8 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
     },
     onSuccess: () => {
       toast.success("Success", {
-        description: `You have successfully assigned area ${selectedArea.area} to zone book ${selectedZonebook?.zoneBook}`,
+        description: `You have successfully assigned area ${selectedArea.name} to zone book ${selectedZonebook?.zoneBook}`,
+        position: "top-right",
       });
 
       setSelectedArea({} as Area);
@@ -128,9 +130,9 @@ export const AssignAreaZonebookDialog: FunctionComponent = () => {
               await postAreaToZonebookMutation.mutateAsync({
                 zone: selectedZonebook!.zone!,
                 book: selectedZonebook!.book!,
-                areaId: selectedArea.areaId,
+                // areaId: selectedArea.areaId,
                 zoneBook: selectedZonebook!.zoneBook!,
-                area: selectedArea.area,
+                area: selectedArea,
               });
             }}
           >
