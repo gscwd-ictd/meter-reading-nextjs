@@ -21,8 +21,6 @@ export const readingDetailsHandler = new Hono()
   })
   .post("/", zValidator("json", CreateReadingDetailsSchema), async (c) => {
     const body = c.req.valid("json");
-    console.log(body);
-
     return c.json(await readingDetailsService.create(body));
   })
   .patch("/:id", zValidator("json", UpdateReadingDetailsSchema), async (c) => {
