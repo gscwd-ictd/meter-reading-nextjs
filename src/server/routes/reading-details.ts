@@ -21,27 +21,9 @@ export const readingDetailsHandler = new Hono()
   })
   .post("/", zValidator("json", CreateReadingDetailsSchema), async (c) => {
     const body = c.req.valid("json");
-    return c.json(
-      await readingDetailsService.create({
-        ...body,
-        readingDate:
-          body.readingDate !== undefined && body.readingDate !== null
-            ? new Date(body.readingDate).toISOString()
-            : undefined,
-        dueDate:
-          body.dueDate !== undefined && body.dueDate !== null
-            ? new Date(body.dueDate).toISOString()
-            : undefined,
-        disconnectionDate:
-          body.disconnectionDate !== undefined && body.disconnectionDate !== null
-            ? new Date(body.disconnectionDate).toISOString()
-            : undefined,
-        reconnectionDate:
-          body.reconnectionDate !== undefined && body.reconnectionDate !== null
-            ? new Date(body.reconnectionDate).toISOString()
-            : undefined,
-      }),
-    );
+    console.log(body);
+
+    return c.json(await readingDetailsService.create(body));
   })
   .patch("/:id", zValidator("json", UpdateReadingDetailsSchema), async (c) => {
     const id = c.req.param("id");

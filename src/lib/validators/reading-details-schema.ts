@@ -10,28 +10,34 @@ export const CreateReadingDetailsSchema = z4.object({
   meterCode: z4.number(),
   consumerType: z4.string(),
   previousReading: z4.number(),
-  longlat: z4.string().optional(),
+  longlat: z4.string().nullish(),
   zoneCode: z4.string(),
   bookCode: z4.string(),
-  // meterStatus: z4.string(),
+
   isRead: z4.boolean(),
   sequenceNumber: z4.string(),
   address: z4.string(),
-  dateInstalled: z4.string(),
   disconnectionType: z4.string(),
-  readingDate: z4.string().optional(),
-  dueDate: z4.string().optional(),
-  disconnectionDate: z4.string().optional(),
-  reconnectionDate: z4.string().optional(),
+
+  dateInstalled: z4.coerce.date(),
+  readingDate: z4.coerce.date().nullish(),
+  dueDate: z4.coerce.date().nullish(),
+  disconnectionDate: z4.coerce.date().nullish(),
+  reconnectionDate: z4.coerce.date().nullish(),
+
   contactNumber: z4.string(),
   classification: z4.string(),
   arrears: z4.number(),
-  currentReading: z4.number().nullable(),
-  billedAmount: z4.number().nullable(),
-  remarks: z4.string().nullable(),
-  additionalRemarks: z4.string().nullable(),
-  image: z4.string().nullable(),
-  printCount: z4.number().nullable(),
+  currentReading: z4.number().nullish(),
+  billedAmount: z4.number().nullish(),
+  remarks: z4.string().nullish(),
+  additionalRemarks: z4.string().nullish(),
+  image: z4.string().nullish(),
+  printCount: z4.number().nullish(),
+
+  isSenior: z4.boolean(),
+  isConnected: z4.boolean(),
+  meterSize: z4.string(),
 });
 
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial().omit({
@@ -39,3 +45,7 @@ export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial().o
 });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
+
+// const test: ReadingDetails = {
+//   longlat,
+// };
