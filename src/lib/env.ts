@@ -17,6 +17,12 @@ const EnvSchema = z4.object({
   MSSQL_PASS: z4.string(),
   MSSQL_NAME: z4.string(),
 
+  HRMS_DB_HOST: z4.string(),
+  HRMS_DB_PORT: z4.coerce.number(),
+  HRMS_DB_USER: z4.string(),
+  HRMS_DB_PASS: z4.string(),
+  HRMS_DB_NAME: z4.string(),
+
   PRIVATE_KEY_B64: z4.string().optional(),
   PUBLIC_KEY_B64: z4.string().optional(),
 });
