@@ -18,7 +18,8 @@
 /out/
 
 # migrations
-/src/server/db/migrations/*
+/src/server/db/migrations/
+!/src/server/db/migrations/.gitkeep
 
 # production
 /build
