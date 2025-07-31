@@ -1,1 +1,0 @@
-ALTER TABLE "reading_details" RENAME COLUMN "additional_remakrs" TO "additional_remarks";
