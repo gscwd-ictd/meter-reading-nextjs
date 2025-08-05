@@ -1,12 +1,12 @@
-import { boolean, timestamp, integer, pgTable, real, text, unique, varchar } from "drizzle-orm/pg-core";
-import { loginAccounts } from "./login-accounts";
+import { boolean, timestamp, integer, pgTable, real, text, varchar } from "drizzle-orm/pg-core";
+import { meterReaders } from "./meter-readers";
 
 export const readingDetails = pgTable("reading_details", {
   id: varchar("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   meterReaderId: varchar("meter_reader_id")
-    .references(() => loginAccounts.id)
+    .references(() => meterReaders.id)
     .notNull(),
   accountNumber: varchar("account_number").unique().notNull(),
   accountName: varchar("account_name").notNull(),

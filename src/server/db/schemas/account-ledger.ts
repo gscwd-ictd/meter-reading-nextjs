@@ -1,10 +1,14 @@
 import { pgTable, real, timestamp, varchar } from "drizzle-orm/pg-core";
 import { readingDetails } from "./reading-details";
+import { meterReaders } from "./meter-readers";
 
 export const accountHistory = pgTable("account_history", {
   id: varchar("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
+  meterReaderId: varchar("meter_reader_id")
+    .references(() => meterReaders.id)
+    .notNull(),
   accountNumber: varchar("account_number")
     .references(() => readingDetails.accountNumber)
     .notNull(),
@@ -17,6 +21,9 @@ export const usage = pgTable("usage", {
   id: varchar("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
+  meterReaderId: varchar("meter_reader_id")
+    .references(() => meterReaders.id)
+    .notNull(),
   accountNumber: varchar("account_number")
     .references(() => readingDetails.accountNumber)
     .notNull(),

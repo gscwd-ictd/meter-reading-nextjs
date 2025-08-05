@@ -3,6 +3,7 @@ import z4 from "zod/v4";
 export const CreateAccountHistorySchema = z4.object({
   id: z4.uuid(),
   accountNumber: z4.string(),
+  meterReaderId: z4.uuid(),
   dateTime: z4.date(),
   remarks: z4.string(),
   createdAt: z4.date(),
