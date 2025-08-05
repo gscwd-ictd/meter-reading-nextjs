@@ -13,7 +13,6 @@ export const CreateAccountHistorySchema = z4.object({
 
 export const UpdateAccountHistorySchema = CreateAccountHistorySchema.partial().omit({
   id: true,
-  createdAt: true,
 });
 
 export type AccountHistory = z4.infer<typeof CreateAccountHistorySchema>;
