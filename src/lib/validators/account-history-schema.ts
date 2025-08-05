@@ -8,7 +8,7 @@ export const CreateAccountHistorySchema = z4.object({
   secondService: z4.string().optional(),
   thirdService: z4.string().optional(),
   dateTime: z4.date(),
-  createdAt: z4.date(),
+  //createdAt: z4.date(),
 });
 
 export const UpdateAccountHistorySchema = CreateAccountHistorySchema.partial().omit({
