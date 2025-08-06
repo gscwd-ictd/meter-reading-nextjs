@@ -7,7 +7,7 @@ export const CreateAccountHistorySchema = z4.object({
   firstService: z4.string().optional(),
   secondService: z4.string().optional(),
   thirdService: z4.string().optional(),
-  dateTime: z4.date(),
+  dateTime: z4.string(),
   //createdAt: z4.date(),
 });
 
