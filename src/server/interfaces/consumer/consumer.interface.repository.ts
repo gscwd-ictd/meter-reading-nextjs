@@ -1,5 +1,5 @@
-import { Consumer } from "@mr/server/types/consumer.type";
+import { ScheduleReadingAccount } from "@mr/server/types/consumer.type";
 
 export interface IConsumerRepository {
-  findConsumerDetails(meterReaderId: string): Promise<Consumer[]>;
+  findConsumerDetails(meterReaderId: string): Promise<ScheduleReadingAccount>;
 }

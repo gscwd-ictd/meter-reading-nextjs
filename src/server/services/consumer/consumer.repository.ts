@@ -1,11 +1,11 @@
 import { consumerDetailsView } from "@mr/server/db/schemas/consumer";
 import { IConsumerRepository } from "@mr/server/interfaces/consumer/consumer.interface.repository";
-import { Consumer } from "@mr/server/types/consumer.type";
+import { ScheduleReadingAccount, ScheduleReadingAccountSchema } from "@mr/server/types/consumer.type";
 import { and, eq } from "drizzle-orm";
 import db from "@mr/server/db/connections";
 
 export class ConsumerRepository implements IConsumerRepository {
-  async findConsumerDetails(meterReaderId: string): Promise<Consumer[]> {
+  async findConsumerDetails(meterReaderId: string): Promise<ScheduleReadingAccount> {
     const today = new Date().toLocaleDateString("en-CA", {
       timeZone: "Asia/Manila",
     });
@@ -20,6 +20,6 @@ export class ConsumerRepository implements IConsumerRepository {
         ),
       );
 
-    return result;
+    return ScheduleReadingAccountSchema.parse(result[0]);
   }
 }

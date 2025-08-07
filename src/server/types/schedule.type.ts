@@ -64,7 +64,7 @@ export const ScheduleReadingSchema = z.object({
 });
 
 /* create a whole month schedule */
-export const CreateMonthScheduleSchema = ScheduleSchema.omit({ meterReaders: true })
+export const CreateMonthScheduleSchema = ScheduleSchema.omit({ id: true, meterReaders: true })
   .extend({
     meterReaders: z
       .object({

@@ -6,15 +6,15 @@ export const ConsumerSchema = z.object({
   checkDigit: z.string(),
   consumerName: z.string(),
   isSenior: z.coerce.boolean(),
-  contactNumber: z.string(),
-  address: z.string(),
+  contactNumber: z.coerce.string(),
+  address: z.coerce.string(),
   classification: z.string(),
-  consumerType: z.coerce.number(),
-  zone: z.string(),
-  book: z.string(),
+  consumerType: z.coerce.string(),
+  zone: z.coerce.string(),
+  book: z.coerce.string(),
   sequenceNumber: z.string(),
   meterNumber: z.string(),
-  meterCode: z.number(),
+  meterCode: z.string(),
   meterSize: z.string(),
   isConnected: z.coerce.boolean(),
   dateConnected: z.coerce.date(),
@@ -23,11 +23,12 @@ export const ConsumerSchema = z.object({
   waterBalance: z.coerce.number(),
   otherBalance: z.coerce.number(),
   previousReading: z.coerce.number(),
+  location: z.coerce.string(),
 });
 
 export const ConsumerUsageSchema = z.object({
   accountNumber: z.string(),
-  firstMonth: z.coerce.string(),
+  firstMonth: z.coerce.number(),
   secondMonth: z.coerce.number(),
   thirdMonth: z.coerce.number(),
   fourthMonth: z.coerce.number(),
@@ -35,13 +36,13 @@ export const ConsumerUsageSchema = z.object({
 
 export const ConsumerHistorySchema = z.object({
   accountNumber: z.string(),
-  firstService: z.string(),
-  secondService: z.string(),
-  thirdService: z.string(),
+  firstService: z.coerce.string(),
+  secondService: z.coerce.string(),
+  thirdService: z.coerce.string(),
 });
 
 export const ConsumerDetailsSchema = ConsumerSchema.extend({
-  usage: ConsumerSchema.omit({
+  usage: ConsumerUsageSchema.omit({
     accountNumber: true,
   }),
   history: ConsumerHistorySchema.omit({
@@ -59,5 +60,24 @@ export const ScheduleMeterReadingSchema = z.object({
   }),
 });
 
+export const ScheduleReadingAccountSchema = z.object({
+  meterReaderId: z.string(),
+  readingDate: z.coerce.date(),
+  zoneBooks: z
+    .object({
+      zone: z.string(),
+      book: z.string(),
+      area: z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+      dueDate: z.coerce.date(),
+      disconnectionDate: z.coerce.date(),
+      accounts: ConsumerDetailsSchema.array(),
+    })
+    .array(),
+});
+
 export type Consumer = z.infer<typeof ConsumerSchema>;
+export type ScheduleReadingAccount = z.infer<typeof ScheduleReadingAccountSchema>;
 export type ScheduleMeterReading = z.infer<typeof ScheduleMeterReadingSchema>;
