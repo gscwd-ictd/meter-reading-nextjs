@@ -8,7 +8,7 @@ export const CreateUsageSchema = z4.object({
   month2Usage: z4.number(),
   month3Usage: z4.number(),
   month4Usage: z4.number(),
-  createdAt: z4.coerce.date(),
+  createdAt: z4.coerce.date().nullish(),
 });
 
 export const UpdateUsageSchema = CreateUsageSchema.partial().omit({
