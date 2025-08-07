@@ -4,7 +4,7 @@ export const CreateRateSchema = z4.object({
   id: z4.uuid(),
   meterCode: z4.number(),
   consumerType: z4.string(),
-  description: z4.string().nullable(),
+  description: z4.string().nullish(),
   minimumRate: z4.number(),
   rate11: z4.number(),
   rate21: z4.number(),
