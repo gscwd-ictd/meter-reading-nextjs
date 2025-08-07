@@ -4,9 +4,9 @@ export const CreateAccountHistorySchema = z4.object({
   id: z4.uuid(),
   accountNumber: z4.string(),
   meterReaderId: z4.uuid(),
-  firstService: z4.string().optional(),
-  secondService: z4.string().optional(),
-  thirdService: z4.string().optional(),
+  firstService: z4.string().nullish(),
+  secondService: z4.string().nullish(),
+  thirdService: z4.string().nullish(),
   dateTime: z4.coerce.date(),
   //createdAt: z4.date(),
 });
