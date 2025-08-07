@@ -3,11 +3,10 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@mr/components/ui/ContextMenu";
-import { isSameDay, isSameMonth, isSaturday, isSunday, startOfMonth } from "date-fns";
-import { SquarePenIcon, SquareSplitHorizontalIcon } from "lucide-react";
+import { isSameDay, isSameMonth, isSaturday, isSunday, parseISO, startOfMonth } from "date-fns";
+import { SquareSplitHorizontalIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { toast } from "sonner";
 import { Scheduler } from "./useScheduler";
@@ -75,18 +74,18 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
         </div>
       </ContextMenuTrigger>
 
-      <ContextMenuContent
-        className="z-[31] w-full rounded bg-white dark:bg-slate-800 dark:ring dark:ring-white"
-        avoidCollisions
-        alignOffset={10}
-      >
-        {!dateIsSunday &&
-          !dayIsFirstReadingDateOfTheMonth &&
-          !hasPopulatedMeterReaders &&
-          !hasSchedule &&
-          entry.dueDate &&
-          entry.disconnectionDate &&
-          hasFetchedSchedule && (
+      {!dateIsSunday &&
+        !dayIsFirstReadingDateOfTheMonth &&
+        !hasPopulatedMeterReaders &&
+        !hasSchedule &&
+        entry.dueDate &&
+        entry.disconnectionDate &&
+        hasFetchedSchedule && (
+          <ContextMenuContent
+            className="z-[31] w-full rounded bg-white dark:bg-slate-800 dark:ring dark:ring-white"
+            avoidCollisions
+            alignOffset={10}
+          >
             <>
               <ContextMenuItem
                 className="hover:cursor-pointer"
@@ -135,15 +134,9 @@ export const ScheduleEntryContextMenu: FunctionComponent<ScheduleEntryContextMen
                 <SquareSplitHorizontalIcon className="text-primary size-5" />
                 <span className="text-sm">Split Dates</span>
               </ContextMenuItem>
-              <ContextMenuSeparator />
             </>
-          )}
-
-        <ContextMenuItem>
-          <SquarePenIcon className="text-primary size-5" />
-          <span className="text-sm">Modify Dates</span>
-        </ContextMenuItem>
-      </ContextMenuContent>
+          </ContextMenuContent>
+        )}
     </ContextMenu>
   );
 };

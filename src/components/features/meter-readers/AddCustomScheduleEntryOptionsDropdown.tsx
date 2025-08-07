@@ -12,11 +12,16 @@ import { PlusCircleIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
-export const AddCustomMeterReaderDropdown: FunctionComponent = () => {
+export const AddCustomScheduleEntryOptionsDropdown: FunctionComponent = () => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+
+  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
 
   const setAddCustomMeterReaderDialogIsOpen = useSchedulesStore(
     (state) => state.setAddCustomMeterReaderDialogIsOpen,
+  );
+  const setAddCustomScheduleEntryDialogIsOpen = useSchedulesStore(
+    (state) => state.setAddCustomScheduleEntryDialogIsOpen,
   );
 
   return (
@@ -36,14 +41,26 @@ export const AddCustomMeterReaderDropdown: FunctionComponent = () => {
                 exit={{ y: 10, opacity: 0 }}
                 className="flex flex-col overflow-clip rounded bg-white shadow-lg"
               >
-                <DropdownMenuItem
-                  onSelect={() => {
-                    setAddCustomMeterReaderDialogIsOpen(true);
-                  }}
-                  className="dark:bg-black"
-                >
-                  Add meter reader
-                </DropdownMenuItem>
+                {!selectedScheduleEntry?.dueDate && !selectedScheduleEntry?.disconnectionDate && (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setAddCustomScheduleEntryDialogIsOpen(true);
+                    }}
+                    className="dark:bg-black"
+                  >
+                    Add schedule entry
+                  </DropdownMenuItem>
+                )}
+                {selectedScheduleEntry?.dueDate && selectedScheduleEntry?.disconnectionDate && (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setAddCustomMeterReaderDialogIsOpen(true);
+                    }}
+                    className="dark:bg-black"
+                  >
+                    Add meter reader
+                  </DropdownMenuItem>
+                )}
               </motion.div>
             </DropdownMenuContent>
           </DropdownMenuPortal>

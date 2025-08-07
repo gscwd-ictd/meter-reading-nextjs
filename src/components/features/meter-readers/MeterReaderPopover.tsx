@@ -5,6 +5,10 @@ import { Button } from "@mr/components/ui/Button";
 import { ScrollArea } from "@mr/components/ui/ScrollArea";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { toast } from "sonner";
 
 type Props = {
   filteredMeterReaders: MeterReaderWithZonebooks[];
@@ -18,6 +22,44 @@ export function MeterReaderPopover({
   setSelectedMeterReader,
 }: Props) {
   const [open, setOpen] = useState<boolean>(false);
+
+  const setAddCustomMeterReaderDialogIsOpen = useSchedulesStore(
+    (state) => state.setAddCustomMeterReaderDialogIsOpen,
+  );
+
+  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
+  const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
+
+  const postNewMeterReader = useMutation({
+    mutationFn: async (meterReader: MeterReaderWithZonebooks) => {
+      try {
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader`, {
+          id: selectedScheduleEntry?.id,
+          meterReaderId: meterReader.id,
+        });
+        return res;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    onSuccess: () => {
+      refetchEntry?.();
+      refetchData?.();
+      toast.success("Success", {
+        description: "You have successfully added a meter reader to the schedule entry",
+        position: "top-right",
+      });
+      setSelectedMeterReader({} as MeterReaderWithZonebooks);
+      setAddCustomMeterReaderDialogIsOpen(false);
+    },
+    onError: () => {
+      toast.error("Error", {
+        description: "An error has been encountered. Please try again later.",
+        position: "top-right",
+      });
+    },
+  });
 
   return (
     <Popover
@@ -65,7 +107,12 @@ export function MeterReaderPopover({
         )}
       </PopoverContent>
       <div className="flex w-full justify-center">
-        <Button className="w-full dark:text-white">Manually add this meter reader</Button>
+        <Button
+          className="w-full dark:text-white"
+          onClick={() => postNewMeterReader.mutateAsync(selectedMeterReader!)}
+        >
+          Manually add this meter reader
+        </Button>
       </div>
     </Popover>
   );

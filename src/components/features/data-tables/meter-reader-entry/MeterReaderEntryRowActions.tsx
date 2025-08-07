@@ -4,10 +4,13 @@
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { CircleXIcon, MapPinnedIcon } from "lucide-react";
+import { MapPinnedIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { ScheduleEntryZonebookSelector } from "../../scheduler/entry/ScheduleEntryZonebookSelector";
 import { RemoveMeterReaderAlertDialog } from "../../scheduler/entry/RemoveMeterReaderAlertDialog";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -18,27 +21,41 @@ type MeterReaderEntryRowActionsProps = {
 export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowActionsProps> = ({
   meterReader,
 }) => {
-  const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
-  const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
+  const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
 
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
     setEntryZonebookSelectorIsOpen(true);
   };
 
-  const removeMeterReader = (id: string) => {
-    const temporaryMeterReaders = [...selectedScheduleEntry!.meterReaders!];
-
-    setSelectedScheduleEntry({
-      ...selectedScheduleEntry,
-      readingDate: selectedScheduleEntry?.readingDate!,
-      disconnectionDate: selectedScheduleEntry?.disconnectionDate!,
-      dueDate: selectedScheduleEntry?.dueDate!,
-      meterReaders: temporaryMeterReaders.filter((mr) => mr.id !== id),
-    });
+  const removeMeterReader = async (id: string) => {
+    await deleteMeterReaderMutation.mutateAsync(id);
   };
+
+  const deleteMeterReaderMutation = useMutation({
+    mutationFn: async (id: string) => {
+      try {
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${id}`);
+        return res;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    onSuccess: () => {
+      refetchEntry?.();
+      refetchData?.();
+      toast.success("Success", {
+        description: "You have successfully removed the meter reader and the assigned zonebooks",
+        position: "top-right",
+      });
+    },
+    onError: () => {
+      toast.error("Error", { description: "Cannot remove meter reader", position: "top-right" });
+    },
+  });
 
   return (
     <>
@@ -56,18 +73,9 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
           </Button>
         </div>
         <div className="col-span-1">
-          {/* <Button
-            variant="destructive"
-            className="w-full px-2 hover:brightness-90"
-            size="sm"
-            onClick={() => removeMeterReader(meterReader.meterReaderId)}
-          >
-            <CircleXIcon className="size-2 fill-transparent text-white sm:size-4 lg:size-4" />
-            <span className="hidden text-xs sm:hidden md:hidden lg:block">Remove</span>
-          </Button> */}
           <RemoveMeterReaderAlertDialog
             meterReader={meterReader}
-            onDelete={() => removeMeterReader(meterReader.id)}
+            onDelete={() => removeMeterReader(meterReader.scheduleMeterReaderId!)}
           />
         </div>
       </div>

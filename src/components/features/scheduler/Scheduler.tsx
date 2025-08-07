@@ -23,6 +23,7 @@ import { MonthYearPicker } from "../calendar/MonthYearPicker";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
+import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
 
 export const Scheduler: FunctionComponent = () => {
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
@@ -54,7 +55,7 @@ export const Scheduler: FunctionComponent = () => {
   // const hasFetched = lastFetchedMonthYear === currentMonthYear;
   const hasFetched = lastFetchedMonthYear === currentMonthYear && hasValidSchedule(currentMonthYear!);
 
-  scheduler.addSundayReadings(currentSchedule);
+  // scheduler.addSundayReadings(currentSchedule);
 
   const {
     data: schedule,
@@ -365,6 +366,7 @@ export const Scheduler: FunctionComponent = () => {
       </div>
       <ScheduleEntryDialog />
       <AddCustomMeterReaderDialog />
+      <AddCustomScheduleEntryDialog />
     </>
   );
 };

@@ -1,12 +1,13 @@
 "use client";
 
-import { LoadingSplash } from "@mr/components/ui/LoadingSplash";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, useCallback, createContext, useContext } from "react";
 
 type NavigationSplashContextType = {
   showSplash: (text?: string, newPath?: string) => void;
   hideSplash: () => void;
+  visible: boolean;
+  text: string;
 };
 
 const NavigationSplashContext = createContext<NavigationSplashContextType | undefined>(undefined);
@@ -26,7 +27,7 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastPathRef = useRef<string | null>(null);
   const manualTriggerRef = useRef(false);
-  const initialSplashShownRef = useRef(false); // 👈 added to track reload
+  const initialSplashShownRef = useRef(false);
 
   const showSplash = useCallback(
     (msg?: string, newPath?: string) => {
@@ -57,7 +58,7 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
     manualTriggerRef.current = false;
   }, []);
 
-  // 👇 Trigger splash once on initial page load
+  // Trigger once on load
   useEffect(() => {
     if (!initialSplashShownRef.current) {
       showSplash("Loading...", window.location.pathname);
@@ -67,11 +68,7 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
 
   useEffect(() => {
     if (!manualTriggerRef.current) return;
-
-    if (lastPathRef.current !== pathname) {
-      hideSplash();
-    }
-
+    if (lastPathRef.current !== pathname) hideSplash();
     lastPathRef.current = pathname;
   }, [pathname, hideSplash]);
 
@@ -82,9 +79,8 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
   }, []);
 
   return (
-    <NavigationSplashContext.Provider value={{ showSplash, hideSplash }}>
+    <NavigationSplashContext.Provider value={{ showSplash, hideSplash, visible, text }}>
       {children}
-      <LoadingSplash show={visible} text={text} />
     </NavigationSplashContext.Provider>
   );
 };

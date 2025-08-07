@@ -6,9 +6,7 @@ import { ZonebookStatusIndicator } from "../zonebook/ZonebookStatusIndicator";
 import { getDayFromDate } from "@mr/lib/functions/handleDateArrayOrObject";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { Badge } from "@mr/components/ui/Badge";
-import { compareAsc, format, formatDate, isToday } from "date-fns";
-import { NormalDates } from "./entry/NormalDates";
-import { SplittedDates } from "./entry/SplittedDates";
+import { isSameDay, isToday, parseISO } from "date-fns";
 import { ShortSplittedDates } from "./entry/ShortSplittedDates";
 import { ShortNormalDates } from "./entry/ShortNormalDates";
 
@@ -19,7 +17,7 @@ type ScheduleEntryTileProps = {
   isWithinMonth: boolean;
   dateIsSunday: boolean;
   dateIsSaturday: boolean;
-  idx: number | null;
+  idx: number;
 };
 
 export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
@@ -32,8 +30,33 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
   setActiveContext,
 }) => {
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
+  const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setScheduleEntryDialogIsOpen = useSchedulesStore((state) => state.setScheduleEntryDialogIsOpen);
   const setSelectedScheduleEntry = useSchedulesStore((state) => state.setSelectedScheduleEntry);
+
+  // get the reading date where it is the first day of duty of the month
+  const firstReadingDate = currentSchedule.find((entry) => entry.dueDate !== undefined)?.readingDate;
+
+  // entry.readingDate is the same with the first duty of the month
+  const dayIsFirstReadingDateOfTheMonth = isSameDay(firstReadingDate!, currentSchedule[idx].readingDate);
+
+  const hasPreviousWithDueAndDisconnection = (
+    schedule: MeterReadingEntryWithZonebooks[],
+    selectedReadingDate: string,
+  ): boolean => {
+    const selectedDate = parseISO(selectedReadingDate);
+
+    // Find index of the selected reading date
+    const index = schedule.findIndex((entry) => isSameDay(entry.readingDate, selectedDate));
+
+    if (index <= 0) {
+      return false; // No previous entry
+    }
+
+    const previousEntry = schedule[index - 1];
+
+    return Boolean(previousEntry?.dueDate && previousEntry?.disconnectionDate);
+  };
 
   return (
     <motion.button
@@ -44,7 +67,13 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
       transition={{ duration: 0.05, ease: "easeOut" }}
       onContextMenu={() => setActiveContext(idx)}
       onClick={(e) => {
-        if (isWithinMonth && hasSchedule) {
+        if (
+          (isWithinMonth && hasSchedule && dayIsFirstReadingDateOfTheMonth) ||
+          (isWithinMonth &&
+            hasSchedule &&
+            !dayIsFirstReadingDateOfTheMonth &&
+            hasPreviousWithDueAndDisconnection(currentSchedule, entry.readingDate.toISOString()))
+        ) {
           setSelectedScheduleEntry(entry);
           setScheduleEntryDialogIsOpen(true);
         } else {
@@ -81,50 +110,6 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
               />
             )}
           </div>
-          {/* Due Date */}
-          {/* {Array.isArray(entry.dueDate) ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-transparent">
-                <span className="text-blue-600 dark:text-blue-600">
-                  {entry.dueDate.sort(compareAsc).map((day, idx) => (
-                    <span className="overflow-auto font-bold" key={idx}>
-                      {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
-                    </span>
-                  ))}
-                </span>
-              </Badge>
-            </div>
-          ) : entry.dueDate ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-transparent">
-                <span className="font-bold text-blue-600 dark:text-blue-600">
-                  {formatDate(entry.dueDate, "MMM dd")}
-                </span>
-              </Badge>
-            </div>
-          ) : null} */}
-          {/* Disconnection Date */}
-          {/* {Array.isArray(entry.disconnectionDate) ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-transparent">
-                <div className="text-red-600 dark:text-rose-600">
-                  {entry.disconnectionDate.sort(compareAsc).map((day, idx) => (
-                    <span className="font-bold" key={idx}>
-                      {day && idx === 0 ? formatDate(day, "MMM dd") : "/" + formatDate(day, "MMM dd")}
-                    </span>
-                  ))}
-                </div>
-              </Badge>
-            </div>
-          ) : entry.disconnectionDate ? (
-            <div className="flex items-center justify-center">
-              <Badge className="w-full gap-0 rounded-none bg-transparent">
-                <span className="font-bold text-red-600 dark:text-rose-600">
-                  {formatDate(entry.disconnectionDate, "MMM dd")}
-                </span>
-              </Badge>
-            </div>
-          ) : null} */}
 
           {Array.isArray(entry?.dueDate) && Array.isArray(entry.disconnectionDate) && (
             <ShortSplittedDates dueDates={entry.dueDate} disconnectionDates={entry.disconnectionDate} />
@@ -140,7 +125,7 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
             entry.dueDate &&
             entry.meterReaders?.length === 0 && (
               <div className="flex items-center justify-center">
-                <Badge className="w-full gap-0 rounded-none bg-transparent text-[5px] font-medium tracking-wide text-gray-600 sm:text-[5px] lg:text-xs dark:bg-transparent">
+                <Badge className="w-full gap-0 rounded-none bg-transparent text-[0.2rem] font-medium tracking-wide text-gray-600 sm:text-[0.2rem] md:text-[0.6rem] lg:text-xs dark:bg-transparent">
                   Applicable Rest Day
                 </Badge>
               </div>

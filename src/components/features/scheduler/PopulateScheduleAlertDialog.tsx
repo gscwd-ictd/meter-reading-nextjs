@@ -57,23 +57,18 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const postSchedule = useMutation({
     mutationKey: ["set-schedule", monthYear],
     mutationFn: async (newSchedule: MeterReadingEntryWithZonebooks[]) => {
-      try {
-        const filteredSchedule = newSchedule.filter((s) => s.dueDate !== undefined);
-        const formattedFilteredSchedule = filteredSchedule.map((schedule) => {
-          return {
-            ...schedule,
-            dueDate: toDatesOrDateOnly(schedule.dueDate),
-            readingDate: toDateString(schedule.readingDate),
-            disconnectionDate: toDatesOrDateOnly(schedule.disconnectionDate),
-          };
-        });
+      const filteredSchedule = newSchedule.filter((s) => s.dueDate !== undefined);
+      const formattedFilteredSchedule = filteredSchedule.map((schedule) => {
+        return {
+          ...schedule,
+          dueDate: toDatesOrDateOnly(schedule.dueDate),
+          readingDate: toDateString(schedule.readingDate),
+          disconnectionDate: toDatesOrDateOnly(schedule.disconnectionDate),
+        };
+      });
 
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
-
-        return res.data;
-      } catch (error) {
-        console.log(error);
-      }
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
+      return res.data;
     },
     onSuccess: async () => {
       toast.success("Success", {
@@ -81,6 +76,14 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         position: "top-right",
         duration: 1500,
       });
+    },
+    onError: (error: any) => {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to save schedule.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred.", { position: "top-right", duration: 1500 });
+      }
     },
   });
 

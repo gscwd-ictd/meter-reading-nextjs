@@ -15,14 +15,16 @@ export const ShortNormalDates: React.FC<NormalDatesProps> = ({ dueDate, disconne
       className="text-muted-foreground flex w-full items-center justify-center gap-0 bg-transparent p-0"
     >
       {dueDate && (
-        <span className="text-primary flex items-center gap-1 text-xs -tracking-wider sm:text-[0.6rem] lg:text-xs">
+        <span className="text-primary flex items-center gap-1 text-[0.3rem] -tracking-wider sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">
           {/* <CalendarClockIcon className="h-4 w-4 shrink-0" /> */}
           {format(dueDate, "MMM dd")}
         </span>
       )}
-      {dueDate && disconnectionDate && <span className="mx-0.5 sm:mx-0">/</span>}
+      {dueDate && disconnectionDate && (
+        <span className="mx-0.5 text-[0.3rem] sm:mx-0 sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">/</span>
+      )}
       {disconnectionDate && (
-        <span className="flex items-center gap-1 text-xs -tracking-wider text-red-500 sm:text-[0.6rem] lg:text-xs">
+        <span className="flex items-center gap-1 text-[0.3rem] -tracking-wider text-red-500 sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">
           {/* <ScissorsLineDashedIcon className="h-4 w-4 shrink-0" /> */}
           {format(disconnectionDate, "MMM dd")}
         </span>

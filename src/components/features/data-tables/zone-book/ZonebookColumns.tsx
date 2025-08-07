@@ -61,8 +61,7 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
               book: row.original.book,
               zone: row.original.zone,
               zoneBook: row.original.zoneBook,
-              // zoneBookId: row.original.zoneBookId,
-              // areaId: row.original.areaId,
+              id: row.original.id,
             }}
           />
         ),

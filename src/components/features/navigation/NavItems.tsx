@@ -92,7 +92,11 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                 ) : (
                   <SidebarMenuButton
                     tooltip={item.title}
-                    isActive={pathname.startsWith(item.url || "")}
+                    isActive={
+                      item.title === "Schedules"
+                        ? pathname.startsWith("/schedules")
+                        : pathname.startsWith(item.url || "")
+                    }
                     onClick={() => {
                       if (item.title === "Schedules") {
                         showSplash("Loading...", item.url);

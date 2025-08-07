@@ -17,6 +17,8 @@ import {
   Book,
   Scan,
   UserCog2,
+  Activity,
+  CircleDashed,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -79,6 +81,15 @@ export const mainNav: NavItem[] = [
     title: "Text Blast Reports",
     url: "/blast-reports",
     icon: FileText,
+  },
+  {
+    title: "Monitoring",
+    url: "/monitoring",
+    icon: Activity,
+    children: [
+      { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
+      { title: "Reports", url: "/monitoring/reports", icon: FileText },
+    ],
   },
   {
     title: "Notifications",

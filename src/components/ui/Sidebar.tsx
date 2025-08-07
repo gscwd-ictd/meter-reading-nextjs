@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { VariantProps, cva } from "class-variance-authority";
+import { cva, VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 
 import { useIsMobile } from "@mr/hooks/use-mobile";
@@ -11,7 +11,7 @@ import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
 import { Separator } from "@mr/components/ui/Separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@mr/components/ui/Sheet";
-import { Skeleton } from "@mr/components/ui/Skeleton";
+import { Skeleton } from "@mr/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@mr/components/ui/Tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
