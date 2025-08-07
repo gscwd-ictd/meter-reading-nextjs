@@ -94,7 +94,11 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
   readingDate: date("reading_date"),
   dueDate: jsonb("due_date"),
   disconnectionDate: jsonb("disconnection_date"),
-  meterReaders: jsonb("meter_readers"),
+  meterReaders: jsonb("meter_readers").$type<{
+    scheduleMeterReaderId: string;
+    id: string;
+    zoneBooks: { zone: string; book: string; zoneBook: string; area: { id: string; name: string } };
+  }>(),
 }).as(sql`
   select
     s.id,
@@ -133,7 +137,14 @@ export const viewScheduleMeterReadingZoneBook = pgView("view_schedule_meter_read
   meterReaderId: varchar("meter_reader_id"),
   month: varchar("month"),
   year: varchar("year"),
-  zoneBooks: jsonb("zone_books"),
+  zoneBooks: jsonb("zone_books").$type<{
+    zone: string;
+    book: string;
+    zoneBook: string;
+    area: { id: string; name: string };
+    dueDate: string;
+    disconnectionDate: string;
+  }>(),
 }).as(sql`
       select
         smr.id,
