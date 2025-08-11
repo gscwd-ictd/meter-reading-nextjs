@@ -2,7 +2,7 @@ import { AppSidebar } from "@mr/components/features/navigation/AppSidebar";
 import { CustomSidebarTrigger } from "@mr/components/features/navigation/CustomSidebarTrigger";
 import { NavigationSplash } from "@mr/components/features/navigation/NavigationSplash";
 import { NavigationSplashProvider } from "@mr/components/features/navigation/NavigationSplashProvider";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@mr/components/ui/Sidebar";
+import { SidebarInset, SidebarProvider } from "@mr/components/ui/Sidebar";
 import { type PropsWithChildren } from "react";
 
 export default function ProtectedPageLayout({ children }: Readonly<PropsWithChildren>) {

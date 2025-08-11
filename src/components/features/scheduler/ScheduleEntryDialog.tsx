@@ -22,7 +22,6 @@ import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { AddCustomScheduleEntryOptionsDropdown } from "../meter-readers/AddCustomScheduleEntryOptionsDropdown";
-import { Button } from "@mr/components/ui/Button";
 
 export const ScheduleEntryDialog: FunctionComponent = () => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
@@ -91,7 +90,14 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
       setSelectedScheduleEntry({ ...scheduleEntry, readingDate: toParsedDateOnly(transformedReadingDate!) });
       setRefetchEntry(refetch);
     }
-  }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry, refetch, setRefetchEntry]);
+  }, [
+    scheduleEntry,
+    scheduleEntryDialogIsOpen,
+    setSelectedScheduleEntry,
+    refetch,
+    setRefetchEntry,
+    transformedReadingDate,
+  ]);
 
   return (
     <Dialog

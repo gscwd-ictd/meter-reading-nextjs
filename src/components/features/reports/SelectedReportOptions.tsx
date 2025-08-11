@@ -4,27 +4,26 @@ import { Report } from "@mr/lib/enums/reports";
 import { Label } from "@radix-ui/react-label";
 import { FunctionComponent, useState } from "react";
 import SimpleMonthYearPicker from "../calendar/SimpleMonthYearPicker";
-import { Button } from "@mr/components/ui/Button";
 import { useFormContext } from "react-hook-form";
 
 export const SelectedReportOptions: FunctionComponent = () => {
-  const { setValue, watch } = useFormContext();
+  const { watch } = useFormContext();
 
   const selectedReport = watch("selectedReport");
   const [yearMonth, setYearMonth] = useState<string>("");
 
   // year-month validator
-  const isValidDateString = (value: unknown): boolean => {
-    if (typeof value !== "string") return false;
+  // const isValidDateString = (value: unknown): boolean => {
+  //   if (typeof value !== "string") return false;
 
-    // Match strict yyyy-MM-dd format
-    const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-    if (!regex.test(value)) return false;
+  //   // Match strict yyyy-MM-dd format
+  //   const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+  //   if (!regex.test(value)) return false;
 
-    // Check if the date is valid (e.g., no Feb 30)
-    const date = new Date(value);
-    return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
-  };
+  //   // Check if the date is valid (e.g., no Feb 30)
+  //   const date = new Date(value);
+  //   return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  // };
 
   return (
     <>

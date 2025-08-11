@@ -3,7 +3,14 @@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LabelList, Cell } from "recharts";
 import { useTheme } from "next-themes";
 
-const data = [
+type ReaderActivity = {
+  name: string;
+  completion: number;
+  completed: number;
+  assigned: number;
+};
+
+const data: ReaderActivity[] = [
   { name: "Artajo, Charlesbe D.", completion: 80, completed: 145, assigned: 180 },
   { name: "Hingco, Ralph Angelo E.", completion: 100, completed: 120, assigned: 120 },
   { name: "Oliva, Jeramel R.", completion: 43, completed: 65, assigned: 150 },
@@ -23,7 +30,7 @@ export default function MeterReaderActivityChart() {
   // Determine top performer based on completion %
   const topPerformer = data.reduce((prev, curr) => (curr.completion > prev.completion ? curr : prev));
 
-  const getColor = (entry: any) => {
+  const getColor = (entry: ReaderActivity) => {
     if (entry.name === topPerformer.name) return COLORS.top;
     if (entry.completion >= 90) return COLORS.good;
     if (entry.completion >= 50) return COLORS.warning;
@@ -68,7 +75,7 @@ export default function MeterReaderActivityChart() {
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={getColor(entry)} />
               ))}
-              <LabelList dataKey="completion" position="right" formatter={(val: any) => `${val}%`} />
+              <LabelList dataKey="completion" position="right" formatter={(val: number) => `${val}%`} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

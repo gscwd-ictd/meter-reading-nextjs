@@ -37,15 +37,15 @@ export const ProgressComponent = () => {
 
   useEffect(() => {
     if (mockDailyData) setDaily(mockDailyData);
-  }, [mockDailyData, setDaily]);
+  }, [setDaily]);
 
   useEffect(() => {
     if (mockIntradayData) setIntraday(mockIntradayData);
-  }, [mockIntradayData, setIntraday]);
+  }, [setIntraday]);
 
   useEffect(() => {
     if (mockDailyData.scheduled) setScheduled(mockDailyData.scheduled);
-  }, [mockDailyData, setScheduled]);
+  }, [setScheduled]);
   return (
     // <div className="flex flex-1 flex-col gap-5">
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">

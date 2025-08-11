@@ -5,10 +5,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Toolt
 import { Zonebook } from "@mr/lib/types/zonebook";
 
 export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
-  if (!zonebooks || zonebooks.length === 0) {
-    return <span className="text-muted-foreground text-sm">No zone books</span>;
-  }
-
   const previewCount = 3;
   const shown = zonebooks.slice(0, previewCount);
   const remaining = zonebooks.length - shown.length;
@@ -27,6 +23,10 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
       setTooltipReady(false);
     }
   }, [isPopoverOpen]);
+
+  if (!zonebooks || zonebooks.length === 0) {
+    return <span className="text-muted-foreground text-sm">No zone books</span>;
+  }
 
   return (
     <div className="flex flex-wrap gap-1">

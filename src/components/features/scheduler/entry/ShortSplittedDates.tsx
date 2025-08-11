@@ -1,6 +1,5 @@
 import { Badge } from "@mr/components/ui/Badge";
 import { format } from "date-fns";
-import { CalendarClockIcon, ScissorsLineDashedIcon } from "lucide-react";
 import React from "react";
 
 interface SplittedDatesProps {

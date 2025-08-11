@@ -77,7 +77,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         duration: 1500,
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || "Failed to save schedule.";
         toast.error(message, { position: "top-right", duration: 1500 });
