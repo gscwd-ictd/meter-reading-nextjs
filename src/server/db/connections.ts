@@ -36,4 +36,6 @@ const sqlConfig: sql.config = {
 
 const mssqlConn = await sql.connect(sqlConfig);
 
-export default { pgConn, mssqlConn };
+const connections = { pgConn, mssqlConn };
+
+export default connections;
