@@ -11,7 +11,7 @@ import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
 import { Separator } from "@mr/components/ui/Separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@mr/components/ui/Sheet";
-import { Skeleton } from "@mr/components/ui/skeleton";
+import { Skeleton } from "@mr/components/ui/Skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@mr/components/ui/Tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";

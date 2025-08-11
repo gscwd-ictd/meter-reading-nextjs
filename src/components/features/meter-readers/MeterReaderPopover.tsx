@@ -28,6 +28,7 @@ export function MeterReaderPopover({
   );
 
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
+  const reset = useSchedulesStore((state) => state.reset);
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const refetchData = useSchedulesStore((state) => state.refetchData);
 
@@ -44,6 +45,7 @@ export function MeterReaderPopover({
       }
     },
     onSuccess: () => {
+      reset();
       refetchEntry?.();
       refetchData?.();
       toast.success("Success", {
@@ -109,6 +111,7 @@ export function MeterReaderPopover({
       <div className="flex w-full justify-center">
         <Button
           className="w-full dark:text-white"
+          disabled={!selectedMeterReader?.name ? true : false}
           onClick={() => postNewMeterReader.mutateAsync(selectedMeterReader!)}
         >
           Manually add this meter reader

@@ -35,8 +35,9 @@ const styles = StyleSheet.create({
   tableHeader: {
     flexDirection: "row",
     backgroundColor: "#f0f0f0",
-    borderBottomWidth: 1,
-    borderColor: "#000",
+    borderWidth: 1,
+    borderColor: "#000", // or "#ccc"
+    borderStyle: "solid",
     paddingVertical: 3,
   },
   tableRow: {
@@ -114,7 +115,7 @@ export default function MeterReadingSchedulePdf({ date }: MeterReadingPDFProps) 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading data</p>;
 
-  const formattedMonth = format(new Date(`${date}-01`), "MMMM, yyyy");
+  const formattedMonth = format(new Date(`${date}-01`), "MMMM yyyy");
   const grouped = groupByDate(data || []);
 
   const uniqueDates = Object.keys(grouped).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());

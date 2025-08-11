@@ -2,12 +2,8 @@ import {
   Calendar,
   LucideIcon,
   Megaphone,
-  Package,
   Settings,
   MapPinned,
-  BookOpen,
-  Send,
-  CircleHelp,
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
@@ -19,6 +15,7 @@ import {
   UserCog2,
   Activity,
   CircleDashed,
+  SquaresSubtract,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -52,7 +49,7 @@ export const mainNav: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: Package,
+    icon: SquaresSubtract,
   },
   {
     title: "Meter Readers",

@@ -25,6 +25,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const refetchData = useSchedulesStore((state) => state.refetchData);
+  const reset = useSchedulesStore((state) => state.reset);
 
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
@@ -45,6 +46,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       }
     },
     onSuccess: () => {
+      reset();
       refetchEntry?.();
       refetchData?.();
       toast.success("Success", {

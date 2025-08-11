@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { format, parse, setMonth, setYear, isValid } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@mr/components/ui/Button";
@@ -16,6 +16,7 @@ export default function MonthYearPicker({ inputValue, setInputValue }: MonthYear
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"year" | "month">("year");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const lastKey = useRef<string | null>(null);
   // const [inputValue, setInputValue] = useState("");
 
   const handleMonthClick = (monthIndex: number) => {
@@ -30,11 +31,15 @@ export default function MonthYearPicker({ inputValue, setInputValue }: MonthYear
     setStep("year");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    lastKey.current = e.key;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^0-9-]/g, ""); // allow only digits and dash
 
-    // Auto-insert dash after 4 digits if not already there
-    if (value.length === 4 && !value.includes("-")) {
+    // Auto-insert dash after 4 digits if not already there, but NOT on backspace
+    if (value.length === 4 && !value.includes("-") && lastKey.current !== "Backspace") {
       value += "-";
     }
 
@@ -64,9 +69,14 @@ export default function MonthYearPicker({ inputValue, setInputValue }: MonthYear
   ];
 
   return (
-    <div className="flex w-full items-center gap-2">
+    <div className="flex w-full gap-2">
       {/* Input with masking */}
-      <Input value={inputValue} onChange={handleInputChange} placeholder="YYYY-MM" className="" />
+      <Input
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder="YYYY-MM"
+        onKeyDown={handleKeyDown}
+      />
 
       {/* Popover on calendar button */}
       <Popover open={open} onOpenChange={setOpen}>

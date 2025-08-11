@@ -43,12 +43,33 @@ export const Scheduler: FunctionComponent = () => {
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const [activeContext, setActiveContext] = useState<number | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const scheduler = useScheduler(holidays);
 
   const hasValidSchedule = (monthYear: string) => {
     return currentSchedule.some(
       (entry) => entry.readingDate && format(entry.readingDate, "yyyy-MM") === monthYear,
     );
+  };
+
+  // this adds timeout when switching months
+  const handleMonthChange = (direction: "prev" | "next" | "today") => {
+    if (isNavigating) return; // prevent rapid repeat
+
+    setIsNavigating(true);
+
+    resetOnChange();
+
+    if (direction === "prev") {
+      scheduler.goToPreviousMonth();
+    } else if (direction === "next") {
+      scheduler.goToNextMonth();
+    } else {
+      scheduler.today();
+    }
+
+    // Release lock after short timeout
+    setTimeout(() => setIsNavigating(false), 1200); // or adjust timing
   };
 
   // these are derived states
@@ -237,8 +258,7 @@ export const Scheduler: FunctionComponent = () => {
                 variant="outline"
                 className="border-none dark:rounded-none"
                 onClick={() => {
-                  resetOnChange();
-                  scheduler.goToPreviousMonth();
+                  handleMonthChange("prev");
                 }}
               >
                 <ChevronLeft />
@@ -249,8 +269,7 @@ export const Scheduler: FunctionComponent = () => {
                     className="border-none dark:rounded-none"
                     variant="outline"
                     onClick={() => {
-                      resetOnChange();
-                      scheduler.today();
+                      handleMonthChange("today");
                     }}
                   >
                     Month
@@ -264,8 +283,7 @@ export const Scheduler: FunctionComponent = () => {
                 variant="outline"
                 className="border-none dark:rounded-none"
                 onClick={() => {
-                  resetOnChange();
-                  scheduler.goToNextMonth();
+                  handleMonthChange("next");
                 }}
               >
                 <ChevronRight />
