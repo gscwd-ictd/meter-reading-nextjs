@@ -2,12 +2,8 @@ import {
   Calendar,
   LucideIcon,
   Megaphone,
-  Package,
   Settings,
   MapPinned,
-  BookOpen,
-  Send,
-  CircleHelp,
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
@@ -17,6 +13,9 @@ import {
   Book,
   Scan,
   UserCog2,
+  Activity,
+  CircleDashed,
+  SquaresSubtract,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -50,7 +49,7 @@ export const mainNav: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: Package,
+    icon: SquaresSubtract,
   },
   {
     title: "Meter Readers",
@@ -79,6 +78,15 @@ export const mainNav: NavItem[] = [
     title: "Text Blast Reports",
     url: "/blast-reports",
     icon: FileText,
+  },
+  {
+    title: "Monitoring",
+    url: "/monitoring",
+    icon: Activity,
+    children: [
+      { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
+      { title: "Reports", url: "/monitoring/reports", icon: FileText },
+    ],
   },
   {
     title: "Notifications",

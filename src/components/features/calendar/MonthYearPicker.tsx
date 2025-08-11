@@ -41,12 +41,17 @@ export function MonthYearPicker({
     scheduler.setCurrentMonthYear(value);
   };
 
+  const reset = useSchedulesStore((state) => state.reset);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
+
   const handleMonthClick = (monthIndex: number) => {
     if (selectedYear === null) return;
 
     const newDate = setYear(setMonth(new Date(), monthIndex), selectedYear);
     const formatted = format(newDate, "yyyy-MM");
 
+    reset();
+    refetchData?.();
     setCurrentMonthYear(formatted);
     updateUrl(formatted);
     setOpen(false);

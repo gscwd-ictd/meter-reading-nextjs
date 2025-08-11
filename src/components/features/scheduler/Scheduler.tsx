@@ -23,6 +23,7 @@ import { MonthYearPicker } from "../calendar/MonthYearPicker";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
+import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
 
 export const Scheduler: FunctionComponent = () => {
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
@@ -42,6 +43,7 @@ export const Scheduler: FunctionComponent = () => {
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const [activeContext, setActiveContext] = useState<number | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
   const scheduler = useScheduler(holidays);
 
   const hasValidSchedule = (monthYear: string) => {
@@ -50,11 +52,31 @@ export const Scheduler: FunctionComponent = () => {
     );
   };
 
+  // this adds timeout when switching months
+  const handleMonthChange = (direction: "prev" | "next" | "today") => {
+    if (isNavigating) return; // prevent rapid repeat
+
+    setIsNavigating(true);
+
+    resetOnChange();
+
+    if (direction === "prev") {
+      scheduler.goToPreviousMonth();
+    } else if (direction === "next") {
+      scheduler.goToNextMonth();
+    } else {
+      scheduler.today();
+    }
+
+    // Release lock after short timeout
+    setTimeout(() => setIsNavigating(false), 1200); // or adjust timing
+  };
+
   // these are derived states
   // const hasFetched = lastFetchedMonthYear === currentMonthYear;
   const hasFetched = lastFetchedMonthYear === currentMonthYear && hasValidSchedule(currentMonthYear!);
 
-  scheduler.addSundayReadings(currentSchedule);
+  // scheduler.addSundayReadings(currentSchedule);
 
   const {
     data: schedule,
@@ -236,8 +258,7 @@ export const Scheduler: FunctionComponent = () => {
                 variant="outline"
                 className="border-none dark:rounded-none"
                 onClick={() => {
-                  resetOnChange();
-                  scheduler.goToPreviousMonth();
+                  handleMonthChange("prev");
                 }}
               >
                 <ChevronLeft />
@@ -248,8 +269,7 @@ export const Scheduler: FunctionComponent = () => {
                     className="border-none dark:rounded-none"
                     variant="outline"
                     onClick={() => {
-                      resetOnChange();
-                      scheduler.today();
+                      handleMonthChange("today");
                     }}
                   >
                     Month
@@ -263,8 +283,7 @@ export const Scheduler: FunctionComponent = () => {
                 variant="outline"
                 className="border-none dark:rounded-none"
                 onClick={() => {
-                  resetOnChange();
-                  scheduler.goToNextMonth();
+                  handleMonthChange("next");
                 }}
               >
                 <ChevronRight />
@@ -365,6 +384,7 @@ export const Scheduler: FunctionComponent = () => {
       </div>
       <ScheduleEntryDialog />
       <AddCustomMeterReaderDialog />
+      <AddCustomScheduleEntryDialog />
     </>
   );
 };

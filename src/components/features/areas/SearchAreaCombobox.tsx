@@ -42,7 +42,7 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
           role="combobox"
           aria-expanded={open}
           size="lg"
-          className={`flex w-full justify-start`}
+          className={`flex w-full justify-start px-4`}
         >
           {areaList && selectedArea && selectedArea.id ? (
             <span className="flex items-center gap-2 text-sm">

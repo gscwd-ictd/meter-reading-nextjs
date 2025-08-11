@@ -8,9 +8,14 @@ export type MeterReadingSchedule = {
 };
 
 export type MeterReadingEntryWithZonebooks = {
-  // scheduleId?: string;
+  id?: string;
   readingDate: Date;
   dueDate: Date | Date[] | undefined;
   disconnectionDate: Date | Date[] | undefined;
   meterReaders?: MeterReaderWithZonebooks[];
+};
+
+export type BilledMeterReadingSchedule = MeterReadingEntryWithZonebooks & {
+  billed: number;
+  remarks: string;
 };

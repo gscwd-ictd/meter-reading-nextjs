@@ -26,5 +26,11 @@ export type MeterReaderWithZonebooks = Employee & {
   scheduleMeterReaderId?: string;
   restDay: "sunday" | "saturday" | undefined;
   zoneBooks: ZonebookWithDates[];
+  // reassignment: {
+  //   isReassigned: boolean;
+  //   reassignedTo: string; // meter reader id
+  //   remarks: string; // leave etc.
+  // };
+
   // recommendedZonebooks?: ZonebookWithDates[];
 };

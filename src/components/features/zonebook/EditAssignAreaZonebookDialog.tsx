@@ -25,8 +25,8 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   const setSelectedArea = useZonebookStore((state) => state.setSelectedArea);
   const refetchZonebooks = useZonebookStore((state) => state.refetchZonebooks);
 
-  const { data: area } = useQuery({
-    queryKey: ["get-area-by-zonebook-id", selectedZonebook?.id],
+  const { data: zonebook } = useQuery({
+    queryKey: ["get-zonebook-by-id", selectedZonebook?.id],
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${selectedZonebook?.id}`);
@@ -81,8 +81,9 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (area && editAssignAreaZonebookDialogIsOpen) setSelectedArea({ name: area.name, id: area.id });
-  }, [area, editAssignAreaZonebookDialogIsOpen, setSelectedArea]);
+    if (zonebook && editAssignAreaZonebookDialogIsOpen)
+      setSelectedArea({ name: zonebook.area.name, id: zonebook.area.id });
+  }, [zonebook, editAssignAreaZonebookDialogIsOpen, setSelectedArea]);
 
   return (
     <Dialog
@@ -130,7 +131,6 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
             </div>
           </div>
         </div>
-
         <DialogFooter>
           <Button
             variant="outline"

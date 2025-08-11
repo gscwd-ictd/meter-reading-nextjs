@@ -21,7 +21,8 @@ import axios from "axios";
 import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { AddCustomMeterReaderDropdown } from "../meter-readers/AddCustomMeterReaderDropdown";
+import { AddCustomScheduleEntryOptionsDropdown } from "../meter-readers/AddCustomScheduleEntryOptionsDropdown";
+import { Button } from "@mr/components/ui/Button";
 
 export const ScheduleEntryDialog: FunctionComponent = () => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
@@ -78,7 +79,6 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
-
         return res.data as MeterReadingEntryWithZonebooks;
       } catch (error) {
         console.log(error);
@@ -88,7 +88,7 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
 
   useEffect(() => {
     if (scheduleEntry && scheduleEntryDialogIsOpen) {
-      setSelectedScheduleEntry(scheduleEntry);
+      setSelectedScheduleEntry({ ...scheduleEntry, readingDate: toParsedDateOnly(transformedReadingDate!) });
       setRefetchEntry(refetch);
     }
   }, [scheduleEntry, scheduleEntryDialogIsOpen, setSelectedScheduleEntry, refetch, setRefetchEntry]);
@@ -112,26 +112,31 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
                   ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
                   : null}
               </div>
-              <AddCustomMeterReaderDropdown />
+
+              <AddCustomScheduleEntryOptionsDropdown />
             </div>
 
             <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
-              {Array.isArray(selectedScheduleEntry?.dueDate) &&
-                Array.isArray(selectedScheduleEntry.disconnectionDate) && (
-                  <SplittedDates
-                    dueDates={selectedScheduleEntry.dueDate}
-                    disconnectionDates={selectedScheduleEntry.disconnectionDate}
-                  />
-                )}
+              {selectedScheduleEntry?.dueDate && selectedScheduleEntry.disconnectionDate && (
+                <>
+                  {Array.isArray(selectedScheduleEntry?.dueDate) &&
+                    Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                      <SplittedDates
+                        dueDates={selectedScheduleEntry.dueDate}
+                        disconnectionDates={selectedScheduleEntry.disconnectionDate}
+                      />
+                    )}
 
-              {selectedScheduleEntry &&
-                !Array.isArray(selectedScheduleEntry?.dueDate) &&
-                !Array.isArray(selectedScheduleEntry.disconnectionDate) && (
-                  <NormalDates
-                    dueDate={selectedScheduleEntry.dueDate!}
-                    disconnectionDate={selectedScheduleEntry.disconnectionDate!}
-                  />
-                )}
+                  {selectedScheduleEntry &&
+                    !Array.isArray(selectedScheduleEntry?.dueDate) &&
+                    !Array.isArray(selectedScheduleEntry.disconnectionDate) && (
+                      <NormalDates
+                        dueDate={selectedScheduleEntry.dueDate!}
+                        disconnectionDate={selectedScheduleEntry.disconnectionDate!}
+                      />
+                    )}
+                </>
+              )}
             </div>
           </DialogTitle>
           <DialogDescription className="text-start">

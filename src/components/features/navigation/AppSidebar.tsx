@@ -11,21 +11,33 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@mr/components/ui/Sidebar";
 import { GaugeCircleIcon } from "lucide-react";
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const { state, isMobile } = useSidebar();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <GaugeCircleIcon className="text-primary size-10" />
           <div className="flex flex-col items-start">
-            <div className="flex items-center gap-0">
-              <span className="text-primary flex text-xl font-black">Metra</span>
-              <span className="text-xl font-black text-slate-500">X</span>
-            </div>
-            <span className="text-xs text-gray-500">Meter Reading Application</span>
+            {(state === "expanded" || isMobile) && (
+              <div className="flex items-center gap-0">
+                <span className="text-primary flex text-xl font-black">Metra</span>
+                <span className="text-xl font-black text-slate-500">X</span>
+              </div>
+            )}
+
+            {state === "collapsed" && !isMobile && (
+              <div className="flex text-base font-black">
+                <span className="text-primary">M</span>
+                <span className="-ml-1 text-gray-500 italic dark:text-gray-300">X</span>
+              </div>
+            )}
+            {state === "expanded" && <span className="text-xs text-gray-500">Meter Reading Application</span>}
 
             {/* Measures Daily Transactions  */}
           </div>
