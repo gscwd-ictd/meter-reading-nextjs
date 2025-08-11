@@ -41,4 +41,9 @@ export const readingDetails = pgTable("reading_details", {
   additionalRemarks: varchar("additional_remarks"),
   image: text("image"),
   printCount: integer("print_count"),
+  penaltyAmount: real("penalty_amount"),
+  seniorDiscount: real("senior_discount"),
+  changeMeterAmount: real("change_meter_amount"),
+  timeStart: timestamp("time_start"),
+  timeEnd: timestamp("time_end"),
 });

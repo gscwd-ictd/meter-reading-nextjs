@@ -33,5 +33,5 @@ export const usage = pgTable("usage", {
   month2Usage: real("month_2_usage").notNull(),
   month3Usage: real("month_3_usage").notNull(),
   month4Usage: real("month_4_usage").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
