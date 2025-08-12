@@ -1,14 +1,20 @@
 "use client";
 
 import { DataTable } from "@mr/components/ui/data-table/data-table";
-import { FunctionComponent, Suspense, useEffect } from "react";
+import { FunctionComponent, ReactNode, Suspense, useEffect } from "react";
 import { useBillAdjustmentsColumns } from "./BillingAdjustmentsColumns";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { BillingAdjustment } from "@mr/lib/types/billing-adjustment";
 import { useBillingAdjustmentsStore } from "@mr/components/stores/useBillingAdjustmentsStore";
 
-export const BillingAdjustmentsDataTable: FunctionComponent = () => {
+type BillingAdjustmentsDataTableProps = {
+  actionBtn: ReactNode | ReactNode[];
+};
+
+export const BillingAdjustmentsDataTable: FunctionComponent<BillingAdjustmentsDataTableProps> = ({
+  actionBtn,
+}) => {
   const setRefetch = useBillingAdjustmentsStore((state) => state.setRefetch);
 
   const { data, refetch, isLoading } = useQuery({
@@ -33,6 +39,7 @@ export const BillingAdjustmentsDataTable: FunctionComponent = () => {
         columns={billAdjustmentColumns}
         loading={isLoading}
         title="Billing Adjustments"
+        actionBtn={actionBtn}
       />
     </Suspense>
   );

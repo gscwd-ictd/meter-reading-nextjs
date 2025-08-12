@@ -8,6 +8,8 @@ type BillingAdjustmentsStore = {
   setSelectedBillAdjustment: (selectedBillAdjustment: BillingAdjustment | null) => void;
   refetch?: () => void;
   setRefetch: (fn: () => void) => void;
+  editBillingAdjustmentsDialogIsOpen: boolean;
+  setEditBillingAdjustmentsDialogIsOpen: (editBillingAdjustmentsDialogIsOpen: boolean) => void;
 };
 
 export const useBillingAdjustmentsStore = create<BillingAdjustmentsStore>((set) => ({
@@ -16,6 +18,10 @@ export const useBillingAdjustmentsStore = create<BillingAdjustmentsStore>((set) 
 
   selectedBillAdjustment: null,
   setSelectedBillAdjustment: (selectedBillAdjustment) => set({ selectedBillAdjustment }),
+
+  editBillingAdjustmentsDialogIsOpen: false,
+  setEditBillingAdjustmentsDialogIsOpen: (editBillingAdjustmentsDialogIsOpen) =>
+    set({ editBillingAdjustmentsDialogIsOpen }),
 
   refetch: undefined,
   setRefetch: (fn) => set({ refetch: fn }),

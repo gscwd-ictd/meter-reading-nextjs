@@ -2,6 +2,7 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { BillingAdjustment } from "@mr/lib/types/billing-adjustment";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { BillingAdjustmentsRowActions } from "./BillingAdjustmentsRowActions";
 
 export const useBillAdjustmentsColumns = (data: BillingAdjustment[] | undefined) => {
   const [billingAdjustmentColumns, setBillingAdjustmentColumns] = useState<ColumnDef<BillingAdjustment>[]>(
@@ -35,6 +36,16 @@ export const useBillAdjustmentsColumns = (data: BillingAdjustment[] | undefined)
         ),
         filterFn: filterFn,
         meta: { exportLabel: "Percentage" },
+      },
+      {
+        accessorKey: "id",
+        header: "Actions",
+        enableColumnFilter: false,
+        cell: ({ row }) => (
+          <BillingAdjustmentsRowActions
+            details={{ name: row.original.name, id: row.original.id!, percentage: row.original.percentage }}
+          />
+        ),
       },
     ];
     setBillingAdjustmentColumns(cols);
