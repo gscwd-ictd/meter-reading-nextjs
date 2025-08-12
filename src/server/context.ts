@@ -1,10 +1,13 @@
 import { IAreaRepository } from "./interfaces/area/area.interface.repository";
+import { IBillingAdjustmentRepository } from "./interfaces/billing-adjustments/billing-adjustment.interface.repository";
 import { IConsumerRepository } from "./interfaces/consumer/consumer.interface.repository";
 import { IMeterReaderRepository } from "./interfaces/meter-readers/meter-readers.interface.repository";
 import { IScheduleRepository } from "./interfaces/schedule/schedule.interface.repository";
 import { IZoneBookRepository } from "./interfaces/zone-book/zone-book.interface.repository";
 import { AreaRepository } from "./services/area/area.repository";
 import { AreaService } from "./services/area/area.service";
+import { BillingAdjustmentRepository } from "./services/billing-adjustments/billing-adjustment.repository";
+import { BillingAdjustmentService } from "./services/billing-adjustments/billing-adjustment.service";
 import { ConsumerRepository } from "./services/consumer/consumer.repository";
 import { ConsumerService } from "./services/consumer/consumer.service";
 import { MeterReaderRepository } from "./services/meter-readers/meter-readers.repository";
@@ -23,6 +26,7 @@ export class MeterReadingContext {
   private _zoneBookRepository?: IZoneBookRepository;
   private _scheduleRepository?: IScheduleRepository;
   private _consumerRepository?: IConsumerRepository;
+  private _billingAdjustmentRepository?: IBillingAdjustmentRepository;
 
   // Services
   private _meterReaderService?: MeterReaderService;
@@ -30,6 +34,7 @@ export class MeterReadingContext {
   private _zoneBookService?: ZoneBookService;
   private _scheduleService?: ScheduleService;
   private _consumerService?: ConsumerService;
+  private _billingAdjustmentService?: BillingAdjustmentService;
 
   private constructor() {}
 
@@ -77,6 +82,14 @@ export class MeterReadingContext {
     return this._consumerRepository;
   }
 
+  public getBillingAdjustmentRepository(): IBillingAdjustmentRepository {
+    if (!this._billingAdjustmentRepository) {
+      this._billingAdjustmentRepository = new BillingAdjustmentRepository();
+    }
+
+    return this._billingAdjustmentRepository;
+  }
+
   // Services
   public getMeterReaderService(): MeterReaderService {
     if (!this._meterReaderService) {
@@ -111,6 +124,14 @@ export class MeterReadingContext {
       this._consumerService = new ConsumerService(this.getConsumerRepository());
     }
     return this._consumerService;
+  }
+
+  public getBillingAdjustmentService(): BillingAdjustmentService {
+    if (!this._billingAdjustmentService) {
+      this._billingAdjustmentService = new BillingAdjustmentService(this.getBillingAdjustmentRepository());
+    }
+
+    return this._billingAdjustmentService;
   }
 }
 
