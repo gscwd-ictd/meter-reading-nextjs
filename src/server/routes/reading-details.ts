@@ -30,7 +30,7 @@ export const readingDetailsHandler = new Hono()
     if (readingDetails.isRead) {
       try {
         const res = await db.mssqlConn.query`
-          EXEC post2ledger 
+          EXEC post2Ledger 
             @accountNo = ${readingDetails.accountNumber}, 
             @readingDate = ${readingDetails.readingDate}, 
             @billDate = ${readingDetails.readingDate},
