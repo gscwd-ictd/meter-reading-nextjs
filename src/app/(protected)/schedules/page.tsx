@@ -19,7 +19,7 @@ export default function SchedulePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Schedule</BreadcrumbPage>
+              <BreadcrumbPage>Schedules</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

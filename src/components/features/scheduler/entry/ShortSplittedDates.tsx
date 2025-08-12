@@ -31,13 +31,13 @@ export const ShortSplittedDates: React.FC<SplittedDatesProps> = ({ dueDates, dis
         className="text-muted-foreground flex min-w-full items-center gap-0 bg-transparent p-0"
       >
         {due && (
-          <div className="text-primary flex items-center gap-1 text-xs sm:text-[0.6rem] lg:text-xs">
+          <div className="text-primary flex items-center gap-1 text-[0.3rem] sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">
             {format(due, "MMM dd")}
           </div>
         )}
-        {due && disc && <span className="text-[0.5rem] sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">/</span>}
+        {due && disc && <span className="text-[0.3rem] sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">/</span>}
         {disc && (
-          <div className="flex items-center gap-1 text-xs text-red-500 sm:text-[0.6rem] lg:text-xs">
+          <div className="flex items-center gap-1 text-[0.3rem] text-red-500 sm:text-[0.3rem] md:text-[0.6rem] lg:text-xs">
             {format(disc, "MMM dd")}
           </div>
         )}

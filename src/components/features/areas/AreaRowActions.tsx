@@ -11,6 +11,7 @@ type AreaRowActionsProps = {
 export const AreaRowActions: FunctionComponent<AreaRowActionsProps> = ({ details }) => {
   const setEditAreaDialogIsOpen = useZonebookStore((state) => state.setEditAreaDialogIsOpen);
   const setSelectedArea = useZonebookStore((state) => state.setSelectedArea);
+
   return (
     <>
       <div className="flex gap-2">
