@@ -23,8 +23,6 @@ export default function PersonnelPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">Meter Readers</h3>
-      <div className="mb-1 text-base font-medium text-gray-400">List of Meter Readers</div>
       <MeterReaderTableComponent />
     </div>
   );

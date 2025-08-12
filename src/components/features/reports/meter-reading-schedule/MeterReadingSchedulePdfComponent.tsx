@@ -9,6 +9,7 @@ const MeterReadingSchedulePdf = dynamic(
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import SimpleMonthYearPicker from "../../calendar/SimpleMonthYearPicker";
+import { ScheduleTable } from "./TestMeterReadingSchedulePdf";
 
 export const MeterReadingSchedulePdfComponent = () => {
   const searchParams = useSearchParams();
@@ -26,13 +27,14 @@ export const MeterReadingSchedulePdfComponent = () => {
       <div className="grid grid-cols-2 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
         <div>
           <h3 className="mt-5 text-xl font-bold">Report on Meter Reading Schedule</h3>
-          <div className="mb-5 text-base font-medium text-gray-400"> </div>
+          <div className="font-m edium mb-5 text-base text-gray-400"> </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
           <SimpleMonthYearPicker inputValue={yearMonth} setInputValue={setYearMonth} />
         </div>
       </div>
-      <MeterReadingSchedulePdf date={date!} />
+      {/* <MeterReadingSchedulePdf date={date!} /> */}
+      <ScheduleTable yearMonth={yearMonth} />
     </div>
   );
 };

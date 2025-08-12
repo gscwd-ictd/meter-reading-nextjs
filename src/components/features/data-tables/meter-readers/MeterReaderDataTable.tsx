@@ -1,12 +1,16 @@
 "use client";
 
-import { FunctionComponent, Suspense } from "react";
+import { FunctionComponent, ReactNode, Suspense } from "react";
 import { useMeterReaderColumns } from "./MeterReaderColumns";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-export const MeterReaderDataTable: FunctionComponent = () => {
+type MeterReaderDataTableProps = {
+  actionBtn: ReactNode | ReactNode[];
+};
+
+export const MeterReaderDataTable: FunctionComponent<MeterReaderDataTableProps> = ({ actionBtn }) => {
   const { data: meterReaders, isFetching } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
@@ -20,7 +24,13 @@ export const MeterReaderDataTable: FunctionComponent = () => {
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={meterReaders ?? []} columns={meterReaderColumns} loading={isFetching} />
+      <DataTable
+        title="Meter Readers"
+        data={meterReaders ?? []}
+        columns={meterReaderColumns}
+        loading={isFetching}
+        actionBtn={actionBtn}
+      />
     </Suspense>
   );
 };

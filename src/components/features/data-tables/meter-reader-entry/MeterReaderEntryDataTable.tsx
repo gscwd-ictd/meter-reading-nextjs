@@ -22,6 +22,7 @@ export const MeterReaderEntryDataTable: FunctionComponent<MeterReaderDataTablePr
       <DataTable
         data={meterReaders ? meterReaders.sort((a, b) => (a.name > b.name ? 1 : -1)) : []}
         columns={meterReaderEntryColumns}
+        title=""
       />
     </Suspense>
   );

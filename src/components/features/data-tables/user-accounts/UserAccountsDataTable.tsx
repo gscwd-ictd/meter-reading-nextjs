@@ -31,7 +31,12 @@ export const UserAccountsDataTable: FunctionComponent = () => {
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={userAccounts ? userAccounts : []} columns={userAccountsColumns} loading={isLoading} />
+      <DataTable
+        data={userAccounts ? userAccounts : []}
+        columns={userAccountsColumns}
+        loading={isLoading}
+        title="User Accounts"
+      />
     </Suspense>
   );
 };

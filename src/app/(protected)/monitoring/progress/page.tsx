@@ -23,7 +23,7 @@ export default function MonitoringPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">Progress</h3>
+      <h3 className="mt-4 text-xl font-bold">Progress</h3>
       <div className="mb-5 text-base font-medium text-gray-400"> </div>
       <ProgressComponent />
     </div>
