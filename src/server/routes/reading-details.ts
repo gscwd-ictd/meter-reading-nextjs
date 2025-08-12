@@ -23,7 +23,13 @@ export const readingDetailsHandler = new Hono()
   .post("/", zValidator("json", CreateReadingDetailsSchema), async (c) => {
     const body = c.req.valid("json");
 
-    const readingDetails = await readingDetailsService.create(body);
+    return c.json(await readingDetailsService.create(body));
+  })
+  .patch("/:id", zValidator("json", UpdateReadingDetailsSchema), async (c) => {
+    const id = c.req.param("id");
+    const body = c.req.valid("json");
+
+    const readingDetails = await readingDetailsService.update(id, body);
 
     const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
 
@@ -56,12 +62,7 @@ export const readingDetailsHandler = new Hono()
       }
     }
 
-    return c.json(await readingDetailsService.create(body));
-  })
-  .patch("/:id", zValidator("json", UpdateReadingDetailsSchema), async (c) => {
-    const id = c.req.param("id");
-    const body = c.req.valid("json");
-    return c.json(await readingDetailsService.update(id, body));
+    return c.json(readingDetails);
   })
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
