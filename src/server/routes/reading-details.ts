@@ -43,7 +43,7 @@ export const readingDetailsHandler = new Hono()
       console.log({
         accountNo: readingDetails.accountNumber,
         readingDate,
-        billDate: readingDetails.readingDate,
+        billDate: readingDate,
         dueDate,
         disconDate: disconnectionDate,
         presentReading: readingDetails.currentReading,
