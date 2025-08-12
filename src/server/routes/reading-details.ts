@@ -40,9 +40,29 @@ export const readingDetailsHandler = new Hono()
       const timeEnd = format(readingDetails.timeEnd!, "MM/dd/yyyy h:mm a");
       const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
 
-      //console.log({ readingDate, dueDate, disconnectionDate, timeStart, timeEnd, currentUsage });
+      console.log({
+        accountNo: readingDetails.accountNumber,
+        readingDate,
+        billDate: readingDate,
+        dueDate,
+        disconDate: disconnectionDate,
+        presentReading: readingDetails.currentReading,
+        previousReading: readingDetails.previousReading,
+        presentUsage: currentUsage,
+        billedAmount: readingDetails.billedAmount,
+        penaltyAmount: readingDetails.penaltyAmount,
+        meterReader: readingDetails.meterReaderId,
+        seniorDiscount: readingDetails.seniorDiscount,
+        changeMeterAmount: readingDetails.changeMeterAmount,
+        arrears: readingDetails.arrears,
+        remarks: readingDetails.remarks,
+        timeStart,
+        timeEnd,
+        currentUsage,
+      });
 
       try {
+        //TODO: change meterReader field
         const res = await db.mssqlConn.query`
           EXEC post2Ledger
             @accountNo = ${readingDetails.accountNumber},
@@ -55,7 +75,7 @@ export const readingDetailsHandler = new Hono()
             @presentUsage = ${currentUsage},
             @billedAmount = ${readingDetails.billedAmount},
             @penaltyAmount = ${readingDetails.penaltyAmount},
-            @meterReader = ${readingDetails.meterReaderId},
+            @meterReader = 'john doe',
             @seniorDiscount = ${readingDetails.seniorDiscount},
             @changeMeterAmount = ${readingDetails.changeMeterAmount},
             @arrears = ${readingDetails.arrears},
@@ -63,7 +83,9 @@ export const readingDetailsHandler = new Hono()
             @timeStart = ${timeStart},
             @timeEnd = ${timeEnd}`;
 
-        console.log(res.recordset);
+        console.log(res);
+
+        console.log(res.recordsets);
       } catch (error) {
         console.error("Error sa mssql stored proc");
         throw error;
