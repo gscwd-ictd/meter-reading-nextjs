@@ -61,34 +61,34 @@ export const readingDetailsHandler = new Hono()
         currentUsage,
       });
 
-      // try {
-      //   const res = await db.mssqlConn.query`
-      //     EXEC post2Ledger
-      //       @accountNo = ${readingDetails.accountNumber},
-      //       @readingDate = ${readingDate},
-      //       @billDate = ${readingDate},
-      //       @dueDate = ${dueDate},
-      //       @disconDate = ${disconnectionDate},
-      //       @presentReading = ${readingDetails.currentReading},
-      //       @previousReading = ${readingDetails.previousReading},
-      //       @presentUsage = ${currentUsage},
-      //       @billedAmount = ${readingDetails.billedAmount},
-      //       @penaltyAmount = ${readingDetails.penaltyAmount},
-      //       @meterReader = ${readingDetails.meterReaderId},
-      //       @seniorDiscount = ${readingDetails.seniorDiscount},
-      //       @changeMeterAmount = ${readingDetails.changeMeterAmount},
-      //       @arrears = ${readingDetails.arrears},
-      //       @remarks = ${readingDetails.remarks},
-      //       @timeStart = ${timeStart},
-      //       @timeEnd = ${timeEnd}`;
+      try {
+        const res = await db.mssqlConn.query`
+          EXEC post2Ledger
+            @accountNo = ${readingDetails.accountNumber},
+            @readingDate = ${readingDate},
+            @billDate = ${readingDate},
+            @dueDate = ${dueDate},
+            @disconDate = ${disconnectionDate},
+            @presentReading = ${readingDetails.currentReading},
+            @previousReading = ${readingDetails.previousReading},
+            @presentUsage = ${currentUsage},
+            @billedAmount = ${readingDetails.billedAmount},
+            @penaltyAmount = ${readingDetails.penaltyAmount},
+            @meterReader = ${readingDetails.meterReaderId},
+            @seniorDiscount = ${readingDetails.seniorDiscount},
+            @changeMeterAmount = ${readingDetails.changeMeterAmount},
+            @arrears = ${readingDetails.arrears},
+            @remarks = ${readingDetails.remarks},
+            @timeStart = ${timeStart},
+            @timeEnd = ${timeEnd}`;
 
-      //   console.log(res);
+        console.log(res);
 
-      //   console.log(res.recordsets);
-      // } catch (error) {
-      //   console.error("Error sa mssql stored proc");
-      //   throw error;
-      // }
+        console.log(res.recordsets);
+      } catch (error) {
+        console.error("Error sa mssql stored proc");
+        throw error;
+      }
     }
 
     return c.json(readingDetails);
