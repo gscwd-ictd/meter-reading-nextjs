@@ -40,6 +40,7 @@ export const consumerDetailsView = pgView("view_consumer_details", {
               'waterBalance', vmr.water_balance,
               'otherBalance', vmr.other_balance,
               'previousReading', vmr.previous_reading,
+              'previousBillingDate', vmr.previous_bill_date,
               'location',
               (st_x(st_transform(st_setsrid(st_geomfromwkb(mll.wkb_geometry), 32651), 4326))::text || ',' ||
               st_y(st_transform(st_setsrid(st_geomfromwkb(mll.wkb_geometry), 32651), 4326))::text),
@@ -53,6 +54,18 @@ export const consumerDetailsView = pgView("view_consumer_details", {
                 'firstService', vls.services1,
                 'secondService', vls.services2,
                 'thirdService', vls.services3
+              ),
+              'billingAdjustments', (
+                select coalesce(
+                    jsonb_agg(
+                        jsonb_build_object(
+                            'name', ba.name,
+                            'percentage', ba.percentage
+                        ) order by ba.name
+                    ),
+                    '[]'::jsonb
+                )
+                from billing_adjustments ba
               )
             )
           )
