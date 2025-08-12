@@ -46,4 +46,5 @@ export const readingDetails = pgTable("reading_details", {
   changeMeterAmount: real("change_meter_amount"),
   timeStart: timestamp("time_start"),
   timeEnd: timestamp("time_end"),
+  previousBillDate: timestamp("previous_bill_date"),
 });
