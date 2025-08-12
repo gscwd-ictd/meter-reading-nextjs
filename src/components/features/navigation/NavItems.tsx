@@ -41,7 +41,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel className="font-semibold tracking-wide uppercase">General</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item, index) => {
@@ -60,7 +60,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                       onClick={() => toggleSubmenu(item.title)}
                     >
                       {item.icon && <item.icon />}
-                      <span className="flex-1">{item.title}</span>
+                      <span className="flex-1 font-sans text-xs font-medium">{item.title}</span>
                       {isSubmenuOpen ? (
                         <ChevronDownIcon className="h-4 w-4 opacity-70" />
                       ) : (
@@ -83,7 +83,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                               }}
                             >
                               {child.icon && <child.icon />}
-                              <span className="text-sm">{child.title}</span>
+                              <span className="text-xs font-medium">{child.title}</span>
                             </SidebarMenuButton>
                           ))}
                       </div>
@@ -112,7 +112,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                     }}
                   >
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span className="text-xs font-medium">{item.title}</span>
                     {item.count && (
                       <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
                     )}
@@ -253,7 +253,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel>System Configuration</SidebarGroupLabel>
+      <SidebarGroupLabel className="font-semibold tracking-wide uppercase">Maintenance</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item, index) => {
@@ -272,7 +272,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                       onClick={() => toggleSubmenu(item.title)}
                     >
                       {item.icon && <item.icon />}
-                      <span className="flex-1">{item.title}</span>
+                      <span className="flex-1 text-xs font-medium">{item.title}</span>
                       {isSubmenuOpen ? (
                         <ChevronDownIcon className="h-4 w-4 opacity-70" />
                       ) : (
@@ -314,7 +314,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                     }}
                   >
                     {item.icon && <item.icon />}
-                    <span>{item.title}</span>
+                    <span className="text-xs font-medium">{item.title}</span>
                     {item.count && (
                       <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
                     )}
