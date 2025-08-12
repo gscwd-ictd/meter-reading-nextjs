@@ -7,6 +7,7 @@ import {
 import { zValidator } from "@hono/zod-validator";
 import db from "@mr/server/db/connections";
 import { Hono } from "hono";
+import { format } from "date-fns";
 
 const readingDetailsRepository = new ReadingDetailsRepository();
 const readingDetailsService = new ReadingDetailsService(readingDetailsRepository);
@@ -31,35 +32,42 @@ export const readingDetailsHandler = new Hono()
 
     const readingDetails = await readingDetailsService.update(id, body);
 
-    const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
-
     if (readingDetails.isRead) {
-      try {
-        const res = await db.mssqlConn.query`
-          EXEC post2Ledger 
-            @accountNo = ${readingDetails.accountNumber}, 
-            @readingDate = ${readingDetails.readingDate}, 
-            @billDate = ${readingDetails.readingDate},
-            @dueDate = ${readingDetails.dueDate},
-            @disconDate = ${readingDetails.disconnectionDate},
-            @presentReading = ${readingDetails.currentReading},
-            @previousReading = ${readingDetails.previousReading},
-            @presentUsage = ${currentUsage},
-            @billedAmount = ${readingDetails.billedAmount},
-            @penaltyAmount = ${readingDetails.penaltyAmount},
-            @meterReader = ${readingDetails.meterReaderId},
-            @seniorDiscount = ${readingDetails.seniorDiscount},
-            @changeMeterAmount = ${readingDetails.changeMeterAmount},
-            @arrears = ${readingDetails.arrears},
-            @remarks = ${readingDetails.remarks},
-            @timeStart = ${readingDetails.timeStart},
-            @timeEnd = ${readingDetails.timeEnd}`;
+      const readingDate = format(readingDetails.readingDate!, "MM/dd/yyyy");
+      const dueDate = format(readingDetails.dueDate!, "MM/dd/yyyy");
+      const disconnectionDate = format(readingDetails.disconnectionDate!, "MM/dd/yyyy");
+      const timeStart = format(readingDetails.timeStart!, "MM/dd/yyyy h:mm a");
+      const timeEnd = format(readingDetails.timeEnd!, "MM/dd/yyyy h:mm a");
+      const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
 
-        console.log(res.recordset);
-      } catch (error) {
-        console.error("Error sa mssql stored proc");
-        throw error;
-      }
+      console.log({ readingDate, dueDate, disconnectionDate, timeStart, timeEnd, currentUsage });
+
+      // try {
+      //   const res = await db.mssqlConn.query`
+      //     EXEC post2Ledger
+      //       @accountNo = ${readingDetails.accountNumber},
+      //       @readingDate = ${readingDate},
+      //       @billDate = ${readingDate},
+      //       @dueDate = ${dueDate},
+      //       @disconDate = ${disconnectionDate},
+      //       @presentReading = ${readingDetails.currentReading},
+      //       @previousReading = ${readingDetails.previousReading},
+      //       @presentUsage = ${currentUsage},
+      //       @billedAmount = ${readingDetails.billedAmount},
+      //       @penaltyAmount = ${readingDetails.penaltyAmount},
+      //       @meterReader = ${readingDetails.meterReaderId},
+      //       @seniorDiscount = ${readingDetails.seniorDiscount},
+      //       @changeMeterAmount = ${readingDetails.changeMeterAmount},
+      //       @arrears = ${readingDetails.arrears},
+      //       @remarks = ${readingDetails.remarks},
+      //       @timeStart = ${timeStart},
+      //       @timeEnd = ${timeEnd}`;
+
+      //   console.log(res.recordset);
+      // } catch (error) {
+      //   console.error("Error sa mssql stored proc");
+      //   throw error;
+      // }
     }
 
     return c.json(readingDetails);
