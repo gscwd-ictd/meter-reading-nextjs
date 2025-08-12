@@ -62,6 +62,7 @@ export const readingDetailsHandler = new Hono()
       });
 
       try {
+        //TODO: change meterReader field
         const res = await db.mssqlConn.query`
           EXEC post2Ledger
             @accountNo = ${readingDetails.accountNumber},
@@ -74,7 +75,7 @@ export const readingDetailsHandler = new Hono()
             @presentUsage = ${currentUsage},
             @billedAmount = ${readingDetails.billedAmount},
             @penaltyAmount = ${readingDetails.penaltyAmount},
-            @meterReader = ${readingDetails.meterReaderId},
+            @meterReader = 'john doe',
             @seniorDiscount = ${readingDetails.seniorDiscount},
             @changeMeterAmount = ${readingDetails.changeMeterAmount},
             @arrears = ${readingDetails.arrears},
