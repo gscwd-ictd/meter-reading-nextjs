@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Circle, CircleDashed, CircleGauge } from "lucide-react";
+import { Circle } from "lucide-react";
 
 type LoadingSplashProps = {
   text?: string;

@@ -4,7 +4,6 @@ import { FunctionComponent, Suspense, useEffect } from "react";
 import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useAreasColumns } from "./AreasColumns";
 import { Area } from "@mr/lib/types/zonebook";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";

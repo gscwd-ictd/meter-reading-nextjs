@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@mr/components/ui/Dialog";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import CalendarPicker from "../../calendar/CalendarPicker";
 import { useState } from "react";
 import { Button } from "@mr/components/ui/Button";
@@ -70,7 +70,7 @@ export const AddCustomScheduleEntryDialog = () => {
       refetchData?.();
       refetchEntry?.();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || "Failed to add schedule entry";
         toast.error(message, { position: "top-right", duration: 1500 });
@@ -109,7 +109,7 @@ export const AddCustomScheduleEntryDialog = () => {
         {/* Calendar Picker Section */}
         <>
           <CalendarPicker
-            startDate={selectedScheduleEntry?.readingDate!}
+            startDate={selectedScheduleEntry?.readingDate ?? new Date()}
             dueDate={dueDate}
             setDueDate={setDueDate}
             disconnectionDate={disconnectionDate}

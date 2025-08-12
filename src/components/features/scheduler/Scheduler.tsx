@@ -1,6 +1,6 @@
 "use client";
 
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
 import { holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
@@ -128,7 +128,7 @@ export const Scheduler: FunctionComponent = () => {
   }, [calendarIsSet, currentMonthYear, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
   // run this state setter if the there is a fetched schedule for the month
-  const hasScheduleOption = () => {
+  const hasScheduleOption = useCallback(() => {
     // this should be true since this function is executed
     setHasSchedule(true);
 
@@ -137,10 +137,10 @@ export const Scheduler: FunctionComponent = () => {
 
     // this should turn true since populating of meter readers is only allowed when the schedule is empty for the month
     setHasPopulatedMeterReaders(true);
-  };
+  }, [setHasSchedule, setScheduleHasSplittedDates, setHasPopulatedMeterReaders]);
 
   // run this state setter if there is no fetched schedule for the month
-  const hasNoScheduleOption = () => {
+  const hasNoScheduleOption = useCallback(() => {
     // this should be false since this function is executed
     setHasSchedule(false);
 
@@ -149,7 +149,7 @@ export const Scheduler: FunctionComponent = () => {
 
     // this should turn false since schedule has not yet been submitted
     setHasPopulatedMeterReaders(false);
-  };
+  }, [setHasSchedule, setScheduleHasSplittedDates, setHasPopulatedMeterReaders]);
 
   // this is the reset state button when from one month to another
   const resetOnChange = () => {

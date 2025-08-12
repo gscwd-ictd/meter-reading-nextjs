@@ -21,7 +21,6 @@ import { DataTableToolbar } from "./data-table-toolbar";
 import { createContext, useEffect, useState } from "react";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
-import { LoadingBadge } from "../LoadingBadge";
 
 type DataTableProps<T> = {
   columns: Array<ColumnDef<T, unknown>>;
