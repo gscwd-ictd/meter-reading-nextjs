@@ -1,4 +1,4 @@
-import { BillAdjustmentsTableComponent } from "@mr/components/features/bill-adjustments/BillAdjustmentsTableComponent";
+import { BillingAdjustmentsTableComponent } from "@mr/components/features/billing-adjustments/BillingAdjustmentsTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,14 +19,14 @@ export default function BillAdjustmentsPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Bill Adjustments</BreadcrumbPage>
+              <BreadcrumbPage>Billing Adjustments</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
       {/* Table component here */}
-      <BillAdjustmentsTableComponent />
+      <BillingAdjustmentsTableComponent />
     </div>
   );
 }

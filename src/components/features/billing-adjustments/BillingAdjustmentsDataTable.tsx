@@ -2,21 +2,21 @@
 
 import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { FunctionComponent, Suspense, useEffect } from "react";
-import { useBillAdjustmentsColumns } from "./BillAdjustmentsColumns";
+import { useBillAdjustmentsColumns } from "./BillingAdjustmentsColumns";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { BillAdjustment } from "@mr/lib/types/bill-adjustments";
-import { useBillAdjustmentsStore } from "@mr/components/stores/useBillAdjustmentsStore";
+import { BillingAdjustment } from "@mr/lib/types/billing-adjustment";
+import { useBillingAdjustmentsStore } from "@mr/components/stores/useBillingAdjustmentsStore";
 
-export const BillAdjustmentsDataTable: FunctionComponent = () => {
-  const setRefetch = useBillAdjustmentsStore((state) => state.setRefetch);
+export const BillingAdjustmentsDataTable: FunctionComponent = () => {
+  const setRefetch = useBillingAdjustmentsStore((state) => state.setRefetch);
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["get-all-bill-adjustments"],
     queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/bill-adjustments`); // should be areas
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/billing-adjustments`); // should be areas
 
-      return res.data as BillAdjustment[];
+      return res.data as BillingAdjustment[];
     },
   });
 
@@ -32,7 +32,7 @@ export const BillAdjustmentsDataTable: FunctionComponent = () => {
         data={data ? data : []}
         columns={billAdjustmentColumns}
         loading={isLoading}
-        title="Bill Adjustments"
+        title="Billing Adjustments"
       />
     </Suspense>
   );

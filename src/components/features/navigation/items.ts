@@ -96,7 +96,7 @@ export const mainNav: NavItem[] = [
 
 export const secondaryNav: NavItem[] = [
   { title: "Areas", url: "/areas", icon: MapPinned },
-  { title: "Bill Adjustments", url: "/bill-adjustments", icon: Proportions },
+  { title: "Billing Adjustments", url: "/billing-adjustments", icon: Proportions },
   {
     title: "User Accounts",
     url: "/user-accounts",
