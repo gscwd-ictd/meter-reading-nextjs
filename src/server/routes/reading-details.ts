@@ -40,7 +40,26 @@ export const readingDetailsHandler = new Hono()
       const timeEnd = format(readingDetails.timeEnd!, "MM/dd/yyyy h:mm a");
       const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
 
-      console.log({ readingDate, dueDate, disconnectionDate, timeStart, timeEnd, currentUsage });
+      console.log({
+        accountNo: readingDetails.accountNumber,
+        readingDate,
+        billDate: readingDetails.readingDate,
+        dueDate,
+        disconDate: disconnectionDate,
+        presentReading: readingDetails.currentReading,
+        previousReading: readingDetails.previousReading,
+        presentUsage: currentUsage,
+        billedAmount: readingDetails.billedAmount,
+        penaltyAmount: readingDetails.penaltyAmount,
+        meterReader: readingDetails.meterReaderId,
+        seniorDiscount: readingDetails.seniorDiscount,
+        changeMeterAmount: readingDetails.changeMeterAmount,
+        arrears: readingDetails.arrears,
+        remarks: readingDetails.remarks,
+        timeStart,
+        timeEnd,
+        currentUsage,
+      });
 
       // try {
       //   const res = await db.mssqlConn.query`
