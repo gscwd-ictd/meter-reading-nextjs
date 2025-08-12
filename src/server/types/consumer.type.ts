@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ZoneBookSchema } from "./zone-book.type";
+import { BillingAdjustmentSchema } from "./billing-adjustment.type";
 
 export const ConsumerSchema = z.object({
   accountNumber: z.string(),
@@ -23,7 +24,12 @@ export const ConsumerSchema = z.object({
   waterBalance: z.coerce.number(),
   otherBalance: z.coerce.number(),
   previousReading: z.coerce.number(),
+  previousBillingDate: z.coerce.date(),
   location: z.coerce.string(),
+  billingAdjustments: BillingAdjustmentSchema.pick({
+    name: true,
+    percentage: true,
+  }).array(),
 });
 
 export const ConsumerUsageSchema = z.object({
