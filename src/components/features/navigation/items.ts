@@ -16,6 +16,7 @@ import {
   Activity,
   CircleDashed,
   SquaresSubtract,
+  Proportions,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -57,18 +58,16 @@ export const mainNav: NavItem[] = [
     icon: Users2Icon,
   },
   {
+    title: "Zonebooks",
+    url: "/zonebooks",
+    icon: Book,
+  },
+  {
     title: "Schedules",
     url: `/schedules?date=${currentYearMonth}`,
     icon: Calendar,
   },
-  {
-    title: "Zonebooks",
-    icon: MapPinned,
-    children: [
-      { title: "List", url: "/zonebooks-list", icon: Book },
-      { title: "Areas", url: "/areas", icon: Scan },
-    ],
-  },
+
   {
     title: "Text Blast",
     url: "/text-blast",
@@ -96,15 +95,12 @@ export const mainNav: NavItem[] = [
 ];
 
 export const secondaryNav: NavItem[] = [
+  { title: "Areas", url: "/areas", icon: MapPinned },
+  { title: "Bill Adjustments", url: "/bill-adjustments", icon: Proportions },
   {
     title: "User Accounts",
     url: "/user-accounts",
     icon: UserCog2,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 

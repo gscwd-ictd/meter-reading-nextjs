@@ -23,8 +23,6 @@ export default function UsersPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">User Accounts</h3>
-      <div className="mb-1 text-base font-medium text-gray-400">List of Users</div>
       <UserAccountsDataTable />
     </div>
   );

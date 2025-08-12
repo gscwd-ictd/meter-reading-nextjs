@@ -1,14 +1,14 @@
-import { AreaTableComponent } from "@mr/components/features/data-tables/zone-book-areas/AreaTableComponent";
+import { BillAdjustmentsTableComponent } from "@mr/components/features/bill-adjustments/BillAdjustmentsTableComponent";
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
 
-export default function AreasPage() {
+export default function BillAdjustmentsPage() {
   return (
     <div className="flex h-full flex-col gap-0 p-5">
       <div className="">
@@ -19,13 +19,14 @@ export default function AreasPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Zone & Books</BreadcrumbPage>
+              <BreadcrumbPage>Bill Adjustments</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      <AreaTableComponent />
+      {/* Table component here */}
+      <BillAdjustmentsTableComponent />
     </div>
   );
 }

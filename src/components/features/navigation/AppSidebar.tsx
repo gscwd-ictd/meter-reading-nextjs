@@ -43,8 +43,10 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent className="flex flex-col justify-between">
-        <NavMain items={mainNav} />
+      <SidebarContent className="flex h-full flex-col gap-0">
+        <div className="flex flex-grow flex-col gap-0">
+          <NavMain items={mainNav} />
+        </div>
         <NavSecondary items={secondaryNav} />
       </SidebarContent>
       <SidebarFooter>

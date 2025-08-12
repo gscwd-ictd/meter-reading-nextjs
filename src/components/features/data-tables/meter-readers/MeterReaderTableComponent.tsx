@@ -8,14 +8,15 @@ export const MeterReaderTableComponent: FunctionComponent = () => {
   const [addMeterReaderDialogIsOpen, setAddMeterReaderDialogIsOpen] = useState<boolean>(false);
 
   return (
-    <>
-      <div className="flex justify-start pb-1">
-        <AddMeterReaderDialog
-          addMeterReaderDialogIsOpen={addMeterReaderDialogIsOpen}
-          setAddMeterReaderDialogIsOpen={setAddMeterReaderDialogIsOpen}
-        />
-      </div>
-      <MeterReaderDataTable />
-    </>
+    <div className="mt-4">
+      <MeterReaderDataTable
+        actionBtn={
+          <AddMeterReaderDialog
+            addMeterReaderDialogIsOpen={addMeterReaderDialogIsOpen}
+            setAddMeterReaderDialogIsOpen={setAddMeterReaderDialogIsOpen}
+          />
+        }
+      />
+    </div>
   );
 };

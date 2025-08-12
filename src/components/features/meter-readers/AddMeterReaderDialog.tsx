@@ -191,7 +191,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       }}
       modal
     >
-      <DialogTrigger asChild className="my-2">
+      <DialogTrigger asChild className="w-full sm:w-full md:w-full lg:w-auto">
         <Button variant="default" className="dark:text-white">
           <PlusCircleIcon />
           Add meter reader
