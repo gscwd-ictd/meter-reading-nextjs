@@ -63,7 +63,9 @@ export const readingDetailsHandler = new Hono()
             @timeStart = ${timeStart},
             @timeEnd = ${timeEnd}`;
 
-        console.log(res.recordset);
+        console.log(res);
+
+        console.log(res.recordsets);
       } catch (error) {
         console.error("Error sa mssql stored proc");
         throw error;
