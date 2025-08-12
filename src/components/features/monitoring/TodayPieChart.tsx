@@ -1,6 +1,6 @@
 "use client";
-import { CheckIcon, CircleIcon } from "lucide-react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, Label } from "recharts";
+import { CircleIcon } from "lucide-react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label } from "recharts";
 
 const COLORS = {
   finished: "#3b82f6", // Green
@@ -63,7 +63,7 @@ export default function TodayDonutChart({ scheduled, finished }: { scheduled: nu
 
   return (
     <>
-      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">Today's Completion</h2>
+      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">Today&apos;s Completion</h2>
 
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>

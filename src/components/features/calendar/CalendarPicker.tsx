@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { format, addDays, isSaturday, isSunday, parse } from "date-fns";
-import { DayPicker, DateAfter } from "react-day-picker";
+import React, { useState, useEffect, Dispatch, SetStateAction, useCallback } from "react";
+import { format, addDays, isSaturday, isSunday } from "date-fns";
+import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popover";
 import { Input } from "@mr/components/ui/Input";
@@ -38,30 +38,33 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
     return suggested;
   };
 
-  const computeDisconnectionDate = (due: Date) => {
-    let disconnection = addDays(due, 3);
+  const computeDisconnectionDate = useCallback(
+    (due: Date) => {
+      let disconnection = addDays(due, 3);
 
-    while (true) {
-      const dateStr = format(disconnection, "yyyy-MM-dd");
-      const monthDay = format(disconnection, "MM-dd");
+      while (true) {
+        const dateStr = format(disconnection, "yyyy-MM-dd");
+        const monthDay = format(disconnection, "MM-dd");
 
-      const isWeekend = isSaturday(disconnection) || isSunday(disconnection);
-      const isNonBusiness = nonBusinessDays.some((d) => d.date === monthDay);
-      const isHoliday = holidays.some((h) => normalizeToYyyyMmDd(h.date) === dateStr);
+        const isWeekend = isSaturday(disconnection) || isSunday(disconnection);
+        const isNonBusiness = nonBusinessDays.some((d) => d.date === monthDay);
+        const isHoliday = holidays.some((h) => normalizeToYyyyMmDd(h.date) === dateStr);
 
-      if (!isWeekend && !isNonBusiness && !isHoliday) break;
+        if (!isWeekend && !isNonBusiness && !isHoliday) break;
 
-      disconnection = addDays(disconnection, 1);
-    }
+        disconnection = addDays(disconnection, 1);
+      }
 
-    return disconnection;
-  };
+      return disconnection;
+    },
+    [nonBusinessDays, holidays], // Only change if these arrays change
+  );
 
   useEffect(() => {
     const suggestedDue = computeSuggestedDueDate(startDate);
     setDueDate(suggestedDue);
     setDisconnectionDate(computeDisconnectionDate(suggestedDue));
-  }, [startDate]);
+  }, [startDate, computeDisconnectionDate, setDisconnectionDate, setDueDate]);
 
   const handleDueDateSelect = (date: Date | undefined) => {
     setDueDate(date);
@@ -111,7 +114,7 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
               disabled={isDateDisabled}
               className="w-full"
               components={{
-                MonthCaption: ({ calendarMonth, displayIndex, ...props }) => (
+                MonthCaption: ({ calendarMonth, ...props }) => (
                   <span {...props} className="flex w-full justify-center p-3 text-sm font-bold">
                     {format(calendarMonth.date, "MMMM yyyy")}
                   </span>
