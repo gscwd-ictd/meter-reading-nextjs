@@ -47,9 +47,13 @@ export const CreateReadingDetailsSchema = z4.object({
   previousBillDate: z4.coerce.date().nullish(),
 });
 
-export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial().omit({
-  id: true,
-});
+export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
+  .omit({
+    id: true,
+  })
+  .extend({
+    meterReader: z4.string().nullish(),
+  });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
 

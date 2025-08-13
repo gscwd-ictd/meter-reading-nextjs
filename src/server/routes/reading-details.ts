@@ -51,7 +51,7 @@ export const readingDetailsHandler = new Hono()
         presentUsage: currentUsage,
         billedAmount: readingDetails.billedAmount,
         penaltyAmount: readingDetails.penaltyAmount,
-        meterReader: readingDetails.meterReaderId,
+        meterReader: body.meterReader,
         seniorDiscount: readingDetails.seniorDiscount,
         changeMeterAmount: readingDetails.changeMeterAmount,
         arrears: readingDetails.arrears,
