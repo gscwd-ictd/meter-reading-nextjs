@@ -1,3 +1,4 @@
+import z from "zod/v3";
 import z4 from "zod/v4";
 
 export const CreateReadingDetailsSchema = z4.object({
@@ -14,6 +15,7 @@ export const CreateReadingDetailsSchema = z4.object({
   zoneCode: z4.string(),
   bookCode: z4.string(),
   averageUsage: z4.number().nullish(),
+  otherBalance: z4.number().nullish(),
 
   isRead: z4.boolean(),
   sequenceNumber: z4.string(),
