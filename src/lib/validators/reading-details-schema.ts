@@ -13,6 +13,7 @@ export const CreateReadingDetailsSchema = z4.object({
   longlat: z4.string().nullish(),
   zoneCode: z4.string(),
   bookCode: z4.string(),
+  averageUsage: z4.number().nullish(),
 
   isRead: z4.boolean(),
   sequenceNumber: z4.string(),
