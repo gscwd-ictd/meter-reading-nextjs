@@ -19,13 +19,15 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
   const { state, isMobile } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
-        <div className="flex items-center gap-2">
-          <GaugeCircleIcon className="text-primary size-10" />
+        <div
+          className={`flex items-center ${state === "collapsed" ? "justify-center" : "justify-start"} gap-2`}
+        >
+          {(state === "expanded" || isMobile) && <GaugeCircleIcon className="text-primary size-10" />}
           <div className="flex flex-col items-start">
             {(state === "expanded" || isMobile) && (
-              <div className="flex items-center gap-0">
+              <div className="flex w-full items-center gap-0">
                 <span className="text-primary flex text-xl font-black">Metra</span>
                 <span className="text-xl font-black text-slate-500">X</span>
               </div>

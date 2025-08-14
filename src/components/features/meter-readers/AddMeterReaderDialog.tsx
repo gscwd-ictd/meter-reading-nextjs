@@ -105,7 +105,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         return res.data;
         // return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
-        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+        if (axios.isAxiosError(error)) {
+          const message = error.response?.data?.message || "Failed to load zone books.";
+          toast.error(message, { position: "top-right", duration: 1500 });
+        } else {
+          toast.error("An unexpected error occurred", { position: "top-right" });
+        }
       }
     },
     enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
@@ -157,7 +162,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     },
     onError: (error: unknown) => {
       setIsSubmitting(false);
-      toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to load zone books.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred", { position: "top-right" });
+      }
     },
   });
 

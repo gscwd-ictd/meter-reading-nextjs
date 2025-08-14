@@ -71,7 +71,7 @@ export const DeleteBillingAdjustmentsDialog: FunctionComponent<DeleteBillingAdju
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete meter reader</AlertDialogTitle>
+          <AlertDialogTitle>Delete Billing Adjustment</AlertDialogTitle>
           <AlertDialogDescription>
             Do you want to remove <span className="text-primary font-bold">{details.name}</span> from the list
             of Billing Adjustments?

@@ -37,9 +37,9 @@ export const LoadingSplash: FunctionComponent<LoadingSplashProps> = ({ text = "L
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 z-30 flex items-center justify-center bg-white/90 dark:bg-black/95"
+      className="absolute inset-0 z-30 flex items-center justify-center bg-white/30 backdrop-blur-xs"
     >
-      <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-8 dark:bg-black">
+      <div className="flex flex-col items-center gap-4 rounded-2xl p-8">
         <div className="relative inline-flex h-32 w-32 items-center justify-center">
           {/* Static dashed circle */}
           <div className="border-primary absolute size-32 rounded-full border-[6px]" />
@@ -64,13 +64,13 @@ export const LoadingSplash: FunctionComponent<LoadingSplashProps> = ({ text = "L
 
         {/* Branding & optional text */}
         <div className="text-center">
-          <div className="text-primary text-xl font-black">
-            Metra<span className="text-slate-500">X</span>
+          <div className="text-primary text-xl font-black dark:text-blue-700">
+            Metra<span className="text-slate-500 dark:text-slate-700">X</span>
           </div>
-          <div className="text-xs font-bold text-gray-500">
+          <div className="text-xs font-bold text-gray-500 dark:text-gray-700">
             <i>Measure Transactions</i>
           </div>
-          {text && <div className="mt-2 text-sm text-gray-600">{text}</div>}
+          {text && <div className="mt-2 text-sm text-gray-600 dark:text-gray-800">{text}</div>}
         </div>
       </div>
     </motion.div>

@@ -66,7 +66,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput disabled={sortedList.length === 0} placeholder={title} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty className="dark:text-white">No results found.</CommandEmpty>
             <CommandGroup>
               {sortedList.length === 0 ? (
                 <p className="text-muted-foreground p-2 text-sm">No data</p>

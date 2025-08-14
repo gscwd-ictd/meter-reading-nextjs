@@ -228,7 +228,7 @@ export const Scheduler: FunctionComponent = () => {
 
   return (
     <>
-      <div className="bg-background mx-3 flex h-full flex-col overflow-hidden">
+      <div className="flex h-full flex-col overflow-hidden bg-transparent">
         <header className="flex items-center justify-between px-2">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">
@@ -335,7 +335,7 @@ export const Scheduler: FunctionComponent = () => {
                     {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
                       <div
                         key={idx}
-                        className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
+                        className="border-border bg-background grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
                       >
                         <div className="flex justify-end">
                           <Skeleton className="size-6 rounded-full p-2" />
