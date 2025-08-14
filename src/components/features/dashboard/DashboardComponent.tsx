@@ -1,8 +1,7 @@
-import { Button } from "@mr/components/ui/Button";
+"use client";
 import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { Progress } from "@mr/components/ui/Progress";
 import {
-  ArrowRightCircleIcon,
   CircleGaugeIcon,
   ClockArrowDownIcon,
   ReceiptTextIcon,
@@ -82,6 +81,7 @@ export const DashboardComponent: FunctionComponent = () => {
           title="Monthly Reading Progress"
           className="col-span-full border bg-white dark:bg-gray-900"
           icon={`${(1500 / 2500) * 100}%`}
+          onButtonClick={() => {}}
         >
           <div className="space-y-2">
             <Progress
@@ -90,11 +90,6 @@ export const DashboardComponent: FunctionComponent = () => {
               // className="[--progress-background:220_100%_90%] [--progress:220_100%_50%]"
             />
             <div className="text-sm text-gray-500">1500 out of 2500</div>
-            <div className="flex justify-end">
-              <Button variant="ghost" className="text-primary">
-                <ArrowRightCircleIcon className="size-full" />
-              </Button>
-            </div>
           </div>
         </DashboardCard>
       </div>
