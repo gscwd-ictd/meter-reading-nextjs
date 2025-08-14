@@ -30,7 +30,11 @@ export const readingDetailsHandler = new Hono()
     const id = c.req.param("id");
     const body = c.req.valid("json");
 
+    console.log({ body });
+
     const readingDetails = await readingDetailsService.update(id, body);
+
+    console.log({ readingDetails });
 
     if (readingDetails.isRead) {
       const readingDate = format(readingDetails.readingDate!, "MM/dd/yyyy");
