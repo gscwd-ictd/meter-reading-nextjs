@@ -5,6 +5,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from "@mr/components/ui/Dialog";
 import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
@@ -47,7 +48,8 @@ export function AddAreaDialog() {
     <Dialog open={addAreaDialogIsOpen} onOpenChange={setAddAreaDialogIsOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-primary">Add New Area</DialogTitle>
+          <DialogTitle className="text-primary text-xl font-semibold">Add New Area</DialogTitle>
+          <DialogDescription className="text-sm text-gray-500">Enter area information</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -61,14 +63,11 @@ export function AddAreaDialog() {
             />
           </div>
         </div>
-        <DialogFooter className="flex justify-end gap-2">
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
+        <DialogFooter className="flex w-full">
           <Button
             onClick={async () => await postAreaMutation.mutateAsync(name)}
             disabled={!name.trim()}
-            className="w-[5rem]"
+            className="w-full dark:text-white"
           >
             Add
           </Button>

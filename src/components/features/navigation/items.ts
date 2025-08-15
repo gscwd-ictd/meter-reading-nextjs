@@ -17,6 +17,7 @@ import {
   CircleDashed,
   SquaresSubtract,
   Proportions,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -73,24 +74,30 @@ export const mainNav: NavItem[] = [
     url: "/text-blast",
     icon: MessageCircleWarning,
   },
-  {
-    title: "Text Blast Reports",
-    url: "/blast-reports",
-    icon: FileText,
-  },
-  {
-    title: "Monitoring",
-    url: "/monitoring",
-    icon: Activity,
-    children: [
-      { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
-      { title: "Reports", url: "/monitoring/reports", icon: FileText },
-    ],
-  },
+
+  // {
+  //   title: "Monitoring",
+  //   url: "/monitoring",
+  //   icon: Activity,
+  //   children: [
+  //     { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
+  //     { title: "Reports", url: "/monitoring/reports", icon: FileText },
+  //   ],
+  // },
   {
     title: "Notifications",
     url: "/notifications",
     icon: Megaphone,
+  },
+];
+
+export const reportsNav: NavItem[] = [
+  { title: "Progress", url: "/progress", icon: CircleDashed },
+  { title: "Reports", url: "/reports", icon: FileSpreadsheet },
+  {
+    title: "Text Blast Reports",
+    url: "/blast-reports",
+    icon: FileText,
   },
 ];
 

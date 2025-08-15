@@ -129,8 +129,8 @@ export function DataTable<T>({
               <LoadingSpinner className="text-primary size-20" />
             ) : (
               <div className="flex items-center justify-center gap-2">
-                <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
-                <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                <FileX2 className="text-muted-foreground h-7 w-7 dark:text-white" />
+                <span className="text-muted-foreground text-2xl font-extrabold tracking-wide dark:text-white">
                   No Results
                 </span>
               </div>

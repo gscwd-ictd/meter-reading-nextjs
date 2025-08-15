@@ -1,3 +1,4 @@
+import { ProgressComponent } from "@mr/components/features/monitoring/ProgressComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,7 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
-import { ProgressComponent } from "../../../../components/features/monitoring/ProgressComponent";
 
 export default function MonitoringPage() {
   return (

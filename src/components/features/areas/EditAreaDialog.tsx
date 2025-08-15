@@ -5,6 +5,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from "@mr/components/ui/Dialog";
 import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
@@ -64,7 +65,8 @@ export const EditAreaDialog: FunctionComponent = () => {
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-primary">Edit Area Name</DialogTitle>
+          <DialogTitle className="text-primary text-xl font-semibold">Edit Area Name</DialogTitle>
+          <DialogDescription className="text-sm text-gray-500">Enter area information</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">

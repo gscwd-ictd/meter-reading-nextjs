@@ -48,22 +48,7 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
           exportLabel: "Name",
         },
       },
-      // {
-      //   accessorKey: "positionTitle",
-      //   header: ({ column }) => <DataTableColumnHeader column={column} title="Position Title" />,
-      //   filterFn: filterFn,
-      //   cell: ({ row }) => (
-      //     <div>
-      //       <div className="flex flex-col">
-      //         <div>{row.original.positionTitle}</div>
-      //         <div>{row.original.positionTitle}</div>
-      //       </div>
-      //     </div>
-      //   ),
-      //   meta: {
-      //     exportLabel: "Position Title",
-      //   },
-      // },
+
       {
         accessorKey: "mobileNumber",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
@@ -83,9 +68,9 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         cell: ({ row }) => (
           <span>
             {row.original.restDay === "sunday" ? (
-              <Badge className="w-[4rem] border-black bg-gray-50 text-black">Sunday</Badge>
+              <Badge className="w-[4rem] border-gray-700 bg-gray-50 text-black">Sunday</Badge>
             ) : row.original.restDay === "saturday" ? (
-              <Badge className="w-[4rem] border-black bg-black text-white">Saturday</Badge>
+              <Badge className="border-primary bg-primary w-[4rem] text-white">Saturday</Badge>
             ) : null}
           </span>
         ),

@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { holidays } from "./holidays";
+import { Holidays, holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,8 +24,14 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
+import { transformHolidays } from "@mr/lib/functions/transformHolidays";
 
-export const Scheduler: FunctionComponent = () => {
+type SchedulerProps = {
+  holidaysLoaded: boolean;
+  holidays: Holidays;
+};
+
+export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holidaysLoaded }) => {
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const searchParams = useSearchParams();
@@ -44,7 +50,8 @@ export const Scheduler: FunctionComponent = () => {
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const [activeContext, setActiveContext] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
-  const scheduler = useScheduler(holidays);
+
+  const scheduler = useScheduler(holidays ?? []);
 
   const hasValidSchedule = (monthYear: string) => {
     return currentSchedule.some(
@@ -54,7 +61,7 @@ export const Scheduler: FunctionComponent = () => {
 
   // this adds timeout when switching months
   const handleMonthChange = (direction: "prev" | "next" | "today") => {
-    if (isNavigating) return; // prevent rapid repeat
+    if (!holidaysLoaded || isNavigating) return; // prevent rapid repeat
 
     setIsNavigating(true);
 
@@ -105,9 +112,9 @@ export const Scheduler: FunctionComponent = () => {
   });
 
   // these are derived loading states, it should be below the useQuery since loading is derived
-  const isInitializingCalendar = !calendarIsSet && currentSchedule.length === 0;
+  const isInitializingCalendar = (!calendarIsSet && currentSchedule.length === 0) || !holidaysLoaded;
   const isFetchingSchedule = calendarIsSet && currentSchedule.length > 0 && isLoading;
-  const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading;
+  const isReady = calendarIsSet && currentSchedule.length > 0 && !isLoading && holidaysLoaded;
 
   // this ensures that monthYear does not go null
   useEffect(() => {
@@ -228,7 +235,7 @@ export const Scheduler: FunctionComponent = () => {
 
   return (
     <>
-      <div className="bg-background mx-3 flex h-full flex-col overflow-hidden">
+      <div className="flex h-full flex-col overflow-hidden bg-transparent">
         <header className="flex items-center justify-between px-2">
           <section className="flex items-center gap-4">
             <div className="flex size-14 flex-col overflow-clip rounded-lg border">
@@ -335,7 +342,7 @@ export const Scheduler: FunctionComponent = () => {
                     {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
                       <div
                         key={idx}
-                        className="bg-background border-border grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
+                        className="border-border bg-background grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
                       >
                         <div className="flex justify-end">
                           <Skeleton className="size-6 rounded-full p-2" />
