@@ -48,6 +48,7 @@ export const CreateReadingDetailsSchema = z4.object({
   timeStart: z4.coerce.date().nullish(),
   timeEnd: z4.coerce.date().nullish(),
   previousBillDate: z4.coerce.date().nullish(),
+  createdAt: z4.coerce.date().nullish(),
 });
 
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
