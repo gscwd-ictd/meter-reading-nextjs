@@ -20,6 +20,6 @@ export class ConsumerRepository implements IConsumerRepository {
         ),
       );
 
-    return ScheduleReadingAccountSchema.parse(result[0]);
+    return result[0];
   }
 }
