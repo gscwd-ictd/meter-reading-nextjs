@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { NavMain, NavSecondary } from "./NavItems";
-import { mainNav, secondaryNav, user } from "./items";
+import { NavMain, NavMonitoringAndReports, NavSecondary } from "./NavItems";
+import { mainNav, reportsNav, secondaryNav, user } from "./items";
 import { NavUser } from "./NavUser";
 
 import {
@@ -47,6 +47,7 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
       </SidebarHeader>
       <SidebarContent className="flex h-full flex-col gap-0">
         <NavMain items={mainNav} />
+        <NavMonitoringAndReports items={reportsNav} />
         <NavSecondary items={secondaryNav} />
       </SidebarContent>
       <SidebarFooter>

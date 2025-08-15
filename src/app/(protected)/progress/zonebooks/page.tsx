@@ -19,7 +19,7 @@ export default function ZonebookProgressPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/monitoring/progress">Progress</BreadcrumbLink>
+              <BreadcrumbLink href="/progress">Progress</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

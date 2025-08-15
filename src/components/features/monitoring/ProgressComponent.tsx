@@ -53,7 +53,7 @@ export const ProgressComponent = () => {
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
       <ChartCard
         onClick={() => {
-          router.push("/monitoring/progress/zonebooks");
+          router.push("/progress/zonebooks");
         }}
       >
         <TodayPieChart scheduled={daily.scheduled} finished={daily.finished} />

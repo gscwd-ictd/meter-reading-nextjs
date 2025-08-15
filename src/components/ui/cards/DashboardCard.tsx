@@ -1,7 +1,7 @@
 "use client";
 import { FunctionComponent, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../Card";
-import { ArrowRightCircleIcon } from "lucide-react";
+import { ArrowRightCircleIcon, ArrowRightIcon, ArrowRightSquareIcon } from "lucide-react";
 import { Button } from "../Button";
 
 type DashboardCardProps = PropsWithChildren & {
@@ -25,7 +25,10 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   onButtonClick,
 }) => {
   return (
-    <Card onClick={onCardClick} className={`${className} relative`}>
+    <Card
+      onClick={onCardClick}
+      className={`${className} group relative transition-shadow hover:shadow-md hover:brightness-98`} // Added group class and hover effect
+    >
       {icon && <div className="absolute top-5 right-5">{icon}</div>}
       <CardHeader>
         <CardTitle className="text-lg font-normal tracking-wide">{title}</CardTitle>
@@ -34,8 +37,12 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
       <CardContent>{children}</CardContent>
       {footer && <CardFooter>{footer}</CardFooter>}
       {onButtonClick && (
-        <Button variant="ghost" className="text-primary absolute right-2 bottom-2" onClick={onButtonClick}>
-          <ArrowRightCircleIcon className="size-full" />
+        <Button
+          variant="ghost"
+          className="text-primary hover:text-primary absolute right-2 bottom-2 size-fit opacity-0 transition-opacity duration-200 group-hover:opacity-70 hover:bg-transparent hover:opacity-100"
+          onClick={onButtonClick}
+        >
+          View more
         </Button>
       )}
     </Card>
