@@ -9,9 +9,12 @@ import {
   TextQuoteIcon,
   User2Icon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 
 export const DashboardComponent: FunctionComponent = () => {
+  const router = useRouter();
+
   return (
     <div className="mt-4 flex w-full flex-col gap-5">
       <div className="mb-1 text-xl font-bold text-gray-800 dark:text-white">Welcome back</div>
@@ -81,7 +84,7 @@ export const DashboardComponent: FunctionComponent = () => {
           title="Monthly Reading Progress"
           className="col-span-full border bg-white dark:bg-gray-900"
           icon={`${(1500 / 2500) * 100}%`}
-          onButtonClick={() => {}}
+          onButtonClick={() => router.push("/progress/zonebooks")}
         >
           <div className="space-y-2">
             <Progress
