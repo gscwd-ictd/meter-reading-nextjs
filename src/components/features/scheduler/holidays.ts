@@ -47,6 +47,12 @@ export const holidays = [
     date: "2025-04-19",
     type: "special",
   },
+  {
+    id: "26007302-8bc3-4846-8f3b-afeb8b9ee73d",
+    name: "Tuna Festival",
+    date: "2025-09-05",
+    type: "special",
+  },
   // {
   //   id: '26007302-8bc3-4846-8f3b-afeb8b9ee73d',
   //   name: 'Char',
