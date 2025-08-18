@@ -49,7 +49,7 @@ export const holidays = [
   {
     id: "26007302-8bc3-4846-8f3b-afeb8b9ee73d",
     name: "Tuna Festival",
-    date: "2025-09-5",
+    date: "2025-09-05",
     type: "special",
   },
   // {
