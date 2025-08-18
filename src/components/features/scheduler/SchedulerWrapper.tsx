@@ -7,6 +7,7 @@ import { Scheduler } from "./Scheduler";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { transformHolidays } from "@mr/lib/functions/transformHolidays";
+import { holidays } from "./holidays";
 
 export default function SchedulerWrapper() {
   const { data: allHolidays, isSuccess: holidaysLoaded } = useQuery({
@@ -19,10 +20,10 @@ export default function SchedulerWrapper() {
     staleTime: Infinity,
   });
 
-  const holidays = useMemo(() => {
-    if (allHolidays) return transformHolidays(allHolidays);
-    else [];
-  }, [allHolidays]);
+  // const holidays = useMemo(() => {
+  //   if (allHolidays) return transformHolidays(allHolidays);
+  //   else [];
+  // }, [allHolidays]);
 
   if (!holidaysLoaded) {
     return (
@@ -44,7 +45,7 @@ export default function SchedulerWrapper() {
           </div>
         }
       >
-        <Scheduler holidays={holidays ?? []} holidaysLoaded={holidaysLoaded} />
+        <Scheduler holidays={holidays} holidaysLoaded={holidaysLoaded} />
       </Suspense>
     </div>
   );
