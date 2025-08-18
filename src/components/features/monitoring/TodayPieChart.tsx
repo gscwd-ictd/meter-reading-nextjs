@@ -63,7 +63,9 @@ export default function TodayDonutChart({ scheduled, finished }: { scheduled: nu
 
   return (
     <>
-      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">Today&apos;s Completion</h2>
+      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">
+        Today&apos;s Zonebook Completion
+      </h2>
 
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>

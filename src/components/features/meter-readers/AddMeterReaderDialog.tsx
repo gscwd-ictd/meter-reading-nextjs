@@ -13,7 +13,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
-import { PlusCircleIcon, Users2Icon } from "lucide-react";
+import { PlusCircleIcon } from "lucide-react";
 import { MeterReaderTabs } from "./MeterReaderTabs";
 import { SearchPersonnelCombobox } from "./SearchPersonnelCombobox";
 import { toast } from "sonner";
@@ -105,7 +105,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         return res.data;
         // return await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/unassigned`);
       } catch (error) {
-        toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+        if (axios.isAxiosError(error)) {
+          const message = error.response?.data?.message || "Failed to load zone books.";
+          toast.error(message, { position: "top-right", duration: 1500 });
+        } else {
+          toast.error("An unexpected error occurred", { position: "top-right" });
+        }
       }
     },
     enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
@@ -157,7 +162,12 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
     },
     onError: (error: unknown) => {
       setIsSubmitting(false);
-      toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to load zone books.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred", { position: "top-right" });
+      }
     },
   });
 
@@ -205,7 +215,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       >
         <DialogHeader className="flex flex-col gap-0">
           <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold">
-            <Users2Icon className="size-5" /> New Meter Reader
+            New Meter Reader
           </DialogTitle>
 
           <DialogDescription className="text-gray-500">
