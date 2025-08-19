@@ -32,7 +32,12 @@ export const ZonebookDataTable: FunctionComponent = () => {
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} loading={isLoading} />
+      <DataTable
+        data={zoneBooks ? zoneBooks : []}
+        columns={zonebookColumns}
+        loading={isLoading}
+        title="Zone & Books"
+      />
     </Suspense>
   );
 };

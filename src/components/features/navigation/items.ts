@@ -16,6 +16,8 @@ import {
   Activity,
   CircleDashed,
   SquaresSubtract,
+  Proportions,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -57,37 +59,31 @@ export const mainNav: NavItem[] = [
     icon: Users2Icon,
   },
   {
+    title: "Zonebooks",
+    url: "/zonebooks",
+    icon: Book,
+  },
+  {
     title: "Schedules",
     url: `/schedules?date=${currentYearMonth}`,
     icon: Calendar,
   },
-  {
-    title: "Zonebooks",
-    icon: MapPinned,
-    children: [
-      { title: "List", url: "/zonebooks-list", icon: Book },
-      { title: "Areas", url: "/areas", icon: Scan },
-    ],
-  },
+
   {
     title: "Text Blast",
     url: "/text-blast",
     icon: MessageCircleWarning,
   },
-  {
-    title: "Text Blast Reports",
-    url: "/blast-reports",
-    icon: FileText,
-  },
-  {
-    title: "Monitoring",
-    url: "/monitoring",
-    icon: Activity,
-    children: [
-      { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
-      { title: "Reports", url: "/monitoring/reports", icon: FileText },
-    ],
-  },
+
+  // {
+  //   title: "Monitoring",
+  //   url: "/monitoring",
+  //   icon: Activity,
+  //   children: [
+  //     { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
+  //     { title: "Reports", url: "/monitoring/reports", icon: FileText },
+  //   ],
+  // },
   {
     title: "Notifications",
     url: "/notifications",
@@ -95,16 +91,23 @@ export const mainNav: NavItem[] = [
   },
 ];
 
+export const reportsNav: NavItem[] = [
+  { title: "Progress", url: "/progress", icon: CircleDashed },
+  { title: "Reports", url: "/reports", icon: FileSpreadsheet },
+  {
+    title: "Text Blast Reports",
+    url: "/blast-reports",
+    icon: FileText,
+  },
+];
+
 export const secondaryNav: NavItem[] = [
+  { title: "Areas", url: "/areas", icon: MapPinned },
+  { title: "Billing Adjustments", url: "/billing-adjustments", icon: Proportions },
   {
     title: "User Accounts",
     url: "/user-accounts",
     icon: UserCog2,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 

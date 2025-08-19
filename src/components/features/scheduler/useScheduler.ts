@@ -625,11 +625,11 @@ export const useScheduler = (holidays: Holiday[]) => {
               } else {
                 // ✅ Weekdays → Increment and adjust for holidays/weekends/non-duty days
                 if (prevDue && prevDisc) {
-                  newDueDate = addDays(prevDue, 1);
+                  newDueDate = adjustForHolidayOrWeekend(addDays(prevDue, 1)); // changed from addDays to adjust before adding
                   newDisconnectionDate = adjustForHolidayOrWeekend(addDays(prevDisc, 1));
                 } else {
                   // Fallback to original schedule
-                  newDueDate = currDue;
+                  newDueDate = currDue ? adjustForHolidayOrWeekend(currDue) : undefined; // changed from currDue to adjust before currDue
                   newDisconnectionDate = currDisc ? adjustForHolidayOrWeekend(currDisc) : undefined;
                 }
               }

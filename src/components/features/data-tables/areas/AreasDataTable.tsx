@@ -7,9 +7,12 @@ import axios from "axios";
 import { useAreasColumns } from "./AreasColumns";
 import { Area } from "@mr/lib/types/zonebook";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
+import { Button } from "@mr/components/ui/Button";
+import { CirclePlusIcon } from "lucide-react";
 
 export const AreasDataTable: FunctionComponent = () => {
   const setRefetchAreas = useZonebookStore((state) => state.setRefetchAreas);
+  const setAddAreaDialogIsOpen = useZonebookStore((state) => state.setAddAreaDialogIsOpen);
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["get-all-zoneBooks"],
@@ -28,7 +31,20 @@ export const AreasDataTable: FunctionComponent = () => {
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={data ? data : []} columns={areaColumns} loading={isLoading} />
+      <DataTable
+        title="Areas"
+        data={data ? data : []}
+        columns={areaColumns}
+        loading={isLoading}
+        actionBtn={
+          <Button
+            className="flex w-full lg:w-fit dark:text-white"
+            onClick={() => setAddAreaDialogIsOpen(true)}
+          >
+            <CirclePlusIcon /> Add Area
+          </Button>
+        }
+      />
     </Suspense>
   );
 };

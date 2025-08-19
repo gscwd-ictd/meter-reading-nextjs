@@ -18,7 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DataTablePagination } from "./data-table-pagination";
 import { Input } from "@mr/components/ui/Input";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { createContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { FileX2 } from "lucide-react";
 
@@ -30,6 +30,8 @@ type DataTableProps<T> = {
   enablePagination?: boolean;
   pageSize?: number;
   loading?: boolean;
+  actionBtn?: ReactNode | ReactNode[];
+  title: string;
 };
 
 type ColumnVisibilityToggleContextState = {
@@ -48,6 +50,8 @@ export function DataTable<T>({
   enablePagination = true,
   pageSize = 10,
   loading = false,
+  actionBtn,
+  title = "",
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -90,17 +94,31 @@ export function DataTable<T>({
   return (
     <div className="flex h-full min-h-[22rem] flex-col space-y-4">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
-        <div className="grid items-start gap-2 sm:grid-cols-1 sm:grid-rows-2 md:grid-cols-1 md:grid-rows-2 lg:flex lg:grid-cols-2 lg:grid-rows-1">
-          {enableGlobalFilter && (
-            <Input
-              placeholder="Search from table..."
-              value={debounceValue ?? ""}
-              onChange={(event) => setDebounceValue(event.target.value)}
-              className="lg:w-[25%]"
-            />
-          )}
+        {/* Right-aligned: Search + Actions (flexible for mobile) */}
+        <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
+          <h3 className="order-1 text-xl font-bold">{title}</h3>
 
-          <DataTableToolbar table={table} />
+          {/* Search Input (full width on mobile, fixed width on desktop) */}
+          <div className="order-2 flex flex-col justify-end gap-2 sm:flex-col md:flex-col lg:flex-row">
+            {enableGlobalFilter && (
+              <Input
+                placeholder="Search..."
+                value={debounceValue ?? ""}
+                onChange={(event) => setDebounceValue(event.target.value)}
+                className="order-2 sm:order-2 sm:w-full md:order-2 md:w-full lg:order-1 lg:w-64" // Fixed width on desktop
+              />
+            )}
+
+            {actionBtn && (
+              <div className="order-1 flex justify-end sm:order-1 md:order-1 lg:order-2">{actionBtn}</div>
+            )}
+          </div>
+
+          <div className="order-3" />
+
+          <div className="order-4 col-span-full">
+            <DataTableToolbar table={table} />
+          </div>
         </div>
       </ColumnVisibilityToggleContext.Provider>
 
@@ -111,8 +129,8 @@ export function DataTable<T>({
               <LoadingSpinner className="text-primary size-20" />
             ) : (
               <div className="flex items-center justify-center gap-2">
-                <FileX2 className="text-muted-foreground dark:text-muted h-7 w-7" />
-                <span className="text-muted-foreground dark:text-muted text-2xl font-extrabold tracking-wide">
+                <FileX2 className="text-muted-foreground h-7 w-7 dark:text-white" />
+                <span className="text-muted-foreground text-2xl font-extrabold tracking-wide dark:text-white">
                   No Results
                 </span>
               </div>

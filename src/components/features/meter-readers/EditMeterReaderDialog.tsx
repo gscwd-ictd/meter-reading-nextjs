@@ -12,7 +12,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
-import { SquarePenIcon, Users2Icon } from "lucide-react";
+import { Users2Icon } from "lucide-react";
 import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
@@ -239,7 +239,6 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     >
       <DialogTrigger asChild>
         <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-amber-400">
-          <SquarePenIcon className="size-4" />
           Update Details
         </button>
       </DialogTrigger>

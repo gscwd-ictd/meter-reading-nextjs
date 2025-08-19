@@ -6,7 +6,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
-import { ProgressComponent } from "../../../../components/features/monitoring/ProgressComponent";
+
+import { ReportComponent } from "@mr/components/features/reports/ReportComponent";
 
 export default function MonitoringPage() {
   return (
@@ -18,14 +19,15 @@ export default function MonitoringPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Progress</BreadcrumbPage>
+            <BreadcrumbPage>Reports</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">Progress</h3>
+      <h3 className="mt-4 text-xl font-bold">Reports</h3>
       <div className="mb-5 text-base font-medium text-gray-400"> </div>
-      <ProgressComponent />
+
+      <ReportComponent />
     </div>
   );
 }

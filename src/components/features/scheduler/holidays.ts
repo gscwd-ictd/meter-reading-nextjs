@@ -2,6 +2,7 @@ export type Holidays = typeof holidays;
 
 export type Day = { id: string; name: string; date: string };
 export type Holiday = Day & { type: string };
+export type HolidayFromHrms = Omit<Holiday, "date"> & { holidayDate: string };
 
 export const holidays = [
   // {
@@ -44,6 +45,12 @@ export const holidays = [
     id: "c4c1376f-8335-47e7-9ecc-dce20d39712d",
     name: "Black Saturday",
     date: "2025-04-19",
+    type: "special",
+  },
+  {
+    id: "26007302-8bc3-4846-8f3b-afeb8b9ee73d",
+    name: "Tuna Festival",
+    date: "2025-09-05",
     type: "special",
   },
   // {
@@ -92,6 +99,12 @@ export const holidays = [
     id: "39bc9494-dc50-4a67-a9a4-261be9509603",
     name: "National Heroes Day",
     date: "2025-08-25",
+    type: "regular",
+  },
+  {
+    id: "39bc9494-dc50-4a67-a9a4-1fd974f3ce48",
+    name: "Tuna Festival",
+    date: "2025-09-05",
     type: "regular",
   },
   {

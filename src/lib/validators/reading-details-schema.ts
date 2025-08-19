@@ -1,3 +1,4 @@
+import z from "zod/v3";
 import z4 from "zod/v4";
 
 export const CreateReadingDetailsSchema = z4.object({
@@ -13,6 +14,8 @@ export const CreateReadingDetailsSchema = z4.object({
   longlat: z4.string().nullish(),
   zoneCode: z4.string(),
   bookCode: z4.string(),
+  averageUsage: z4.number().nullish(),
+  otherBalance: z4.number().nullish(),
 
   isRead: z4.boolean(),
   sequenceNumber: z4.string(),
@@ -45,11 +48,16 @@ export const CreateReadingDetailsSchema = z4.object({
   timeStart: z4.coerce.date().nullish(),
   timeEnd: z4.coerce.date().nullish(),
   previousBillDate: z4.coerce.date().nullish(),
+  createdAt: z4.coerce.date().nullish(),
 });
 
-export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial().omit({
-  id: true,
-});
+export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
+  .omit({
+    id: true,
+  })
+  .extend({
+    meterReader: z4.string().nullish(),
+  });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
 

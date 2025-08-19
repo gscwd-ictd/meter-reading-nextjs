@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { NavMain, NavSecondary } from "./NavItems";
-import { mainNav, secondaryNav, user } from "./items";
+import { NavMain, NavMonitoringAndReports, NavSecondary } from "./NavItems";
+import { mainNav, reportsNav, secondaryNav, user } from "./items";
 import { NavUser } from "./NavUser";
 
 import {
@@ -19,13 +19,15 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
   const { state, isMobile } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
-        <div className="flex items-center gap-2">
-          <GaugeCircleIcon className="text-primary size-10" />
+        <div
+          className={`flex items-center ${state === "collapsed" ? "justify-center" : "justify-start"} gap-2`}
+        >
+          {(state === "expanded" || isMobile) && <GaugeCircleIcon className="text-primary size-10" />}
           <div className="flex flex-col items-start">
             {(state === "expanded" || isMobile) && (
-              <div className="flex items-center gap-0">
+              <div className="flex w-full items-center gap-0">
                 <span className="text-primary flex text-xl font-black">Metra</span>
                 <span className="text-xl font-black text-slate-500">X</span>
               </div>
@@ -43,8 +45,9 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent className="flex flex-col justify-between">
+      <SidebarContent className="flex h-full flex-col gap-0">
         <NavMain items={mainNav} />
+        <NavMonitoringAndReports items={reportsNav} />
         <NavSecondary items={secondaryNav} />
       </SidebarContent>
       <SidebarFooter>
