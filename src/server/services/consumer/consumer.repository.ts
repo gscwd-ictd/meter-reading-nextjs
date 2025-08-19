@@ -3,6 +3,7 @@ import { IConsumerRepository } from "@mr/server/interfaces/consumer/consumer.int
 import { ScheduleReadingAccount, ScheduleReadingAccountSchema } from "@mr/server/types/consumer.type";
 import { and, eq } from "drizzle-orm";
 import db from "@mr/server/db/connections";
+import { format } from "date-fns";
 
 export class ConsumerRepository implements IConsumerRepository {
   async findConsumerDetails(meterReaderId: string): Promise<ScheduleReadingAccount> {
@@ -16,7 +17,7 @@ export class ConsumerRepository implements IConsumerRepository {
       .where(
         and(
           eq(consumerDetailsView.meterReaderId, meterReaderId),
-          eq(consumerDetailsView.readingDate, "08-18-2025"),
+          eq(consumerDetailsView.readingDate, format(new Date(), "MM-dd-yyyy")),
         ),
       );
 
