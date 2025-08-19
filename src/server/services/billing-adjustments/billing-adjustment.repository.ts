@@ -7,7 +7,7 @@ import {
 import db from "@mr/server/db/connections";
 import { billingAdjustments } from "@mr/server/db/schemas/billing-adjustments";
 import { HTTPException } from "hono/http-exception";
-import { DrizzleError, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export class BillingAdjustmentRepository implements IBillingAdjustmentRepository {
   async findAll(): Promise<BillingAdjustment[]> {
