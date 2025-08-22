@@ -17,6 +17,7 @@ import { meterReaderHandler } from "./routes/meter-readers";
 import { scheduleHandler } from "./routes/schedule";
 import { usage } from "./routes/usage";
 import { billingAdjustmentHandler } from "./routes/billing-adjustments";
+import { dashboardHandler } from "./routes/dashboard";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -55,6 +56,7 @@ function createApp() {
     tokensHandler,
     usage,
     billingAdjustmentHandler,
+    dashboardHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
