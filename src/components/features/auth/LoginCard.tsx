@@ -50,7 +50,7 @@ export const LoginCard: FunctionComponent = () => {
 
   return (
     <Card className="w-full max-w-md rounded-xl bg-white/90 shadow-xl backdrop-blur-md dark:bg-slate-900/90">
-      <CardContent className="space-y-6 p-8">
+      <CardContent className="relative space-y-6 p-8">
         {/* Header Section */}
         <div className="flex flex-col items-center space-y-3 text-center">
           <div className="bg-primary/10 rounded-full p-4">

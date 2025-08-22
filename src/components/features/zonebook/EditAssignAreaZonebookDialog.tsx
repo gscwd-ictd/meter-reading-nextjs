@@ -56,9 +56,10 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   const patchAreaToZonebookMutation = useMutation({
     mutationKey: ["patch-area-mutation", selectedZonebook?.id],
     mutationFn: async (zonebook: Zonebook) => {
+      console.log(zonebook);
       try {
         const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.id}`, {
-          area: zonebook.area,
+          area: zonebook.area ? zonebook.area : "",
         });
 
         return res.data;

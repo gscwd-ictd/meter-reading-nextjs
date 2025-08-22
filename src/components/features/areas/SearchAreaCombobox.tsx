@@ -44,18 +44,13 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
           size="lg"
           className={`flex w-full justify-start px-4`}
         >
-          {areaList && selectedArea && selectedArea.id ? (
-            <span className="flex items-center gap-2 text-sm">
-              {areaList && areaList.find((area: Area) => area.name === selectedArea?.name)?.name}
-            </span>
+          {selectedArea?.id ? (
+            <span className="flex items-center gap-2 text-sm">{selectedArea.name}</span>
           ) : (
-            !areaList &&
-            !selectedArea?.id && (
-              <span className="flex items-center gap-2 text-sm">
-                <ScanSearchIcon className="text-primary size-5" />
-                <span className="text-primary text-sm">Search from areas list...</span>
-              </span>
-            )
+            <span className="flex items-center gap-2 text-sm">
+              <ScanSearchIcon className="text-primary size-5" />
+              <span className="text-primary text-sm">Search from areas list...</span>
+            </span>
           )}
         </Button>
       </PopoverTrigger>
@@ -75,36 +70,47 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
             <CommandList className="max-h-60 overflow-y-auto" role="listbox" tabIndex={-1}>
               <CommandEmpty>No areas found.</CommandEmpty>
               <CommandGroup>
-                {areaList &&
-                  areaList.map((area: Area, index: number) => (
-                    <CommandItem
-                      key={area.id}
-                      value={area.name}
-                      onSelect={(currentValue) => {
-                        if (area.id === selectedArea?.id) setSelectedArea({} as Area);
-                        else setSelectedArea(area);
+                {/* Add reset option as the first item */}
+                <CommandItem
+                  key="reset"
+                  value="reset"
+                  onSelect={() => {
+                    setSelectedArea({} as Area); // or {} as Area depending on your store's expected type
+                    setSearchArea("");
+                    setOpen(false);
+                  }}
+                  className="px-2 py-2 hover:cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground font-medium">Empty</span>
+                    </div>
+                  </div>
+                </CommandItem>
 
-                        setSearchArea(currentValue === searchArea ? "" : currentValue);
-                        setOpen(false);
-                      }}
-                      className={cn("px-2 py-2 hover:cursor-pointer", index !== 0 && "border-muted border-t")}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Scan />
-                        <div className="flex flex-col">
-                          <span className="font-medium">{area.name}</span>
-                        </div>
+                {/* Existing area items */}
+                {areaList?.map((area: Area, index: number) => (
+                  <CommandItem
+                    key={area.id}
+                    value={area.name}
+                    onSelect={(currentValue) => {
+                      setSelectedArea(area);
+                      setSearchArea(currentValue === searchArea ? "" : currentValue);
+                      setOpen(false);
+                    }}
+                    className={cn("px-2 py-2 hover:cursor-pointer", index !== 0 && "border-muted border-t")}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Scan />
+                      <div className="flex flex-col">
+                        <span className="font-medium">{area.name}</span>
                       </div>
-                      <Check
-                        className={cn(
-                          "ml-auto",
-                          searchArea.toLowerCase().includes(area.name.toLowerCase())
-                            ? "opacity-100"
-                            : "opacity-0",
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
+                    </div>
+                    <Check
+                      className={cn("ml-auto", selectedArea?.id === area.id ? "opacity-100" : "opacity-0")}
+                    />
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>

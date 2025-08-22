@@ -20,7 +20,7 @@ export default function MeterReadingSchedulePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/monitoring/reports">Reports</BreadcrumbLink>
+              <BreadcrumbPage>Reports</BreadcrumbPage>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
