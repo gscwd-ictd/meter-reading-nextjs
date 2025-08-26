@@ -20,13 +20,13 @@ type Props = {
   triggerLabel?: string;
 };
 
-export function RemoveZonebookAlertDialog({ zoneBook, onDelete, triggerLabel = "Remove" }: Props) {
+export function RemoveZonebookAlertDialog({ zoneBook, onDelete, triggerLabel = "" }: Props) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm" className="flex gap-1">
           <Trash2 size={16} />
-          <span className="hidden sm:hidden md:hidden lg:block">{triggerLabel}</span>
+          {triggerLabel && <span className="hidden sm:hidden md:hidden lg:block">{triggerLabel}</span>}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

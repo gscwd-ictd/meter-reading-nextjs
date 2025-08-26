@@ -44,6 +44,7 @@ export const useUserAccountsColumns = (data: MeterReader[]) => {
         accessorKey: "companyId",
         header: "Actions",
         cell: ({ row }) => <UserAccountsDropdownActions meterReader={row.original} />,
+        meta: { exportLabel: "Company ID" },
       },
     ];
 

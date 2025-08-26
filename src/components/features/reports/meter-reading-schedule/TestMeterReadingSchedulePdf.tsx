@@ -1,9 +1,10 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
+import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 
 type MeterReader = {
   scheduleMeterReaderId: string;
@@ -34,11 +35,19 @@ export const ScheduleTable: FC<ScheduleTableProps> = ({ yearMonth }) => {
       const res = await axios.get(`/api/schedules?date=${yearMonth}`);
       return res.data;
     },
+    enabled: !!yearMonth,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
-  if (isLoading) return <div>Loading schedule...</div>;
+  if (isLoading)
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <LoadingSpinner /> Loading Schedule...
+      </div>
+    );
   if (isError) return <div>Failed to load schedule.</div>;
-  if (!data || data.length === 0) return <div>No schedule found.</div>;
+  if (!data || data.length === 0) return <div>Please input the exact year-month.</div>;
 
   return (
     <div className="overflow-x-auto">

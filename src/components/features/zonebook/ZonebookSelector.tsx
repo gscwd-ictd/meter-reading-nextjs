@@ -340,12 +340,12 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
         </Command>
         <div className="flex flex-col gap-1">
           <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
-          <div className="h-[16rem] overflow-auto rounded border p-0">
-            <Table className="table-auto text-sm" onWheel={(e) => e.stopPropagation()}>
+          <div className="h-[16rem] overflow-y-scroll rounded border p-0">
+            <Table className="table-fixed text-sm" onWheel={(e) => e.stopPropagation()}>
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-semibold text-gray-600"></TableHead>
-                  <TableHead className="w-[100px] font-semibold text-gray-600">Zone-book</TableHead>
+                  <TableHead className="font-semibold text-gray-600">Zone-book</TableHead>
                   <TableHead className="font-semibold text-gray-600">Zone</TableHead>
                   <TableHead className="font-semibold text-gray-600">Book</TableHead>
                   <TableHead className="font-semibold text-gray-600">Area</TableHead>
@@ -363,7 +363,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                       <TableCell>{entry.zoneBook}</TableCell>
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell>{entry.area.name}</TableCell>
+                      <TableCell className="truncate">{entry.area.name}</TableCell>
                       <TableCell>
                         <button
                           onClick={() => {
@@ -371,13 +371,12 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                               (zb) => zb.zoneBook !== entry.zoneBook,
                             );
                             setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+                            setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
 
                             const newFilteredZonebooks = [...tempFilteredZonebooks];
                             newFilteredZonebooks.unshift(entry);
 
-                            setValue("zoneBooks", newFilteredZonebooks);
-
-                            setTempFilteredZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+                            setTempFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
                           }}
                         >
                           <CircleXIcon className="fill-red-600 text-white" />
