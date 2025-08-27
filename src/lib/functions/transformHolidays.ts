@@ -1,4 +1,4 @@
-import { Holiday, HolidayFromHrms } from "@mr/components/features/scheduler/holidays";
+import { Holiday, HolidayFromHrms } from "@mr/components/features/(general)/scheduler/holidays";
 import { format } from "date-fns";
 
 export function transformHolidays(holidaysFromHrms: HolidayFromHrms[]): Holiday[] {

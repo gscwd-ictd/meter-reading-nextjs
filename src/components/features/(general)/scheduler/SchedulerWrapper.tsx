@@ -2,15 +2,18 @@
 
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { SubmitScheduleSuccessDialog } from "./SubmitScheduleSuccessDialog";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { Scheduler } from "./Scheduler";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { transformHolidays } from "@mr/lib/functions/transformHolidays";
 import { holidays } from "./holidays";
 
 export default function SchedulerWrapper() {
-  const { data: allHolidays, isSuccess: holidaysLoaded } = useQuery({
+  const {
+    data: allHolidays,
+    isLoading,
+    isSuccess: holidaysLoaded,
+  } = useQuery({
     queryKey: ["get-all-holidays"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_HRMS_HOLIDAYS}`);
@@ -18,6 +21,11 @@ export default function SchedulerWrapper() {
       return res.data;
     },
     staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
   });
 
   // const holidays = useMemo(() => {
@@ -25,7 +33,7 @@ export default function SchedulerWrapper() {
   //   else [];
   // }, [allHolidays]);
 
-  if (!holidaysLoaded) {
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <LoadingSpinner className="size-8" />
@@ -45,7 +53,7 @@ export default function SchedulerWrapper() {
           </div>
         }
       >
-        <Scheduler holidays={holidays} holidaysLoaded={holidaysLoaded} />
+        <Scheduler holidays={holidays} holidaysLoaded={isLoading} />
       </Suspense>
     </div>
   );

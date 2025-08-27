@@ -1,4 +1,4 @@
-import { MeterReadingSchedulePdfComponent } from "@mr/components/features/reports/meter-reading-schedule/MeterReadingSchedulePdfComponent";
+import { MeterReadingSchedulePdfComponent } from "@mr/components/features/(monitoring)/reports/meter-reading-schedule/MeterReadingSchedulePdfComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,

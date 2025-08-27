@@ -1,17 +1,17 @@
-import SchedulerWrapper from "@mr/components/features/(general)/scheduler/SchedulerWrapper";
+import { ReadingRemarksTableComponent } from "@mr/components/features/(administration)/reading-remarks/ReadingRemarksTableComponent";
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
 
-export default function SchedulePage() {
+export default function ReadingRemarksPage() {
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] pt-5">
-      <div className="px-5 pb-5">
+    <div className="flex h-full flex-col gap-0 p-5">
+      <div className="">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -19,13 +19,14 @@ export default function SchedulePage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Schedules</BreadcrumbPage>
+              <BreadcrumbPage>Reading Remarks</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
 
-      <SchedulerWrapper />
+      {/* Table component here */}
+      <ReadingRemarksTableComponent />
     </div>
   );
 }

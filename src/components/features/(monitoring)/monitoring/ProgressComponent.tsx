@@ -1,8 +1,8 @@
 "use client";
-import IntradayProgressChart from "@mr/components/features/monitoring/IntraDayProgressChart";
-import MeterReaderActivityChart from "@mr/components/features/monitoring/MeterReaderActivirtyProgressChart";
-import ProgressChart from "@mr/components/features/monitoring/ProgressChart";
-import TodayPieChart from "@mr/components/features/monitoring/TodayPieChart";
+import IntradayProgressChart from "@mr/components/features/(monitoring)/monitoring/IntraDayProgressChart";
+import MeterReaderActivityChart from "@mr/components/features/(monitoring)/monitoring/MeterReaderActivirtyProgressChart";
+import ProgressChart from "@mr/components/features/(monitoring)/monitoring/ProgressChart";
+import TodayPieChart from "@mr/components/features/(monitoring)/monitoring/TodayPieChart";
 import { ChartCard } from "@mr/components/ui/cards/ChartCard";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

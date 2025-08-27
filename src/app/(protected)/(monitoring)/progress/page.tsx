@@ -1,4 +1,4 @@
-import { ProgressComponent } from "@mr/components/features/monitoring/ProgressComponent";
+import { ProgressComponent } from "@mr/components/features/(monitoring)/monitoring/ProgressComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -6,11 +6,11 @@ import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
 import { Label } from "@mr/components/ui/Label";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { SearchAreaCombobox } from "../areas/SearchAreaCombobox";
 import { Area, Zonebook } from "@mr/lib/types/zonebook";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { SearchAreaCombobox } from "../../(administration)/areas/SearchAreaCombobox";
 
 export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   const editAssignAreaZonebookDialogIsOpen = useZonebookStore(
@@ -56,21 +56,15 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   const patchAreaToZonebookMutation = useMutation({
     mutationKey: ["patch-area-mutation", selectedZonebook?.id],
     mutationFn: async (zonebook: Zonebook) => {
-      console.log(zonebook);
-      try {
-        const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.id}`, {
-          area: zonebook.area ? zonebook.area : "",
-        });
+      const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.id}`, {
+        area: zonebook.area.id ? zonebook.area : { ...zonebook.area, id: null },
+      });
 
-        return res.data;
-      } catch (error) {
-        console.log(error);
-        return error;
-      }
+      return res.data;
     },
     onSuccess: () => {
       toast.success("Success", {
-        description: `You have successfully reassigned the area to ${selectedArea.name} on zone book ${selectedZonebook?.zoneBook}`,
+        description: `You have successfully reassigned the area to ${selectedArea.name ? `${selectedArea.name}` : "an empty area"} on zone book ${selectedZonebook?.zoneBook}`,
         position: "top-right",
       });
 
@@ -78,6 +72,14 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
       setSelectedZonebook({} as Zonebook);
       setEditAssignAreaZonebookDialogIsOpen(false);
       refetchZonebooks?.();
+    },
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Something went wrong.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred", { position: "top-right" });
+      }
     },
   });
 

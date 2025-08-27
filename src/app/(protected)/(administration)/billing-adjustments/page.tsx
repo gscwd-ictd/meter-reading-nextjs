@@ -1,4 +1,4 @@
-import { BillingAdjustmentsTableComponent } from "@mr/components/features/billing-adjustments/BillingAdjustmentsTableComponent";
+import { BillingAdjustmentsTableComponent } from "@mr/components/features/(administration)/billing-adjustments/BillingAdjustmentsTableComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,

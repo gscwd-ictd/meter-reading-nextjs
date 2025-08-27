@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@mr/components/ui/Dialog";
 import { format } from "date-fns";
-import CalendarPicker from "../../calendar/CalendarPicker";
+import CalendarPicker from "../../../calendar/CalendarPicker";
 import { useState } from "react";
 import { Button } from "@mr/components/ui/Button";
 import { holidays, NonBusinessDays } from "../holidays";

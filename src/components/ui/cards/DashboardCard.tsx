@@ -11,6 +11,7 @@ type DashboardCardProps = PropsWithChildren & {
   footer?: ReactNode | ReactNode[];
   icon?: ReactNode | ReactNode[];
   onButtonClick?: MouseEventHandler<HTMLButtonElement>;
+  size?: "sm" | "lg";
 };
 
 export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
@@ -22,11 +23,12 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   footer,
   icon,
   onButtonClick,
+  size = "lg",
 }) => {
   return (
     <Card
       onClick={onCardClick}
-      className={`group relative overflow-hidden ${className} transition-all hover:shadow-md hover:brightness-98`}
+      className={`group relative overflow-hidden ${className} transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"}`}
     >
       {/* Shine effect */}
       <span className="shine pointer-events-none absolute inset-0 z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />

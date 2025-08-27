@@ -1,4 +1,4 @@
-import { AreaTableComponent } from "@mr/components/features/areas/AreaTableComponent";
+import { AreaTableComponent } from "@mr/components/features/(administration)/areas/AreaTableComponent";
 import {
   Breadcrumb,
   BreadcrumbList,
