@@ -6,11 +6,11 @@ import { Button } from "@mr/components/ui/Button";
 import { Input } from "@mr/components/ui/Input";
 import { Label } from "@mr/components/ui/Label";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
-import { SearchAreaCombobox } from "../areas/SearchAreaCombobox";
 import { Area, Zonebook } from "@mr/lib/types/zonebook";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { SearchAreaCombobox } from "../../(administration)/areas/SearchAreaCombobox";
 
 export const AssignAreaZonebookDialog: FunctionComponent = () => {
   const assignAreaZonebookDialogIsOpen = useZonebookStore((state) => state.assignAreaZonebookDialogIsOpen);
