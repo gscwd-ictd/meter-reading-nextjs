@@ -7,7 +7,7 @@ import { CalendarCheck2Icon, CalendarIcon, ChevronLeft, ChevronRight } from "luc
 import { Button } from "@mr/components/ui/Button";
 import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popover";
 import { cn } from "@mr/lib/utils";
-import { Scheduler } from "../scheduler/useScheduler";
+import { Scheduler } from "../(general)/scheduler/useScheduler";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
 type MonthYearPickerProps = {

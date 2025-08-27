@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ScheduleTable } from "./TestMeterReadingSchedulePdf";
-import { YearMonthPickerWithSubmit } from "../../calendar/YearMonthPickerWithSubmit";
+import { YearMonthPickerWithSubmit } from "@mr/components/features/calendar/YearMonthPickerWithSubmit";
 
 export const MeterReadingSchedulePdfComponent = () => {
   const searchParams = useSearchParams();

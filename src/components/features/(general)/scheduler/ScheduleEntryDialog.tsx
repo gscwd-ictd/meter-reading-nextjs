@@ -13,7 +13,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { format } from "date-fns";
 import { FunctionComponent, useEffect, useMemo } from "react";
-import { MeterReaderEntryDataTable } from "../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
+import { MeterReaderEntryDataTable } from "../../data-tables/meter-reader-entry/MeterReaderEntryDataTable";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import { isValidYyyyMmDdOrDate, toParsedDateOnly } from "@mr/lib/functions/handleDateArrayOrObject";
 import { useQuery } from "@tanstack/react-query";

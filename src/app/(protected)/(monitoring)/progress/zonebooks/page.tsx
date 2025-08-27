@@ -1,4 +1,4 @@
-import { ZonebookDailyProgressComponent } from "@mr/components/features/monitoring/zonebook/ZonebookDailyProgressComponent";
+import { ZonebookDailyProgressComponent } from "@mr/components/features/(monitoring)/monitoring/zonebook/ZonebookDailyProgressComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,

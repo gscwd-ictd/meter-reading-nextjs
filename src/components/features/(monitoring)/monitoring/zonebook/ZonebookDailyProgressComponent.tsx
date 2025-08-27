@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@mr/components/ui/Button";
 import { DateRange } from "react-day-picker";
-import { CalendarDateRangePicker } from "../../calendar/CalendarDateRangePicker";
+import { CalendarDateRangePicker } from "../../../calendar/CalendarDateRangePicker";
 import { ZonebookProgressTable } from "./ZonebookProgressTable";
 import { format } from "date-fns";
 

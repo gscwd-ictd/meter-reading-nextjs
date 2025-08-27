@@ -2,8 +2,8 @@
 
 import { FunctionComponent } from "react";
 import { AddAreaDialog } from "./AddAreaDialog";
-import { AreasDataTable } from "../data-tables/areas/AreasDataTable";
 import { EditAreaDialog } from "./EditAreaDialog";
+import { AreasDataTable } from "../../data-tables/areas/AreasDataTable";
 
 export const AreaTableComponent: FunctionComponent = () => {
   return (

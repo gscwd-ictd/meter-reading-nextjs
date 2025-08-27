@@ -13,6 +13,7 @@ import {
   CircleDashed,
   SquaresSubtract,
   Proportions,
+  BetweenHorizonalStart,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -100,6 +101,11 @@ export const reportsNav: NavItem[] = [
 export const secondaryNav: NavItem[] = [
   { title: "Areas", url: "/areas", icon: MapPinned },
   { title: "Billing Adjustments", url: "/billing-adjustments", icon: Proportions },
+  {
+    title: "Reading Remarks",
+    url: "/reading-remarks",
+    icon: BetweenHorizonalStart,
+  },
   {
     title: "User Accounts",
     url: "/user-accounts",

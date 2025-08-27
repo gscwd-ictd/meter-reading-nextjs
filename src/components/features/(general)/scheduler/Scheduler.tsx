@@ -19,7 +19,7 @@ import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
 import { motion } from "framer-motion";
 import { Skeleton } from "@mr/components/ui/Skeleton";
-import { MonthYearPicker } from "../calendar/MonthYearPicker";
+import { MonthYearPicker } from "../../calendar/MonthYearPicker";
 import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
