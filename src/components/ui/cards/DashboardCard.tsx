@@ -1,7 +1,6 @@
 "use client";
 import { FunctionComponent, MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../Card";
-import { ArrowRightCircleIcon, ArrowRightIcon, ArrowRightSquareIcon } from "lucide-react";
 import { Button } from "../Button";
 
 type DashboardCardProps = PropsWithChildren & {
@@ -12,6 +11,7 @@ type DashboardCardProps = PropsWithChildren & {
   footer?: ReactNode | ReactNode[];
   icon?: ReactNode | ReactNode[];
   onButtonClick?: MouseEventHandler<HTMLButtonElement>;
+  size?: "sm" | "lg";
 };
 
 export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
@@ -23,13 +23,17 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   footer,
   icon,
   onButtonClick,
+  size = "lg",
 }) => {
   return (
     <Card
       onClick={onCardClick}
-      className={`${className} group relative transition-shadow hover:shadow-md hover:brightness-98`} // Added group class and hover effect
+      className={`group relative overflow-hidden ${className} transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"}`}
     >
-      {icon && <div className="absolute top-5 right-5">{icon}</div>}
+      {/* Shine effect */}
+      <span className="shine pointer-events-none absolute inset-0 z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />
+
+      {icon && <div className="absolute top-5 right-5 z-20">{icon}</div>}
       <CardHeader>
         <CardTitle className="text-lg font-normal tracking-wide">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -39,7 +43,7 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
       {onButtonClick && (
         <Button
           variant="ghost"
-          className="text-primary hover:text-primary absolute right-2 bottom-2 size-fit opacity-0 transition-opacity duration-200 group-hover:opacity-70 hover:bg-transparent hover:opacity-100"
+          className="text-primary hover:text-primary absolute right-2 bottom-2 z-20 size-fit opacity-0 transition-opacity duration-200 group-hover:opacity-70 hover:bg-transparent hover:opacity-100"
           onClick={onButtonClick}
         >
           View more

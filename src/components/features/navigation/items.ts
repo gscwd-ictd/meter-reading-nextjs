@@ -1,8 +1,6 @@
 import {
   Calendar,
   LucideIcon,
-  Megaphone,
-  Settings,
   MapPinned,
   GalleryVerticalEnd,
   AudioWaveform,
@@ -11,13 +9,11 @@ import {
   MessageCircleWarning,
   FileText,
   Book,
-  Scan,
   UserCog2,
-  Activity,
   CircleDashed,
   SquaresSubtract,
   Proportions,
-  FileSpreadsheet,
+  BetweenHorizonalStart,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -74,36 +70,42 @@ export const mainNav: NavItem[] = [
     url: "/text-blast",
     icon: MessageCircleWarning,
   },
-
-  // {
-  //   title: "Monitoring",
-  //   url: "/monitoring",
-  //   icon: Activity,
-  //   children: [
-  //     { title: "Progress", url: "/monitoring/progress", icon: CircleDashed },
-  //     { title: "Reports", url: "/monitoring/reports", icon: FileText },
-  //   ],
-  // },
-  {
-    title: "Notifications",
-    url: "/notifications",
-    icon: Megaphone,
-  },
 ];
 
 export const reportsNav: NavItem[] = [
   { title: "Progress", url: "/progress", icon: CircleDashed },
-  { title: "Reports", url: "/reports", icon: FileSpreadsheet },
   {
-    title: "Text Blast Reports",
-    url: "/blast-reports",
+    title: "Reports",
     icon: FileText,
+    children: [
+      {
+        title: "Meter Reading Schedule",
+        url: "/reports/meter-reading-schedule",
+      },
+      {
+        title: "Monthly Billing Summary",
+        url: "/reports/monthly-billing-summary",
+      },
+      {
+        title: "Summary of Bills",
+        url: "/reports/summary-of-bills",
+      },
+      {
+        title: "Text Blast",
+        url: "/reports/text-blast",
+      },
+    ],
   },
 ];
 
 export const secondaryNav: NavItem[] = [
   { title: "Areas", url: "/areas", icon: MapPinned },
   { title: "Billing Adjustments", url: "/billing-adjustments", icon: Proportions },
+  {
+    title: "Reading Remarks",
+    url: "/reading-remarks",
+    icon: BetweenHorizonalStart,
+  },
   {
     title: "User Accounts",
     url: "/user-accounts",

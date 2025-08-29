@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { Area } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { AreaRowActions } from "../../areas/AreaRowActions";
+import { AreaRowActions } from "../../(administration)/areas/AreaRowActions";
 
 export const useAreasColumns = (data: Area[] | undefined) => {
   const [areaColumns, setAreaColumns] = useState<ColumnDef<Area>[]>([]);

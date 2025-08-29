@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format, parse, setMonth, setYear } from "date-fns";
-import { CalendarCheck2Icon, CalendarIcon } from "lucide-react";
+import { CalendarCheck2Icon, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@mr/components/ui/Button";
 import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popover";
 import { cn } from "@mr/lib/utils";
-import { Scheduler } from "../scheduler/useScheduler";
+import { Scheduler } from "../(general)/scheduler/useScheduler";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
 type MonthYearPickerProps = {
@@ -25,12 +25,18 @@ export function MonthYearPicker({
 }: MonthYearPickerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"year" | "month">("year");
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
+  const reset = useSchedulesStore((state) => state.reset);
+  const refetchData = useSchedulesStore((state) => state.refetchData);
+
+  // Parse current selection
+  const selectedDate = currentMonthYear ? parse(currentMonthYear, "yyyy-MM", new Date()) : null;
+  const selectedYear = selectedDate?.getFullYear();
+  const selectedMonth = selectedDate?.getMonth();
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const updateUrl = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -41,13 +47,8 @@ export function MonthYearPicker({
     scheduler.setCurrentMonthYear(value);
   };
 
-  const reset = useSchedulesStore((state) => state.reset);
-  const refetchData = useSchedulesStore((state) => state.refetchData);
-
-  const handleMonthClick = (monthIndex: number) => {
-    if (selectedYear === null) return;
-
-    const newDate = setYear(setMonth(new Date(), monthIndex), selectedYear);
+  const handleMonthSelect = (monthIndex: number) => {
+    const newDate = setYear(setMonth(new Date(), monthIndex), currentYear);
     const formatted = format(newDate, "yyyy-MM");
 
     reset();
@@ -55,98 +56,53 @@ export function MonthYearPicker({
     setCurrentMonthYear(formatted);
     updateUrl(formatted);
     setOpen(false);
-    setSelectedYear(null); // reset state for next open
   };
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const handleYearChange = (increment: number) => {
+    setCurrentYear((prev) => prev + increment);
+  };
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={(val) => {
-        setOpen(val);
-
-        if (val) {
-          // Opening popover: retain year from current value if available
-          if (currentMonthYear) {
-            const parsed = parse(currentMonthYear, "yyyy-MM", new Date());
-            setSelectedYear(parsed.getFullYear());
-          }
-          setStep("year"); // always start at year selection
-        } else {
-          setSelectedYear(null);
-          setStep("year");
-        }
-      }}
-    >
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           className={cn(
-            "w-[200px] justify-between text-left font-normal",
+            "w-[200px] justify-start text-left font-normal",
             !currentMonthYear && "text-muted-foreground",
           )}
         >
-          <span>{currentMonthYear ?? "Pick month"}</span>
           {hasSchedule ? (
-            <CalendarCheck2Icon className="ml-2 h-4 w-4 text-green-600 opacity-80" />
+            <CalendarCheck2Icon className="mr-2 h-4 w-4 text-green-600 opacity-80" />
           ) : (
-            <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+            <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
           )}
+          <span>{currentMonthYear ?? "Pick month"}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[220px] p-4">
-        {step === "year" ? (
-          <>
-            <div className="text-muted-foreground mb-2 text-sm font-medium">Select a year</div>
-            <div className="grid grid-cols-3 gap-2">
-              {years.map((year) => (
-                <Button
-                  key={year}
-                  variant={selectedYear === year ? "default" : "outline"}
-                  onClick={() => {
-                    setSelectedYear(year);
-                    setStep("month");
-                  }}
-                  className="dark:text-white"
-                >
-                  {year}
-                </Button>
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-muted-foreground text-sm font-medium">Select a month</span>
-              <Button variant="ghost" size="sm" onClick={() => setStep("year")}>
-                Back
-              </Button>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {months.map((month, index) => (
-                <Button key={month} variant="outline" onClick={() => handleMonthClick(index)}>
-                  {month.slice(0, 3)}
-                </Button>
-              ))}
-            </div>
-          </>
-        )}
+      <PopoverContent className="w-[260px] p-3">
+        <div className="mb-3 flex items-center justify-between">
+          <Button variant="ghost" size="icon" onClick={() => handleYearChange(-1)}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="font-medium">{currentYear}</span>
+          <Button variant="ghost" size="icon" onClick={() => handleYearChange(1)}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {months.map((month, index) => (
+            <Button
+              key={month}
+              variant={selectedYear === currentYear && selectedMonth === index ? "default" : "outline"}
+              onClick={() => handleMonthSelect(index)}
+              className="h-6 text-xs dark:text-white"
+            >
+              {month}
+            </Button>
+          ))}
+        </div>
       </PopoverContent>
     </Popover>
   );

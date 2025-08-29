@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 import { Badge } from "@mr/components/ui/Badge";
-import { ZonebookPreview } from "../../zonebook/ZonebookPreview";
+import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
   const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);

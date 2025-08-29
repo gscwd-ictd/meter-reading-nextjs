@@ -1,7 +1,7 @@
 "use client";
 
 import { FunctionComponent, useState } from "react";
-import { AddMeterReaderDialog } from "../../meter-readers/AddMeterReaderDialog";
+import { AddMeterReaderDialog } from "../../(general)/meter-readers/AddMeterReaderDialog";
 import { MeterReaderDataTable } from "./MeterReaderDataTable";
 
 export const MeterReaderTableComponent: FunctionComponent = () => {

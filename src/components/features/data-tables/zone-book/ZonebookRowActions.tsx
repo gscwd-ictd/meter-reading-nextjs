@@ -18,7 +18,7 @@ export const ZonebookRowActions: FunctionComponent<ZonebookRowActionsProps> = ({
 
   return (
     <div className="flex gap-2">
-      {!zonebook.area?.id && (
+      {!zonebook.id && (
         <PlusIcon
           className="text-primary size-8 rounded bg-gray-200 p-2 hover:cursor-pointer"
           role="button"
@@ -28,7 +28,7 @@ export const ZonebookRowActions: FunctionComponent<ZonebookRowActionsProps> = ({
           }}
         />
       )}
-      {zonebook.area?.id && (
+      {zonebook.id && (
         <SquarePenIcon
           className="bg-primary size-8 rounded p-2 text-white hover:cursor-pointer"
           role="button"
