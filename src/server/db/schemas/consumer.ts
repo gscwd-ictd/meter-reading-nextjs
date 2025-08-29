@@ -23,7 +23,7 @@ export const consumerDetailsView = pgView("view_consumer_details", {
                   'accountNumber', vmr.account_no,
                   'checkDigit', vmr.check_digit,
                   'consumerName', vmr.consumer_name,
-                  'isSenior', vmr."isSenior",
+                  'isSenior', (vmr."isSenior" = 'True')::boolean,
                   'contactNumber', vmr.contact_no,
                   'address', vmr.address,
                   'classification', vmr.classification,

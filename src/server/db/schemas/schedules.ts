@@ -1,4 +1,15 @@
-import { date, index, jsonb, pgTable, pgView, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  date,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  pgView,
+  timestamp,
+  unique,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
 import { relations, sql } from "drizzle-orm";
 
@@ -180,4 +191,38 @@ export const viewScheduleMeterReadingZoneBook = pgView("view_schedule_meter_read
         smr.id,
         smr.meter_reader_id,
         s.reading_date
+  `);
+
+export const viewZoneBookScheduleReader = pgView("view_zone_book_schedule_reader", {
+  id: varchar("id"),
+  zone: varchar("zone"),
+  book: varchar("book"),
+  area: jsonb("area").$type<{ id: string; name: string }>(),
+  meterReaderId: varchar("meter_reader_id"),
+  month: integer("month"),
+  year: integer("year"),
+  readingDate: date("reading_date"),
+  dueDate: date("due_date"),
+  disconnectionDate: date("disconnection_date"),
+}).as(sql`
+    select
+        coalesce(s.id::text, '') as id,
+        vzbwa.zone,
+        vzbwa.book,
+        vzbwa.area,
+        coalesce(smr.meter_reader_id::text, '') as meter_reader_id,
+        coalesce(s.reading_date::text, '') as reading_date,
+        coalesce(szb.due_date::text, '') as due_date,
+        coalesce(szb.disconnection_date::text,'') as disconnection_date,
+        extract(month from s.reading_date) as month,
+        extract(year from s.reading_date) as year
+    from view_zone_book_with_area vzbwa
+    left join schedule_zone_books szb
+      on vzbwa.zone = szb.zone
+    and vzbwa.book = szb.book
+    left join schedule_meter_readers smr
+      on szb.schedule_meter_reader_id = smr.id
+    left join schedules s
+      on smr.schedule_id = s.id   
+    order by vzbwa.zone, vzbwa.book
   `);

@@ -3,6 +3,7 @@ import { IBillingAdjustmentRepository } from "./interfaces/billing-adjustments/b
 import { IConsumerRepository } from "./interfaces/consumer/consumer.interface.repository";
 import { IDashboardRepository } from "./interfaces/dashboard/dashboard.interface.repository";
 import { IMeterReaderRepository } from "./interfaces/meter-readers/meter-readers.interface.repository";
+import { IReadingRemarkRepository } from "./interfaces/reading-remarks/reading-remark.interface.repository";
 import { IScheduleRepository } from "./interfaces/schedule/schedule.interface.repository";
 import { IZoneBookRepository } from "./interfaces/zone-book/zone-book.interface.repository";
 import { AreaRepository } from "./services/area/area.repository";
@@ -15,6 +16,8 @@ import { DashboardRepository } from "./services/dashboard/dashboard.repository";
 import { DashboardService } from "./services/dashboard/dashboard.service";
 import { MeterReaderRepository } from "./services/meter-readers/meter-readers.repository";
 import { MeterReaderService } from "./services/meter-readers/meter-readers.service";
+import { ReadingRemarkRepository } from "./services/reading-remarks/reading-remark.repository";
+import { ReadingRemarkService } from "./services/reading-remarks/reading-remark.service";
 import { ScheduleRepository } from "./services/schedule/schedule.repository";
 import { ScheduleService } from "./services/schedule/schedule.service";
 import { ZoneBookRepository } from "./services/zone-book/zone-book.repository";
@@ -31,6 +34,7 @@ export class MeterReadingContext {
   private _consumerRepository?: IConsumerRepository;
   private _billingAdjustmentRepository?: IBillingAdjustmentRepository;
   private _dashboardRepository?: IDashboardRepository;
+  private _readingRemarkRepository?: IReadingRemarkRepository;
 
   // Services
   private _meterReaderService?: MeterReaderService;
@@ -40,6 +44,7 @@ export class MeterReadingContext {
   private _consumerService?: ConsumerService;
   private _billingAdjustmentService?: BillingAdjustmentService;
   private _dashboardService?: DashboardService;
+  private _readingRemarkService?: ReadingRemarkService;
 
   private constructor() {}
 
@@ -103,6 +108,14 @@ export class MeterReadingContext {
     return this._dashboardRepository;
   }
 
+  public getReadingRemarkRepository(): IReadingRemarkRepository {
+    if (!this._readingRemarkRepository) {
+      this._readingRemarkRepository = new ReadingRemarkRepository();
+    }
+
+    return this._readingRemarkRepository;
+  }
+
   // Services
   public getMeterReaderService(): MeterReaderService {
     if (!this._meterReaderService) {
@@ -153,6 +166,14 @@ export class MeterReadingContext {
     }
 
     return this._dashboardService;
+  }
+
+  public getReadingRemarkService(): ReadingRemarkService {
+    if (!this._readingRemarkService) {
+      this._readingRemarkService = new ReadingRemarkService(this.getReadingRemarkRepository());
+    }
+
+    return this._readingRemarkService;
   }
 }
 

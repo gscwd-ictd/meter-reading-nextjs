@@ -18,6 +18,7 @@ import { scheduleHandler } from "./routes/schedule";
 import { usage } from "./routes/usage";
 import { billingAdjustmentHandler } from "./routes/billing-adjustments";
 import { dashboardHandler } from "./routes/dashboard";
+import { readingRemarkHandler } from "./routes/reading-remarks";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -57,6 +58,7 @@ function createApp() {
     usage,
     billingAdjustmentHandler,
     dashboardHandler,
+    readingRemarkHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
