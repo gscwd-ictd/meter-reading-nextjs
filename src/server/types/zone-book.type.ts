@@ -17,10 +17,21 @@ export const AssignZoneBookAreaSchema = ZoneBookSchema.pick({
   book: true,
 }).extend({
   area: z.object({
-    id: z.string(),
+    id: z.string().nullish(),
   }),
 });
 
+export const UpdateZoneBookAreaSchema = AssignZoneBookAreaSchema.pick({
+  zone: true,
+  book: true,
+})
+  .partial()
+  .extend({
+    area: z.object({
+      id: z.string().nullish(),
+    }),
+  });
+
 export type ZoneBook = z.infer<typeof ZoneBookSchema>;
 export type AssignZoneBookArea = z.infer<typeof AssignZoneBookAreaSchema>;
-export type UpdateZoneBookArea = z.infer<typeof AssignZoneBookAreaSchema>;
+export type UpdateZoneBookArea = z.infer<typeof UpdateZoneBookAreaSchema>;
