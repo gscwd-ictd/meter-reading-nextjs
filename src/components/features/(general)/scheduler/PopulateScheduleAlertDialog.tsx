@@ -39,12 +39,14 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
 
-  const isDisabled = () =>
-    (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
-      ? true
-      : hasPopulatedMeterReaders
-        ? true
-        : false;
+  // const isDisabled = () =>
+  //   (meterReaders && meterReaders.length < 1) || !scheduleHasSplittedDates
+  //     ? true
+  //     : hasPopulatedMeterReaders
+  //       ? true
+  //       : false;
+
+  const isDisabled = () => (hasPopulatedMeterReaders ? true : false);
 
   const { data: meterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
