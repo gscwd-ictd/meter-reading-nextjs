@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { MeterReader } from "@mr/lib/types/personnel";
 import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { UserAccountsDropdownActions } from "../../user-accounts/UserAccountsDropdownActions";
+import { UserAccountsDropdownActions } from "../../(administration)/user-accounts/UserAccountsDropdownActions";
 
 export const useUserAccountsColumns = (data: MeterReader[]) => {
   const [userAccountsColumns, setUserAccountsColumns] = useState<ColumnDef<MeterReader>[]>([]);
@@ -44,6 +44,7 @@ export const useUserAccountsColumns = (data: MeterReader[]) => {
         accessorKey: "companyId",
         header: "Actions",
         cell: ({ row }) => <UserAccountsDropdownActions meterReader={row.original} />,
+        meta: { exportLabel: "Company ID" },
       },
     ];
 

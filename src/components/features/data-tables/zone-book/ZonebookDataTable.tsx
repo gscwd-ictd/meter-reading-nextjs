@@ -5,7 +5,6 @@ import { DataTable } from "@mr/components/ui/data-table/data-table";
 import { useZonebookColumns } from "./ZonebookColumns";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
 
 export const ZonebookDataTable: FunctionComponent = () => {
@@ -33,7 +32,12 @@ export const ZonebookDataTable: FunctionComponent = () => {
 
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <DataTable data={zoneBooks ? zoneBooks : []} columns={zonebookColumns} loading={isLoading} />
+      <DataTable
+        data={zoneBooks ? zoneBooks : []}
+        columns={zonebookColumns}
+        loading={isLoading}
+        title="Zone & Books"
+      />
     </Suspense>
   );
 };

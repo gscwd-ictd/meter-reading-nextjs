@@ -6,11 +6,9 @@ export const zoneBook = pgTable(
   "zone_book",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
-    areaId: varchar("area_id")
-      .references(() => area.id, {
-        onDelete: "cascade",
-      })
-      .notNull(),
+    areaId: varchar("area_id").references(() => area.id, {
+      onDelete: "cascade",
+    }),
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),

@@ -6,18 +6,22 @@ import {
   scheduleZoneBooks,
   viewScheduleMeterReadingZoneBook,
   viewScheduleReading,
+  viewZoneBookScheduleReader,
 } from "@mr/server/db/schemas/schedules";
 import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.interface.repository";
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateScheduleMeterReader,
   ScheduleMeterReaderZoneBook,
   ScheduleMeterReaderZoneBookSchema,
   ScheduleReading,
   ScheduleReadingSchema,
   ScheduleSchema,
+  ZoneBookScheduleReader,
+  ZoneBookScheduleReaderSchema,
 } from "@mr/server/types/schedule.type";
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
@@ -193,43 +197,15 @@ export class ScheduleRepository implements IScheduleRepository {
       .from(viewScheduleMeterReadingZoneBook)
       .where(eq(viewScheduleMeterReadingZoneBook.scheduleMeterReaderId, scheduleMeterReaderId));
 
-    // const unassigned = await db.pgConn.execute(
-    //   sql`select distinct zone, book, area, zone_book as "zoneBook" from get_schedule_meter_reader_zone_book_status(${scheduleMeterReaderId},'unassigned')`,
-    // );
+    if (!assigned) {
+      throw new HTTPException(404, {
+        message: `schedule meter reader with id ${scheduleMeterReaderId} not found`,
+      });
+    }
 
     const unassigned = await db.pgConn.execute(
       sql`select zone, book, zone_book as "zoneBook", area from get_schedule_unassigned_zone_books( ${assigned.month},  ${assigned.year}, ${assigned.meterReaderId})`,
     );
-    // const preAssigned = await db.pgConn.execute(sql`select
-    //                     szb.zone,
-    //                     szb.book
-    //                 from
-    //                     schedules s
-    //                 left join
-    //                         schedule_meter_readers smr
-    //                             on s.id = smr.schedule_id
-    //                 left join
-    //                         schedule_zone_books szb
-    //                             on smr.id = szb.schedule_meter_reader_id
-    //                 left join
-    //                         view_zone_book_with_area vzba
-    //                             on szb.zone = vzba.zone and szb.book = vzba.book
-    //               where extract(month from s.reading_date) = ${assigned.month}
-    //               and extract(year from s.reading_date) = ${assigned.year}
-    //               and smr.meter_reader_id = ${assigned.meterReaderId}`);
-
-    // const preDefault = await db.pgConn.execute(
-    //   sql`select * from view_meter_reader_with_zone_book where id = ${assigned.meterReaderId}`,
-    // );
-
-    // const preDefaultZoneBooks = preDefault.rows[0]?.zone_books ?? [];
-
-    // const assignedZoneBookKeys = preAssigned.rows.map((item) => `${item.zone}-${item.book}`);
-
-    // // Filter out those in preAssigned
-    // const unassigned = preDefaultZoneBooks.filter(
-    //   (item: any) => !assignedZoneBookKeys.includes(`${item.zone}-${item.book}`),
-    // );
 
     return ScheduleMeterReaderZoneBookSchema.parse({
       assigned: assigned.zoneBooks,
@@ -269,15 +245,72 @@ export class ScheduleRepository implements IScheduleRepository {
     return await this.findMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReaderId);
   }
 
+  async removeScheduleMeterReaderById(scheduleMeterReaderId: string) {
+    const scheduleMeterReader =
+      await this.findMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReaderId);
+
+    await db.pgConn
+      .delete(scheduleMeterReaders)
+      .where(eq(scheduleMeterReaders.id, scheduleMeterReaderId))
+      .prepare("delete_schedule_meter_reader_by_id")
+      .execute();
+
+    return scheduleMeterReader;
+  }
+
+  async createScheduleMeterReader(data: CreateScheduleMeterReader): Promise<ScheduleMeterReaderZoneBook> {
+    const [scheduleMeterReader] = await db.pgConn
+      .insert(scheduleMeterReaders)
+      .values({ scheduleId: data.id, meterReaderId: data.meterReaderId })
+      .returning();
+
+    return await this.findMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReader.id);
+  }
+
+  async findZoneBookScheduleReader(month: number, year: number): Promise<ZoneBookScheduleReader[]> {
+    const stmt = await db.pgConn
+      .select()
+      .from(viewZoneBookScheduleReader)
+      .where(
+        or(
+          eq(viewZoneBookScheduleReader.id, ""),
+          and(eq(viewZoneBookScheduleReader.month, month), eq(viewZoneBookScheduleReader.year, year)),
+        ),
+      );
+
+    const result = await Promise.all(
+      stmt.map(async (items) => {
+        if (!items.meterReaderId) {
+          return {
+            ...items,
+            meterReader: {
+              id: "",
+              name: "",
+              photoUrl: "",
+            },
+          };
+        }
+
+        const details = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(items.meterReaderId);
+
+        return { ...items, meterReader: details };
+      }),
+    );
+
+    return ZoneBookScheduleReaderSchema.array().parse(result);
+  }
+
   /* 
             sql function do not delete please
 
-            create or replace function get_schedule_unassigned_zone_books(
+create or replace function get_schedule_unassigned_zone_books(
   input_month int,
   input_year int,
   input_meter_reader_id uuid
 )
-returns table(zone text, book text) as $$
+returns table(zone varchar, book varchar, zone_book text, area jsonb) as $$
 begin
   return query
   with schedule_meter_reader_assigned_zone_books as (
@@ -295,20 +328,33 @@ begin
   predefault_meter_reader_zone_book as (
     select
       mrzb.zone,
-      mrzb.book
+      mrzb.book,
+      vzbwa.zone_book,
+      vzbwa.area
     from meter_readers mr
     inner join meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
+      left join view_zone_book_with_area vzbwa
+    on vzbwa.zone = mrzb.zone and vzbwa.book = mrzb.book
     where mr.id = input_meter_reader_id
   )
   select
     pmrzb.zone,
-    pmrzb.book
+    pmrzb.book,
+    pmrzb.zone_book,
+    pmrzb.area
   from predefault_meter_reader_zone_book pmrzb
   left join schedule_meter_reader_assigned_zone_books smrazb
     on pmrzb.zone = smrazb.zone and pmrzb.book = smrazb.book
   where smrazb.zone is null;
 end;
 $$ language plpgsql;
+
+select * from get_schedule_unassigned_zone_books(7,2025, 'b0156f0a-282c-4fe4-9e49-a22985a5b962');
+
+select * from view_zone_book_with_area;
+
+
+
 
     */
 }

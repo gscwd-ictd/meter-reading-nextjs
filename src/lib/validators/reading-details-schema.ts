@@ -1,3 +1,4 @@
+import z from "zod/v3";
 import z4 from "zod/v4";
 
 export const CreateReadingDetailsSchema = z4.object({
@@ -10,32 +11,56 @@ export const CreateReadingDetailsSchema = z4.object({
   meterCode: z4.number(),
   consumerType: z4.string(),
   previousReading: z4.number(),
-  longlat: z4.string().optional(),
+  longlat: z4.string().nullish(),
   zoneCode: z4.string(),
   bookCode: z4.string(),
-  // meterStatus: z4.string(),
+  averageUsage: z4.number().nullish(),
+  otherBalance: z4.number().nullish(),
+
   isRead: z4.boolean(),
   sequenceNumber: z4.string(),
   address: z4.string(),
-  dateInstalled: z4.string(),
   disconnectionType: z4.string(),
-  readingDate: z4.string().optional(),
-  dueDate: z4.string(),
-  disconnectionDate: z4.string(),
-  reconnectionDate: z4.string(),
-  contactNumber: z4.string(),
+
+  dateInstalled: z4.coerce.date().nullish(),
+  readingDate: z4.coerce.date().nullish(),
+  dueDate: z4.coerce.date().nullish(),
+  disconnectionDate: z4.coerce.date().nullish(),
+  reconnectionDate: z4.coerce.date().nullish(),
+
+  contactNumber: z4.string().nullish(),
   classification: z4.string(),
   arrears: z4.number(),
-  currentReading: z4.number().nullable(),
-  billedAmount: z4.number().nullable(),
-  remarks: z4.string().nullable(),
-  additionalRemarks: z4.string().nullable(),
-  image: z4.string().nullable(),
-  printCount: z4.number().nullable(),
+  currentReading: z4.number().nullish(),
+  billedAmount: z4.number().nullish(),
+  remarks: z4.string().nullish(),
+  additionalRemarks: z4.string().nullish(),
+  image: z4.string().nullish(),
+  printCount: z4.number().nullish(),
+
+  isSenior: z4.boolean(),
+  isConnected: z4.boolean(),
+  meterSize: z4.string(),
+
+  penaltyAmount: z4.number().nullish(),
+  seniorDiscount: z4.number().nullish(),
+  changeMeterAmount: z4.number().nullish(),
+  timeStart: z4.coerce.date().nullish(),
+  timeEnd: z4.coerce.date().nullish(),
+  previousBillDate: z4.coerce.date().nullish(),
+  createdAt: z4.coerce.date().nullish(),
 });
 
-export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial().omit({
-  id: true,
-});
+export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
+  .omit({
+    id: true,
+  })
+  .extend({
+    meterReader: z4.string().nullish(),
+  });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
+
+// const test: ReadingDetails = {
+//   longlat,
+// };

@@ -2,9 +2,9 @@ import z4 from "zod/v4";
 
 export const CreateLeakageSchema = z4.object({
   id: z4.uuid(),
-  nearestMeterNumber: z4.string().nullable(),
-  remarks: z4.string().nullable(),
-  additionalRemarks: z4.string().nullable(),
+  nearestMeterNumber: z4.string().nullish(),
+  remarks: z4.string().nullish(),
+  additionalRemarks: z4.string().nullish(),
   dateTime: z4.date(),
 });
 

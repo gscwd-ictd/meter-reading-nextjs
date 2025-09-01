@@ -5,6 +5,7 @@ import {
   CreateMeterReaderScheduleReadingSchema,
   //CreateMeterReaderScheduleZoneBookSchema,
   CreateMonthScheduleSchema,
+  CreateScheduleMeterReaderSchema,
   ScheduleQuerySchema,
 } from "../types/schedule.type";
 
@@ -60,7 +61,6 @@ const scheduleRoutes = new Hono()
 
   .get("/meter-reader/:scheduleMeterReaderId/zone-books", async (c) => {
     const scheduleMeterReaderId = c.req.param("scheduleMeterReaderId");
-    console.log(scheduleMeterReaderId);
     const result = await scheduleService.getMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReaderId);
     return c.json(result);
   })
@@ -70,6 +70,28 @@ const scheduleRoutes = new Hono()
     const result = await scheduleService.addMeterReaderScheduleZoneBook(body);
 
     return c.json(result, 201);
-  });
+  })
 
+  .delete("/meter-reader/:scheduleMeterReaderId", async (c) => {
+    const scheduleMeterReaderId = c.req.param("scheduleMeterReaderId");
+    const result = await scheduleService.deleteScheduleMeterReaderById(scheduleMeterReaderId);
+    return c.json(result);
+  })
+
+  .post("/meter-reader", zValidator("json", CreateScheduleMeterReaderSchema), async (c) => {
+    const body = c.req.valid("json");
+    const result = await scheduleService.addScheduleMeterReader(body);
+
+    return c.json(result, 201);
+  })
+
+  .get("/zone-book", zValidator("query", ScheduleQuerySchema), async (c) => {
+    const { date } = c.req.valid("query");
+
+    const [year, month] = date.split("-").map(Number);
+
+    const result = await scheduleService.getZoneBookScheduleReader(month, year);
+
+    return c.json(result);
+  });
 export const scheduleHandler = new Hono().route("/schedules", scheduleRoutes);

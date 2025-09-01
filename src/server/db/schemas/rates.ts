@@ -1,4 +1,4 @@
-import { foreignKey, index, integer, pgTable, real, text, unique, varchar } from "drizzle-orm/pg-core";
+import { foreignKey, integer, pgTable, real, text, unique, varchar } from "drizzle-orm/pg-core";
 import { readingDetails } from "./reading-details";
 
 export const rates = pgTable(

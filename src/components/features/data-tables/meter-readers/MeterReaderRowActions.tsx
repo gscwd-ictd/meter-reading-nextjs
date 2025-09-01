@@ -10,10 +10,10 @@ import {
 } from "@mr/components/ui/DropdownMenu";
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { FunctionComponent, useState } from "react";
-import { EditMeterReaderDialog } from "../../meter-readers/EditMeterReaderDialog";
+import { EditMeterReaderDialog } from "../../(general)/meter-readers/EditMeterReaderDialog";
 import { MeterReader } from "@mr/lib/types/personnel";
-import { DeleteMeterReaderDialog } from "../../meter-readers/DeleteMeterReaderDialog";
-import { ViewAssignedZonebooksDialog } from "../../meter-readers/ViewAssignedZonebooksDialog";
+import { DeleteMeterReaderDialog } from "../../(general)/meter-readers/DeleteMeterReaderDialog";
+import { ViewAssignedZonebooksDialog } from "../../(general)/meter-readers/ViewAssignedZonebooksDialog";
 
 type MeterReaderRowActionsProps = {
   meterReader: MeterReader;

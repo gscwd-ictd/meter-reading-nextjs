@@ -1,13 +1,7 @@
 import {
   Calendar,
   LucideIcon,
-  Megaphone,
-  Package,
-  Settings,
   MapPinned,
-  BookOpen,
-  Send,
-  CircleHelp,
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
@@ -15,8 +9,11 @@ import {
   MessageCircleWarning,
   FileText,
   Book,
-  Scan,
   UserCog2,
+  CircleDashed,
+  SquaresSubtract,
+  Proportions,
+  BetweenHorizonalStart,
 } from "lucide-react";
 
 import UserIcon from "@images/user-icon.svg";
@@ -50,7 +47,7 @@ export const mainNav: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: Package,
+    icon: SquaresSubtract,
   },
   {
     title: "Meter Readers",
@@ -58,45 +55,61 @@ export const mainNav: NavItem[] = [
     icon: Users2Icon,
   },
   {
+    title: "Zonebooks",
+    url: "/zonebooks",
+    icon: Book,
+  },
+  {
     title: "Schedules",
     url: `/schedules?date=${currentYearMonth}`,
     icon: Calendar,
   },
-  {
-    title: "Zonebooks",
-    icon: MapPinned,
-    children: [
-      { title: "List", url: "/zonebooks-list", icon: Book },
-      { title: "Areas", url: "/areas", icon: Scan },
-    ],
-  },
+
   {
     title: "Text Blast",
     url: "/text-blast",
     icon: MessageCircleWarning,
   },
+];
+
+export const reportsNav: NavItem[] = [
+  { title: "Progress", url: "/progress", icon: CircleDashed },
   {
-    title: "Text Blast Reports",
-    url: "/blast-reports",
+    title: "Reports",
     icon: FileText,
-  },
-  {
-    title: "Notifications",
-    url: "/notifications",
-    icon: Megaphone,
+    children: [
+      {
+        title: "Meter Reading Schedule",
+        url: "/reports/meter-reading-schedule",
+      },
+      {
+        title: "Monthly Billing Summary",
+        url: "/reports/monthly-billing-summary",
+      },
+      {
+        title: "Summary of Bills",
+        url: "/reports/summary-of-bills",
+      },
+      {
+        title: "Text Blast",
+        url: "/reports/text-blast",
+      },
+    ],
   },
 ];
 
 export const secondaryNav: NavItem[] = [
+  { title: "Areas", url: "/areas", icon: MapPinned },
+  { title: "Billing Adjustments", url: "/billing-adjustments", icon: Proportions },
+  {
+    title: "Reading Remarks",
+    url: "/reading-remarks",
+    icon: BetweenHorizonalStart,
+  },
   {
     title: "User Accounts",
     url: "/user-accounts",
     icon: UserCog2,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 

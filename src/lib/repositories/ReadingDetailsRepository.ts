@@ -34,7 +34,16 @@ export class ReadingDetailsRepository implements I_Crud<ReadingDetails> {
   }
 
   async update(id: string, dto: Omit<Partial<ReadingDetails>, "id">): Promise<ReadingDetails> {
-    throw new Error("Method not implemented.");
+    try {
+      const res = await db.pgConn
+        .update(readingDetails)
+        .set(dto)
+        .where(eq(readingDetails.id, id))
+        .returning();
+      return res[0];
+    } catch (error) {
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<{ status: string }> {
