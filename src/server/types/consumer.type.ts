@@ -18,13 +18,13 @@ export const ConsumerSchema = z.object({
   meterCode: z.string(),
   meterSize: z.string(),
   isConnected: z.coerce.boolean(),
-  dateConnected: z.coerce.date(),
-  disconnectionDate: z.coerce.date(),
+  dateConnected: z.coerce.string(),
+  disconnectionDate: z.coerce.string(),
   averageUsage: z.coerce.number(),
   waterBalance: z.coerce.number(),
   otherBalance: z.coerce.number(),
   previousReading: z.coerce.number(),
-  previousBillingDate: z.coerce.date(),
+  previousBillingDate: z.coerce.string(),
   location: z.coerce.string(),
   billingAdjustments: BillingAdjustmentSchema.pick({
     name: true,
@@ -69,7 +69,7 @@ export const ScheduleMeterReadingSchema = z.object({
 export const ScheduleReadingAccountSchema = z
   .object({
     meterReaderId: z.string(),
-    readingDate: z.coerce.date(),
+    readingDate: z.coerce.string(),
     zoneBooks: z
       .object({
         zone: z.string(),
