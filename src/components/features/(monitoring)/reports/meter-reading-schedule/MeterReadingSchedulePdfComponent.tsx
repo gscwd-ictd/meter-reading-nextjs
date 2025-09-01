@@ -22,8 +22,10 @@ export const MeterReadingSchedulePdfComponent = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-1 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
+    <div className="flex h-full flex-col gap-2">
+      {/* Key changes here */}
+
+      <div className="grid flex-shrink-0 grid-cols-1 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
         <div>
           <h3 className="mt-5 text-xl font-bold">Report on Meter Reading Schedule</h3>
           <div className="mb-5 text-base font-medium text-gray-400"></div>
@@ -31,7 +33,9 @@ export const MeterReadingSchedulePdfComponent = () => {
 
         <YearMonthPickerWithSubmit value={yearMonth} onChange={setYearMonth} onSubmit={handleGenerate} />
       </div>
-      <ScheduleTable yearMonth={submittedYearMonth} />
+      <div className="mt-4 min-h-0 flex-1 overflow-auto">
+        <ScheduleTable yearMonth={submittedYearMonth} />
+      </div>
     </div>
   );
 };

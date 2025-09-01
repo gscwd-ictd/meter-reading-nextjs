@@ -10,9 +10,14 @@ export const DashboardComponent: FunctionComponent = () => {
   const router = useRouter();
 
   return (
-    <div className="mt-4 flex w-full flex-col gap-6">
+    <div className="mt-4 flex w-full flex-col gap-4">
       {/* Welcome */}
-      <div className="mb-1 text-xl font-bold text-gray-800 dark:text-white">Welcome back</div>
+      <div className="mb-1 flex items-center justify-between">
+        <div className="text-xl font-bold text-gray-800 dark:text-white">Welcome back</div>
+        <div className="text-sm text-gray-500">
+          {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        </div>
+      </div>
 
       {/* Top KPIs */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -69,14 +74,20 @@ export const DashboardComponent: FunctionComponent = () => {
 
       {/* Monthly Progress Section */}
       <DashboardCard
-        title="Monthly Reading Progress"
+        title="Monthly Reading"
         className="col-span-full border bg-white dark:bg-gray-900"
-        icon={`${(1500 / 2500) * 100}%`}
         onButtonClick={() => router.push("/progress/zonebooks")}
       >
-        <div className="space-y-2">
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Progress</span>
+            <span className="font-medium">{Math.round((1500 / 2500) * 100)}%</span>
+          </div>
           <Progress value={(1500 / 2500) * 100} />
-          <div className="text-sm text-gray-500">1500 out of 2500</div>
+          <div className="flex justify-between text-sm text-gray-500">
+            <span>1500 of 2500 completed</span>
+            <span>{2500 - 1500} remaining</span>
+          </div>
         </div>
       </DashboardCard>
     </div>

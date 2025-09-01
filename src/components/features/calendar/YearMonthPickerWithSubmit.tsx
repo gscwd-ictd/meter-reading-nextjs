@@ -59,7 +59,7 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
                 key={month}
                 variant={selectedYear === currentYear && selectedMonth === index ? "default" : "outline"}
                 onClick={() => handleMonthSelect(index)}
-                className="h-6 text-xs"
+                className="h-6 text-xs dark:text-white"
               >
                 {month}
               </Button>

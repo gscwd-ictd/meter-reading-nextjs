@@ -69,7 +69,7 @@ export const DeleteAreaDialog: FunctionComponent<DeleteAreaDialogProps> = ({ are
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete meter reader</AlertDialogTitle>
+          <AlertDialogTitle>Delete area</AlertDialogTitle>
           <AlertDialogDescription>
             Do you want to remove <span className="text-primary font-bold">{area.name}</span> from the list of
             Areas?

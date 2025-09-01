@@ -214,7 +214,7 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         }}
       >
         <DialogHeader className="flex flex-col gap-0">
-          <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold">
+          <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold dark:text-white">
             New Meter Reader
           </DialogTitle>
 

@@ -29,9 +29,11 @@ export default function MeterReadingSchedulePage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <Suspense>
-          <MeterReadingSchedulePdfComponent />
-        </Suspense>
+        <div className="flex-shrink-0">
+          <Suspense>
+            <MeterReadingSchedulePdfComponent />
+          </Suspense>
+        </div>
       </div>
     </>
   );

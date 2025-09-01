@@ -47,6 +47,9 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
     // reset the splittedDates observer
     setScheduleHasSplittedDates(false);
 
+    // this is set to null, null is the default value
+    setScheduleHasSplittedDates(null);
+
     // reset the observer
     setHasSchedule(false);
 

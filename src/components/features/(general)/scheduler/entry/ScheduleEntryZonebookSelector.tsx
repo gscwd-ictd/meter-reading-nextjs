@@ -522,6 +522,95 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
           )}
         </Command>
 
+        <div className="flex flex-col gap-1">
+          <Label className="text-primary font-bold">Assigned Zonebooks</Label>
+          <div className="h-[16rem] overflow-auto rounded border p-0">
+            <Table className="table-auto text-sm" onWheel={(e) => e.stopPropagation()}>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="font-semibold text-gray-600"></TableHead>
+                  <TableHead className="w-[100px] font-semibold text-gray-600">Zone-book</TableHead>
+                  <TableHead className="font-semibold text-gray-600">Zone</TableHead>
+                  <TableHead className="font-semibold text-gray-600">Book</TableHead>
+                  <TableHead className="w-[10rem] font-semibold text-gray-600">Area</TableHead>
+                  <TableHead className="font-semibold text-gray-600">Due</TableHead>
+                  <TableHead className="font-semibold text-gray-600">Disc</TableHead>
+                  <TableHead className="font-semibold text-gray-600"></TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {!isLoading && assignedZonebooks && assignedZonebooks.length > 0 ? (
+                  assignedZonebooks.map((entry) => (
+                    <TableRow key={entry.zoneBook} className="">
+                      <TableCell>
+                        <MapPinCheckIcon className="size-5 text-green-600" />
+                      </TableCell>
+                      <TableCell>{entry.zoneBook}</TableCell>
+                      <TableCell>{entry.zone}</TableCell>
+                      <TableCell>{entry.book}</TableCell>
+                      <TableCell className="w-[10rem]">{entry.area.name}</TableCell>
+                      <TableCell>
+                        {selectedScheduleEntry?.dueDate &&
+                        Array.isArray(selectedScheduleEntry.dueDate) &&
+                        Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                          <ScheduleEntryDueDateSelector
+                            zonebook={entry.zoneBook}
+                            zoneBooks={assignedZonebooks}
+                            setZonebooks={setAssignedZonebooks}
+                            dueDate={entry.dueDate}
+                            disconnectionDate={entry.disconnectionDate}
+                          />
+                        ) : selectedScheduleEntry?.dueDate &&
+                          !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                          format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                        ) : (
+                          "else"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {selectedScheduleEntry?.disconnectionDate &&
+                        Array.isArray(selectedScheduleEntry.disconnectionDate)
+                          ? entry.dueDate && entry.disconnectionDate
+                            ? format(entry.disconnectionDate, "MMM dd, yyyy")
+                            : "-"
+                          : selectedScheduleEntry?.disconnectionDate &&
+                              !Array.isArray(selectedScheduleEntry.disconnectionDate)
+                            ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                            : null}
+                      </TableCell>
+                      <TableCell>
+                        {/* <button onClick={() => handleDelete(entry.zoneBook)}>
+                          <CircleXIcon className="fill-red-600 text-white" />
+                        </button> */}
+                        <RemoveZonebookAlertDialog
+                          zoneBook={entry.zoneBook}
+                          onDelete={() => handleDelete(entry.zoneBook)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="p-4">
+                      <div className="flex w-full items-center justify-center gap-2 text-center">
+                        <span className="text-primary">Loading assigned zonebooks</span>
+                        <LoadingSpinner className="text-primary" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">
+                      No zone books added
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
         <Button
           className="h-[3rem] dark:text-white"
           onClick={handleApplyAllZonebooks}

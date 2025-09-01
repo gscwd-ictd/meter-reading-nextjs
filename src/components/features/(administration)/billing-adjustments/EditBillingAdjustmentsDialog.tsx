@@ -21,6 +21,7 @@ import { Button } from "@mr/components/ui/Button";
 import { PlusCircleIcon } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@mr/components/ui/Input";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@mr/components/ui/Form";
 
 // Zod validation schema
 const billingAdjustmentSchema = z.object({
@@ -36,19 +37,21 @@ const billingAdjustmentSchema = z.object({
 type FormValues = z.infer<typeof billingAdjustmentSchema>;
 
 export const EditBillingAdjustmentsDialog: FunctionComponent = () => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(billingAdjustmentSchema),
     defaultValues: {
       name: "",
       percentage: 0,
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = form;
 
   const selectedBillAdjustment = useBillingAdjustmentsStore((state) => state.selectedBillAdjustment);
 
@@ -109,41 +112,64 @@ export const EditBillingAdjustmentsDialog: FunctionComponent = () => {
     >
       <DialogContent className="max-w-md rounded-xl p-6">
         <DialogHeader>
-          <DialogTitle className="text-primary text-xl font-semibold">Edit Billing Adjustment</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogTitle className="text-primary text-xl font-semibold dark:text-white">
+            Edit Billing Adjustment
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground text-sm">
             Enter a name and its equivalent percentage.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Enter billing adjustment name" {...register("name")} />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-          </div>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter adjustment name" {...field} />
+                  </FormControl>
 
-          <div className="space-y-2">
-            <Label htmlFor="percentage">Percentage</Label>
-            <Input
-              id="percentage"
-              placeholder="Enter percentage (0-100)"
-              type="number"
-              step="0.01"
-              {...register("percentage", { valueAsNumber: true })}
+                  {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+                </FormItem>
+              )}
             />
-            {errors.percentage && <p className="text-sm text-red-500">{errors.percentage.message}</p>}
-          </div>
 
-          <DialogFooter>
-            <Button
-              type="submit"
-              className="mt-4 h-[3rem] w-full"
-              disabled={patchBillingAdjustmentsMutation.isPending}
-            >
-              {patchBillingAdjustmentsMutation.isPending ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <FormField
+              control={form.control}
+              name="percentage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Percentage (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter percentage of adjustment"
+                      {...field}
+                      type="number"
+                      step="0.01"
+                    />
+                  </FormControl>
+
+                  {errors.percentage && (
+                    <p className="mt-1 text-xs text-red-500">{errors.percentage.message}</p>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button
+                type="submit"
+                className="mt-4 h-[3rem] w-full dark:text-white"
+                disabled={patchBillingAdjustmentsMutation.isPending}
+              >
+                {patchBillingAdjustmentsMutation.isPending ? "Saving..." : "Apply Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

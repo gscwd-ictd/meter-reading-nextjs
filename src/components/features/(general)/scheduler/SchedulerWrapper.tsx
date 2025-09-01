@@ -33,7 +33,7 @@ export default function SchedulerWrapper() {
   //   else [];
   // }, [allHolidays]);
 
-  if (isLoading) {
+  if (!holidaysLoaded) {
     return (
       <div className="flex h-full items-center justify-center">
         <LoadingSpinner className="size-8" />
@@ -53,7 +53,7 @@ export default function SchedulerWrapper() {
           </div>
         }
       >
-        <Scheduler holidays={holidays} holidaysLoaded={isLoading} />
+        <Scheduler holidays={holidays} holidaysLoaded={holidaysLoaded} />
       </Suspense>
     </div>
   );

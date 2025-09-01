@@ -37,8 +37,8 @@ type SchedulesStore = {
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
   scheduleEntryIsSplitted: boolean;
   setScheduleEntryIsSplitted: (scheduleEntryIsSplitted: boolean) => void;
-  scheduleHasSplittedDates: boolean;
-  setScheduleHasSplittedDates: (scheduleHasSplittedDates: boolean) => void;
+  scheduleHasSplittedDates: boolean | null;
+  setScheduleHasSplittedDates: (scheduleHasSplittedDates: boolean | null) => void;
   splittedDates: SplitDate[];
   setSplittedDates: (splittedDates: SplitDate[]) => void;
   hasPopulatedMeterReaders: boolean;
