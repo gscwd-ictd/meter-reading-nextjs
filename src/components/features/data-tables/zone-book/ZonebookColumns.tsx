@@ -43,7 +43,7 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
       },
 
       {
-        accessorKey: "rea",
+        accessorKey: "area.name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Area" />,
         filterFn: filterFn,
         cell: ({ row }) => <span>{row.original.area?.name ?? "-"}</span>,

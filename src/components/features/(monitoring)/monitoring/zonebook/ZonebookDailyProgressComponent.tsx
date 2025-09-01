@@ -53,7 +53,7 @@ export const ZonebookDailyProgressComponent = () => {
       <div className="flex justify-center gap-2 px-4 sm:justify-center md:justify-center lg:justify-end">
         <CalendarDateRangePicker onDateChange={setDateRange} initialDate={{ from: new Date() }} />
 
-        <Button onClick={handleSubmit} disabled={!dateRange?.from}>
+        <Button onClick={handleSubmit} disabled={!dateRange?.from} className="dark:text-white">
           Submit
         </Button>
       </div>
