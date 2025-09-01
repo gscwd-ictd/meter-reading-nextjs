@@ -20,16 +20,4 @@ export class ZoneBookService implements IZoneBookService {
   async updateZoneBookArea(zoneBookId: string, data: UpdateZoneBookArea): Promise<ZoneBook> {
     return this.repository.updateZoneBookArea(zoneBookId, data);
   }
-
-  // async getUnassignedAreaZoneBook(): Promise<ZoneBook[]> {
-  //   return await this.repository.findUnassignedAreaZoneBook();
-  // }
-
-  // async getAssignedAreaZoneBook(): Promise<AssignedAreaZoneBook[]> {
-  //   return await this.repository.findAssignedAreaZoneBook();
-  // }
-
-  // async addAssignedAreaZoneBook(data: CreateAssignedAreaZoneBook): Promise<AssignedAreaZoneBook> {
-  //   return await this.repository.createAssignedAreaZoneBook(data);
-  // }
 }

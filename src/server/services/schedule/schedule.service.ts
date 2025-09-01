@@ -6,6 +6,7 @@ import {
   CreateScheduleMeterReader,
   ScheduleMeterReaderZoneBook,
   ScheduleReading,
+  ZoneBookScheduleReader,
 } from "@mr/server/types/schedule.type";
 
 export class ScheduleService implements IScheduleService {
@@ -49,5 +50,9 @@ export class ScheduleService implements IScheduleService {
 
   async addScheduleMeterReader(data: CreateScheduleMeterReader): Promise<ScheduleMeterReaderZoneBook> {
     return await this.repository.createScheduleMeterReader(data);
+  }
+
+  async getZoneBookScheduleReader(month: number, year: number): Promise<ZoneBookScheduleReader[]> {
+    return await this.repository.findZoneBookScheduleReader(month, year);
   }
 }

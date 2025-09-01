@@ -66,23 +66,25 @@ export const ScheduleMeterReadingSchema = z.object({
   }),
 });
 
-export const ScheduleReadingAccountSchema = z.object({
-  meterReaderId: z.string(),
-  readingDate: z.coerce.date(),
-  zoneBooks: z
-    .object({
-      zone: z.string(),
-      book: z.string(),
-      area: z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-      dueDate: z.coerce.date(),
-      disconnectionDate: z.coerce.date(),
-      accounts: ConsumerDetailsSchema.array(),
-    })
-    .array(),
-});
+export const ScheduleReadingAccountSchema = z
+  .object({
+    meterReaderId: z.string(),
+    readingDate: z.coerce.date(),
+    zoneBooks: z
+      .object({
+        zone: z.string(),
+        book: z.string(),
+        area: z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+        dueDate: z.coerce.date(),
+        disconnectionDate: z.coerce.date(),
+        accounts: ConsumerDetailsSchema.array(),
+      })
+      .array(),
+  })
+  .nullish();
 
 export type Consumer = z.infer<typeof ConsumerSchema>;
 export type ScheduleReadingAccount = z.infer<typeof ScheduleReadingAccountSchema>;

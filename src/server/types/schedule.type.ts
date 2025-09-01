@@ -100,6 +100,25 @@ export const CreateScheduleMeterReaderSchema = z.object({
   meterReaderId: z.string(),
 });
 
+export const ZoneBookScheduleReaderSchema = z.object({
+  zone: z.string(),
+  book: z.string(),
+  area: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  meterReader: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      photoUrl: z.coerce.string(),
+    })
+    .optional(),
+  readingDate: z.coerce.string(),
+  dueDate: z.coerce.string(),
+  disconnectionDate: z.coerce.string(),
+});
+
 export type ScheduleQuery = z.infer<typeof ScheduleQuerySchema>;
 export type ScheduleReading = z.infer<typeof ScheduleReadingSchema>;
 export type Schedule = z.infer<typeof ScheduleSchema>;
@@ -107,3 +126,5 @@ export type CreateMonthSchedule = z.infer<typeof CreateMonthScheduleSchema>;
 export type CreateMeterReaderScheduleReading = z.infer<typeof CreateMeterReaderScheduleReadingSchema>;
 export type ScheduleMeterReaderZoneBook = z.infer<typeof ScheduleMeterReaderZoneBookSchema>;
 export type CreateScheduleMeterReader = z.infer<typeof CreateScheduleMeterReaderSchema>;
+
+export type ZoneBookScheduleReader = z.infer<typeof ZoneBookScheduleReaderSchema>;

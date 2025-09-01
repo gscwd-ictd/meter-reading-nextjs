@@ -83,5 +83,15 @@ const scheduleRoutes = new Hono()
     const result = await scheduleService.addScheduleMeterReader(body);
 
     return c.json(result, 201);
+  })
+
+  .get("/zone-book", zValidator("query", ScheduleQuerySchema), async (c) => {
+    const { date } = c.req.valid("query");
+
+    const [year, month] = date.split("-").map(Number);
+
+    const result = await scheduleService.getZoneBookScheduleReader(month, year);
+
+    return c.json(result);
   });
 export const scheduleHandler = new Hono().route("/schedules", scheduleRoutes);

@@ -6,6 +6,7 @@ import {
   scheduleZoneBooks,
   viewScheduleMeterReadingZoneBook,
   viewScheduleReading,
+  viewZoneBookScheduleReader,
 } from "@mr/server/db/schemas/schedules";
 import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.interface.repository";
 import {
@@ -17,8 +18,10 @@ import {
   ScheduleReading,
   ScheduleReadingSchema,
   ScheduleSchema,
+  ZoneBookScheduleReader,
+  ZoneBookScheduleReaderSchema,
 } from "@mr/server/types/schedule.type";
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { and, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
@@ -262,6 +265,41 @@ export class ScheduleRepository implements IScheduleRepository {
       .returning();
 
     return await this.findMeterReaderZoneBookByScheduleMeterReaderId(scheduleMeterReader.id);
+  }
+
+  async findZoneBookScheduleReader(month: number, year: number): Promise<ZoneBookScheduleReader[]> {
+    const stmt = await db.pgConn
+      .select()
+      .from(viewZoneBookScheduleReader)
+      .where(
+        or(
+          eq(viewZoneBookScheduleReader.id, ""),
+          and(eq(viewZoneBookScheduleReader.month, month), eq(viewZoneBookScheduleReader.year, year)),
+        ),
+      );
+
+    const result = await Promise.all(
+      stmt.map(async (items) => {
+        if (!items.meterReaderId) {
+          return {
+            ...items,
+            meterReader: {
+              id: "",
+              name: "",
+              photoUrl: "",
+            },
+          };
+        }
+
+        const details = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(items.meterReaderId);
+
+        return { ...items, meterReader: details };
+      }),
+    );
+
+    return ZoneBookScheduleReaderSchema.array().parse(result);
   }
 
   /* 
