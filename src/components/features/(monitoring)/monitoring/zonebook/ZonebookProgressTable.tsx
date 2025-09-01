@@ -17,15 +17,16 @@ type MeterReaderWithZonebooksReports = {
 
 const columns: ColumnDef<MeterReaderWithZonebooksReports>[] = [
   {
-    accessorKey: "meterReader",
-    header: "Meter Reader",
-    cell: ({ row }) => <div className="text-left font-medium">{row.getValue("meterReader")}</div>,
-  },
-  {
     accessorKey: "zoneBook",
     header: "Zone Book",
     cell: ({ row }) => <div className="text-muted-foreground text-left">{row.getValue("zoneBook")}</div>,
   },
+  {
+    accessorKey: "meterReader",
+    header: "Meter Reader",
+    cell: ({ row }) => <div className="text-left font-medium">{row.getValue("meterReader")}</div>,
+  },
+
   {
     id: "accounts",
     header: "Accounts",

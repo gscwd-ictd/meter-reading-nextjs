@@ -99,7 +99,7 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-primary">Reassign Area to Zonebook</DialogTitle>
+          <DialogTitle className="text-primary dark:text-white">Reassign Area to Zonebook</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">

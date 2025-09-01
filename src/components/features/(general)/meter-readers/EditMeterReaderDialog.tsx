@@ -101,7 +101,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
     mutationFn: async (meterReader: MeterReaderType) => {
       try {
         const transformedEmployee = await transformSelectedPersonnelToSubmit({ ...meterReader });
-        console.log(transformedEmployee);
+
         return await axios.put(
           `${process.env.NEXT_PUBLIC_MR_BE}/meter-readers/${selectedMeterReader.id}`,
           transformedEmployee,
@@ -249,11 +249,11 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         }}
       >
         <DialogHeader className="flex flex-col gap-0">
-          <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold">
-            <Users2Icon className="size-5" /> Update Meter Reader
+          <DialogTitle className="text-primary text-xl font-bold dark:text-white">
+            Update Meter Reader
           </DialogTitle>
 
-          <DialogDescription className="text-gray-500">Edit meter reader details</DialogDescription>
+          <DialogDescription className="text-gray-500">Update meter reader information</DialogDescription>
         </DialogHeader>
         {selectedMeterReader && (
           <FormProvider {...methods}>

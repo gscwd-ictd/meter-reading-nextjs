@@ -66,11 +66,9 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput disabled={sortedList.length === 0} placeholder={title} />
           <CommandList>
-            <CommandEmpty className="dark:text-white">No results found.</CommandEmpty>
+            <CommandEmpty className="p-3 text-sm dark:text-white">No results found.</CommandEmpty>
             <CommandGroup>
-              {sortedList.length === 0 ? (
-                <p className="text-muted-foreground p-2 text-sm">No data</p>
-              ) : (
+              {sortedList.length > 0 &&
                 sortedList.map((list, index) => {
                   const isSelected = selectedValues.has(list);
                   return (
@@ -105,8 +103,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       )}
                     </CommandItem>
                   );
-                })
-              )}
+                })}
             </CommandGroup>
             {selectedValues.size > 0 && (
               <>

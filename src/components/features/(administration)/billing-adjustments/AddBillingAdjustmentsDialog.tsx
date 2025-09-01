@@ -19,8 +19,8 @@ import { BillingAdjustment } from "@mr/lib/types/billing-adjustment";
 import { toast } from "sonner";
 import { Button } from "@mr/components/ui/Button";
 import { PlusCircleIcon } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
 import { Input } from "@mr/components/ui/Input";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@mr/components/ui/Form";
 
 // Zod validation schema
 const billingAdjustmentSchema = z.object({
@@ -43,18 +43,19 @@ export const AddBillingAdjustmentsDialog: FunctionComponent<AddBillingAdjustment
   open,
   setOpen,
 }) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(billingAdjustmentSchema),
     defaultValues: {
       name: "",
       percentage: 0,
     },
   });
+
+  const {
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = form;
 
   const refetch = useBillingAdjustmentsStore((state) => state.refetch);
 
@@ -76,11 +77,13 @@ export const AddBillingAdjustmentsDialog: FunctionComponent<AddBillingAdjustment
       refetch?.();
       setOpen(false);
     },
-    onError: (error) => {
-      toast.error("Error", {
-        description: error.message,
-        position: "top-right",
-      });
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to perform action.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred", { position: "top-right" });
+      }
     },
   });
 
@@ -88,8 +91,13 @@ export const AddBillingAdjustmentsDialog: FunctionComponent<AddBillingAdjustment
     postBillingAdjustmentsMutation.mutate(data);
   };
 
+  const setDefaultValues = () => {
+    reset({ name: "", percentage: 0 });
+    setOpen(!open);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen} modal>
+    <Dialog open={open} onOpenChange={setDefaultValues} modal>
       <DialogTrigger asChild className="w-full sm:w-full md:w-full lg:w-fit">
         <Button variant="default" className="dark:text-white">
           <PlusCircleIcon className="mr-2 h-4 w-4" />
@@ -98,41 +106,64 @@ export const AddBillingAdjustmentsDialog: FunctionComponent<AddBillingAdjustment
       </DialogTrigger>
       <DialogContent className="max-w-md rounded-xl p-6">
         <DialogHeader>
-          <DialogTitle className="text-primary text-xl font-semibold">Add Billing Adjustment</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogTitle className="text-primary text-xl font-semibold dark:text-white">
+            Add Billing Adjustment
+          </DialogTitle>
+          <DialogDescription className="text-muted-foreground text-sm">
             Enter a name and its equivalent percentage.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="Enter billing adjustment name" {...register("name")} />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-          </div>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter adjustment name" {...field} />
+                  </FormControl>
 
-          <div className="space-y-2">
-            <Label htmlFor="percentage">Percentage</Label>
-            <Input
-              id="percentage"
-              placeholder="Enter percentage (0-100)"
-              type="number"
-              step="0.01"
-              {...register("percentage", { valueAsNumber: true })}
+                  {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+                </FormItem>
+              )}
             />
-            {errors.percentage && <p className="text-sm text-red-500">{errors.percentage.message}</p>}
-          </div>
 
-          <DialogFooter>
-            <Button
-              type="submit"
-              className="mt-4 h-[3rem] w-full"
-              disabled={postBillingAdjustmentsMutation.isPending}
-            >
-              {postBillingAdjustmentsMutation.isPending ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <FormField
+              control={form.control}
+              name="percentage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium">Percentage (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter percentage of adjustment"
+                      {...field}
+                      type="number"
+                      step="0.01"
+                    />
+                  </FormControl>
+
+                  {errors.percentage && (
+                    <p className="mt-1 text-xs text-red-500">{errors.percentage.message}</p>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button
+                type="submit"
+                className="mt-4 h-[3rem] w-full dark:text-white"
+                disabled={postBillingAdjustmentsMutation.isPending}
+              >
+                {postBillingAdjustmentsMutation.isPending ? "Saving..." : "Add"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

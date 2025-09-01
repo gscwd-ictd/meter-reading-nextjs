@@ -1,38 +1,39 @@
 "use client";
 
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import { Area } from "@mr/server/types/area.type";
 
 type MeterReader = {
   scheduleMeterReaderId: string;
   id: string;
   name: string;
+  photoUrl: string;
 };
 
 type ScheduleEntry = {
   id: string;
-  readingDate: string; // yyyy-MM-dd
-  dueDate: string; // yyyy-MM-dd
-  disconnectionDate: string; // yyyy-MM-dd
-  meterReaders: MeterReader[];
-  zoneBook: string;
-  area: string;
-  billed: number;
-  remarks: string;
+  readingDate: string;
+  dueDate: string;
+  disconnectionDate: string;
+  meterReader: MeterReader;
+  zone: string;
+  book: string;
+  area: Area;
 };
 
 type ScheduleTableProps = {
-  yearMonth: string; // yyyy-MM
+  yearMonth: string;
 };
 
 export const ScheduleTable: FC<ScheduleTableProps> = ({ yearMonth }) => {
   const { data, isLoading, isError } = useQuery<ScheduleEntry[]>({
     queryKey: ["schedule", yearMonth],
     queryFn: async () => {
-      const res = await axios.get(`/api/schedules?date=${yearMonth}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules/zone-book?date=${yearMonth}`);
       return res.data;
     },
     enabled: !!yearMonth,
@@ -50,42 +51,46 @@ export const ScheduleTable: FC<ScheduleTableProps> = ({ yearMonth }) => {
   if (!data || data.length === 0) return <div>Please input the exact year-month.</div>;
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border border-gray-300 text-sm">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border px-2 py-1">DAY</th>
-            <th className="border px-2 py-1">DATE</th>
-            <th className="border px-2 py-1">DUE</th>
-            <th className="border px-2 py-1">DISC</th>
-            <th className="border px-2 py-1">METER READER</th>
-            <th className="border px-2 py-1">ZONE/BOOK</th>
-            <th className="border px-2 py-1">AREA</th>
-            <th className="border px-2 py-1">BILLED</th>
-            <th className="border px-2 py-1">REMARKS</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((entry) => (
-            <tr key={entry.id}>
-              <td className="border px-2 py-1">{format(parseISO(entry.readingDate), "d")}</td>
-              <td className="border px-2 py-1">{format(parseISO(entry.readingDate), "MMM dd, yyyy")}</td>
-              {/* <td className="border px-2 py-1">{format(parseISO(entry.dueDate), "MMM dd, yyyy")}</td>
-              <td className="border px-2 py-1">
-                {format(parseISO(entry.disconnectionDate), "MMM dd, yyyy")}
-              </td> */}
-              <td className="border px-2 py-1">TEST</td>
-              <td className="border px-2 py-1">TEST</td>
-
-              <td className="border px-2 py-1">{entry.meterReaders.map((mr) => mr.name).join(", ")}</td>
-              <td className="border px-2 py-1">{entry.zoneBook}</td>
-              <td className="border px-2 py-1">{entry.area}</td>
-              <td className="border px-2 py-1">{entry.billed}</td>
-              <td className="border px-2 py-1">{entry.remarks}</td>
+    <div className="flex h-[44rem] flex-col">
+      {" "}
+      {/* Main container */}
+      {/* Table container that takes remaining space */}
+      <div className="min-h-0 flex-1 overflow-auto">
+        {" "}
+        {/* Key changes here */}
+        <table className="min-w-full border border-gray-300 text-sm">
+          <thead>
+            <tr className="sticky top-0 bg-gray-100 dark:bg-black">
+              <th className="border px-2 py-1">DAY</th>
+              <th className="border px-2 py-1">DATE</th>
+              <th className="border px-2 py-1">DUE</th>
+              <th className="border px-2 py-1">DISC</th>
+              <th className="border px-2 py-1">METER READER</th>
+              <th className="border px-2 py-1">ZONE/BOOK</th>
+              <th className="border px-2 py-1">AREA</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((entry, idx) => (
+              <tr key={idx}>
+                <td className="border px-2 py-1">{idx + 1}</td>
+                <td className="border px-2 py-1">
+                  {entry.readingDate ? format(parseISO(entry.readingDate), "MMM dd, yyyy") : ""}
+                </td>
+                <td className="border px-2 py-1">
+                  {entry.dueDate ? format(parseISO(entry.dueDate), "MMM dd, yyyy") : ""}
+                </td>
+                <td className="border px-2 py-1">
+                  {entry.disconnectionDate ? format(parseISO(entry.disconnectionDate), "MMM dd, yyyy") : ""}
+                </td>
+                <td className="border px-2 py-1">{entry.meterReader.name}</td>
+                <td className="border px-2 py-1">{entry.zone + "-" + entry.book}</td>
+                <td className="border px-2 py-1">{entry.area.name}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

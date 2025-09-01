@@ -72,12 +72,12 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
       <AlertDialogTrigger asChild>
         <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-red-600 hover:text-white">
           <UserRoundXIcon className="size-4" />
-          Delete Meter Reader
+          Remove Meter Reader
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete meter reader</AlertDialogTitle>
+          <AlertDialogTitle>Remove meter reader</AlertDialogTitle>
           <AlertDialogDescription>
             Do you want to remove <span className="text-primary font-bold">{selectedMeterReader.name}</span>{" "}
             as a meter reader?
@@ -91,7 +91,7 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
               deleteMeterReader.mutateAsync(selectedMeterReader.id);
             }}
           >
-            Delete
+            Remove
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
