@@ -297,7 +297,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       modal
     >
       <DialogContent
-        className="max-h-full min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[50%]"
+        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[50%]"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -461,7 +461,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
             </div>
           ) : (
             <CommandGroup
-              className="h-[10rem] overflow-auto rounded border"
+              className="h-[16rem] overflow-auto rounded border"
               onWheel={(e) => e.stopPropagation()}
             >
               {!selectedZone && !selectedBook && !unassignedZonebooks && isLoading ? (
@@ -524,7 +524,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
         <div className="flex flex-col gap-1">
           <Label className="text-primary font-bold">Assigned Zonebooks</Label>
-          <div className="h-[16rem] overflow-auto rounded border p-0">
+          <div className="h-[22rem] overflow-auto rounded border p-0">
             <Table className="table-auto text-sm" onWheel={(e) => e.stopPropagation()}>
               <TableHeader>
                 <TableRow>
