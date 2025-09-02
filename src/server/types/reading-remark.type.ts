@@ -3,8 +3,8 @@ import z from "zod";
 export const ReadingRemarkSchema = z.object({
   id: z.string(),
   name: z.string(),
-  isAverage: z.coerce.boolean().nullish(),
-  isActive: z.coerce.boolean().nullish(),
+  isAverage: z.boolean(),
+  isActive: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().nullable(),
 });
