@@ -133,7 +133,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
         </div>
       </DialogTrigger>
       <DialogContent
-        className="overflow-y-auto"
+        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[50%]"
         hideClose
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
@@ -284,7 +284,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
             </div>
           ) : (
             <CommandGroup
-              className="h-[8rem] overflow-auto rounded border"
+              className="h-[16rem] overflow-auto rounded border"
               onWheel={(e) => e.stopPropagation()}
             >
               {!selectedZone && !selectedBook && !tempFilteredZonebooks && loading ? (
@@ -340,7 +340,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
         </Command>
         <div className="flex flex-col gap-1">
           <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
-          <div className="h-[16rem] overflow-y-scroll rounded border p-0">
+          <div className="h-[22rem] overflow-y-scroll rounded border p-0">
             <Table className="table-fixed text-sm" onWheel={(e) => e.stopPropagation()}>
               <TableHeader>
                 <TableRow>
