@@ -19,12 +19,14 @@ import {
   MeterReaderDetails,
   MeterReaderDetailsSchema,
 } from "@mr/server/types/meter-reader.type";
-import { eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { MySqlQueryResult } from "drizzle-orm/mysql2";
 import { HTTPException } from "hono/http-exception";
 import { ZoneBook, ZoneBookSchema } from "@mr/server/types/zone-book.type";
 import { loginAccounts } from "@mr/server/db/schemas/login-accounts";
 import * as argon2 from "argon2";
+import { ScheduleReadingAccount, ScheduleReadingAccountSchema } from "@mr/server/types/consumer.type";
+import { scheduleReadingAccountView } from "@mr/server/db/schemas/consumer";
 
 export class MeterReaderRepository implements IMeterReaderRepository {
   async findEmployeeDetailsByName(query: string): Promise<EmployeeDetails[]> {
@@ -293,5 +295,24 @@ export class MeterReaderRepository implements IMeterReaderRepository {
 
     // Step 4: Return the previously fetched data (before deletion)
     return findMeterReader;
+  }
+
+  async findScheduleReadingAccountByMeterReader(meterReaderId: string): Promise<ScheduleReadingAccount> {
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    });
+
+    const result = await db.pgConn
+      .select()
+      .from(scheduleReadingAccountView)
+      .where(
+        and(
+          eq(scheduleReadingAccountView.meterReaderId, meterReaderId),
+          //MM-dd-yyyy
+          eq(scheduleReadingAccountView.readingDate, today),
+        ),
+      );
+
+    return ScheduleReadingAccountSchema.parse(result[0]);
   }
 }

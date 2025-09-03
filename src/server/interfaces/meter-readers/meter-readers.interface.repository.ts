@@ -1,3 +1,4 @@
+import { ScheduleReadingAccount } from "@mr/server/types/consumer.type";
 import {
   EmployeeDetails,
   MeterReader,
@@ -36,4 +37,6 @@ export interface IMeterReaderRepository {
   updateMeterReaderById(id: string, data: AssignMeterReader): Promise<MeterReader>;
 
   removeMeterReaderById(meterReaderId: string): Promise<MeterReader>;
+
+  findScheduleReadingAccountByMeterReader(meterReaderId: string): Promise<ScheduleReadingAccount>;
 }
