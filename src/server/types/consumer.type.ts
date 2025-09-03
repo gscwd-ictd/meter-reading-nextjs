@@ -29,7 +29,9 @@ export const ConsumerSchema = z.object({
   billingAdjustments: BillingAdjustmentSchema.pick({
     name: true,
     percentage: true,
-  }).array(),
+  })
+    .array()
+    .optional(),
 });
 
 export const ConsumerUsageSchema = z.object({
@@ -87,5 +89,6 @@ export const ScheduleReadingAccountSchema = z
   .nullish();
 
 export type Consumer = z.infer<typeof ConsumerSchema>;
+export type ConsumerDetails = z.infer<typeof ConsumerDetailsSchema>;
 export type ScheduleReadingAccount = z.infer<typeof ScheduleReadingAccountSchema>;
 export type ScheduleMeterReading = z.infer<typeof ScheduleMeterReadingSchema>;

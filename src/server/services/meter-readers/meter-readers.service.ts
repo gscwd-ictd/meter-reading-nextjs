@@ -1,5 +1,6 @@
 import { IMeterReaderRepository } from "@mr/server/interfaces/meter-readers/meter-readers.interface.repository";
 import { IMeterReaderService } from "@mr/server/interfaces/meter-readers/meter-readers.interface.service";
+import { ScheduleReadingAccount } from "@mr/server/types/consumer.type";
 import {
   EmployeeDetails,
   MeterReader,
@@ -59,5 +60,9 @@ export class MeterReaderService implements IMeterReaderService {
 
   async deleteMeterReaderById(meterReaderId: string): Promise<MeterReader> {
     return await this.repository.removeMeterReaderById(meterReaderId);
+  }
+
+  async getScheduleReadingAccountByMeterReader(meterReaderId: string): Promise<ScheduleReadingAccount> {
+    return await this.repository.findScheduleReadingAccountByMeterReader(meterReaderId);
   }
 }
