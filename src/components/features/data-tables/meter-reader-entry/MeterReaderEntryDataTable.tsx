@@ -11,8 +11,6 @@ type MeterReaderDataTableProps = {
 };
 
 export const MeterReaderEntryDataTable: FunctionComponent<MeterReaderDataTableProps> = ({ meterReaders }) => {
-  // const [meterReaders, setMeterReaders] = useState<MeterReader[]>([]);
-
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
 
   const meterReaderEntryColumns = useMeterReaderEntryColumns(selectedScheduleEntry?.meterReaders);

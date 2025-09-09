@@ -29,6 +29,8 @@ const readingRemarksSchema = z.object({
   name: z.string().min(1, "Name is required"),
   isAverage: z.boolean(),
   isActive: z.boolean(),
+  isZeroConsumption: z.boolean(),
+  isNegativeConsumption: z.boolean(),
 });
 
 type FormValues = z.infer<typeof readingRemarksSchema>;
@@ -48,6 +50,8 @@ export const AddReadingRemarksDialog: FunctionComponent<AddReadingRemarksDialogP
       name: "",
       isAverage: false,
       isActive: true,
+      isNegativeConsumption: false,
+      isZeroConsumption: false,
     },
   });
 
@@ -67,6 +71,8 @@ export const AddReadingRemarksDialog: FunctionComponent<AddReadingRemarksDialogP
         name: data.name,
         isAverage: data.isAverage,
         isActive: data.isActive,
+        isZeroConsumption: data.isZeroConsumption,
+        isNegativeConsumption: data.isNegativeConsumption,
       });
       return res.data;
     },
@@ -119,7 +125,7 @@ export const AddReadingRemarksDialog: FunctionComponent<AddReadingRemarksDialogP
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
             {/* Remark name */}
             <FormField
               control={form.control}
@@ -176,12 +182,50 @@ export const AddReadingRemarksDialog: FunctionComponent<AddReadingRemarksDialogP
               )}
             />
 
+            {/* Zero Consumption toggle */}
+            <FormField
+              control={form.control}
+              name="isZeroConsumption"
+              render={({ field }) => (
+                <FormItem className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition">
+                  <div>
+                    <FormLabel className="font-medium">Zero</FormLabel>
+                    <FormDescription className="text-muted-foreground text-xs">
+                      Does it have a zero consumption?
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Negative Consumption toggle */}
+            <FormField
+              control={form.control}
+              name="isNegativeConsumption"
+              render={({ field }) => (
+                <FormItem className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition">
+                  <div>
+                    <FormLabel className="font-medium">Average</FormLabel>
+                    <FormDescription className="text-muted-foreground text-xs">
+                      Does it have a negative consumption?
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
             {/* Footer */}
-            <DialogFooter className="flex justify-end space-x-2">
+            <DialogFooter className="flex justify-center space-x-2">
               <Button
                 type="submit"
                 disabled={postReadingRemarksMutation.isPending}
-                className="w-full px-6 dark:text-white"
+                className="mt-2 w-full px-6 dark:text-white"
               >
                 {postReadingRemarksMutation.isPending ? "Saving..." : "Add Remark"}
               </Button>

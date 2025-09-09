@@ -478,8 +478,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
                   >
                     <MapPinIcon className="text-primary size-5" />
-                    <span className="col-span-2 font-medium text-gray-600 dark:text-white">
-                      {zb.zoneBook}
+                    <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                      Zone {zb.zone}
+                    </span>
+                    <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                      Book {zb.book}
                     </span>
                     <span className="col-span-9 font-medium text-black dark:text-white">{zb.area.name}</span>
                   </CommandItem>
@@ -495,8 +498,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
                     >
                       <MapPinIcon className="text-primary size-5" />
-                      <span className="col-span-2 font-medium text-gray-600 dark:text-white">
-                        {zb.zoneBook}
+                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                        Zone {zb.zone}
+                      </span>
+                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                        Book {zb.book}
                       </span>
                       <span className="col-span-9 font-medium text-black dark:text-white">
                         {zb.area.name}
@@ -509,8 +515,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   .map((zb, idx) => (
                     <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
                       <MapPinCheckIcon className="size-5 text-green-600" />
-                      <span className="col-span-2 font-medium text-gray-600 dark:text-white">
-                        {zb.zoneBook}
+                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                        Zone {zb.zone}
+                      </span>
+                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
+                        Book {zb.book}
                       </span>
                       <span className="col-span-9 font-medium text-black dark:text-white">
                         {zb.area.name}
@@ -529,7 +538,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-semibold text-gray-600"></TableHead>
-                  <TableHead className="w-[100px] font-semibold text-gray-600">Zone-book</TableHead>
+                  {/* <TableHead className="w-[100px] font-semibold text-gray-600">Zone-book</TableHead> */}
                   <TableHead className="font-semibold text-gray-600">Zone</TableHead>
                   <TableHead className="font-semibold text-gray-600">Book</TableHead>
                   <TableHead className="w-[10rem] font-semibold text-gray-600">Area</TableHead>
@@ -546,7 +555,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                       <TableCell>
                         <MapPinCheckIcon className="size-5 text-green-600" />
                       </TableCell>
-                      <TableCell>{entry.zoneBook}</TableCell>
+                      {/* <TableCell>{entry.zoneBook}</TableCell> */}
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
                       <TableCell className="w-[10rem]">{entry.area.name}</TableCell>

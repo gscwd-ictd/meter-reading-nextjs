@@ -1,11 +1,13 @@
-import { MeterReader } from "./personnel";
-
 export type Zonebook = {
   zoneBook: string;
   zone: string;
   book: string;
   area: Area;
   id?: string;
+};
+
+export type ZonebookReassignment = Zonebook & {
+  meterReader: { name: string; id: string };
 };
 
 export type ZonebookWithDates = Zonebook & {
@@ -19,7 +21,6 @@ export type Area = {
 };
 
 export type Reassignment = {
-  meterReaders: MeterReader[];
-  zonebooks: ZonebookWithDates;
+  zonebooks: ZonebookReassignment[];
   remarks: string;
 };

@@ -3,13 +3,14 @@
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { MapPinnedIcon } from "lucide-react";
+import { ArrowRightLeftIcon, MapPinnedIcon, Trash2 } from "lucide-react";
 import { FunctionComponent } from "react";
 import { ScheduleEntryZonebookSelector } from "../../(general)/scheduler/entry/ScheduleEntryZonebookSelector";
 import { RemoveMeterReaderAlertDialog } from "../../(general)/scheduler/entry/RemoveMeterReaderAlertDialog";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { MeterReaderReassignmentDialog } from "../../(general)/scheduler/entry/MeterReaderReassignmentDialog";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -22,6 +23,10 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
 }) => {
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
+  const setRemoveMeterReaderEntryIsOpen = useSchedulesStore((state) => state.setRemoveMeterReaderEntryIsOpen);
+  const setMeterReaderZoneBookReassignmentDialogIsOpen = useSchedulesStore(
+    (state) => state.setMeterReaderZoneBookReassignmentDialogIsOpen,
+  );
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const reset = useSchedulesStore((state) => state.reset);
@@ -29,6 +34,17 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
     setEntryZonebookSelectorIsOpen(true);
+  };
+
+  const openRemoveMeterReaderEntry = (meterReader: MeterReaderWithZonebooks) => {
+    setSelectedMeterReader(meterReader);
+    setRemoveMeterReaderEntryIsOpen(true);
+  };
+
+  const openReassignment = (meterReader: MeterReaderWithZonebooks) => {
+    setSelectedMeterReader(meterReader);
+    console.log(meterReader);
+    setMeterReaderZoneBookReassignmentDialogIsOpen(true);
   };
 
   const removeMeterReader = async (id: string) => {
@@ -60,7 +76,9 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
 
   return (
     <>
+      <MeterReaderReassignmentDialog />
       <ScheduleEntryZonebookSelector />
+      <RemoveMeterReaderAlertDialog onDelete={removeMeterReader} />
       <div className="flex grid-cols-2 gap-2">
         <div className="col-span-1">
           <Button
@@ -69,15 +87,32 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
             size="sm"
             onClick={() => openZonebookSelector(meterReader)}
           >
-            <MapPinnedIcon className="size-2 sm:size-4 lg:size-4 dark:text-white" />
+            <MapPinnedIcon className="size-3 sm:size-4 lg:size-3 dark:text-white" />
             <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Zonebooks</span>
           </Button>
         </div>
         <div className="col-span-1">
-          <RemoveMeterReaderAlertDialog
-            meterReader={meterReader}
-            onDelete={() => removeMeterReader(meterReader.scheduleMeterReaderId!)}
-          />
+          <Button
+            className="w-full px-2"
+            variant="default"
+            size="sm"
+            // disabled
+            onClick={() => openReassignment(meterReader)}
+          >
+            <ArrowRightLeftIcon className="size-3 sm:size-4 lg:size-3 dark:text-white" />
+            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Reassign</span>
+          </Button>
+        </div>
+        <div className="col-span-1">
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex gap-1"
+            onClick={() => openRemoveMeterReaderEntry(meterReader)}
+          >
+            <Trash2 className="size-3 sm:size-4 lg:size-3 dark:text-white" />
+            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white">Remove</span>
+          </Button>
         </div>
       </div>
     </>

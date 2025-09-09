@@ -25,7 +25,7 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
   }, [isPopoverOpen]);
 
   if (!zonebooks || zonebooks.length === 0) {
-    return <span className="text-muted-foreground text-sm">No zone books</span>;
+    return <span className="text-muted-foreground text-xs">No zone books</span>;
   }
 
   return (

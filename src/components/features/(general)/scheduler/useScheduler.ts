@@ -660,6 +660,7 @@ export const useScheduler = (holidays: Holiday[]) => {
     (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
       const transformMeterReaders: MeterReaderWithZonebooks[] = meterReaders.map((mr) => ({
         ...mr,
+        reassignment: { remarks: "", zonebooks: [] },
         zoneBooks: mr.zoneBooks.map((zb) => ({ ...zb, dueDate: undefined, disconnectionDate: undefined })),
       }));
 

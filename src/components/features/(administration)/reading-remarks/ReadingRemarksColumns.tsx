@@ -47,6 +47,31 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
         enableSorting: true,
       },
       {
+        accessorKey: "isZeroConsumption",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Zero Consumption" />,
+        cell: ({ row }) => (
+          <>
+            <span>{row.original.isZeroConsumption ? "Yes" : "No"}</span>
+          </>
+        ),
+        enableColumnFilter: true,
+        meta: { exportLabel: "Is Zero Consumption" },
+        enableSorting: true,
+      },
+      {
+        accessorKey: "isNegativeConsumption",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Negative Consumption" />,
+        cell: ({ row }) => (
+          <>
+            <span>{row.original.isNegativeConsumption ? "Yes" : "No"}</span>
+          </>
+        ),
+        enableColumnFilter: true,
+        meta: { exportLabel: "Is Negative Consumption" },
+        enableSorting: true,
+      },
+
+      {
         accessorKey: "id",
         header: "Actions",
         enableColumnFilter: false,
@@ -57,6 +82,8 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
               id: row.original.id!,
               isActive: row.original.isActive,
               isAverage: row.original.isAverage,
+              isNegativeConsumption: row.original.isNegativeConsumption,
+              isZeroConsumption: row.original.isZeroConsumption,
             }}
           />
         ),

@@ -1,4 +1,4 @@
-import { Zonebook, ZonebookWithDates } from "./zonebook";
+import { Reassignment, Zonebook, ZonebookWithDates } from "./zonebook";
 
 export type Employee = {
   name: string;
@@ -26,11 +26,7 @@ export type MeterReaderWithZonebooks = Employee & {
   scheduleMeterReaderId?: string;
   restDay: "sunday" | "saturday" | undefined;
   zoneBooks: ZonebookWithDates[];
-  // reassignment: {
-  //   isReassigned: boolean;
-  //   reassignedTo: string; // meter reader id
-  //   remarks: string; // leave etc.
-  // };
+  reassignment: Reassignment;
 
   // recommendedZonebooks?: ZonebookWithDates[];
 };
