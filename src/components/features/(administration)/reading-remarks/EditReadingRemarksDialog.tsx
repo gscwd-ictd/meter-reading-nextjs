@@ -26,6 +26,8 @@ const readingRemarksSchema = z.object({
   name: z.string().min(1, "Name is required"),
   isAverage: z.boolean(),
   isActive: z.boolean(),
+  isZeroConsumption: z.boolean(),
+  isNegativeConsumption: z.boolean(),
 });
 
 type FormValues = z.infer<typeof readingRemarksSchema>;
@@ -47,6 +49,8 @@ export const EditReadingRemarksDialog: FunctionComponent<EditReadingRemarksDialo
       name: "",
       isAverage: false,
       isActive: true,
+      isNegativeConsumption: false,
+      isZeroConsumption: false,
     },
   });
 
@@ -66,6 +70,8 @@ export const EditReadingRemarksDialog: FunctionComponent<EditReadingRemarksDialo
         name: readingRemark.name || "",
         isAverage: readingRemark.isAverage || false,
         isActive: readingRemark.isActive !== undefined ? readingRemark.isActive : true,
+        isNegativeConsumption: readingRemark.isNegativeConsumption || false,
+        isZeroConsumption: readingRemark.isZeroConsumption || false,
       });
     }
   }, [readingRemark, reset]);
@@ -77,6 +83,8 @@ export const EditReadingRemarksDialog: FunctionComponent<EditReadingRemarksDialo
         name: data.name,
         isAverage: data.isAverage,
         isActive: data.isActive,
+        isNegativeConsumption: data.isNegativeConsumption,
+        isZeroConsumption: data.isZeroConsumption,
       });
       return res.data;
     },
@@ -125,7 +133,7 @@ export const EditReadingRemarksDialog: FunctionComponent<EditReadingRemarksDialo
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
             {/* Remark name */}
             <FormField
               control={control}
@@ -182,15 +190,50 @@ export const EditReadingRemarksDialog: FunctionComponent<EditReadingRemarksDialo
               )}
             />
 
+            {/* Zero Consumption toggle */}
+            <FormField
+              control={form.control}
+              name="isZeroConsumption"
+              render={({ field }) => (
+                <FormItem className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition">
+                  <div>
+                    <FormLabel className="font-medium">Zero</FormLabel>
+                    <FormDescription className="text-muted-foreground text-xs">
+                      Does it have a zero consumption?
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Negative Consumption toggle */}
+            <FormField
+              control={form.control}
+              name="isNegativeConsumption"
+              render={({ field }) => (
+                <FormItem className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-4 transition">
+                  <div>
+                    <FormLabel className="font-medium">Average</FormLabel>
+                    <FormDescription className="text-muted-foreground text-xs">
+                      Does it have a negative consumption?
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
             {/* Footer */}
-            <DialogFooter className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="px-6">
-                Cancel
-              </Button>
+            <DialogFooter className="flex justify-center space-x-2">
               <Button
                 type="submit"
                 disabled={updateReadingRemarksMutation.isPending || !readingRemark}
-                className="px-6 dark:text-white"
+                className="mt-2 w-full px-6 dark:text-white"
               >
                 {updateReadingRemarksMutation.isPending ? "Updating..." : "Update Remark"}
               </Button>

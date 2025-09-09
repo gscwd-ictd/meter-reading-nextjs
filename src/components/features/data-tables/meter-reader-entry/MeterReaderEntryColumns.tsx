@@ -8,6 +8,7 @@ import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 import { useIsMobile } from "@mr/hooks/use-mobile";
+import { MeterReaderEntryRemarkActions } from "./MeterReaderEntryRemarkActions";
 
 export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
   const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<
@@ -38,7 +39,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
                 />
                 <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              {row.original.name}
+              <span className="text-xs">{row.original.name}</span>
             </span>
           ),
           meta: { exportLabel: "Name" },
@@ -53,7 +54,17 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
           enableColumnFilter: false,
           enableSorting: false,
         },
-
+        {
+          accessorKey: "reassignment.remarks",
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Remarks" />,
+          cell: ({ row }) => <MeterReaderEntryRemarkActions remarks={row.original.reassignment?.remarks} />,
+          enableColumnFilter: true,
+          meta: { exportLabel: "Remarks" },
+          filterFn: (row, filterValue) => {
+            const remarks = row.original.reassignment?.remarks || "";
+            return remarks.toLocaleLowerCase().includes(filterValue.toLowerCase());
+          },
+        },
         {
           id: "actions",
           header: "Actions",
@@ -87,7 +98,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
         },
         {
           id: "actions",
-          header: "Actions",
+          header: "",
           cell: ({ row }) => <MeterReaderEntryRowActions meterReader={row.original} />,
         },
       ];

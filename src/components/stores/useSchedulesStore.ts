@@ -35,6 +35,12 @@ type SchedulesStore = {
   setHasFetchedSchedule: (hasFetchedSchedule: boolean) => void;
   entryZonebookSelectorIsOpen: boolean;
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
+  removeMeterReaderEntryIsOpen: boolean;
+  setRemoveMeterReaderEntryIsOpen: (removeMeterReaderEntryIsOpen: boolean) => void;
+  meterReaderZoneBookReassignmentDialogIsOpen: boolean;
+  setMeterReaderZoneBookReassignmentDialogIsOpen: (
+    meterReaderZoneBookReassignmentDialogIsOpen: boolean,
+  ) => void;
   scheduleEntryIsSplitted: boolean;
   setScheduleEntryIsSplitted: (scheduleEntryIsSplitted: boolean) => void;
   scheduleHasSplittedDates: boolean | null;
@@ -105,6 +111,12 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   addCustomScheduleEntryDialogIsOpen: false,
   setAddCustomScheduleEntryDialogIsOpen: (addCustomScheduleEntryDialogIsOpen) =>
     set({ addCustomScheduleEntryDialogIsOpen }),
+  removeMeterReaderEntryIsOpen: false,
+  setRemoveMeterReaderEntryIsOpen: (removeMeterReaderEntryIsOpen) => set({ removeMeterReaderEntryIsOpen }),
+
+  meterReaderZoneBookReassignmentDialogIsOpen: false,
+  setMeterReaderZoneBookReassignmentDialogIsOpen: (meterReaderZoneBookReassignmentDialogIsOpen) =>
+    set({ meterReaderZoneBookReassignmentDialogIsOpen }),
 
   reset: () => {
     set({
