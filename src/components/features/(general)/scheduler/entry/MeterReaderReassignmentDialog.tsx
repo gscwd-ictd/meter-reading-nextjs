@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@mr/components/ui/Dialog";
@@ -14,6 +15,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { FunctionComponent, useEffect, useState } from "react";
 import { SelectMeterReaderPopover } from "./SelectMeterReaderPopover";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
+import { Button } from "@mr/components/ui/Button";
 
 // Create a compatible type for the popover value
 interface PopoverMeterReaderValue {
@@ -120,11 +122,15 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
               );
             })
           ) : (
-            <div className="rounded border p-4">
-              <div className="flex h-full w-full justify-center text-sm">No zonebook</div>
+            <div className="rounded border-2 border-dashed p-4">
+              <div className="flex h-[32rem] w-full items-center justify-center text-sm">No zonebook</div>
             </div>
           )}
         </div>
+
+        <DialogFooter>
+          <Button className="w-full">Apply</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
