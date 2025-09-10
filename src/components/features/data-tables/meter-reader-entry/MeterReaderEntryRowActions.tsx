@@ -3,14 +3,21 @@
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { ArrowRightLeftIcon, MapPinnedIcon, Trash2 } from "lucide-react";
-import { FunctionComponent } from "react";
+import { ArrowRightLeftIcon, MapPinnedIcon, MoreVertical, Trash2 } from "lucide-react";
+import { FunctionComponent, useState } from "react";
 import { ScheduleEntryZonebookSelector } from "../../(general)/scheduler/entry/ScheduleEntryZonebookSelector";
 import { RemoveMeterReaderAlertDialog } from "../../(general)/scheduler/entry/RemoveMeterReaderAlertDialog";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 import { MeterReaderReassignmentDialog } from "../../(general)/scheduler/entry/MeterReaderReassignmentDialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@mr/components/ui/DropdownMenu";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -21,6 +28,10 @@ type MeterReaderEntryRowActionsProps = {
 export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowActionsProps> = ({
   meterReader,
 }) => {
+  const [zonebookPopoverOpen, setZonebookPopoverOpen] = useState(false);
+  const [reassignPopoverOpen, setReassignPopoverOpen] = useState(false);
+  const [removePopoverOpen, setRemovePopoverOpen] = useState(false);
+
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
   const setRemoveMeterReaderEntryIsOpen = useSchedulesStore((state) => state.setRemoveMeterReaderEntryIsOpen);
@@ -79,40 +90,108 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       <MeterReaderReassignmentDialog />
       <ScheduleEntryZonebookSelector />
       <RemoveMeterReaderAlertDialog onDelete={removeMeterReader} />
-      <div className="flex grid-cols-2 gap-2">
-        <div className="col-span-1">
-          <Button
-            className="w-full px-2"
-            variant="outline"
-            size="sm"
-            onClick={() => openZonebookSelector(meterReader)}
-          >
-            <MapPinnedIcon className="size-3 sm:size-4 lg:size-3 dark:text-white" />
-            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Zonebooks</span>
-          </Button>
+      <div className="flex items-center gap-2">
+        {/* Desktop/Tablet View - Individual Buttons */}
+        <div className="hidden grid-cols-3 gap-2 md:grid">
+          {/* Zonebooks Button with Popover */}
+          <div className="col-span-1">
+            <Popover open={zonebookPopoverOpen} onOpenChange={setZonebookPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  className="w-full px-2"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openZonebookSelector(meterReader)}
+                  onMouseEnter={() => setZonebookPopoverOpen(true)}
+                  onMouseLeave={() => setZonebookPopoverOpen(false)}
+                >
+                  <MapPinnedIcon className="size-4 dark:text-white" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2 text-xs" side="top" align="center">
+                Manage Zonebooks
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Reassign Button with Popover */}
+          <div className="col-span-1">
+            <Popover open={reassignPopoverOpen} onOpenChange={setReassignPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  className="w-full px-2"
+                  variant="default"
+                  size="sm"
+                  onClick={() => openReassignment(meterReader)}
+                  onMouseEnter={() => setReassignPopoverOpen(true)}
+                  onMouseLeave={() => setReassignPopoverOpen(false)}
+                >
+                  <ArrowRightLeftIcon className="size-4 dark:text-white" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2 text-xs" side="top" align="center">
+                Reassign Zonebooks
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          {/* Remove Button with Popover */}
+          <div className="col-span-1">
+            <Popover open={removePopoverOpen} onOpenChange={setRemovePopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="flex w-full gap-1"
+                  onClick={() => openRemoveMeterReaderEntry(meterReader)}
+                  onMouseEnter={() => setRemovePopoverOpen(true)}
+                  onMouseLeave={() => setRemovePopoverOpen(false)}
+                >
+                  <Trash2 className="size-4 dark:text-white" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2 text-xs" side="top" align="center">
+                Remove Meter Reader
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
-        <div className="col-span-1">
-          <Button
-            className="w-full px-2"
-            variant="default"
-            size="sm"
-            // disabled
-            onClick={() => openReassignment(meterReader)}
-          >
-            <ArrowRightLeftIcon className="size-3 sm:size-4 lg:size-3 dark:text-white" />
-            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white"> Reassign</span>
-          </Button>
-        </div>
-        <div className="col-span-1">
-          <Button
-            variant="destructive"
-            size="sm"
-            className="flex gap-1"
-            onClick={() => openRemoveMeterReaderEntry(meterReader)}
-          >
-            <Trash2 className="size-3 sm:size-4 lg:size-3 dark:text-white" />
-            <span className="hidden text-xs sm:hidden md:hidden lg:block dark:text-white">Remove</span>
-          </Button>
+
+        {/* Mobile View - Dropdown Menu */}
+        <div className="md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 w-9 p-0">
+                <MoreVertical className="size-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuItem
+                onClick={() => openZonebookSelector(meterReader)}
+                className="flex cursor-pointer items-center gap-2"
+              >
+                <MapPinnedIcon className="size-4" />
+                <span>Manage Zonebooks</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => openReassignment(meterReader)}
+                className="flex cursor-pointer items-center gap-2"
+              >
+                <ArrowRightLeftIcon className="size-4" />
+                <span>Reassign Zonebooks</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => openRemoveMeterReaderEntry(meterReader)}
+                className="text-destructive focus:text-destructive flex cursor-pointer items-center gap-2"
+              >
+                <Trash2 className="size-4" />
+                <span>Remove Meter Reader</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </>

@@ -13,7 +13,15 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import { Check, ChevronDown, CircleXIcon, MapPinCheckIcon, MapPinIcon, PlusCircleIcon } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  CircleXIcon,
+  MapPinCheckIcon,
+  MapPinIcon,
+  PlusCircleIcon,
+  X,
+} from "lucide-react";
 import { Zonebook } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
@@ -78,6 +86,21 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
   const filteredBooks = booksForZone?.filter((option) =>
     option.toLowerCase().includes(bookInput.toLowerCase()),
   );
+
+  // Add clear option handler for zone
+  const handleClearZone = () => {
+    setSelectedZone("");
+    setSelectedBook("");
+    setSelectedZonebook(null);
+    setZoneIsOpen(false);
+  };
+
+  // Add clear option handler for book
+  const handleClearBook = () => {
+    setSelectedBook("");
+    setSelectedZonebook(null);
+    setBookIsOpen(false);
+  };
 
   const handleZoneSelect = (zone: string) => {
     setSelectedZone(zone);
@@ -175,6 +198,16 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
+                    {/* Add Clear option */}
+                    <CommandItem
+                      key="clear-zone"
+                      value="clear"
+                      onSelect={handleClearZone}
+                      className="text-muted-foreground"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Clear selection
+                    </CommandItem>
                     {filteredZones?.map((zone) => (
                       <CommandItem
                         key={zone}
@@ -228,6 +261,16 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
+                    {/* Add Clear option */}
+                    <CommandItem
+                      key="clear-book"
+                      value="clear"
+                      onSelect={handleClearBook}
+                      className="text-muted-foreground"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Clear selection
+                    </CommandItem>
                     {filteredBooks.map((book) => (
                       <CommandItem
                         key={book}
@@ -356,14 +399,14 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
               <TableBody>
                 {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
                   meterReaderZonebooks.map((entry) => (
-                    <TableRow key={entry.zoneBook} className="">
+                    <TableRow key={entry.zoneBook}>
                       <TableCell>
                         <MapPinCheckIcon className="size-5 text-green-600" />
                       </TableCell>
                       <TableCell>{entry.zoneBook}</TableCell>
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell className="truncate">{entry.area.name}</TableCell>
+                      <TableCell className="truncate">{entry.area?.name}</TableCell>
                       <TableCell>
                         <button
                           onClick={() => {

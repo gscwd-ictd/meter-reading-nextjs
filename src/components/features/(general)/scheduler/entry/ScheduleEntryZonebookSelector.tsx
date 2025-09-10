@@ -6,7 +6,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import { Check, ChevronDown, MapPinCheckIcon, MapPinIcon } from "lucide-react";
+import { Check, ChevronDown, MapPinCheckIcon, MapPinIcon, X } from "lucide-react";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
@@ -249,13 +249,28 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
   const handleBookSelect = (book: string) => {
     setSelectedBook(book);
-    setSelectedZonebook(assignedZonebooks?.find((zb) => zb.zone === selectedZone && zb.book === book)!);
+    setSelectedZonebook(unassignedZonebooks?.find((zb) => zb.zone === selectedZone && zb.book === book)!);
   };
 
   const handleZonebookSelect = (zoneBook: ZonebookWithDates) => {
     setSelectedZonebook(zoneBook);
     setSelectedZone(zoneBook.zone);
     setSelectedBook(zoneBook.book);
+  };
+
+  // Add clear option handler for zone
+  const handleClearZone = () => {
+    setSelectedZone("");
+    setSelectedBook("");
+    setSelectedZonebook(null);
+    setZoneIsOpen(false);
+  };
+
+  // Add clear option handler for book
+  const handleClearBook = () => {
+    setSelectedBook("");
+    setSelectedZonebook(null);
+    setBookIsOpen(false);
   };
 
   // useEffect for checking if fetched
@@ -297,7 +312,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       modal
     >
       <DialogContent
-        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[50%]"
+        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[60%]"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -376,6 +391,16 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
+                    {/* Add Clear option */}
+                    <CommandItem
+                      key="clear-zone"
+                      value="clear"
+                      onSelect={handleClearZone}
+                      className="text-muted-foreground"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Clear selection
+                    </CommandItem>
                     {zones?.map((zone) => (
                       <CommandItem
                         key={zone}
@@ -425,6 +450,16 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     className="h-auto max-h-[12rem] overflow-auto"
                     onWheel={(e) => e.stopPropagation()}
                   >
+                    {/* Add Clear option */}
+                    <CommandItem
+                      key="clear-book"
+                      value="clear"
+                      onSelect={handleClearBook}
+                      className="text-muted-foreground"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Clear selection
+                    </CommandItem>
                     {booksForZone.map((book) => (
                       <CommandItem
                         key={book}
@@ -550,15 +585,15 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
 
               <TableBody>
                 {!isLoading && assignedZonebooks && assignedZonebooks.length > 0 ? (
-                  assignedZonebooks.map((entry) => (
-                    <TableRow key={entry.zoneBook} className="">
+                  assignedZonebooks.map((entry, idx) => (
+                    <TableRow key={idx} className="">
                       <TableCell>
                         <MapPinCheckIcon className="size-5 text-green-600" />
                       </TableCell>
                       {/* <TableCell>{entry.zoneBook}</TableCell> */}
                       <TableCell>{entry.zone}</TableCell>
                       <TableCell>{entry.book}</TableCell>
-                      <TableCell className="w-[10rem]">{entry.area.name}</TableCell>
+                      <TableCell className="w-[10rem]">{entry.area?.name}</TableCell>
                       <TableCell>
                         {selectedScheduleEntry?.dueDate &&
                         Array.isArray(selectedScheduleEntry.dueDate) &&
