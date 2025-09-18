@@ -250,7 +250,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       >
         <DialogHeader className="flex flex-col gap-0">
           <DialogTitle className="text-primary text-xl font-bold dark:text-white">
-            Update Meter Reader
+            Edit Meter Reader
           </DialogTitle>
 
           <DialogDescription className="text-gray-500">Update meter reader information</DialogDescription>

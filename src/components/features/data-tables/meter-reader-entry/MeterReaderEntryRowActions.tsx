@@ -122,6 +122,13 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
                   className="w-full px-2"
                   variant="default"
                   size="sm"
+                  disabled={
+                    meterReader.zoneBooks.length === 0
+                      ? true
+                      : meterReader.reassignment?.remarks !== null || meterReader.zoneBooks.length > 0
+                        ? false
+                        : true
+                  }
                   onClick={() => openReassignment(meterReader)}
                   onMouseEnter={() => setReassignPopoverOpen(true)}
                   onMouseLeave={() => setReassignPopoverOpen(false)}
@@ -130,7 +137,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2 text-xs" side="top" align="center">
-                Reassign Zonebooks
+                Zonebook Reassignment Remarks
               </PopoverContent>
             </Popover>
           </div>

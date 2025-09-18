@@ -21,6 +21,6 @@ export type Area = {
 };
 
 export type Reassignment = {
-  zonebooks: ZonebookReassignment[];
-  remarks: string;
+  zoneBooks: ZonebookReassignment[];
+  remarks: string | null;
 };

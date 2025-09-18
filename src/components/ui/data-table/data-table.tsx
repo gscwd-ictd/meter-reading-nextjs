@@ -48,7 +48,7 @@ export function DataTable<T>({
   enableColumnVisibilityToggle = true,
   enableGlobalFilter = true,
   enablePagination = true,
-  pageSize = 10,
+  pageSize = 8,
   loading = false,
   actionBtn,
   title = "",

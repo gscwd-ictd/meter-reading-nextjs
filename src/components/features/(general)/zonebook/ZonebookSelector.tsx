@@ -40,6 +40,7 @@ import {
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { useFormContext } from "react-hook-form";
+import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
 
 type Props = {
   loading: boolean;
@@ -63,6 +64,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
   const tempFilteredZonebooks = useZonebookStore((state) => state.tempFilteredZonebooks);
   const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
+  const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
 
   const zoneBookSorter = (zoneBooks: Zonebook[]) => ZonebookFlatSorter(zoneBooks);
 
@@ -145,7 +147,10 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
       }}
     >
       <DialogTrigger asChild>
-        <div role="button" className="text-primary flex items-center gap-1">
+        <button
+          className="text-primary flex items-center gap-1"
+          disabled={selectedEmployee === undefined ? true : false}
+        >
           <Label
             htmlFor="zoneBooks"
             className="gap-1 text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
@@ -153,7 +158,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
             Zonebooks <span className="text-red-600">*</span>
           </Label>
           <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
-        </div>
+        </button>
       </DialogTrigger>
       <DialogContent
         className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[50%]"
