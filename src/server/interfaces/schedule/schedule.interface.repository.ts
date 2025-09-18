@@ -1,7 +1,9 @@
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateReassignment,
   CreateScheduleMeterReader,
+  Reassignment,
   ScheduleMeterReaderZoneBook,
   ScheduleReading,
   ZoneBookScheduleReader,
@@ -28,4 +30,6 @@ export interface IScheduleRepository {
   createScheduleMeterReader(data: CreateScheduleMeterReader): Promise<ScheduleMeterReaderZoneBook>;
 
   findZoneBookScheduleReader(month: number, year: number): Promise<ZoneBookScheduleReader[]>;
+
+  reassignmentMeterReader(scheduleMeterReaderId: string, data: CreateReassignment): Promise<Reassignment>;
 }

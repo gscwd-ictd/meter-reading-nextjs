@@ -16,6 +16,34 @@ export const ScheduleQuerySchema = z.object({
 /* single array  */
 export const DateValueSchema = z.union([z.string(), z.string().array()]);
 
+export const ReassignmentSchema = z.object({
+  remarks: z.string().nullish(),
+  zoneBooks: z
+    .object({
+      zone: z.string(),
+      book: z.string(),
+      meterReader: z.object({
+        id: z.string(),
+        name: z.string().optional(),
+        photoUrl: z.string().optional(),
+      }),
+    })
+    .array(),
+});
+
+export const CreateReassignmentSchema = z.object({
+  remarks: z.string(),
+  zoneBooks: z
+    .object({
+      zone: z.string(),
+      book: z.string(),
+      meterReader: z.object({
+        id: z.string(),
+      }),
+    })
+    .array(),
+});
+
 /* partial details of reading schedule */
 export const ScheduleSchema = z.object({
   id: z.string(),
@@ -32,6 +60,7 @@ export const ScheduleSchema = z.object({
         zoneBook: true,
         area: true,
       }).array(),
+      reassignment: ReassignmentSchema.optional(),
     })
     .array(),
 });
@@ -59,6 +88,7 @@ export const ScheduleReadingSchema = z.object({
         zoneBook: true,
         area: true,
       }).array(),
+      reassignment: ReassignmentSchema.optional(),
     })
     .array(),
 });
@@ -128,3 +158,5 @@ export type ScheduleMeterReaderZoneBook = z.infer<typeof ScheduleMeterReaderZone
 export type CreateScheduleMeterReader = z.infer<typeof CreateScheduleMeterReaderSchema>;
 
 export type ZoneBookScheduleReader = z.infer<typeof ZoneBookScheduleReaderSchema>;
+export type Reassignment = z.infer<typeof ReassignmentSchema>;
+export type CreateReassignment = z.infer<typeof CreateReassignmentSchema>;
