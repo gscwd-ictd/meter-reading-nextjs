@@ -3,4 +3,6 @@ export type ReadingRemark = {
   name: string;
   isAverage: boolean;
   isActive: boolean;
+  isZeroConsumption: boolean;
+  isNegativeConsumption: boolean;
 };
