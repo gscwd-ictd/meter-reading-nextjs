@@ -3,9 +3,10 @@ import { meterReadingContext } from "../context";
 import { zValidator } from "@hono/zod-validator";
 import {
   CreateMeterReaderScheduleReadingSchema,
-  //CreateMeterReaderScheduleZoneBookSchema,
   CreateMonthScheduleSchema,
+  CreateReassignmentSchema,
   CreateScheduleMeterReaderSchema,
+  ReassignmentSchema,
   ScheduleQuerySchema,
 } from "../types/schedule.type";
 
@@ -93,5 +94,18 @@ const scheduleRoutes = new Hono()
     const result = await scheduleService.getZoneBookScheduleReader(month, year);
 
     return c.json(result);
-  });
+  })
+
+  .put(
+    "/meter-reader/:scheduleMeterReaderId/reassignment",
+    zValidator("json", CreateReassignmentSchema),
+    async (c) => {
+      const scheduleMeterReaderId = c.req.param("scheduleMeterReaderId");
+      const body = c.req.valid("json");
+
+      const result = await scheduleService.reassignmentMeterReader(scheduleMeterReaderId, body);
+
+      return c.json(result);
+    },
+  );
 export const scheduleHandler = new Hono().route("/schedules", scheduleRoutes);

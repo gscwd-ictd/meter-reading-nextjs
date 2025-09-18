@@ -1,5 +1,6 @@
 import { meterReadingContext } from "@mr/server/context";
 import db from "@mr/server/db/connections";
+import { reassignment, reassignmentView, reassignmentZoneBook } from "@mr/server/db/schemas/reassignment";
 import {
   scheduleMeterReaders,
   schedules,
@@ -12,7 +13,10 @@ import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.int
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateReassignment,
   CreateScheduleMeterReader,
+  Reassignment,
+  ReassignmentSchema,
   ScheduleMeterReaderZoneBook,
   ScheduleMeterReaderZoneBookSchema,
   ScheduleReading,
@@ -21,7 +25,7 @@ import {
   ZoneBookScheduleReader,
   ZoneBookScheduleReaderSchema,
 } from "@mr/server/types/schedule.type";
-import { and, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
+import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
@@ -75,6 +79,8 @@ export class ScheduleRepository implements IScheduleRepository {
     }
 
     // Step 3: Parse the first (and expected only) result into a strongly-typed schedule object
+
+    //return stmt[0];
     const schedule = ScheduleSchema.parse(stmt[0]);
 
     // Step 4: For each meter reader in the schedule, fetch their full details
@@ -84,14 +90,40 @@ export class ScheduleRepository implements IScheduleRepository {
           .getMeterReaderService()
           .getMeterReaderDetailsById(reader.id);
 
+        let reassignmentDetails: any[] = [];
+
+        if (reader.reassignment?.zoneBooks?.length) {
+          reassignmentDetails = await Promise.all(
+            reader.reassignment.zoneBooks.map(async (item) => {
+              const reassignedDetails = await meterReadingContext
+                .getMeterReaderService()
+                .getMeterReaderDetailsById(item.meterReader.id);
+
+              return {
+                ...item,
+                meterReader: {
+                  id: reassignedDetails.id,
+                  name: reassignedDetails.name,
+                  photoUrl: reassignedDetails.photoUrl,
+                },
+              };
+            }),
+          );
+        }
+
         return {
           ...reader,
           ...details,
+          reassignment: {
+            ...reader.reassignment,
+            zoneBooks: reassignmentDetails,
+          },
         };
       }),
     );
 
     // Step 6: Replace the original meterReaders with the enriched list and validate the full structure
+
     return ScheduleReadingSchema.parse({ ...schedule, meterReaders: result });
   }
 
@@ -300,6 +332,72 @@ export class ScheduleRepository implements IScheduleRepository {
     );
 
     return ZoneBookScheduleReaderSchema.array().parse(result);
+  }
+
+  async findReassignmentByScheduleMeterReaderId(scheduleMeterReaderId: string): Promise<Reassignment> {
+    const [result] = await db.pgConn
+      .select()
+      .from(reassignmentView)
+      .where(eq(reassignmentView.scheduleMeterReaderId, scheduleMeterReaderId));
+
+    if (!result) {
+      throw new HTTPException(404, {
+        message: `reassignment not found with id ${scheduleMeterReaderId}`,
+      });
+    }
+
+    const mappedZoneBooks = await Promise.all(
+      (result.zoneBooks ?? []).map(async (item) => {
+        const details = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(item.meterReader.id);
+
+        return {
+          ...item,
+          meterReader: {
+            id: details.id,
+            name: details.name,
+            photoUrl: details.photoUrl,
+          },
+        };
+      }),
+    );
+
+    return ReassignmentSchema.parse({ ...result, zoneBooks: mappedZoneBooks });
+  }
+
+  async reassignmentMeterReader(
+    scheduleMeterReaderId: string,
+    data: CreateReassignment,
+  ): Promise<Reassignment> {
+    const { remarks, zoneBooks } = data;
+
+    const result = await db.pgConn.transaction(async (tx) => {
+      // Always delete first, safe even if nothing exists
+      await tx.delete(reassignment).where(eq(reassignment.scheduleMeterReaderId, scheduleMeterReaderId));
+
+      // Insert new reassignment
+      const [insertReassignment] = await tx
+        .insert(reassignment)
+        .values({ scheduleMeterReaderId, remarks })
+        .returning({ id: reassignment.id });
+
+      // Insert zoneBooks if provided
+      if (zoneBooks.length > 0) {
+        await tx.insert(reassignmentZoneBook).values(
+          zoneBooks.map((item) => ({
+            reassignmentId: insertReassignment.id,
+            zone: item.zone,
+            book: item.book,
+            meterReaderId: item.meterReader.id,
+          })),
+        );
+      }
+
+      return scheduleMeterReaderId;
+    });
+
+    return await this.findReassignmentByScheduleMeterReaderId(result);
   }
 
   /* 
