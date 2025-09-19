@@ -30,6 +30,7 @@ export default function ReassignmentRemarkSuggestionPopover({
     "Equipment Maintenance",
     "Customer Request",
     "Area Inaccessibility",
+    "Special Privilege Leave",
   ];
 
   const handleSuggestionSelect = (suggestion: string) => {
