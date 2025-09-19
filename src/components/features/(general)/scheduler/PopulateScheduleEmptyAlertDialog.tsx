@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
-import { CalendarCheck2, CalendarPlus } from "lucide-react";
 import { FunctionComponent, useEffect } from "react";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { Scheduler } from "./useScheduler";
@@ -30,7 +29,7 @@ export const PopulateScheduleEmptyAlertDialog: FunctionComponent<PopulateSchedul
   scheduler,
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
-  const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
+  // const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
   const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);

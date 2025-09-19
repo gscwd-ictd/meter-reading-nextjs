@@ -12,7 +12,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
-import { SquarePenIcon, Users2Icon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";

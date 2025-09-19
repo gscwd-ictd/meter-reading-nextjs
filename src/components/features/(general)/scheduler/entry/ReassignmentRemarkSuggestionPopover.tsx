@@ -22,6 +22,7 @@ export default function ReassignmentRemarkSuggestionPopover({
     "Forced Leave",
     "Vacation Leave",
     "Sick Leave",
+    "Special Privilege Leave",
     "Holiday",
     "Training",
     "Route Adjustment",
@@ -30,7 +31,6 @@ export default function ReassignmentRemarkSuggestionPopover({
     "Equipment Maintenance",
     "Customer Request",
     "Area Inaccessibility",
-    "Special Privilege Leave",
   ];
 
   const handleSuggestionSelect = (suggestion: string) => {
@@ -55,7 +55,7 @@ export default function ReassignmentRemarkSuggestionPopover({
               Suggestions
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-64 p-3" align="end" onWheel={(e) => e.stopPropagation()}>
+          <PopoverContent className="w-[400px] p-3" align="end" onWheel={(e) => e.stopPropagation()}>
             <div className="grid gap-2">
               <div className="text-muted-foreground border-b pb-1 text-sm font-medium">
                 Select a suggestion

@@ -4,7 +4,7 @@ import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { ArrowRightLeftIcon, MapPinnedIcon, MoreVertical, Trash2 } from "lucide-react";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { ScheduleEntryZonebookSelector } from "../../(general)/scheduler/entry/ScheduleEntryZonebookSelector";
 import { RemoveMeterReaderAlertDialog } from "../../(general)/scheduler/entry/RemoveMeterReaderAlertDialog";
 import { useMutation } from "@tanstack/react-query";
@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
+import { differenceInMonths, format, parse } from "date-fns";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -28,9 +29,12 @@ type MeterReaderEntryRowActionsProps = {
 export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowActionsProps> = ({
   meterReader,
 }) => {
-  const [zonebookPopoverOpen, setZonebookPopoverOpen] = useState(false);
-  const [reassignPopoverOpen, setReassignPopoverOpen] = useState(false);
-  const [removePopoverOpen, setRemovePopoverOpen] = useState(false);
+  const [zonebookPopoverOpen, setZonebookPopoverOpen] = useState<boolean>(false);
+  const [reassignPopoverOpen, setReassignPopoverOpen] = useState<boolean>(false);
+  const [removePopoverOpen, setRemovePopoverOpen] = useState<boolean>(false);
+  const [monthDifference, setMonthDifference] = useState<number>(0);
+  const [currentDate, setCurrentDate] = useState("");
+  const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
 
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
@@ -41,6 +45,23 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const reset = useSchedulesStore((state) => state.reset);
+
+  // Function to calculate month difference
+  const calculateMonthDifference = (dateString: string) => {
+    try {
+      // Parse the input date (YYYY-MM format)
+      const inputDate = parse(dateString, "yyyy-MM", new Date());
+
+      // Get current date
+      const today = new Date();
+
+      // Calculate difference in months
+      return differenceInMonths(today, inputDate);
+    } catch (error) {
+      console.error("Error calculating date difference:", error);
+      return 0;
+    }
+  };
 
   const openZonebookSelector = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
@@ -54,7 +75,6 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
 
   const openReassignment = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
-    console.log(meterReader);
     setMeterReaderZoneBookReassignmentDialogIsOpen(true);
   };
 
@@ -84,6 +104,16 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
       toast.error("Error", { description: "Cannot remove meter reader", position: "top-right" });
     },
   });
+
+  // Update when selected date changes
+  useEffect(() => {
+    const diff = calculateMonthDifference(lastFetchedMonthYear!);
+    setMonthDifference(diff);
+
+    // Set current date in YYYY-MM format
+    const now = new Date();
+    setCurrentDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+  }, [lastFetchedMonthYear]);
 
   return (
     <>
@@ -125,7 +155,9 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
                   disabled={
                     meterReader.zoneBooks.length === 0
                       ? true
-                      : meterReader.reassignment?.remarks !== null || meterReader.zoneBooks.length > 0
+                      : meterReader.reassignment?.remarks === null &&
+                          meterReader.zoneBooks.length > 0 &&
+                          monthDifference < 1
                         ? false
                         : true
                   }

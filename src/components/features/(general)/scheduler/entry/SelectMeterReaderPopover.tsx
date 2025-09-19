@@ -30,12 +30,8 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
   const { data: assignedMeterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
-        return res.data;
-      } catch (error) {
-        console.log(error);
-      }
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
+      return res.data;
     },
   });
 

@@ -20,6 +20,7 @@ import { DoubleArrowRightIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { LightbulbIcon } from "lucide-react";
 
 type Zonebook = {
   zone: string;
@@ -167,24 +168,27 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
           <DialogTitle className="text-primary text-xl font-semibold dark:text-white">
             Set Zonebook Reassignment Remarks
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground flex flex-col space-y-1 text-sm">
-            <span className="flex gap-2">
+          <DialogDescription className="text-muted-foreground text-sm">
+            <span className="flex gap-2 space-y-0">
               <span>{meterReader?.name}</span>
-              <Badge className="dark:text-white">
+              <Badge className="px-1 tracking-tighter dark:text-white">
                 {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
               </Badge>{" "}
               <Badge variant="secondary" className="dark:text-white">
                 {format(selectedScheduleEntry?.readingDate!, "EEEE")}
               </Badge>
             </span>
-            <span className="rounded border bg-gray-400 p-2 text-xs text-white dark:bg-transparent">
-              Select the meter reader to document for the following zonebook(s). This action only updates the
-              remarks for report purposes and does not change the active assignment.
-            </span>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
+          <div className="flex items-start gap-2 rounded border border-dashed bg-gray-100 p-2 text-xs">
+            <LightbulbIcon className="shrink-0 text-yellow-400/60" />
+            <span className="leading-4 tracking-normal">
+              Select the meter reader to document for the following zonebook(s). This action only updates the
+              remarks for report purposes and does not change the active assignment.
+            </span>
+          </div>
           <div className="space-y-1">
             <div className="text-sm font-medium">Zone Book</div>
 
@@ -224,11 +228,6 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
           >
             Apply
           </Button>
-
-          {/* <Button onClick={() => console.log(allZonebooksAssigned)}>Zonebook Log</Button>
-          <Button onClick={() => console.log(remarks === "" ? "remarks is empty" : remarks)}>
-            Remarks Log
-          </Button> */}
         </DialogFooter>
       </DialogContent>
     </Dialog>

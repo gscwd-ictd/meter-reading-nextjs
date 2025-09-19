@@ -17,7 +17,6 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@mr/components/ui/Button";
 import { PlusCircleIcon } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
 import { Input } from "@mr/components/ui/Input";
 import { useReadingRemarksStore } from "@mr/components/stores/useReadingRemarksStore";
 import { ReadingRemark } from "@mr/lib/types/reading-remark";
