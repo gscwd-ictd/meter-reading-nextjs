@@ -10,10 +10,12 @@ export const MeterReaderEntryRemarkActions: FunctionComponent<MeterReaderEntryRe
 }) => {
   return (
     <>
-      {remarks !== undefined || remarks !== "" ? (
+      {remarks === undefined || remarks === "" ? (
         <span className="text-muted-foreground text-xs">N/A</span>
       ) : (
-        <Button onClick={() => console.log(remarks)}>{remarks}</Button>
+        <Button onClick={() => console.log(remarks)} variant="outline">
+          <span className="text-xs dark:text-white">{remarks}</span>
+        </Button>
       )}
     </>
   );

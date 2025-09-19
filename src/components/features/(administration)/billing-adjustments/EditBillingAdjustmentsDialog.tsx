@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, FunctionComponent, SetStateAction, useEffect } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@mr/components/ui/Dialog";
 import { useBillingAdjustmentsStore } from "@mr/components/stores/useBillingAdjustmentsStore";
 import { useMutation } from "@tanstack/react-query";
@@ -18,8 +17,6 @@ import axios from "axios";
 import { BillingAdjustment } from "@mr/lib/types/billing-adjustment";
 import { toast } from "sonner";
 import { Button } from "@mr/components/ui/Button";
-import { PlusCircleIcon } from "lucide-react";
-import { Label } from "@radix-ui/react-label";
 import { Input } from "@mr/components/ui/Input";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@mr/components/ui/Form";
 
@@ -91,10 +88,12 @@ export const EditBillingAdjustmentsDialog: FunctionComponent = () => {
       setEditBillingAdjustmentsDialogIsOpen(false);
     },
     onError: (error) => {
-      toast.error("Error", {
-        description: error.message,
-        position: "top-right",
-      });
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to save changes.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred.", { position: "top-right", duration: 1500 });
+      }
     },
   });
 

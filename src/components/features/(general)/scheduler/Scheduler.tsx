@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { Holidays, holidays } from "./holidays";
+import { Holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,7 +24,6 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
-import { transformHolidays } from "@mr/lib/functions/transformHolidays";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;

@@ -10,8 +10,8 @@ import { holidays } from "./holidays";
 
 export default function SchedulerWrapper() {
   const {
-    data: allHolidays,
-    isLoading,
+    // data: allHolidays,
+    // isLoading,
     isSuccess: holidaysLoaded,
   } = useQuery({
     queryKey: ["get-all-holidays"],

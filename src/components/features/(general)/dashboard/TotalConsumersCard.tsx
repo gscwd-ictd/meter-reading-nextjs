@@ -5,7 +5,7 @@ import axios from "axios";
 import { CheckCircle2, FileX, Users, Unplug } from "lucide-react";
 
 export const TotalConsumersCard = () => {
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["consumer-count"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/dashboard/consumer-counts`);

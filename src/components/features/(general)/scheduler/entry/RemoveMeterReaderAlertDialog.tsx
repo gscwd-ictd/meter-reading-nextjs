@@ -35,7 +35,7 @@ export function RemoveMeterReaderAlertDialog({ onDelete }: Props) {
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
             Meter reader <span className="text-primary">{meterReader?.name}</span> will be removed from this
-            day's schedule entry.
+            day&apos;s schedule entry.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

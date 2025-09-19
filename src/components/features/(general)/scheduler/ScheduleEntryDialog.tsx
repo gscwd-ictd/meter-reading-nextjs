@@ -83,6 +83,8 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
         console.log(error);
       }
     },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   useEffect(() => {
@@ -161,7 +163,7 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
             meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
           />
         )}
-        <DialogFooter></DialogFooter>
+        <DialogFooter />
       </DialogContent>
     </Dialog>
   );

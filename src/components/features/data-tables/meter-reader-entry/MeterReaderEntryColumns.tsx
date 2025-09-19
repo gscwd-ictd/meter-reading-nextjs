@@ -37,7 +37,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
                   alt={row.original.name}
                   className="object-cover"
                 />
-                <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{row.original.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className="text-xs">{row.original.name}</span>
             </span>
@@ -57,7 +57,11 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
         {
           accessorKey: "reassignment.remarks",
           header: ({ column }) => <DataTableColumnHeader column={column} title="Remarks" />,
-          cell: ({ row }) => <MeterReaderEntryRemarkActions remarks={row.original.reassignment?.remarks} />,
+          cell: ({ row }) => (
+            <MeterReaderEntryRemarkActions
+              remarks={row.original.reassignment?.remarks ? row.original.reassignment?.remarks : ""}
+            />
+          ),
           enableColumnFilter: true,
           meta: { exportLabel: "Remarks" },
           filterFn: (row, filterValue) => {
