@@ -306,7 +306,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
         setUnassignedZonebooks([]);
         setHasFetchedZonebooks(false);
         setSelectedMeterReader(null);
-        refetchEntry!();
+
+        // refetchEntry!();
       }}
       modal
     >
