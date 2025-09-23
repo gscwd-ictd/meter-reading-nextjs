@@ -58,7 +58,7 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       {
         accessorKey: "zoneBooks",
         accessorFn: (row) => row.zoneBooks.map((zb) => zb.zoneBook),
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Default Zonebooks" />,
         cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
         enableColumnFilter: false,
       },

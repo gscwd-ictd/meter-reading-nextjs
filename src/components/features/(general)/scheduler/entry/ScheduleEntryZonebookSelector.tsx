@@ -302,7 +302,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
         setSelectedBook("");
         setSelectedZone("");
         setSelectedZonebook(null);
-        setHasFetchedZonebooks(false);
         setAssignedZonebooks([]);
         setUnassignedZonebooks([]);
         setHasFetchedZonebooks(false);

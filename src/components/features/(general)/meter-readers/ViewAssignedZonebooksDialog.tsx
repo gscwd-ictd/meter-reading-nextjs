@@ -45,7 +45,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
       </DialogTrigger>
       <DialogContent className="flex h-screen w-full max-w-full flex-col overflow-hidden p-0 sm:p-0 md:p-6 lg:h-[90vh] lg:!max-w-3xl lg:p-6">
         <DialogHeader>
-          <DialogTitle>Assigned Zonebooks</DialogTitle>
+          <DialogTitle>Assigned Default Zonebooks</DialogTitle>
           <p className="text-muted-foreground text-sm">
             Meter Reader: <span className="font-medium">{meterReader.name || meterReader.id}</span>
           </p>

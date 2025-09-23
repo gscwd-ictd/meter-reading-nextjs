@@ -75,7 +75,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     }
 
     // Release lock after short timeout
-    setTimeout(() => setIsNavigating(false), 1200); // or adjust timing
+    setTimeout(() => setIsNavigating(false), 500); // or adjust timing
   };
 
   // these are derived states
@@ -104,6 +104,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
         });
       }
     },
+
     retry: false,
     retryOnMount: false,
     refetchOnWindowFocus: false,
