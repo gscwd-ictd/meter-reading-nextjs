@@ -46,8 +46,13 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const reset = useSchedulesStore((state) => state.reset);
 
-  // Function to calculate month difference
-  const calculateMonthDifference = (dateString: string) => {
+  // Fixed function to calculate month difference with null check
+  const calculateMonthDifference = (dateString: string | null): number => {
+    // Handle null or undefined input
+    if (!dateString) {
+      return 0; // or whatever default value makes sense for your use case
+    }
+
     try {
       // Parse the input date (YYYY-MM format)
       const inputDate = parse(dateString, "yyyy-MM", new Date());

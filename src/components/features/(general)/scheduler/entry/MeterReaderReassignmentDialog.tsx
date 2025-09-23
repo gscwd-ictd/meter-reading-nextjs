@@ -109,7 +109,7 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
         position: "top-right",
       });
 
-      refetchEntry?.();
+      refetchEntry!();
       setOpen(false);
       setSelectedMeterReader(null);
     },
@@ -182,11 +182,12 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex items-start gap-2 rounded border border-dashed bg-gray-100 p-2 text-xs">
+          <div className="flex items-start gap-2 rounded border border-dashed bg-gray-100 p-2 text-xs dark:bg-transparent">
             <LightbulbIcon className="shrink-0 text-yellow-400/60" />
             <span className="leading-4 tracking-normal">
-              Select the meter reader to document for the following zonebook(s). This action only updates the
-              remarks for report purposes and does not change the active assignment.
+              To reassign the following zone books for documentation purposes, select a new meter reader. This
+              action updates the records (including remarks and the default zone book) but does not alter the
+              active field assignment for meter reading duties.
             </span>
           </div>
           <div className="space-y-1">

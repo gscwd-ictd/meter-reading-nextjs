@@ -149,7 +149,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
             htmlFor="zoneBooks"
             className="gap-1 text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
           >
-            Zonebooks <span className="text-red-600">*</span>
+            Default Zonebooks <span className="text-red-600">*</span>
           </Label>
           <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
         </div>
