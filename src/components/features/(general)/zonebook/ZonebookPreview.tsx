@@ -37,7 +37,7 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
               {zb.zone}-{zb.book}
             </Badge>
           </TooltipTrigger>
-          <TooltipContent className="dark:text-white"> {zb.area.name ? zb.area.name : "N/A"}</TooltipContent>
+          <TooltipContent className="dark:text-white"> {zb.area?.name ? zb.area.name : "N/A"}</TooltipContent>
         </Tooltip>
       ))}
       {remaining > 0 && (

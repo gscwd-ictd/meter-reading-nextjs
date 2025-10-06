@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 import { useIsMobile } from "@mr/hooks/use-mobile";
 import { MeterReaderEntryRemarkActions } from "./MeterReaderEntryRemarkActions";
+import { Reassignment } from "@mr/lib/types/zonebook";
 
 export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
   const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<
@@ -59,7 +60,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
           header: ({ column }) => <DataTableColumnHeader column={column} title="Remarks" />,
           cell: ({ row }) => (
             <MeterReaderEntryRemarkActions
-              remarks={row.original.reassignment?.remarks ? row.original.reassignment?.remarks : ""}
+              meterReader={row.original ? row.original : ({} as MeterReaderWithZonebooks)}
             />
           ),
           enableColumnFilter: true,
