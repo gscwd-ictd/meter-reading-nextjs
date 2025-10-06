@@ -31,33 +31,49 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
+
       return res.data;
     },
   });
 
-  const getSymmetricDifference = (
-    a: MeterReaderWithZonebooks[] = [],
-    b: MeterReaderWithZonebooks[] = [],
-  ): MeterReaderWithZonebooks[] => {
-    return [
-      ...a.filter((readerA) => !b.some((readerB) => readerB.id === readerA.id)),
-      ...b.filter((readerB) => !a.some((readerA) => readerA.id === readerB.id)),
-    ];
-  };
+  // const getSymmetricDifference = (
+  //   a: MeterReaderWithZonebooks[] = [],
+  //   b: MeterReaderWithZonebooks[] = [],
+  // ): MeterReaderWithZonebooks[] => {
+  //   return [
+  //     ...a.filter((readerA) => !b.some((readerB) => readerB.id === readerA.id)),
+  //     ...b.filter((readerB) => !a.some((readerA) => readerA.id === readerB.id)),
+  //   ];
+  // };
+
+  // const filteredMeterReaders = useMemo(() => {
+  //   const existingMeterReaders = [{ ...meterReader! }];
+  //   const symmetricDifference = getSymmetricDifference(assignedMeterReaders, existingMeterReaders);
+
+  //   // Filter by search term
+  //   if (!searchTerm) return symmetricDifference;
+
+  //   return symmetricDifference.filter(
+  //     (mr) =>
+  //       mr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       mr.mobileNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
+  //   );
+  // }, [assignedMeterReaders, meterReader, searchTerm]);
 
   const filteredMeterReaders = useMemo(() => {
-    const existingMeterReaders = [{ ...meterReader! }];
-    const symmetricDifference = getSymmetricDifference(assignedMeterReaders, existingMeterReaders);
+    const existingMeterReaders = [...assignedMeterReaders];
+
+    console.log(existingMeterReaders);
 
     // Filter by search term
-    if (!searchTerm) return symmetricDifference;
+    if (!searchTerm) return existingMeterReaders;
 
-    return symmetricDifference.filter(
+    return existingMeterReaders.filter(
       (mr) =>
         mr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         mr.mobileNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [assignedMeterReaders, meterReader, searchTerm]);
+  }, [assignedMeterReaders, searchTerm]);
 
   const handleSelect = (mr: MeterReaderWithZonebooks) => {
     if (onChange) {

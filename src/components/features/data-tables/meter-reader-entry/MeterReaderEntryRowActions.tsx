@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
 import { differenceInMonths, format, parse } from "date-fns";
+import { MeterReaderZonebookReassignmentDialog } from "../../(general)/scheduler/entry/MeterReaderZonebookReassignmentDialog";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -122,6 +123,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
 
   return (
     <>
+      <MeterReaderZonebookReassignmentDialog />
       <MeterReaderReassignmentDialog />
       <ScheduleEntryZonebookSelector />
       <RemoveMeterReaderAlertDialog onDelete={removeMeterReader} />

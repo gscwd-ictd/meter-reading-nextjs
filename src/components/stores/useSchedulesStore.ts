@@ -55,6 +55,8 @@ type SchedulesStore = {
   setAddCustomMeterReaderDialogIsOpen: (addCustomMeterReaderDialogIsOpen: boolean) => void;
   addCustomScheduleEntryDialogIsOpen: boolean;
   setAddCustomScheduleEntryDialogIsOpen: (addCustomScheduleEntryDialogIsOpen: boolean) => void;
+  reassignmentRemarksDialogIsOpen: boolean;
+  setReassignmentRemarksDialogIsOpen: (reassignmentRemarksDialogIsOpen: boolean) => void;
   refetchData?: () => void;
   setRefetchData: (fn: () => void) => void;
   refetchEntry?: () => void;
@@ -118,6 +120,9 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setMeterReaderZoneBookReassignmentDialogIsOpen: (meterReaderZoneBookReassignmentDialogIsOpen) =>
     set({ meterReaderZoneBookReassignmentDialogIsOpen }),
 
+  reassignmentRemarksDialogIsOpen: false,
+  setReassignmentRemarksDialogIsOpen: (reassignmentRemarksDialogIsOpen) =>
+    set({ reassignmentRemarksDialogIsOpen }),
   reset: () => {
     set({
       calendarIsSet: false,
