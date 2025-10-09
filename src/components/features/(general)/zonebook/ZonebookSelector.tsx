@@ -41,6 +41,7 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { useFormContext } from "react-hook-form";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
+import { Input } from "@mr/components/ui/Input";
 
 type Props = {
   loading: boolean;
@@ -173,7 +174,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
           </DialogDescription>
         </DialogHeader>
 
-        <Command className="flex h-full flex-col gap-2 overflow-y-auto p-0">
+        <Command className="h-[16rem]h-full flex flex-col gap-2 overflow-y-auto p-0">
           <div className="grid w-full grid-cols-3 items-end gap-2">
             {/* Zone Combobox */}
             <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
@@ -392,27 +393,32 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
             <Table className="table-fixed text-sm" onWheel={(e) => e.stopPropagation()}>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-semibold text-gray-600"></TableHead>
-                  <TableHead className="font-semibold text-gray-600">Zone-book</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Zone</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Book</TableHead>
+                  <TableHead className="w-[5%] font-semibold text-gray-600"></TableHead>
+                  {/* <TableHead className="font-semibold text-gray-600">Zone-book</TableHead> */}
+                  <TableHead className="w-[15%] font-semibold text-gray-600">Zone</TableHead>
+                  <TableHead className="w-[15%] font-semibold text-gray-600">Book</TableHead>
                   <TableHead className="font-semibold text-gray-600">Area</TableHead>
-                  <TableHead className="font-semibold text-gray-600"></TableHead>
+                  <TableHead className="w-[15%] font-semibold text-gray-600">Day</TableHead>
+                  <TableHead className="w-[5%] font-semibold text-gray-600"></TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
                   meterReaderZonebooks.map((entry) => (
-                    <TableRow key={entry.zoneBook}>
-                      <TableCell>
+                    <TableRow key={entry.zoneBook} className="border-b">
+                      <TableCell className="flex h-[3rem] w-full items-center justify-center border-r">
                         <MapPinCheckIcon className="size-5 text-green-600" />
                       </TableCell>
-                      <TableCell>{entry.zoneBook}</TableCell>
-                      <TableCell>{entry.zone}</TableCell>
-                      <TableCell>{entry.book}</TableCell>
-                      <TableCell className="truncate">{entry.area?.name}</TableCell>
-                      <TableCell>
+                      {/* <TableCell>{entry.zoneBook}</TableCell> */}
+                      <TableCell className="border-r">{entry.zone}</TableCell>
+                      <TableCell className="border-r">{entry.book}</TableCell>
+                      <TableCell className="truncate border-r">{entry.area?.name}</TableCell>
+                      <TableCell className="border-r">
+                        <Input type="number" className="h-[2rem]" />
+                      </TableCell>
+
+                      <TableCell className="flex h-[3rem] items-center justify-center border-r">
                         <button
                           onClick={() => {
                             const newMeterReaderZonebooks = meterReaderZonebooks.filter(
@@ -427,7 +433,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                             setTempFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
                           }}
                         >
-                          <CircleXIcon className="fill-red-600 text-white" />
+                          <CircleXIcon className="size-5 fill-red-600 text-white" />
                         </button>
                       </TableCell>
                     </TableRow>

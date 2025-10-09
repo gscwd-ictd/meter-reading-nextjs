@@ -260,7 +260,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
           </section>
 
           <section className="hidden sm:hidden md:block lg:block">
-            <ButtonGroup className="rounded-md border">
+            <ButtonGroup className="rounded border">
               <Button
                 variant="outline"
                 className="border-none dark:rounded-none"
@@ -273,7 +273,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className="border-none dark:rounded-none"
+                    className=""
                     variant="outline"
                     onClick={() => {
                       handleMonthChange("today");

@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
-import { differenceInMonths, format, parse } from "date-fns";
+import { differenceInMonths, parse } from "date-fns";
 import { MeterReaderZonebookReassignmentDialog } from "../../(general)/scheduler/entry/MeterReaderZonebookReassignmentDialog";
 
 type MeterReaderEntryRowActionsProps = {
@@ -34,7 +34,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const [reassignPopoverOpen, setReassignPopoverOpen] = useState<boolean>(false);
   const [removePopoverOpen, setRemovePopoverOpen] = useState<boolean>(false);
   const [monthDifference, setMonthDifference] = useState<number>(0);
-  const [currentDate, setCurrentDate] = useState("");
+  const [, setCurrentDate] = useState("");
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
 
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);

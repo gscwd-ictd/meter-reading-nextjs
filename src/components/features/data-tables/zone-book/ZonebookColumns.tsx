@@ -48,7 +48,11 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
         filterFn: filterFn,
         cell: ({ row }) => (
           <span>
-            {row.original.id ? (row.original.area?.name !== "" ? row.original.area.name : "-") : ""}
+            {row.original.id
+              ? row.original.area && row.original.area?.name !== ""
+                ? row.original.area.name
+                : "-"
+              : ""}
           </span>
         ),
         meta: {
