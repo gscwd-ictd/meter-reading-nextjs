@@ -7,6 +7,8 @@ import { format, isSaturday, isSunday, parse } from "date-fns";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { BilledMeterReadingSchedule } from "@mr/lib/types/schedule";
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
+import { PdfHeader } from "../PdfHeader";
+import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 
 type ScheduleTableProps = {
   yearMonth: string;
@@ -24,7 +26,6 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 5,
     textAlign: "center",
-    // paddingBottom: 10,
   },
   title: {
     fontSize: 11,
@@ -75,14 +76,13 @@ const styles = StyleSheet.create({
     fontSize: 8,
     textAlign: "center",
   },
-  footer: {
-    position: "absolute",
-    bottom: 30,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 8,
-    color: "#666",
+  spacerRow: {
+    height: 20,
+  },
+  daySeparator: {
+    height: 2,
+    backgroundColor: "#000000",
+    width: "100%",
   },
 
   // Width Styles
@@ -110,7 +110,11 @@ const styles = StyleSheet.create({
   w5: { width: "5%" },
 });
 
-// PDF Document Component
+// Rows per page configuration
+const FIRST_PAGE_ROWS = 20; // Exactly 20 rows total
+const OTHER_PAGES_ROWS = 28; // Exactly 28 rows total
+
+// PDF Document Component with pagination
 const SchedulePDF: FC<{
   data: BilledMeterReadingSchedule[];
   yearMonth: string;
@@ -120,167 +124,293 @@ const SchedulePDF: FC<{
     const newDate = parse(yearMonth, "yyyy-MM", new Date());
     return format(newDate, "MMMM, yyyy");
   };
+
+  // Group data by day to keep days together
+  const groupDataByDay = () => {
+    const dayGroups: Array<{
+      day: number;
+      dayNumber: number;
+      rows: Array<{
+        type: "data";
+        content: {
+          entry: BilledMeterReadingSchedule;
+          dayNumber: number;
+          meterReader?: { name: string; zoneBooks?: any[] };
+          isNoMeterReader: boolean;
+          originalIndex: number;
+        };
+      }>;
+    }> = [];
+
+    data.forEach((entry, idx) => {
+      const currentDay = new Date(entry.readingDate).getDate();
+      const meterReaders = entry.meterReaders || [];
+
+      // Find existing day group or create new one
+      let dayGroup = dayGroups.find((group) => group.day === currentDay);
+      if (!dayGroup) {
+        dayGroup = {
+          day: currentDay,
+          dayNumber: dayNumbers[idx],
+          rows: [],
+        };
+        dayGroups.push(dayGroup);
+      }
+
+      if (meterReaders.length === 0) {
+        dayGroup.rows.push({
+          type: "data",
+          content: {
+            entry,
+            dayNumber: dayNumbers[idx],
+            isNoMeterReader: true,
+            originalIndex: idx,
+          },
+        });
+      } else {
+        meterReaders.forEach((reader) => {
+          dayGroup!.rows.push({
+            type: "data",
+            content: {
+              entry,
+              dayNumber: dayNumbers[idx],
+              meterReader: reader,
+              isNoMeterReader: false,
+              originalIndex: idx,
+            },
+          });
+        });
+      }
+    });
+
+    return dayGroups;
+  };
+
+  const dayGroups = groupDataByDay();
+
+  // Create pages with exact row counts
+  const createPages = () => {
+    const pages: Array<{
+      rows: any[];
+      hasHeader: boolean;
+    }> = [];
+
+    let currentDayIndex = 0;
+
+    // First page - exactly 20 rows total
+    const firstPage = { rows: [] as any[], hasHeader: true };
+    let firstPageRowCount = 1; // Start with 1 for the table header
+
+    // Fill first page with complete day groups up to exactly 20 rows
+    while (currentDayIndex < dayGroups.length && firstPageRowCount < FIRST_PAGE_ROWS) {
+      const dayGroup = dayGroups[currentDayIndex];
+      const dayRowCount = dayGroup.rows.length;
+
+      // Check if this day group fits in the remaining space
+      const remainingRows = FIRST_PAGE_ROWS - firstPageRowCount;
+
+      if (dayRowCount <= remainingRows) {
+        // Add day separator (except for first day)
+        if (currentDayIndex > 0) {
+          firstPage.rows.push({ type: "daySeparator" });
+          firstPageRowCount += 1; // Separator counts as 1 row
+        }
+
+        // Add all data rows for this day
+        firstPage.rows.push(...dayGroup.rows);
+        firstPageRowCount += dayRowCount;
+        currentDayIndex++;
+      } else {
+        // Day doesn't fit, move to next page
+        break;
+      }
+    }
+
+    pages.push(firstPage);
+
+    // Subsequent pages - exactly 28 rows each
+    while (currentDayIndex < dayGroups.length) {
+      const page = { rows: [] as any[], hasHeader: false };
+      let pageRowCount = 0;
+
+      // Fill page with complete day groups up to exactly 28 rows
+      while (currentDayIndex < dayGroups.length && pageRowCount < OTHER_PAGES_ROWS) {
+        const dayGroup = dayGroups[currentDayIndex];
+        const dayRowCount = dayGroup.rows.length;
+
+        // Check if this day group fits in the remaining space
+        const remainingRows = OTHER_PAGES_ROWS - pageRowCount;
+
+        if (dayRowCount <= remainingRows) {
+          // Add day separator (except when page is empty)
+          if (page.rows.length > 0) {
+            page.rows.push({ type: "daySeparator" });
+            pageRowCount += 1; // Separator counts as 1 row
+          }
+
+          // Add all data rows for this day
+          page.rows.push(...dayGroup.rows);
+          pageRowCount += dayRowCount;
+          currentDayIndex++;
+        } else {
+          // Day doesn't fit, move to next page
+          break;
+        }
+      }
+
+      pages.push(page);
+    }
+
+    return pages;
+  };
+
+  const pages = createPages();
+
+  // Table Header Component
+  const TableHeader = () => (
+    <View style={[styles.tableRow, styles.w100]}>
+      <View style={[styles.tableColHeader, styles.w5]}>
+        <Text style={styles.headerText}>DAY</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w5]}>
+        <Text style={styles.headerText}>DATE</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w5]}>
+        <Text style={styles.headerText}>DUE</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w5]}>
+        <Text style={styles.headerText}>DISC</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w15]}>
+        <Text style={styles.headerText}>METER READER</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w15]}>
+        <Text style={styles.headerText}>ZONE/BOOK</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w35]}>
+        <Text style={styles.headerText}>AREA</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w10]}>
+        <Text style={styles.headerText}>BILLED</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w10]}>
+        <Text style={styles.headerText}>REMARKS</Text>
+      </View>
+    </View>
+  );
+
+  // Render a data row
+  const DataRow = ({ item, rowIndex }: { item: any; rowIndex: number }) => {
+    const readingDate = new Date(item.entry.readingDate);
+
+    return (
+      <View style={[styles.tableRow, styles.w100]} key={`data-${rowIndex}`}>
+        <View style={[styles.tableCol, styles.w5]}>
+          <Text style={styles.cellText}>{item.dayNumber}</Text>
+        </View>
+        <View style={[styles.tableCol, styles.w5]}>
+          <Text style={styles.cellText}>{item.entry.readingDate ? format(readingDate, "MM/dd") : "N/A"}</Text>
+        </View>
+        <View style={[styles.tableCol, styles.w5]}>
+          <Text style={styles.cellText}>
+            {item.entry.dueDate
+              ? format(
+                  Array.isArray(item.entry.dueDate) ? item.entry.dueDate[0] : item.entry.dueDate,
+                  "MM/dd",
+                )
+              : "N/A"}
+          </Text>
+        </View>
+        <View style={[styles.tableCol, styles.w5]}>
+          <Text style={styles.cellText}>
+            {item.entry.disconnectionDate
+              ? format(
+                  Array.isArray(item.entry.disconnectionDate)
+                    ? item.entry.disconnectionDate[0]
+                    : item.entry.disconnectionDate,
+                  "MM/dd",
+                )
+              : "N/A"}
+          </Text>
+        </View>
+        <View style={[styles.tableCol, styles.w15]}>
+          <Text style={[styles.cellText, { textAlign: "left" }]}>
+            {item.isNoMeterReader ? "-" : item.meterReader?.name || "N/A"}
+          </Text>
+        </View>
+        <View style={[styles.tableCol, styles.w15]}>
+          <Text style={styles.cellText}>
+            {item.isNoMeterReader
+              ? "-"
+              : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
+                ? item.meterReader.zoneBooks.map(
+                    (zb: ZonebookWithDates, zbIdx: number) =>
+                      `${zb.zone}-${zb.book}${item.meterReader!.zoneBooks!.length > zbIdx + 1 ? ", " : ""}`,
+                  )
+                : "-"}
+          </Text>
+        </View>
+        <View style={[styles.tableCol, styles.w35]}>
+          <Text style={styles.cellText}>-</Text>
+        </View>
+        <View style={[styles.tableCol, styles.w10]}>
+          <Text style={styles.cellText}>{item.isNoMeterReader ? "-" : "0"}</Text>
+        </View>
+        <View style={[styles.tableCol, styles.w10]}>
+          <Text style={styles.cellText}>{item.isNoMeterReader ? "-" : "N/A"}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  // If no data, show empty state
+  if (dayGroups.length === 0) {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page} orientation="landscape">
+          <PdfHeader />
+          <View style={styles.header}>
+            <Text style={[{ fontWeight: "bold", fontSize: "9" }]}>METER READING SCHEDULE</Text>
+            <Text style={styles.title}>{formatDate(yearMonth)}</Text>
+          </View>
+        </Page>
+      </Document>
+    );
+  }
+
   return (
     <Document>
-      <Page size="A4" style={styles.page} orientation="landscape">
-        <View style={styles.header}>
-          <Text style={styles.subtitle}>Republic of the Philippines</Text>
-          <Text style={styles.title}>GENERAL SANTOS CITY WATER DISTRICT</Text>
-          <Text style={styles.subtitle}>E. Fernandez St., Lagao, GSC</Text>
-          <Text style={[styles.subtitle]}>Tel Nos. (083) 552-3824, 301-0542, 554-7231, 553-4960</Text>
-        </View>
-        <View style={styles.header}>
-          <Text style={[{ fontWeight: "bold", fontSize: "9" }]}>METER READING SCHEDULE</Text>
-          <Text style={styles.title}>{formatDate(yearMonth)}</Text>
-        </View>
-
-        <View style={styles.table}>
-          {/* Table Header */}
-          <View style={[styles.tableRow, styles.w100]}>
-            <View style={[styles.tableColHeader, styles.w5]}>
-              <Text style={styles.headerText}>DAY</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w5]}>
-              <Text style={styles.headerText}>DATE</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w5]}>
-              <Text style={styles.headerText}>DUE</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w5]}>
-              <Text style={styles.headerText}>DISC</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w15]}>
-              <Text style={styles.headerText}>METER READER</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w15]}>
-              <Text style={styles.headerText}>ZONE/BOOK</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w35]}>
-              <Text style={styles.headerText}>AREA</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w10]}>
-              <Text style={styles.headerText}>BILLED</Text>
-            </View>
-            <View style={[styles.tableColHeader, styles.w10]}>
-              <Text style={styles.headerText}>REMARKS</Text>
-            </View>
-          </View>
-
-          {/* Table Rows */}
-          {data.map((entry, idx) => {
-            const readingDate = new Date(entry.readingDate);
-            const dayNumber = dayNumbers[idx];
-            const meterReaders = entry.meterReaders || [];
-
-            if (meterReaders.length === 0) {
-              return (
-                <View style={[styles.tableRow, styles.w100]} key={idx}>
-                  <View style={[styles.tableCol, styles.w5]}>
-                    <Text style={styles.cellText}>{dayNumber}</Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w5]}>
-                    <Text style={styles.cellText}>
-                      {entry.readingDate ? format(readingDate, "MMM dd, yyyy (EEE)") : "N/A"}
-                    </Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w5]}>
-                    <Text style={styles.cellText}>
-                      {entry.dueDate
-                        ? format(
-                            Array.isArray(entry.dueDate) ? entry.dueDate[0] : entry.dueDate,
-                            "MMM dd, yyyy",
-                          )
-                        : "N/A"}
-                    </Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w5]}>
-                    <Text style={styles.cellText}>
-                      {entry.disconnectionDate
-                        ? format(
-                            Array.isArray(entry.disconnectionDate)
-                              ? entry.disconnectionDate[0]
-                              : entry.disconnectionDate,
-                            "MMM dd, yyyy",
-                          )
-                        : "N/A"}
-                    </Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w15]}>
-                    <Text style={styles.cellText}>-</Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w15]}>
-                    <Text style={styles.cellText}>-</Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w35]}>
-                    <Text style={styles.cellText}>-</Text>
-                  </View>
-                  <View style={[styles.tableCol, styles.w10]}>
-                    <Text style={styles.cellText}>-</Text>
-                  </View>{" "}
-                  <View style={[styles.tableCol, styles.w10]}>
-                    <Text style={styles.cellText}>-</Text>
-                  </View>
-                </View>
-              );
-            }
-
-            return meterReaders.map((reader, readerIdx) => (
-              <View style={[styles.tableRow, styles.w100]} key={`${idx}-${readerIdx}`}>
-                <View style={[styles.tableCol, styles.w5]}>
-                  <Text style={styles.cellText}>{dayNumber}</Text>
-                </View>
-                <View style={[styles.tableCol, styles.w5]}>
-                  <Text style={styles.cellText}>
-                    {entry.readingDate ? format(readingDate, "MM/dd") : "N/A"}
-                  </Text>
-                </View>
-                <View style={[styles.tableCol, styles.w5]}>
-                  <Text style={styles.cellText}>
-                    {entry.dueDate
-                      ? format(Array.isArray(entry.dueDate) ? entry.dueDate[0] : entry.dueDate, "MM/dd")
-                      : "N/A"}
-                  </Text>
-                </View>
-                <View style={[styles.tableCol, styles.w5]}>
-                  <Text style={styles.cellText}>
-                    {entry.disconnectionDate
-                      ? format(
-                          Array.isArray(entry.disconnectionDate)
-                            ? entry.disconnectionDate[0]
-                            : entry.disconnectionDate,
-                          "MM/dd",
-                        )
-                      : "N/A"}
-                  </Text>
-                </View>
-                <View style={[styles.tableCol, styles.w15]}>
-                  <Text style={[styles.cellText, { textAlign: "left" }]}>{reader.name}</Text>
-                </View>
-                <View style={[styles.tableCol, styles.w15]}>
-                  <Text style={styles.cellText}>
-                    {reader.zoneBooks && reader.zoneBooks.length > 0
-                      ? reader.zoneBooks.map(
-                          (zb, idx) =>
-                            `${zb.zone}-${zb.book}${reader.zoneBooks.length > idx + 1 ? ", " : ""}`,
-                        )
-                      : "-"}
-                  </Text>
-                </View>
-                <View style={[styles.tableCol, styles.w35]}>
-                  <Text style={styles.cellText}>-</Text>
-                </View>
-                <View style={[styles.tableCol, styles.w10]}>
-                  <Text style={styles.cellText}>0</Text>
-                </View>
-                <View style={[styles.tableCol, styles.w10]}>
-                  <Text style={styles.cellText}>N/A</Text>
-                </View>
+      {pages.map((page, pageIndex) => (
+        <Page key={pageIndex} size="A4" style={styles.page} orientation="landscape">
+          {/* Show header only on first page */}
+          {page.hasHeader && (
+            <>
+              <PdfHeader />
+              <View style={styles.header}>
+                <Text style={[{ fontWeight: "bold", fontSize: "9" }]}>METER READING SCHEDULE</Text>
+                <Text style={styles.title}>{formatDate(yearMonth)}</Text>
               </View>
-            ));
-          })}
-        </View>
-        <Text style={styles.footer}>Total Records: {data.length} | Generated by MR System</Text>
-      </Page>
+            </>
+          )}
+
+          {/* Table */}
+          <View style={styles.table}>
+            {/* Table Header - ONLY on first page */}
+            {page.hasHeader && <TableHeader />}
+
+            {/* Render rows for this page */}
+            {page.rows.map((row, rowIndex) => {
+              if (row.type === "daySeparator") {
+                return <View style={styles.daySeparator} key={`separator-${pageIndex}-${rowIndex}`} />;
+              } else {
+                return (
+                  <DataRow item={row.content!} rowIndex={rowIndex} key={`data-${pageIndex}-${rowIndex}`} />
+                );
+              }
+            })}
+          </View>
+        </Page>
+      ))}
     </Document>
   );
 };
@@ -441,60 +571,6 @@ export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) =
           </div>
         </div>
       </div>
-
-      {/* Download Section */}
-      {/* <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-lg">
-        <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              />
-            </svg>
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-800">Download Schedule</h3>
-          <p className="mb-4 text-sm text-gray-600">Download the PDF document to your device</p>
-
-          <PDFDownloadLink
-            document={<SchedulePDF data={sortedData} yearMonth={yearMonth} dayNumbers={dayNumbers} />}
-            fileName={`meter-reading-schedule-${yearMonth}.pdf`}
-            className="inline-flex min-w-[200px] items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
-          >
-            {({ loading }) => (
-              <>
-                {loading ? (
-                  <>
-                    <LoadingSpinner className="mr-2 h-4 w-4" />
-                    Preparing Download...
-                  </>
-                ) : (
-                  <>
-                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    Download PDF
-                  </>
-                )}
-              </>
-            )}
-          </PDFDownloadLink>
-        </div>
-
-        <div className="mt-6 border-t border-gray-200 pt-6">
-          <div className="text-center text-sm text-gray-500">
-            <p>The PDF includes all schedule details with professional formatting</p>
-            <p className="mt-1">Landscape orientation optimized for table viewing</p>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 };

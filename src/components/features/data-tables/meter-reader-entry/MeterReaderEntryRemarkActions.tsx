@@ -1,7 +1,6 @@
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Button } from "@mr/components/ui/Button";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { Reassignment } from "@mr/lib/types/zonebook";
 import { FunctionComponent } from "react";
 
 type MeterReaderEntryRemarkActionsProps = {
