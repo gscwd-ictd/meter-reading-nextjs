@@ -3,7 +3,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@mr/
 
 export default function DashboardPage() {
   return (
-    <div className="flex h-full flex-col p-5">
+    <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -13,6 +13,6 @@ export default function DashboardPage() {
       </Breadcrumb>
 
       <DashboardComponent />
-    </div>
+    </>
   );
 }

@@ -30,12 +30,12 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   return (
     <Card
       onClick={onCardClick}
-      className={`group relative overflow-hidden ${className} transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"}`}
+      className={`group relative overflow-hidden ${className} shadow-md transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Shine effect */}
-      <span className="shine pointer-events-none absolute inset-0 z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />
+      <span className="shine pointer-events-none absolute inset-0 z-10 -translate-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />
 
       {icon && (
         <div
@@ -48,7 +48,7 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
         </div>
       )}
       <CardHeader>
-        <CardTitle className="text-lg font-normal tracking-wide">{title}</CardTitle>
+        <CardTitle className="text-lg font-normal tracking-wide sm:text-xl lg:text-lg">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>
