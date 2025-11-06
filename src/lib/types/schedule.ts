@@ -13,6 +13,7 @@ export type MeterReadingEntryWithZonebooks = {
   dueDate: Date | Date[] | undefined;
   disconnectionDate: Date | Date[] | undefined;
   meterReaders?: MeterReaderWithZonebooks[];
+  day?: number | undefined;
 };
 
 export type BilledMeterReadingSchedule = MeterReadingEntryWithZonebooks & {

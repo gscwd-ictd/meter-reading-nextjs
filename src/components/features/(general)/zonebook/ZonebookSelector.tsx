@@ -14,7 +14,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popov
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
 import {
+  Ban,
   Check,
+  CheckCircle,
   ChevronDown,
   CircleXIcon,
   MapPinCheckIcon,
@@ -46,6 +48,14 @@ import { Input } from "@mr/components/ui/Input";
 type Props = {
   loading: boolean;
   onSelectionChange?: (zone: string, book: string) => void;
+};
+
+type ZoneBookEntry = {
+  zoneBook: string;
+  zone: string;
+  book: string;
+  area?: { name: string };
+  day?: number;
 };
 
 export default function ZoneBookSelector({ onSelectionChange, loading }: Props) {
@@ -137,6 +147,20 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
     });
   };
 
+  // get the missing days
+  const getMissingDays = (entries: ZoneBookEntry[]): number[] => {
+    const validDays = Array.from({ length: 21 }, (_, i) => i + 1);
+    const assignedDays = new Set<number>();
+
+    entries.forEach((entry) => {
+      if (entry.day !== undefined && entry.day >= 1 && entry.day <= 21) {
+        assignedDays.add(entry.day);
+      }
+    });
+
+    return validDays.filter((day) => !assignedDays.has(day));
+  };
+
   return (
     <Dialog
       open={zonebookSelectorIsOpen}
@@ -174,7 +198,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
           </DialogDescription>
         </DialogHeader>
 
-        <Command className="h-[16rem]h-full flex flex-col gap-2 overflow-y-auto p-0">
+        <Command className="flex h-[16rem] flex-col gap-2 overflow-y-auto p-0">
           <div className="grid w-full grid-cols-3 items-end gap-2">
             {/* Zone Combobox */}
             <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
@@ -389,6 +413,22 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
         </Command>
         <div className="flex flex-col gap-1">
           <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
+          <div className="flex items-center gap-2 text-sm">
+            <span>Unassigned days:</span>
+            {getMissingDays(meterReaderZonebooks).length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {getMissingDays(meterReaderZonebooks).map((day) => (
+                  <span key={day} className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
+                    {day}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
+                All days assigned ✓
+              </span>
+            )}
+          </div>
           <div className="h-[22rem] overflow-y-scroll rounded border p-0">
             <Table className="table-fixed text-sm" onWheel={(e) => e.stopPropagation()}>
               <TableHeader>
@@ -405,7 +445,7 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
 
               <TableBody>
                 {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
-                  meterReaderZonebooks.map((entry) => (
+                  meterReaderZonebooks.map((entry, index) => (
                     <TableRow key={entry.zoneBook} className="border-b">
                       <TableCell className="flex h-[3rem] w-full items-center justify-center border-r">
                         <MapPinCheckIcon className="size-5 text-green-600" />
@@ -413,9 +453,33 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                       {/* <TableCell>{entry.zoneBook}</TableCell> */}
                       <TableCell className="border-r">{entry.zone}</TableCell>
                       <TableCell className="border-r">{entry.book}</TableCell>
-                      <TableCell className="truncate border-r">{entry.area?.name}</TableCell>
+                      <TableCell className="truncate border-r text-xs">{entry.area?.name}</TableCell>
                       <TableCell className="border-r">
-                        <Input type="number" className="h-[2rem]" />
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            className="h-[2rem] border-gray-300" // Remove conditional border
+                            value={entry.day || ""}
+                            onChange={(e) => {
+                              const updatedZonebooks = [...meterReaderZonebooks];
+                              updatedZonebooks[index] = {
+                                ...entry,
+                                day: e.target.value === "" ? undefined : Number(e.target.value),
+                              };
+                              setMeterReaderZonebooks(updatedZonebooks);
+                              setValue("zoneBooks", updatedZonebooks);
+                              console.log(
+                                `Row ${index}:`,
+                                e.target.value === "" ? undefined : Number(e.target.value),
+                              );
+                            }}
+                          />
+                          {entry.day !== undefined ? (
+                            <CheckCircle className="size-5 text-green-600" />
+                          ) : (
+                            <Ban className="size-5 text-red-400" />
+                          )}
+                        </div>
                       </TableCell>
 
                       <TableCell className="flex h-[3rem] items-center justify-center border-r">

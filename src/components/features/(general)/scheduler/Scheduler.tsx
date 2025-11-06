@@ -273,7 +273,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className=""
+                    className="rounded-none border-none shadow-none"
                     variant="outline"
                     onClick={() => {
                       handleMonthChange("today");
