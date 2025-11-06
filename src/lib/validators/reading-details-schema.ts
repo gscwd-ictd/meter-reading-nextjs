@@ -1,3 +1,4 @@
+import { is } from "drizzle-orm";
 import z from "zod/v3";
 import z4 from "zod/v4";
 
@@ -49,6 +50,7 @@ export const CreateReadingDetailsSchema = z4.object({
   timeEnd: z4.coerce.date().nullish(),
   previousBillDate: z4.coerce.date().nullish(),
   createdAt: z4.coerce.date().nullish(),
+  isPosted: z4.boolean(),
 });
 
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
