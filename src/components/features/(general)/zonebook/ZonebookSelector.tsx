@@ -161,6 +161,17 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
     return validDays.filter((day) => !assignedDays.has(day));
   };
 
+  const handleDayChange = (value: number | undefined, index: number, entry: Zonebook) => {
+    const updatedZonebooks = [...meterReaderZonebooks];
+    updatedZonebooks[index] = {
+      ...entry,
+      day: value,
+    };
+    setMeterReaderZonebooks(updatedZonebooks);
+    setValue("zoneBooks", updatedZonebooks);
+    console.log(`Row ${index}:`, value);
+  };
+
   return (
     <Dialog
       open={zonebookSelectorIsOpen}
@@ -173,350 +184,388 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
     >
       <DialogTrigger asChild>
         <button
-          className="text-primary flex items-center gap-1"
+          className="text-primary flex items-center gap-2"
           disabled={selectedEmployee === undefined ? true : false}
         >
-          <Label
-            htmlFor="zoneBooks"
-            className="gap-1 text-left text-sm font-medium text-gray-700 group-hover:cursor-pointer"
-          >
+          <Label htmlFor="zoneBooks" className="text-sm font-medium text-gray-700 group-hover:cursor-pointer">
             Default Zonebooks <span className="text-red-600">*</span>
           </Label>
           <PlusCircleIcon className="fill-primary text-primary-foreground size-4" />
         </button>
       </DialogTrigger>
       <DialogContent
-        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[50%]"
+        className="flex h-[95vh] max-h-[800px] min-w-[90vw] flex-col overflow-hidden lg:min-w-[70vw] xl:min-w-[60vw]"
         hideClose
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="gap-0">
-          <DialogTitle>Assign zonebook</DialogTitle>
-          <DialogDescription className="text-gray-500">
-            Select a zonebook and press add to assign
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-lg font-semibold">Assign Zonebooks</DialogTitle>
+          <DialogDescription className="text-gray-600">
+            Select zonebooks and assign reading days (1-21)
           </DialogDescription>
         </DialogHeader>
 
-        <Command className="flex h-[16rem] flex-col gap-2 overflow-y-auto p-0">
-          <div className="grid w-full grid-cols-3 items-end gap-2">
-            {/* Zone Combobox */}
-            <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
-              <PopoverTrigger asChild className="flex flex-col gap-1">
-                <div>
-                  <Label
-                    htmlFor="zone"
-                    className="text-primary text-left text-sm font-bold group-hover:cursor-pointer"
-                  >
+        <div className="flex flex-1 flex-col gap-6 overflow-hidden">
+          {/* Selection Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-700">Available Zonebooks</h3>
+              <div className="text-xs text-gray-500">
+                Unassigned: <span className="font-medium text-gray-700">{tempFilteredZonebooks.length}</span>
+              </div>
+            </div>
+
+            <Command className="flex flex-col gap-3 overflow-hidden">
+              <div className="grid grid-cols-3 gap-3">
+                {/* Zone Combobox */}
+                <div className="space-y-2">
+                  <Label htmlFor="zone" className="text-sm font-medium text-gray-700">
                     Zone
                   </Label>
-                  <Button variant="outline" role="combobox" className="w-full justify-between">
-                    {selectedZone || "Zone"}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent avoidCollisions className="p-0">
-                <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Search zones..."
-                    value={zoneInput}
-                    onValueChange={setZoneInput}
-                  />
-                  <CommandEmpty>No zone found.</CommandEmpty>
-                  <CommandList
-                    className="h-auto max-h-[12rem] overflow-auto"
-                    onWheel={(e) => e.stopPropagation()}
-                  >
-                    {/* Add Clear option */}
-                    <CommandItem
-                      key="clear-zone"
-                      value="clear"
-                      onSelect={handleClearZone}
-                      className="text-muted-foreground"
-                    >
-                      <X className="mr-2 h-4 w-4" />
-                      Clear selection
-                    </CommandItem>
-                    {filteredZones?.map((zone) => (
-                      <CommandItem
-                        key={zone}
-                        value={zone}
-                        onSelect={() => {
-                          handleZoneSelect(zone);
-                          setZoneIsOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn("mr-2 h-4 w-4", selectedZone === zone ? "opacity-100" : "opacity-0")}
+                  <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" role="combobox" className="w-full justify-between">
+                        <span className={selectedZone ? "text-gray-900" : "text-gray-500"}>
+                          {selectedZone || "Select zone"}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search zones..."
+                          value={zoneInput}
+                          onValueChange={setZoneInput}
                         />
-                        {zone}
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                        <CommandEmpty>No zone found.</CommandEmpty>
+                        <CommandList className="max-h-48">
+                          <CommandItem
+                            key="clear-zone"
+                            value="clear"
+                            onSelect={handleClearZone}
+                            className="text-muted-foreground"
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear selection
+                          </CommandItem>
+                          {filteredZones?.map((zone) => (
+                            <CommandItem
+                              key={zone}
+                              value={zone}
+                              onSelect={() => {
+                                handleZoneSelect(zone);
+                                setZoneIsOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedZone === zone ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {zone}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-            {/* Book Combobox */}
-            <Popover open={bookIsOpen} onOpenChange={setBookIsOpen}>
-              <PopoverTrigger asChild className="flex flex-col gap-1">
-                <div>
-                  <Label
-                    htmlFor="book"
-                    className="text-primary text-left text-sm font-bold group-hover:cursor-pointer"
-                  >
+                {/* Book Combobox */}
+                <div className="space-y-2">
+                  <Label htmlFor="book" className="text-sm font-medium text-gray-700">
                     Book
                   </Label>
+                  <Popover open={bookIsOpen} onOpenChange={setBookIsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between"
+                        disabled={!selectedZone}
+                      >
+                        <span className={selectedBook ? "text-gray-900" : "text-gray-500"}>
+                          {selectedBook || "Select book"}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search books..."
+                          value={bookInput}
+                          onValueChange={setBookInput}
+                        />
+                        <CommandEmpty>No book found.</CommandEmpty>
+                        <CommandList className="max-h-48">
+                          <CommandItem
+                            key="clear-book"
+                            value="clear"
+                            onSelect={handleClearBook}
+                            className="text-muted-foreground"
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear selection
+                          </CommandItem>
+                          {filteredBooks.map((book) => (
+                            <CommandItem
+                              key={book}
+                              value={book}
+                              onSelect={() => {
+                                handleBookSelect(book);
+                                setBookIsOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedBook === book ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {book}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Add Button */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700 opacity-0">Action</Label>
                   <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                    disabled={!selectedZone}
+                    disabled={!selectedZonebook}
+                    onClick={async () => {
+                      const newMeterReaderZonebooks = [...meterReaderZonebooks];
+                      newMeterReaderZonebooks.push(selectedZonebook!);
+
+                      setZoneInput("");
+                      setBookInput("");
+                      setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+
+                      const newZonebooks = await getNewFilteredZonebooks(selectedZonebook!);
+                      setTempFilteredZonebooks(ZonebookFlatSorter(newZonebooks));
+                      setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
+
+                      setSelectedBook("");
+                      setSelectedZone("");
+                      setSelectedZonebook(null);
+                    }}
+                    className="w-full"
                   >
-                    {selectedBook || "Book"}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    Add to List
                   </Button>
                 </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Search books..."
-                    value={bookInput}
-                    onValueChange={setBookInput}
-                  />
-                  <CommandEmpty>No book found.</CommandEmpty>
-                  <CommandList
-                    className="h-auto max-h-[12rem] overflow-auto"
-                    onWheel={(e) => e.stopPropagation()}
-                  >
-                    {/* Add Clear option */}
-                    <CommandItem
-                      key="clear-book"
-                      value="clear"
-                      onSelect={handleClearBook}
-                      className="text-muted-foreground"
-                    >
-                      <X className="mr-2 h-4 w-4" />
-                      Clear selection
-                    </CommandItem>
-                    {filteredBooks.map((book) => (
-                      <CommandItem
-                        key={book}
-                        value={book}
-                        onSelect={() => {
-                          handleBookSelect(book);
-                          setBookIsOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn("mr-2 h-4 w-4", selectedBook === book ? "opacity-100" : "opacity-0")}
-                        />
-                        {book}
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-
-            {/* Add Button */}
-            <Button
-              disabled={selectedZonebook === null ? true : false}
-              onClick={async () => {
-                const newMeterReaderZonebooks = [...meterReaderZonebooks];
-
-                newMeterReaderZonebooks.push(selectedZonebook!);
-
-                setZoneInput("");
-
-                setBookInput("");
-
-                setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
-
-                const newZonebooks = await getNewFilteredZonebooks(selectedZonebook!);
-
-                setTempFilteredZonebooks(ZonebookFlatSorter(newZonebooks));
-
-                setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
-
-                setSelectedBook("");
-                setSelectedZone("");
-                setSelectedZonebook(null);
-              }}
-              className="dark:text-white dark:disabled:text-black"
-            >
-              Add
-            </Button>
-          </div>
-
-          {loading ? (
-            <div className="text-primary flex h-full w-full items-center justify-center">
-              <LoadingSpinner /> Loading zoneBooks...
-            </div>
-          ) : (
-            <CommandGroup
-              className="h-[16rem] overflow-auto rounded border"
-              onWheel={(e) => e.stopPropagation()}
-            >
-              {!selectedZone && !selectedBook && !tempFilteredZonebooks && loading ? (
-                <div>
-                  <LoadingSpinner />
-                </div>
-              ) : !selectedZone && !selectedBook && tempFilteredZonebooks && !loading ? (
-                tempFilteredZonebooks.length > 0 &&
-                tempFilteredZonebooks.map((zb, idx) => (
-                  <CommandItem
-                    key={idx}
-                    value={selectedZonebook?.zoneBook}
-                    onSelect={() => handleZonebookSelect(zb)}
-                    className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
-                  >
-                    <MapPinIcon className="text-primary size-5" />
-                    <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                    <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
-                  </CommandItem>
-                ))
-              ) : selectedZone && !selectedBook && tempFilteredZonebooks && !loading ? (
-                tempFilteredZonebooks
-                  .filter((zb) => zb.zone === selectedZone)
-                  .map((zb, idx) => (
-                    <CommandItem
-                      key={idx}
-                      value={selectedZonebook?.zoneBook}
-                      onSelect={() => handleZonebookSelect(zb)}
-                      className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
-                    >
-                      <MapPinIcon className="text-primary size-5" />
-                      <span className="col-span-2 font-medium text-gray-600">{zb.zoneBook}</span>
-                      <span className="col-span-9 font-medium text-black">{zb.area.name}</span>
-                    </CommandItem>
-                  ))
-              ) : selectedZone && selectedBook && tempFilteredZonebooks && !loading ? (
-                tempFilteredZonebooks
-                  .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
-                  .map((zb, idx) => (
-                    <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
-                      <MapPinCheckIcon className="size-5 text-green-600" />
-                      <span className="col-span-2 font-medium text-gray-600 dark:text-white">
-                        {zb.zoneBook}
-                      </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">
-                        {zb.area.name}
-                      </span>
-                    </CommandItem>
-                  ))
-              ) : null}
-            </CommandGroup>
-          )}
-        </Command>
-        <div className="flex flex-col gap-1">
-          <Label className="text-primary font-bold">Meter Reader Zonebooks</Label>
-          <div className="flex items-center gap-2 text-sm">
-            <span>Unassigned days:</span>
-            {getMissingDays(meterReaderZonebooks).length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {getMissingDays(meterReaderZonebooks).map((day) => (
-                  <span key={day} className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">
-                    {day}
-                  </span>
-                ))}
               </div>
-            ) : (
-              <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
-                All days assigned ✓
-              </span>
-            )}
+
+              {/* Zonebook List */}
+              <div className="rounded-md border">
+                <CommandGroup className="max-h-48">
+                  {loading ? (
+                    <div className="flex h-32 items-center justify-center text-gray-500">
+                      <LoadingSpinner className="mr-2" />
+                      Loading zonebooks...
+                    </div>
+                  ) : (
+                    <>
+                      {!selectedZone && !selectedBook && tempFilteredZonebooks && !loading
+                        ? tempFilteredZonebooks.map((zb, idx) => (
+                            <CommandItem
+                              key={idx}
+                              onSelect={() => handleZonebookSelect(zb)}
+                              className="flex items-center gap-3 px-3 py-2 text-sm"
+                            >
+                              <MapPinIcon className="size-4 text-gray-400" />
+                              <span className="font-medium text-gray-600">{zb.zoneBook}</span>
+                              <span className="flex-1 truncate text-gray-900">{zb.area.name}</span>
+                            </CommandItem>
+                          ))
+                        : selectedZone &&
+                          !selectedBook &&
+                          tempFilteredZonebooks &&
+                          !loading &&
+                          tempFilteredZonebooks
+                            .filter((zb) => zb.zone === selectedZone)
+                            .map((zb, idx) => (
+                              <CommandItem
+                                key={idx}
+                                onSelect={() => handleZonebookSelect(zb)}
+                                className="flex items-center gap-3 px-3 py-2 text-sm"
+                              >
+                                <MapPinIcon className="size-4 text-gray-400" />
+                                <span className="font-medium text-gray-600">{zb.zoneBook}</span>
+                                <span className="flex-1 truncate text-gray-900">{zb.area.name}</span>
+                              </CommandItem>
+                            ))}
+                    </>
+                  )}
+                </CommandGroup>
+              </div>
+            </Command>
           </div>
-          <div className="h-[22rem] overflow-y-scroll rounded border p-0">
-            <Table className="table-fixed text-sm" onWheel={(e) => e.stopPropagation()}>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[5%] font-semibold text-gray-600"></TableHead>
-                  {/* <TableHead className="font-semibold text-gray-600">Zone-book</TableHead> */}
-                  <TableHead className="w-[15%] font-semibold text-gray-600">Zone</TableHead>
-                  <TableHead className="w-[15%] font-semibold text-gray-600">Book</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Area</TableHead>
-                  <TableHead className="w-[15%] font-semibold text-gray-600">Day</TableHead>
-                  <TableHead className="w-[5%] font-semibold text-gray-600"></TableHead>
-                </TableRow>
-              </TableHeader>
 
-              <TableBody>
-                {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
-                  meterReaderZonebooks.map((entry, index) => (
-                    <TableRow key={entry.zoneBook} className="border-b">
-                      <TableCell className="flex h-[3rem] w-full items-center justify-center border-r">
-                        <MapPinCheckIcon className="size-5 text-green-600" />
-                      </TableCell>
-                      {/* <TableCell>{entry.zoneBook}</TableCell> */}
-                      <TableCell className="border-r">{entry.zone}</TableCell>
-                      <TableCell className="border-r">{entry.book}</TableCell>
-                      <TableCell className="truncate border-r text-xs">{entry.area?.name}</TableCell>
-                      <TableCell className="border-r">
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            className="h-[2rem] border-gray-300" // Remove conditional border
-                            value={entry.day || ""}
-                            onChange={(e) => {
-                              const updatedZonebooks = [...meterReaderZonebooks];
-                              updatedZonebooks[index] = {
-                                ...entry,
-                                day: e.target.value === "" ? undefined : Number(e.target.value),
-                              };
-                              setMeterReaderZonebooks(updatedZonebooks);
-                              setValue("zoneBooks", updatedZonebooks);
-                              console.log(
-                                `Row ${index}:`,
-                                e.target.value === "" ? undefined : Number(e.target.value),
-                              );
-                            }}
-                          />
-                          {entry.day !== undefined ? (
-                            <CheckCircle className="size-5 text-green-600" />
-                          ) : (
-                            <Ban className="size-5 text-red-400" />
-                          )}
-                        </div>
-                      </TableCell>
-
-                      <TableCell className="flex h-[3rem] items-center justify-center border-r">
-                        <button
-                          onClick={() => {
-                            const newMeterReaderZonebooks = meterReaderZonebooks.filter(
-                              (zb) => zb.zoneBook !== entry.zoneBook,
-                            );
-                            setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
-                            setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
-
-                            const newFilteredZonebooks = [...tempFilteredZonebooks];
-                            newFilteredZonebooks.unshift(entry);
-
-                            setTempFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
-                          }}
-                        >
-                          <CircleXIcon className="size-5 fill-red-600 text-white" />
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+          {/* Assignment Section */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex items-center justify-between pb-3">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-gray-700">Assigned Zonebooks</h3>
+                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                  {meterReaderZonebooks.length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-600">Available days:</span>
+                {getMissingDays(meterReaderZonebooks).length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    {getMissingDays(meterReaderZonebooks).map((day) => (
+                      <span
+                        key={day}
+                        className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+                      >
+                        {day}
+                      </span>
+                    ))}
+                  </div>
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center">
-                      No zone books added
-                    </TableCell>
-                  </TableRow>
+                  <span className="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                    Complete ✓
+                  </span>
                 )}
-              </TableBody>
-            </Table>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-hidden rounded-md border">
+              {/* Table Container with Scroll */}
+              <div className="h-full overflow-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-gray-50">
+                    <TableRow>
+                      <TableHead className="w-12 font-semibold text-gray-700">Status</TableHead>
+                      <TableHead className="w-20 font-semibold text-gray-700">Zone</TableHead>
+                      <TableHead className="w-20 font-semibold text-gray-700">Book</TableHead>
+                      <TableHead className="font-semibold text-gray-700">Area</TableHead>
+                      <TableHead className="w-32 font-semibold text-gray-700">
+                        <div className="flex items-center gap-1">
+                          Day
+                          <span className="text-xs font-normal text-gray-500">(1-21)</span>
+                        </div>
+                      </TableHead>
+                      <TableHead className="w-12 font-semibold text-gray-700">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {meterReaderZonebooks && meterReaderZonebooks.length > 0 ? (
+                      meterReaderZonebooks.map((entry, index) => (
+                        <TableRow key={entry.zoneBook} className="group hover:bg-gray-50">
+                          <TableCell>
+                            <div className="flex justify-center">
+                              {entry.day !== undefined ? (
+                                <div className="flex size-6 items-center justify-center rounded-full bg-green-100">
+                                  <CheckCircle className="size-4 text-green-600" />
+                                </div>
+                              ) : (
+                                <div className="flex size-6 items-center justify-center rounded-full bg-gray-100">
+                                  <Ban className="size-4 text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium text-gray-900">{entry.zone}</TableCell>
+                          <TableCell className="font-medium text-gray-900">{entry.book}</TableCell>
+                          <TableCell>
+                            <div className="max-w-[200px] truncate text-gray-700" title={entry.area?.name}>
+                              {entry.area?.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  className={`h-8 w-20 text-center ${
+                                    entry.day !== undefined
+                                      ? "border-green-300 bg-green-50 text-green-900"
+                                      : "border-gray-300 text-gray-900"
+                                  }`}
+                                  min={1}
+                                  max={21}
+                                  placeholder="Day"
+                                  value={entry.day || ""}
+                                  onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    if (inputValue === "") {
+                                      handleDayChange(undefined, index, entry);
+                                      return;
+                                    }
+                                    const numericValue = Number(inputValue);
+                                    if (
+                                      Number.isInteger(numericValue) &&
+                                      numericValue >= 1 &&
+                                      numericValue <= 21
+                                    ) {
+                                      handleDayChange(numericValue, index, entry);
+                                    }
+                                  }}
+                                />
+                                {entry.day && (
+                                  <div className="absolute -top-1 -right-1">
+                                    <div className="flex size-4 items-center justify-center rounded-full bg-green-500">
+                                      <Check className="size-2.5 text-white" />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <button
+                              onClick={() => {
+                                const newMeterReaderZonebooks = meterReaderZonebooks.filter(
+                                  (zb) => zb.zoneBook !== entry.zoneBook,
+                                );
+                                setMeterReaderZonebooks(zoneBookSorter(newMeterReaderZonebooks));
+                                setValue("zoneBooks", zoneBookSorter(newMeterReaderZonebooks));
+
+                                const newFilteredZonebooks = [...tempFilteredZonebooks];
+                                newFilteredZonebooks.unshift(entry);
+                                setTempFilteredZonebooks(zoneBookSorter(newFilteredZonebooks));
+                              }}
+                              className="rounded p-1 opacity-70 transition-all group-hover:opacity-100 hover:bg-gray-200 hover:opacity-100"
+                              title="Remove assignment"
+                            >
+                              <CircleXIcon className="size-4 fill-red-500 text-white" />
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="py-12 text-center">
+                          <div className="flex flex-col items-center gap-3 text-gray-500">
+                            <MapPinIcon className="size-12 text-gray-300" />
+                            <div>
+                              <p className="font-medium text-gray-600">No zonebooks assigned</p>
+                              <p className="text-sm">Add zonebooks from the list above</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           </div>
         </div>
 
-        <DialogFooter className="flex w-full justify-center">
+        <DialogFooter className="pt-4">
           <DialogClose asChild>
-            <Button variant="default" className="w-full dark:text-white">
+            <Button variant="default" className="w-full">
               Close
             </Button>
           </DialogClose>
