@@ -5,6 +5,7 @@ import { IDashboardRepository } from "./interfaces/dashboard/dashboard.interface
 import { IMeterReaderRepository } from "./interfaces/meter-readers/meter-readers.interface.repository";
 import { IReadingRemarkRepository } from "./interfaces/reading-remarks/reading-remark.interface.repository";
 import { IScheduleRepository } from "./interfaces/schedule/schedule.interface.repository";
+import { IUploadImageRepository } from "./interfaces/upload-image/upload-image.interface.repository";
 import { IZoneBookRepository } from "./interfaces/zone-book/zone-book.interface.repository";
 import { AreaRepository } from "./services/area/area.repository";
 import { AreaService } from "./services/area/area.service";
@@ -20,6 +21,8 @@ import { ReadingRemarkRepository } from "./services/reading-remarks/reading-rema
 import { ReadingRemarkService } from "./services/reading-remarks/reading-remark.service";
 import { ScheduleRepository } from "./services/schedule/schedule.repository";
 import { ScheduleService } from "./services/schedule/schedule.service";
+import { UploadImageRepository } from "./services/upload-image/upload-image.repository";
+import { UploadImageService } from "./services/upload-image/upload-image.service";
 import { ZoneBookRepository } from "./services/zone-book/zone-book.repository";
 import { ZoneBookService } from "./services/zone-book/zone-book.service";
 
@@ -35,6 +38,7 @@ export class MeterReadingContext {
   private _billingAdjustmentRepository?: IBillingAdjustmentRepository;
   private _dashboardRepository?: IDashboardRepository;
   private _readingRemarkRepository?: IReadingRemarkRepository;
+  private _uploadImageRepository?: IUploadImageRepository;
 
   // Services
   private _meterReaderService?: MeterReaderService;
@@ -45,6 +49,7 @@ export class MeterReadingContext {
   private _billingAdjustmentService?: BillingAdjustmentService;
   private _dashboardService?: DashboardService;
   private _readingRemarkService?: ReadingRemarkService;
+  private _uploadImageService?: UploadImageService;
 
   private constructor() {}
 
@@ -116,6 +121,14 @@ export class MeterReadingContext {
     return this._readingRemarkRepository;
   }
 
+  public getUploadImageRepository(): IUploadImageRepository {
+    if (!this._uploadImageRepository) {
+      this._uploadImageRepository = new UploadImageRepository();
+    }
+
+    return this._uploadImageRepository;
+  }
+
   // Services
   public getMeterReaderService(): MeterReaderService {
     if (!this._meterReaderService) {
@@ -174,6 +187,13 @@ export class MeterReadingContext {
     }
 
     return this._readingRemarkService;
+  }
+
+  public getUploadImageService(): UploadImageService {
+    if (!this._uploadImageService) {
+      this._uploadImageService = new UploadImageService(this.getUploadImageRepository());
+    }
+    return this._uploadImageService;
   }
 }
 

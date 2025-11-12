@@ -3,14 +3,7 @@ import { ZoneBookSchema } from "./zone-book.type";
 
 /* route query */
 export const ScheduleQuerySchema = z.object({
-  date: z.string().refine(
-    (val) =>
-      /^\d{4}-\d{2}$/.test(val) || // Matches YYYY-MM
-      /^\d{4}-\d{2}-\d{2}$/.test(val), // Matches YYYY-MM-DD
-    {
-      message: "Invalid date format. Use YYYY-MM or YYYY-MM-DD.",
-    },
-  ),
+  date: z.string().regex(/^\d{4}-(\d{2})(-\d{2})?$/, "Invalid date format. Use YYYY-MM or YYYY-MM-DD."),
 });
 
 /* single array  */

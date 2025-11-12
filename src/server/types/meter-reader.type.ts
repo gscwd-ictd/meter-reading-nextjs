@@ -35,7 +35,7 @@ export const MeterReaderDetailsSchema = z.object({
 
 export const MeterReaderSchema = MeterReaderDetailsSchema.extend({
   restDay: z.enum(RestDayType).transform((val) => (val === "0" ? "sunday" : "saturday")),
-  zoneBooks: ZoneBookSchema.omit({ id: true }).array(),
+  zoneBooks: ZoneBookSchema.extend({ day: z.number().nullish() }).omit({ id: true }).array(),
 });
 
 export const PaginatedSchema = z.object({
@@ -64,7 +64,9 @@ export const AssignMeterReaderSchema = MeterReaderSchema.pick({
   zoneBooks: ZoneBookSchema.pick({
     zone: true,
     book: true,
-  }).array(),
+  })
+    .extend({ day: z.number().nullable() })
+    .array(),
 });
 
 export type EmployeeDetails = z.infer<typeof EmployeeDetailsSchema>;

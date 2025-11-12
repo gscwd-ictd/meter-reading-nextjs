@@ -72,6 +72,7 @@ export const ScheduleReadingAccountSchema = z
   .object({
     meterReaderId: z.string(),
     readingDate: z.coerce.string(),
+    dateToday: z.coerce.string(),
     zoneBooks: z
       .object({
         zone: z.string(),
@@ -82,7 +83,7 @@ export const ScheduleReadingAccountSchema = z
         }),
         dueDate: z.coerce.date(),
         disconnectionDate: z.coerce.date(),
-        accounts: ConsumerDetailsSchema.array(),
+        accounts: ConsumerDetailsSchema.extend({ isExist: z.coerce.boolean() }).array(),
       })
       .array(),
   })
