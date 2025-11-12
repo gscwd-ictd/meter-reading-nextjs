@@ -103,7 +103,11 @@ export const SearchPersonnelCombobox: FunctionComponent = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" onWheel={(e) => e.stopPropagation()}>
+      <PopoverContent
+        className="w-full p-0"
+        onWheel={(e) => e.stopPropagation()}
+        style={{ width: "var(--radix-popover-trigger-width)" }}
+      >
         {!employees && (isLoading || isPending) ? (
           <div className="text-primary flex w-full justify-center gap-2 font-medium">
             <LoadingSpinner /> Loading...

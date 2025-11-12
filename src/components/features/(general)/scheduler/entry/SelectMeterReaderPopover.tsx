@@ -63,8 +63,6 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
   const filteredMeterReaders = useMemo(() => {
     const existingMeterReaders = [...assignedMeterReaders];
 
-    console.log(existingMeterReaders);
-
     // Filter by search term
     if (!searchTerm) return existingMeterReaders;
 

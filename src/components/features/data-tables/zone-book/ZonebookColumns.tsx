@@ -70,6 +70,7 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
               zone: row.original.zone,
               zoneBook: row.original.zoneBook,
               id: row.original.id,
+              day: row.original.day ? row.original.day : null,
             }}
           />
         ),
