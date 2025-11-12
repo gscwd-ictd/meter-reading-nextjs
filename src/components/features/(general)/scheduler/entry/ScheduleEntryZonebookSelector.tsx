@@ -190,6 +190,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   book: zb.book,
                   dueDate: zb.dueDate,
                   disconnectionDate: zb.disconnectionDate,
+                  day: zb.day,
                 };
               })
             : [],
@@ -212,6 +213,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       disconnectionDate: Array.isArray(selectedScheduleEntry?.disconnectionDate)
         ? undefined
         : selectedScheduleEntry?.disconnectionDate,
+      day: null,
     });
 
     setAssignedZonebooks(zoneBooksToBeAssigned);
@@ -302,12 +304,12 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
         setSelectedBook("");
         setSelectedZone("");
         setSelectedZonebook(null);
-        setHasFetchedZonebooks(false);
         setAssignedZonebooks([]);
         setUnassignedZonebooks([]);
         setHasFetchedZonebooks(false);
         setSelectedMeterReader(null);
-        refetchEntry!();
+
+        // refetchEntry!();
       }}
       modal
     >
@@ -365,7 +367,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <Command className="flex h-full flex-col gap-2 overflow-y-auto">
+        <Command className="flex h-[16rem] flex-col gap-2 overflow-y-auto">
           <div className="grid w-full grid-cols-3 items-end gap-2">
             {/* Zone Combobox */}
             <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>

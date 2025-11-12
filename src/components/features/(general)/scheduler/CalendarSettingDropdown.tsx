@@ -13,6 +13,7 @@ import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { Scheduler } from "./useScheduler";
+import { PopulateSchedByDays } from "./PopulateSchedByDays";
 
 type CalendarSettingDropdownProps = {
   scheduler: Scheduler;
@@ -44,6 +45,9 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

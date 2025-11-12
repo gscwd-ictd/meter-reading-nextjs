@@ -660,7 +660,7 @@ export const useScheduler = (holidays: Holiday[]) => {
     (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
       const transformMeterReaders: MeterReaderWithZonebooks[] = meterReaders.map((mr) => ({
         ...mr,
-        reassignment: { remarks: "", zonebooks: [] },
+        reassignment: { remarks: "", zoneBooks: [] },
         zoneBooks: mr.zoneBooks.map((zb) => ({ ...zb, dueDate: undefined, disconnectionDate: undefined })),
       }));
 
@@ -677,6 +677,124 @@ export const useScheduler = (holidays: Holiday[]) => {
     },
     [],
   );
+
+  //  existing random day assignment function
+  const addRandomDayNumbers = (meterReaders: MeterReader[]) => {
+    meterReaders.forEach((meterReader) => {
+      const days = Array.from({ length: 21 }, (_, i) => i + 1);
+
+      // Shuffle days array
+      for (let i = days.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [days[i], days[j]] = [days[j], days[i]];
+      }
+
+      meterReader.zoneBooks.forEach((zoneBook, idx) => {
+        zoneBook.day = days[idx % days.length];
+      });
+    });
+
+    return meterReaders.map((mr) => ({ ...mr, reassignment: { zoneBooks: [], remarks: null } }));
+  };
+
+  const assignMeterReadersWithDays = useCallback(
+    (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]) => {
+      // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
+
+      // Pre-calculate day number mapping for the entire schedule
+      const dayNumberMap = calculateDayNumberMap(schedule);
+
+      return schedule.map((entry) => {
+        if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
+          return { ...entry, meterReaders: [] };
+        }
+
+        const readingRestDay = getDayName(entry.readingDate);
+        const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
+
+        const assignedMeterReaders = meterReaders
+          .filter((reader) => reader.restDay !== readingRestDay)
+          .map((reader) => {
+            const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
+
+            return {
+              ...reader,
+              zoneBooks: assignedZoneBooks.map((zb) => ({
+                ...zb,
+                dueDate: entry.dueDate,
+                disconnectionDate: entry.disconnectionDate,
+              })),
+            };
+          })
+          .filter((reader) => reader.zoneBooks.length > 0);
+
+        return {
+          ...entry,
+          meterReaders: assignedMeterReaders,
+          day,
+        };
+      });
+    },
+    [],
+  );
+
+  // Helper to log the day assignments
+  const logDayAssignments = (schedule: MeterReadingSchedule[]) => {
+    const dayMap = calculateDayNumberMap(schedule);
+    const assignments = Array.from(dayMap.entries())
+      .map(([date, day]) => ({
+        date: format(new Date(date), "yyyy-MM-dd (EEE)"),
+        dayNumber: day,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    console.log("Day Assignments:");
+    assignments.forEach((assignment) => {
+      console.log(`${assignment.date}: Day ${assignment.dayNumber}`);
+    });
+  };
+
+  // Pre-calculate day numbers for all working days
+  const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
+    const dayMap = new Map<string, number>();
+    const workingDays = schedule
+      .filter((entry) => entry.dueDate || entry.disconnectionDate)
+      .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
+
+    let dayCounter = 1;
+    let i = 0;
+
+    while (i < workingDays.length) {
+      const current = workingDays[i];
+      if (!current) break;
+
+      const currentDayOfWeek = getDay(current.readingDate);
+      const next = workingDays[i + 1];
+
+      // Check if this is Saturday and next is consecutive Sunday
+      const isConsecutiveWeekendPair =
+        currentDayOfWeek === 6 &&
+        next &&
+        getDay(next.readingDate) === 0 &&
+        isSameDay(next.readingDate, addDays(current.readingDate, 1));
+
+      if (isConsecutiveWeekendPair) {
+        // Assign same day number to Saturday-Sunday pair
+        dayMap.set(current.readingDate.toISOString(), dayCounter);
+        dayMap.set(next.readingDate.toISOString(), dayCounter);
+        i += 2;
+      } else {
+        // Single day assignment
+        dayMap.set(current.readingDate.toISOString(), dayCounter);
+        i += 1;
+      }
+
+      // Move to next day number in cycle
+      dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+    }
+
+    return dayMap;
+  };
 
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
@@ -709,6 +827,8 @@ export const useScheduler = (holidays: Holiday[]) => {
     today,
     setCurrentDate,
     setCurrentMonthYear,
+    assignMeterReadersWithDays,
+    logDayAssignments,
     currentDate,
     currentMonthYear,
   };

@@ -30,7 +30,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   scheduler,
 }) => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
-  const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
+  // const scheduleHasSplittedDates = useSchedulesStore((state) => state.scheduleHasSplittedDates);
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
   const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);

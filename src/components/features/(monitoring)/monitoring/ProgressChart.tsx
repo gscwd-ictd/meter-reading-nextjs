@@ -27,10 +27,6 @@ export default function ProgressChart({ scheduled, finished }: { scheduled: numb
 
   return (
     <>
-      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">
-        Monitoring Today: Scheduled vs Finished
-      </h2>
-
       <div className="h-[180px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart layout="vertical" data={data} margin={{ top: 20, right: 60, left: 20, bottom: 20 }}>

@@ -10,8 +10,8 @@ import {
 
 export default function SchedulePage() {
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] pt-5">
-      <div className="px-5 pb-5">
+    <div className="grid h-full grid-rows-[auto_1fr]">
+      <div className="pb-5">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

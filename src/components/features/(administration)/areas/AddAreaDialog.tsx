@@ -52,11 +52,13 @@ export function AddAreaDialog() {
       setAddAreaDialogIsOpen(false);
       refetchAreas?.();
     },
-    onError: (error: any) => {
-      toast.error("Error", {
-        description: error.response?.data?.message || "Failed to add area",
-        position: "top-right",
-      });
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || "Failed to add area.";
+        toast.error(message, { position: "top-right", duration: 1500 });
+      } else {
+        toast.error("An unexpected error occurred.", { position: "top-right", duration: 1500 });
+      }
     },
   });
 

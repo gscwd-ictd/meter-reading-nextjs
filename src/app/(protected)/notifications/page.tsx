@@ -9,7 +9,7 @@ import {
 
 export default function NotificationsPage() {
   return (
-    <div className="h-full">
+    <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -21,6 +21,6 @@ export default function NotificationsPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    </div>
+    </>
   );
 }

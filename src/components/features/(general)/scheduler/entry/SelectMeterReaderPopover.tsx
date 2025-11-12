@@ -30,38 +30,48 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
   const { data: assignedMeterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
-        return res.data;
-      } catch (error) {
-        console.log(error);
-      }
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
+
+      return res.data;
     },
   });
 
-  const getSymmetricDifference = (
-    a: MeterReaderWithZonebooks[] = [],
-    b: MeterReaderWithZonebooks[] = [],
-  ): MeterReaderWithZonebooks[] => {
-    return [
-      ...a.filter((readerA) => !b.some((readerB) => readerB.id === readerA.id)),
-      ...b.filter((readerB) => !a.some((readerA) => readerA.id === readerB.id)),
-    ];
-  };
+  // const getSymmetricDifference = (
+  //   a: MeterReaderWithZonebooks[] = [],
+  //   b: MeterReaderWithZonebooks[] = [],
+  // ): MeterReaderWithZonebooks[] => {
+  //   return [
+  //     ...a.filter((readerA) => !b.some((readerB) => readerB.id === readerA.id)),
+  //     ...b.filter((readerB) => !a.some((readerA) => readerA.id === readerB.id)),
+  //   ];
+  // };
+
+  // const filteredMeterReaders = useMemo(() => {
+  //   const existingMeterReaders = [{ ...meterReader! }];
+  //   const symmetricDifference = getSymmetricDifference(assignedMeterReaders, existingMeterReaders);
+
+  //   // Filter by search term
+  //   if (!searchTerm) return symmetricDifference;
+
+  //   return symmetricDifference.filter(
+  //     (mr) =>
+  //       mr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       mr.mobileNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
+  //   );
+  // }, [assignedMeterReaders, meterReader, searchTerm]);
 
   const filteredMeterReaders = useMemo(() => {
-    const existingMeterReaders = [{ ...meterReader! }];
-    const symmetricDifference = getSymmetricDifference(assignedMeterReaders, existingMeterReaders);
+    const existingMeterReaders = [...assignedMeterReaders];
 
     // Filter by search term
-    if (!searchTerm) return symmetricDifference;
+    if (!searchTerm) return existingMeterReaders;
 
-    return symmetricDifference.filter(
+    return existingMeterReaders.filter(
       (mr) =>
         mr.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         mr.mobileNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [assignedMeterReaders, meterReader, searchTerm]);
+  }, [assignedMeterReaders, searchTerm]);
 
   const handleSelect = (mr: MeterReaderWithZonebooks) => {
     if (onChange) {
@@ -85,13 +95,15 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between text-xs"
+          className="flex w-full max-w-full min-w-0 items-center justify-between truncate"
         >
-          {selectedMeterReader?.name || "Select Meter Reader"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <div className="flex-1 truncate text-left text-xs">
+            {selectedMeterReader?.name || "Select Meter Reader"}
+          </div>
+          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
+      <PopoverContent className="w-full p-0" align="start" onWheel={(e) => e.stopPropagation()}>
         <div className="border-b p-2">
           <div className="relative">
             <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4 text-xs" />
@@ -105,13 +117,13 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
         </div>
 
         {filteredMeterReaders && filteredMeterReaders.length > 0 ? (
-          <ScrollArea className="max-h-64 overflow-y-auto">
-            <div className="text-muted-foreground mb-2 grid grid-cols-3 gap-2 px-2 text-sm font-semibold">
+          <ScrollArea className="relative">
+            <div className="text-muted-foreground sticky top-0 grid grid-cols-3 gap-2 px-2 py-2 text-sm font-semibold">
               <div>Name</div>
               <div>Mobile</div>
               <div>Rest Day</div>
             </div>
-            <div className="space-y-1">
+            <div className="max-h-64 space-y-1 overflow-y-auto">
               {filteredMeterReaders.map((mr) => (
                 <div
                   key={mr.id}

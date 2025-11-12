@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { Holidays, holidays } from "./holidays";
+import { Holidays } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,7 +24,6 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
-import { transformHolidays } from "@mr/lib/functions/transformHolidays";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
@@ -76,7 +75,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     }
 
     // Release lock after short timeout
-    setTimeout(() => setIsNavigating(false), 1200); // or adjust timing
+    setTimeout(() => setIsNavigating(false), 500); // or adjust timing
   };
 
   // these are derived states
@@ -105,6 +104,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
         });
       }
     },
+
     retry: false,
     retryOnMount: false,
     refetchOnWindowFocus: false,
@@ -260,7 +260,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
           </section>
 
           <section className="hidden sm:hidden md:block lg:block">
-            <ButtonGroup className="rounded-md border">
+            <ButtonGroup className="rounded border">
               <Button
                 variant="outline"
                 className="border-none dark:rounded-none"
@@ -273,7 +273,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className="border-none dark:rounded-none"
+                    className="rounded-none border-none shadow-none"
                     variant="outline"
                     onClick={() => {
                       handleMonthChange("today");

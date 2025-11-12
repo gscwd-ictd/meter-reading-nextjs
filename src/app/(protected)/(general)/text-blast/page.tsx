@@ -14,32 +14,30 @@ import { Button } from "@mr/components/ui/Button";
 
 export default function TextBlastPage() {
   return (
-    <div className="h-full flex flex-col p-5">
-      <div className="">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Text Blast</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+    <>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Text Blast</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
-      <h3 className="font-bold text-xl mt-5">Text Blast</h3>
-      <div className="font-medium text-base text-gray-400">Send Water Bill to Concessionaires</div>
+      <h3 className="mt-5 text-xl font-bold">Text Blast</h3>
+      <div className="text-base font-medium text-gray-400">Send Water Bill to Concessionaires</div>
 
-      <div className="h-[90%] min-w-full mt-4 border-2 border-gray-300 rounded-lg">
-        <div className="grid grid-cols-3 h-full">
+      <div className="mt-4 h-[90%] min-w-full rounded-lg border-2 border-gray-300">
+        <div className="grid h-full grid-cols-3">
           <div className="col-span-2 h-full">
             <div className="grid grid-rows-3">
-              <div className="row-span-2 h-full w-full border-2 border-gray-300 border-l-0 border-t-0 border-r-0">
+              <div className="row-span-2 h-full w-full border-2 border-t-0 border-r-0 border-l-0 border-gray-300">
                 <TextBlastTableComponent />
               </div>
-              <div className="h-full m-4">
+              <div className="m-4 h-full">
                 <div className="h-[300px] overflow-scroll">
                   <TextBlastSendMessageComponent />
                 </div>
@@ -49,13 +47,13 @@ export default function TextBlastPage() {
           <div className="">
             <div className="grid grid-rows-2">
               {/* SENT */}
-              <div className="border-2 border-gray-300 border-t-0 border-l-0 border-r-0">
+              <div className="border-2 border-t-0 border-r-0 border-l-0 border-gray-300">
                 <SentMessageTableComponent />
               </div>
               {/* FAILED */}
               <div className="">
                 <NotSentMessageTableComponent />
-                <div className="flex justify-end m-4">
+                <div className="m-4 flex justify-end">
                   <Button variant={"default"} className="w-fit">
                     Send
                   </Button>
@@ -65,6 +63,6 @@ export default function TextBlastPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

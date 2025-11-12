@@ -41,11 +41,20 @@ export function DataTablePagination<T>({ table }: DataTablePaginationProps<T>) {
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
+              {(() => {
+                const standardSizes = [5, 10, 20, 30, 40, 50];
+                const currentSize = table.getState().pagination.pageSize;
+
+                const sizesToShow = standardSizes.includes(currentSize)
+                  ? standardSizes
+                  : [currentSize, ...standardSizes];
+
+                return sizesToShow.map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ));
+              })()}
             </SelectContent>
           </Select>
         </div>

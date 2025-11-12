@@ -2,6 +2,7 @@ import { AppSidebar } from "@mr/components/features/navigation/AppSidebar";
 import { CustomSidebarTrigger } from "@mr/components/features/navigation/CustomSidebarTrigger";
 import { NavigationSplash } from "@mr/components/features/navigation/NavigationSplash";
 import { NavigationSplashProvider } from "@mr/components/features/navigation/NavigationSplashProvider";
+import { PageWrapper } from "@mr/components/ui/pages/PageWrapper";
 import { SidebarInset, SidebarProvider } from "@mr/components/ui/Sidebar";
 import { type PropsWithChildren } from "react";
 
@@ -14,9 +15,9 @@ export default function ProtectedPageLayout({ children }: Readonly<PropsWithChil
           <NavigationSplash />
           <CustomSidebarTrigger />
           {/* Remove overflow from SidebarInset and add it to a wrapper around children */}
-          <div className="flex-1 overflow-hidden">
+          <div className="relative flex-1 overflow-hidden">
             {/* This prevents outer scrolling */}
-            {children}
+            <PageWrapper>{children}</PageWrapper>
           </div>
         </SidebarInset>
       </NavigationSplashProvider>

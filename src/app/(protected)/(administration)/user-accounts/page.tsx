@@ -10,7 +10,7 @@ import {
 
 export default function UsersPage() {
   return (
-    <div className="flex h-full flex-col p-5">
+    <>
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -24,6 +24,6 @@ export default function UsersPage() {
       </Breadcrumb>
 
       <UserAccountsDataTable />
-    </div>
+    </>
   );
 }

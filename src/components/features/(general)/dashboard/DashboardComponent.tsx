@@ -5,6 +5,7 @@ import { CircleGaugeIcon, ClockArrowDownIcon, ReceiptTextIcon, SendIcon, TextQuo
 import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 import { TotalConsumersCard } from "./TotalConsumersCard";
+import { ConsumptionCard } from "./ConsumptionCard";
 
 export const DashboardComponent: FunctionComponent = () => {
   const router = useRouter();
@@ -23,54 +24,61 @@ export const DashboardComponent: FunctionComponent = () => {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Billed"
-          className="border bg-white dark:bg-gray-900"
+          className="border bg-cyan-200/30 dark:bg-gray-900"
           icon={<ReceiptTextIcon className="text-gray-700" />}
         >
-          <div className="text-primary text-4xl font-bold">1500</div>
+          <div className="dark:text-primary text-4xl font-bold text-gray-800">1500</div>
           <div className="text-sm text-gray-500">Billed for the month</div>
         </DashboardCard>
 
         <DashboardCard
           title="Unbilled"
-          className="border bg-white dark:bg-gray-900"
+          className="border bg-pink-100/70 dark:bg-gray-900"
           icon={<SendIcon className="text-gray-600" />}
         >
-          <div className="text-primary text-4xl font-bold">1000</div>
+          <div className="dark:text-primary text-4xl font-bold text-gray-800">1000</div>
           <div className="text-sm text-gray-500">Unbilled for the month</div>
         </DashboardCard>
 
         <DashboardCard
           title="With Remarks"
-          className="border bg-white dark:bg-gray-900"
+          className="border bg-violet-200/60 dark:bg-gray-900"
           icon={<TextQuoteIcon className="text-gray-700" />}
         >
-          <div className="text-primary text-4xl font-bold">58</div>
+          <div className="dark:text-primary text-4xl font-bold text-gray-800">58</div>
           <div className="text-sm text-gray-500">With remarks for the month</div>
         </DashboardCard>
 
         <DashboardCard
           title="New Meters"
-          className="border bg-white dark:bg-gray-900"
+          className="border bg-sky-200/90 dark:bg-gray-900"
           icon={<CircleGaugeIcon className="text-gray-600" />}
         >
-          <div className="text-primary text-4xl font-bold">5</div>
+          <div className="dark:text-primary text-4xl font-bold text-gray-800">5</div>
           <div className="text-sm text-gray-500">New meters for the month</div>
         </DashboardCard>
       </div>
 
       {/* Consumers & Readings Section */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+        {/* <div className="row-span-2 h-full rounded-lg border-2 border-dotted bg-white">
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-4xl text-gray-400"></span>
+          </div>
+        </div> */}
+        <ConsumptionCard />
         <TotalConsumersCard />
-        <DashboardCard
-          title="Readings Due"
-          className="border bg-white lg:col-span-2 dark:bg-gray-900"
-          size="sm"
-          icon={<ClockArrowDownIcon className="text-gray-600" />}
-        >
-          <div className="text-primary text-4xl font-bold">65</div>
-          <div className="text-sm text-gray-500">Overdue</div>
-        </DashboardCard>
       </div>
+
+      {/* <DashboardCard
+        title="Readings Due"
+        className="border bg-white lg:col-span-2 dark:bg-gray-900"
+        size="sm"
+        icon={<ClockArrowDownIcon className="text-gray-600" />}
+      >
+        <div className="text-primary text-4xl font-bold">65</div>
+        <div className="text-sm text-gray-500">Overdue</div>
+      </DashboardCard> */}
 
       {/* Monthly Progress Section */}
       <DashboardCard

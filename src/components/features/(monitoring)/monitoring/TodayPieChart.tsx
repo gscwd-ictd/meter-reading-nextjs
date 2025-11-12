@@ -62,11 +62,7 @@ export default function TodayDonutChart({ scheduled, finished }: { scheduled: nu
         ];
 
   return (
-    <>
-      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">
-        Today&apos;s Zonebook Completion
-      </h2>
-
+    <div className="relative">
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie
@@ -109,16 +105,14 @@ export default function TodayDonutChart({ scheduled, finished }: { scheduled: nu
       </ResponsiveContainer>
 
       {/* Legend for small/medium screens (bottom center) */}
-      <div className="mt-4 flex flex-col items-center justify-center gap-2 text-sm text-gray-500 lg:hidden">
+      <div className="flex flex-col items-center justify-center gap-2 text-sm text-gray-500 lg:hidden">
         <LegendItems finished={finished} remaining={remaining} extra={extra} />
       </div>
 
       {/* Legend for large screens (middle-right) */}
       <div className="absolute top-1/2 left-5 hidden -translate-y-1/2 text-sm text-gray-500 lg:block">
-        <div className="w-[160px]">
-          <LegendItems finished={finished} remaining={remaining} extra={extra} />
-        </div>
+        <LegendItems finished={finished} remaining={remaining} extra={extra} />
       </div>
-    </>
+    </div>
   );
 }

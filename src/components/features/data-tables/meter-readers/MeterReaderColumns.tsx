@@ -7,6 +7,7 @@ import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 import { Badge } from "@mr/components/ui/Badge";
 import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
   const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
@@ -58,8 +59,8 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       {
         accessorKey: "zoneBooks",
         accessorFn: (row) => row.zoneBooks.map((zb) => zb.zoneBook),
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
-        cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Default Zonebooks" />,
+        cell: ({ row }) => <ZonebookPreview zonebooks={ZonebookFlatSorter(row.original.zoneBooks)} />,
         enableColumnFilter: false,
       },
       {

@@ -21,7 +21,6 @@ export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ loadi
   } = useFormContext();
 
   const selectedEmployee = useMeterReadersStore((state) => state.selectedEmployee);
-
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
   const mobileNumber = useMeterReadersStore((state) => state.mobileNumber);
   const setMobileNumber = useMeterReadersStore((state) => state.setMobileNumber);
@@ -95,6 +94,7 @@ export const MeterReaderTabs: FunctionComponent<MeterReaderTabsProps> = ({ loadi
               className="w-full cursor-default truncate hover:cursor-pointer"
               readOnly
               onClick={() => setZonebookSelectorIsOpen(true)}
+              disabled={selectedEmployee === undefined ? true : false}
               value={
                 meterReaderZonebooks !== undefined
                   ? meterReaderZonebooks.map((mrzb: Zonebook) => mrzb.zoneBook)
