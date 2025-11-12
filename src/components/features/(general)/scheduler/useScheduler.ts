@@ -669,36 +669,22 @@ export const useScheduler = (holidays: Holiday[]) => {
           return { ...entry, meterReaders: [] };
         }
 
+        // Pre-calculate day number mapping for the entire schedule
+        const dayNumberMap = calculateDayNumberMap(schedule);
+
+        const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
+
         const readingRestDay = getDayName(entry.readingDate);
         const availableReaders = transformMeterReaders.filter((reader) => reader.restDay !== readingRestDay);
 
-        return { ...entry, meterReaders: availableReaders };
+        return { ...entry, meterReaders: availableReaders, day };
       });
     },
     [],
   );
 
-  //  existing random day assignment function
-  const addRandomDayNumbers = (meterReaders: MeterReader[]) => {
-    meterReaders.forEach((meterReader) => {
-      const days = Array.from({ length: 21 }, (_, i) => i + 1);
-
-      // Shuffle days array
-      for (let i = days.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [days[i], days[j]] = [days[j], days[i]];
-      }
-
-      meterReader.zoneBooks.forEach((zoneBook, idx) => {
-        zoneBook.day = days[idx % days.length];
-      });
-    });
-
-    return meterReaders.map((mr) => ({ ...mr, reassignment: { zoneBooks: [], remarks: null } }));
-  };
-
   const assignMeterReadersWithDays = useCallback(
-    (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]) => {
+    (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
       // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
 
       // Pre-calculate day number mapping for the entire schedule
@@ -712,13 +698,15 @@ export const useScheduler = (holidays: Holiday[]) => {
         const readingRestDay = getDayName(entry.readingDate);
         const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
 
-        const assignedMeterReaders = meterReaders
+        // @ts-ignore
+        const assignedMeterReaders: MeterReaderWithZonebooks[] = meterReaders
           .filter((reader) => reader.restDay !== readingRestDay)
           .map((reader) => {
             const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
 
             return {
               ...reader,
+              reassignment: { zoneBooks: [], remarks: null },
               zoneBooks: assignedZoneBooks.map((zb) => ({
                 ...zb,
                 dueDate: entry.dueDate,

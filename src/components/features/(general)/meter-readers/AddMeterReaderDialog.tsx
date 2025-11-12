@@ -114,6 +114,9 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
       }
     },
     enabled: !hasSetInitialZonebookPool && !!addMeterReaderDialogIsOpen,
+    retryOnMount: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const transformSelectedPersonnelToSubmit = async (

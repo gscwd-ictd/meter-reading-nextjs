@@ -149,6 +149,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       return res.data as MeterReaderWithZonebooks;
     },
     enabled: !!editMeterReaderDialogIsOpen,
+    retryOnMount: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   // updated filtered zonebooks
@@ -169,6 +172,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       }
     },
     enabled: !hasSetInitialZonebookPool && editMeterReaderDialogIsOpen,
+    retryOnMount: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const resetToDefaults = () => {
