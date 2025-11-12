@@ -188,26 +188,21 @@ export class MeterReaderRepository implements IMeterReaderRepository {
   async assignMeterReader(data: AssignMeterReader): Promise<MeterReader> {
     // Destructure zoneBooks from input, and keep the rest of the fields for insertion
     const { zoneBooks, mobileNumber, ...meterReaderData } = data;
-
     // Set default password and hash it
     const hashedPw = await argon2.hash("password");
-
     // Use a transaction to ensure all DB changes happen together
     const result = await db.pgConn.transaction(async (tx) => {
       // Step 1: Insert the new meter reader
       const [insertedMeterReader] = await tx.insert(meterReaders).values(meterReaderData).returning();
-
       if (!insertedMeterReader) {
         throw new HTTPException(500, { message: "failed to insert meter reader." });
       }
-
       // Step 2: Create the login account with default password
       await tx.insert(loginAccounts).values({
         meterReaderId: insertedMeterReader.id,
         username: mobileNumber,
         password: hashedPw,
       });
-
       // Step 3: Insert assigned zone-books
       if (zoneBooks?.length) {
         await tx.insert(meterReaderZoneBook).values(
@@ -217,11 +212,9 @@ export class MeterReaderRepository implements IMeterReaderRepository {
           })),
         );
       }
-
       // Step 4: Return only the ID — avoid mixing read concerns into transaction
       return insertedMeterReader.id;
     });
-
     return await this.findMeterReaderWithZoneBookById(result);
   }
 
