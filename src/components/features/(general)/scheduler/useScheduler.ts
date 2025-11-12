@@ -699,7 +699,7 @@ export const useScheduler = (holidays: Holiday[]) => {
 
   const assignMeterReadersWithDays = useCallback(
     (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]) => {
-      const meterReadersWithDays = addRandomDayNumbers(meterReaders);
+      // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
 
       // Pre-calculate day number mapping for the entire schedule
       const dayNumberMap = calculateDayNumberMap(schedule);
@@ -712,7 +712,7 @@ export const useScheduler = (holidays: Holiday[]) => {
         const readingRestDay = getDayName(entry.readingDate);
         const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
 
-        const assignedMeterReaders = meterReadersWithDays
+        const assignedMeterReaders = meterReaders
           .filter((reader) => reader.restDay !== readingRestDay)
           .map((reader) => {
             const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);

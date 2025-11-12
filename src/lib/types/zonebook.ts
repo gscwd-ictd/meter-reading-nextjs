@@ -4,7 +4,7 @@ export type Zonebook = {
   book: string;
   area: Area;
   id?: string;
-  day?: number;
+  day: number | null;
 };
 
 export type ZonebookReassignment = Zonebook & {
@@ -24,4 +24,12 @@ export type Area = {
 export type Reassignment = {
   zoneBooks: ZonebookReassignment[];
   remarks: string | null;
+};
+
+export type ZoneBookEntry = {
+  zoneBook: string;
+  zone: string;
+  book: string;
+  area?: { name: string };
+  day?: number | null;
 };

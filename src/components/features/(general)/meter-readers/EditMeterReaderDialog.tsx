@@ -42,6 +42,7 @@ const meterReaderSchema = z.object({
     z.object({
       zone: z.string(),
       book: z.string(),
+      day: z.number().nullish(),
     }),
   ),
   restDay: z.string().optional(),
@@ -91,7 +92,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       mobileNumber: meterReader.mobileNumber,
       restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReader.zoneBooks.map((zb) => {
-        return { zone: zb.zone, book: zb.book };
+        return { zone: zb.zone, book: zb.book, day: zb.day };
       }),
     };
   };
@@ -200,7 +201,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
       setValue("zoneBooks", meterReader?.zoneBooks);
 
-      setMeterReaderZonebooks(meterReader?.zoneBooks); // this refers to the meter reader's assigned zonebooks
+      setMeterReaderZonebooks(ZonebookFlatSorter(meterReader?.zoneBooks)); // this refers to the meter reader's assigned zonebooks
 
       setSelectedRestDay(meterReader?.restDay);
     }

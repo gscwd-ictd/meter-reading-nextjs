@@ -3,10 +3,11 @@ import { Badge } from "@mr/components/ui/Badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { Zonebook } from "@mr/lib/types/zonebook";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 
 export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
   const previewCount = 3;
-  const shown = zonebooks.slice(0, previewCount);
+  const shown = ZonebookFlatSorter(zonebooks.slice(0, previewCount));
   const remaining = zonebooks.length - shown.length;
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
