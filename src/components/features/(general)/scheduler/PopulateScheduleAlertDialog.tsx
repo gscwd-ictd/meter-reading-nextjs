@@ -66,6 +66,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           dueDate: toDatesOrDateOnly(schedule.dueDate),
           readingDate: toDateString(schedule.readingDate),
           disconnectionDate: toDatesOrDateOnly(schedule.disconnectionDate),
+          day: schedule.day,
         };
       });
 
@@ -112,6 +113,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         return {
           readingDate: sched.readingDate,
           dueDate: sched.dueDate,
+          day: sched.day,
           disconnectionDate: sched.disconnectionDate,
           meterReaders: sched.meterReaders?.map((mr) => {
             return {
@@ -138,7 +140,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     <AlertDialog>
       <AlertDialogTrigger
         disabled={isDisabled()}
-        className="flex w-full gap-2 px-2 py-1 text-sm dark:text-white"
+        className="flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white"
       >
         {hasPopulatedMeterReaders ? (
           <CalendarCheck2 className="size-5" />
@@ -146,17 +148,16 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           <CalendarPlus className="size-5" />
         )}
         {!hasPopulatedMeterReaders ? (
-          <span className={`${isDisabled() ? "line-through" : ""}`}>Populate schedule</span>
+          <span className={`${isDisabled() ? "line-through" : ""}`}>Unassigned: Meter Readers Only</span>
         ) : (
           "Fetched Schedule"
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Populate this month&apos;s schedule with meter readers?</AlertDialogTitle>
+          <AlertDialogTitle>Populate this month&apos;s schedule?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will populate all meter readers with their respective rest days and default zoneBooks for
-            this month.
+            This will populate meter readers with rest days and manually assign their zone books per day.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
