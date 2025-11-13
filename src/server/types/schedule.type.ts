@@ -40,6 +40,7 @@ export const CreateReassignmentSchema = z.object({
 /* partial details of reading schedule */
 export const ScheduleSchema = z.object({
   id: z.string(),
+  day: z.number(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -61,6 +62,7 @@ export const ScheduleSchema = z.object({
 /* full details of reading schedule */
 export const ScheduleReadingSchema = z.object({
   id: z.string(),
+  day: z.number(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,

@@ -22,6 +22,7 @@ export const schedules = pgTable(
   "schedules",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
+    day: integer("day"),
     readingDate: date("reading_date").unique().notNull(),
     dueDate: jsonb("due_date").notNull(),
     disconnectionDate: jsonb("disconnection_date").notNull(),
