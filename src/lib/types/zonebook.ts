@@ -3,7 +3,7 @@ export type Zonebook = {
   zone: string;
   book: string;
   area: Area;
-  id?: string;
+  id?: string | undefined;
   day: number | null;
 };
 

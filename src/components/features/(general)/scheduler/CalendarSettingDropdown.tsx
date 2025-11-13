@@ -21,6 +21,8 @@ type CalendarSettingDropdownProps = {
 
 export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
   const calendarScheduleDropdownIsOpen = useSchedulesStore((state) => state.calendarScheduleDropdownIsOpen);
+  const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
+
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
@@ -42,13 +44,17 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         <DropdownMenuItem asChild>
           <ResetScheduleAlertDialog />
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
-        </DropdownMenuItem>
+        {!hasPopulatedMeterReaders && <DropdownMenuSeparator />}
+        {!hasPopulatedMeterReaders && (
+          <DropdownMenuItem asChild>
+            <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
+          </DropdownMenuItem>
+        )}
+        {!hasPopulatedMeterReaders && (
+          <DropdownMenuItem asChild>
+            <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
