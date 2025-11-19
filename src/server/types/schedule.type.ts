@@ -40,7 +40,7 @@ export const CreateReassignmentSchema = z.object({
 /* partial details of reading schedule */
 export const ScheduleSchema = z.object({
   id: z.string(),
-  day: z.number(),
+  day: z.coerce.number().nullish(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -53,7 +53,9 @@ export const ScheduleSchema = z.object({
         book: true,
         zoneBook: true,
         area: true,
-      }).array(),
+      })
+        .extend({ day: z.coerce.number().nullish() })
+        .array(),
       reassignment: ReassignmentSchema.optional(),
     })
     .array(),
@@ -62,7 +64,7 @@ export const ScheduleSchema = z.object({
 /* full details of reading schedule */
 export const ScheduleReadingSchema = z.object({
   id: z.string(),
-  day: z.number(),
+  day: z.coerce.number().nullish(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -82,7 +84,9 @@ export const ScheduleReadingSchema = z.object({
         book: true,
         zoneBook: true,
         area: true,
-      }).array(),
+      })
+        .extend({ day: z.coerce.number().nullish() })
+        .array(),
       reassignment: ReassignmentSchema.optional(),
     })
     .array(),
@@ -94,6 +98,16 @@ export const CreateMonthScheduleSchema = ScheduleSchema.omit({ id: true, meterRe
     meterReaders: z
       .object({
         id: z.string(),
+        zoneBooks: ZoneBookSchema.pick({
+          zone: true,
+          book: true,
+        })
+          .extend({
+            day: z.number().nullish(),
+            dueDate: z.string(),
+            disconnectionDate: z.string(),
+          })
+          .array(),
       })
       .array(),
   })
@@ -107,6 +121,7 @@ export const CreateMeterReaderScheduleReadingSchema = z.object({
     book: true,
   })
     .extend({
+      day: z.number().nullable(),
       dueDate: z.string(),
       disconnectionDate: z.string(),
     })
@@ -139,6 +154,7 @@ export const ZoneBookScheduleReaderSchema = z.object({
       photoUrl: z.coerce.string(),
     })
     .optional(),
+  day: z.coerce.number().nullish(),
   readingDate: z.coerce.string(),
   dueDate: z.coerce.string(),
   disconnectionDate: z.coerce.string(),

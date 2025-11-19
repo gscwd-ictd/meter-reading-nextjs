@@ -88,7 +88,6 @@ export const consumerDetailsView = pgView("view_consumer_details", {
 export const scheduleReadingAccountView = pgView("view_schedule_reading_account", {
   readingDate: date("reading_date"),
   meterReaderId: varchar("meter_reader_id", { length: 255 }),
-  dateToday: date("date_today"),
   zoneBooks: jsonb("zoneBooks"),
 }).as(sql`
   select
@@ -153,7 +152,8 @@ export const scheduleReadingAccountView = pgView("view_schedule_reading_account"
                     )
                     from billing_adjustments ba
                   ),
-                  'isExist', exists( select 1 from reading_details rd where rd.account_number = vmr.account_no)
+                  'isExist', exists( select 1 from reading_details rd where rd.account_number = vmr.account_no),
+                  'dateToday', now() at time zone  'Asia/Manila'
                 )
               )
               from "viewMeterReading" vmr

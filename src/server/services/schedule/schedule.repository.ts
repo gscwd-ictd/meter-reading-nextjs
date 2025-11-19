@@ -145,20 +145,41 @@ export class ScheduleRepository implements IScheduleRepository {
         const [schedule] = await tx
           .insert(schedules)
           .values({
+            day: item.day,
             readingDate: item.readingDate,
             dueDate: item.dueDate,
             disconnectionDate: item.disconnectionDate,
           })
           .returning(); // Returns the inserted schedule, including scheduleId
-
         // Step 5: If meter readers are assigned to this schedule, insert them
         if (item.meterReaders.length > 0) {
-          await tx.insert(scheduleMeterReaders).values(
-            item.meterReaders.map((reader) => ({
-              scheduleId: schedule.id, // Link to the schedule
-              meterReaderId: reader.id, // Reader assigned
-            })),
-          );
+          // Insert scheduleMeterReaders and get their IDs
+          const insertedSMRs = await tx
+            .insert(scheduleMeterReaders)
+            .values(
+              item.meterReaders.map((reader) => ({
+                scheduleId: schedule.id, // Link to the schedule
+                meterReaderId: reader.id, // Reader assigned
+              })),
+            )
+            .returning();
+          // Now map scheduleMeterReaders to zoneBook inserts
+          const zoneBookInserts = insertedSMRs.flatMap((smr) => {
+            const reader = item.meterReaders.find((r) => r.id === smr.meterReaderId);
+            if (!reader || !reader.zoneBooks) return [];
+            return reader.zoneBooks.map((zb) => ({
+              scheduleMeterReaderId: smr.id,
+              zone: zb.zone,
+              book: zb.book,
+              day: zb.day,
+              dueDate: zb.dueDate,
+              disconnectionDate: zb.disconnectionDate,
+            }));
+          });
+          // Insert new zoneBooks
+          if (zoneBookInserts.length > 0) {
+            await tx.insert(scheduleZoneBooks).values(zoneBookInserts);
+          }
         }
       }
     });
@@ -252,10 +273,11 @@ export class ScheduleRepository implements IScheduleRepository {
     const { scheduleMeterReaderId, zoneBooks } = data;
 
     // Step 2: Prepare the zoneBooks data for insertion
-    const insertZoneBook = zoneBooks.map(({ zone, book, dueDate, disconnectionDate }) => ({
+    const insertZoneBook = zoneBooks.map(({ zone, book, day, dueDate, disconnectionDate }) => ({
       scheduleMeterReaderId,
       zone,
       book,
+      day,
       dueDate,
       disconnectionDate,
     }));
