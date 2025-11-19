@@ -22,6 +22,7 @@ export const schedules = pgTable(
   "schedules",
   {
     id: uuid("id").defaultRandom().primaryKey().notNull(),
+    day: integer("day"),
     readingDate: date("reading_date").unique().notNull(),
     dueDate: jsonb("due_date").notNull(),
     disconnectionDate: jsonb("disconnection_date").notNull(),
@@ -80,6 +81,7 @@ export const scheduleZoneBooks = pgTable(
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
     dueDate: date("due_date").notNull(),
+    day: integer("day"),
     disconnectionDate: date("disconnection_date").notNull(),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
@@ -106,6 +108,7 @@ export const viewScheduleMeterReadingZoneBook = pgView("view_schedule_meter_read
   month: varchar("month"),
   year: varchar("year"),
   zoneBooks: jsonb("zone_books").$type<{
+    day: number;
     zone: string;
     book: string;
     zoneBook: string;
@@ -158,6 +161,7 @@ export const viewZoneBookScheduleReader = pgView("view_zone_book_schedule_reader
   meterReaderId: varchar("meter_reader_id"),
   month: integer("month"),
   year: integer("year"),
+  day: integer("day"),
   readingDate: date("reading_date"),
   dueDate: date("due_date"),
   disconnectionDate: date("disconnection_date"),
@@ -168,6 +172,7 @@ export const viewZoneBookScheduleReader = pgView("view_zone_book_schedule_reader
         vzbwa.book,
         vzbwa.area,
         coalesce(smr.meter_reader_id::text, '') as meter_reader_id,
+        szb.day,
         coalesce(s.reading_date::text, '') as reading_date,
         coalesce(szb.due_date::text, '') as due_date,
         coalesce(szb.disconnection_date::text,'') as disconnection_date,
@@ -186,13 +191,20 @@ export const viewZoneBookScheduleReader = pgView("view_zone_book_schedule_reader
 
 export const viewScheduleReading = pgView("view_schedule_reading", {
   id: varchar("id"),
+  day: integer("day"),
   readingDate: date("reading_date"),
   dueDate: jsonb("due_date"),
   disconnectionDate: jsonb("disconnection_date"),
   meterReaders: jsonb("meter_readers").$type<{
     scheduleMeterReaderId: string;
     id: string;
-    zoneBooks: { zone: string; book: string; zoneBook: string; area: { id: string; name: string } }[];
+    zoneBooks: {
+      day: number;
+      zone: string;
+      book: string;
+      zoneBook: string;
+      area: { id: string; name: string };
+    }[];
     reassignment: {
       remarks: string;
       zoneBooks: {
@@ -207,6 +219,7 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
 }).as(sql`
   select
     s.id,
+    s.day,
     s.reading_date,
     s.due_date,
     s.disconnection_date,
@@ -233,6 +246,7 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
           jsonb_build_object(
               'zone', szb.zone,
               'book', szb.book,
+              'day', szb.day,
               'zoneBook', vzbwa.zone_book,
               'area', vzbwa.area
           )
@@ -270,4 +284,4 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
       limit 1
   ) rj on true
 
-  group by s.id, s.reading_date, s.due_date, s.disconnection_date`);
+  group by s.id, s.day, s.reading_date, s.due_date, s.disconnection_date order by s.reading_date`);
