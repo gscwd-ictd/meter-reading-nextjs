@@ -49,7 +49,7 @@ export const readingDetails = pgTable(
     timeStart: timestamp("time_start"),
     timeEnd: timestamp("time_end"),
     previousBillDate: timestamp("previous_bill_date"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").notNull(),
     isPosted: boolean("is_posted").default(false).notNull(), //added isPosted field for syncing purposes
   },
   (t) => {
