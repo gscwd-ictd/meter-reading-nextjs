@@ -34,6 +34,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
   const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
+  const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const searchParams = useSearchParams();
@@ -127,7 +128,9 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   };
 
   useEffect(() => {
+    console.log("IS POST A SUCCESS: ", postSchedule.isSuccess);
     if (postSchedule.isSuccess) {
+      console.log("TRIGGER NIGGERED");
       refetchData!();
       postSchedule.reset();
 
@@ -136,11 +139,15 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     }
   }, [postSchedule, refetchData, setHasSchedule, setHasFetchedThisMonthsSchedule]);
 
+  useEffect(() => {
+    console.log("SCHED: ", hasSchedule);
+  }, [hasSchedule]);
+
   return (
     <AlertDialog>
       <AlertDialogTrigger
         disabled={isDisabled()}
-        className="flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white"
+        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white`}
       >
         {hasPopulatedMeterReaders ? (
           <CalendarCheck2 className="size-5" />
@@ -150,7 +157,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
         {!hasPopulatedMeterReaders ? (
           <span className={`${isDisabled() ? "line-through" : ""}`}>Unassigned: Meter Readers Only</span>
         ) : (
-          "Fetched Schedule"
+          "-"
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>

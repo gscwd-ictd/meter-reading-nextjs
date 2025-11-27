@@ -48,7 +48,7 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
         </div>
       )}
       <CardHeader>
-        <CardTitle className="text-lg font-normal tracking-wide sm:text-xl lg:text-lg">{title}</CardTitle>
+        <CardTitle className="text-base font-medium tracking-wide sm:text-xl lg:text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>

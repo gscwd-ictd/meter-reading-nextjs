@@ -25,8 +25,6 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
   // Use the value from props instead of internal state
   const selectedMeterReader = value;
 
-  const meterReader = useSchedulesStore((state) => state.selectedMeterReader);
-
   const { data: assignedMeterReaders } = useQuery({
     queryKey: ["get-all-meter-readers"],
     queryFn: async () => {
@@ -34,6 +32,8 @@ export function SelectMeterReaderPopover({ value, onChange }: SelectMeterReaderP
 
       return res.data;
     },
+    // refetchOnMount: true,
+    // retryOnMount: true,
   });
 
   // const getSymmetricDifference = (

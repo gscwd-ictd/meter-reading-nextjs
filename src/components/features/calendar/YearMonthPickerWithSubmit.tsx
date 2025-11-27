@@ -37,7 +37,7 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
     <div className="flex items-center justify-start gap-2 sm:justify-start md:justify-start lg:justify-end">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-[200px] justify-start text-left font-normal">
+          <Button variant="outline" className="h-[2.5rem] w-[200px] justify-start text-left font-normal">
             <CalendarIcon className="mr-2 h-4 w-4" />
             {value || "Select year month"}
           </Button>
@@ -68,7 +68,12 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
         </PopoverContent>
       </Popover>
 
-      <Button onClick={onSubmit} disabled={!value} className="dark:text-white">
+      <Button
+        onClick={onSubmit}
+        disabled={!value}
+        className="h-[2.5rem] w-full px-6 lg:w-auto dark:text-white"
+        size="sm"
+      >
         Generate
       </Button>
     </div>

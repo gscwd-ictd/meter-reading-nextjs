@@ -10,7 +10,7 @@ export const ChartCard: FunctionComponent<ChartCardProps> = ({ children, title, 
   return (
     <div className="group relative mx-auto w-full overflow-hidden rounded-2xl border bg-white p-6 shadow-sm sm:p-6 md:p-2 lg:p-4 dark:bg-black">
       {/* Shine effect – same as DashboardCard */}
-      <span className="shine pointer-events-none absolute inset-0 z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />
+      <span className="pointer-events-none absolute inset-0 z-10 -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-slate-700/20 dark:to-transparent" />
       <h2 className="mt-5 mb-4 px-2 text-start text-lg font-semibold">{title}</h2>
       {onClick && (
         <Button

@@ -3,10 +3,10 @@
 import { FC, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format, isSaturday, isSunday, parse } from "date-fns";
+import { format, parse } from "date-fns";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { BilledMeterReadingSchedule } from "@mr/lib/types/schedule";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
 import { PdfHeader } from "../PdfHeader";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 
@@ -111,15 +111,15 @@ const styles = StyleSheet.create({
 });
 
 // Rows per page configuration
-const FIRST_PAGE_ROWS = 20; // Exactly 20 rows total
-const OTHER_PAGES_ROWS = 28; // Exactly 28 rows total
+const FIRST_PAGE_ROWS = 20; // Exactly 18 rows total
+const OTHER_PAGES_ROWS = 26; // Exactly 28 rows total
 
 // PDF Document Component with pagination
 const SchedulePDF: FC<{
   data: BilledMeterReadingSchedule[];
   yearMonth: string;
-  dayNumbers: number[];
-}> = ({ data, yearMonth, dayNumbers }) => {
+  // dayNumbers: number[];
+}> = ({ data, yearMonth }) => {
   const formatDate = (yearMonth: string) => {
     const newDate = parse(yearMonth, "yyyy-MM", new Date());
     return format(newDate, "MMMM, yyyy");
@@ -143,37 +143,40 @@ const SchedulePDF: FC<{
     }> = [];
 
     data.forEach((entry, idx) => {
-      const currentDay = new Date(entry.readingDate).getDate();
+      const calendarDay = new Date(entry.readingDate).getDate();
+      const sequentialDayNumber = entry.day as number | null; // From API
       const meterReaders = entry.meterReaders || [];
 
       // Find existing day group or create new one
-      let dayGroup = dayGroups.find((group) => group.day === currentDay);
+      let dayGroup = dayGroups.find((group) => group.day === calendarDay);
       if (!dayGroup) {
         dayGroup = {
-          day: currentDay,
-          dayNumber: dayNumbers[idx],
+          day: calendarDay,
+          dayNumber: sequentialDayNumber!, // Use the day number from API
           rows: [],
         };
         dayGroups.push(dayGroup);
       }
 
+      // Handle entries with no meter readers
       if (meterReaders.length === 0) {
         dayGroup.rows.push({
           type: "data",
           content: {
             entry,
-            dayNumber: dayNumbers[idx],
+            dayNumber: sequentialDayNumber!, // Use the day number from API
             isNoMeterReader: true,
             originalIndex: idx,
           },
         });
       } else {
+        // Handle entries with meter readers
         meterReaders.forEach((reader) => {
           dayGroup!.rows.push({
             type: "data",
             content: {
               entry,
-              dayNumber: dayNumbers[idx],
+              dayNumber: sequentialDayNumber!, // Use the day number from API
               meterReader: reader,
               isNoMeterReader: false,
               originalIndex: idx,
@@ -183,7 +186,8 @@ const SchedulePDF: FC<{
       }
     });
 
-    return dayGroups;
+    // Sort groups by calendar day to maintain chronological order
+    return dayGroups.sort((a, b) => a.day - b.day);
   };
 
   const dayGroups = groupDataByDay();
@@ -196,32 +200,42 @@ const SchedulePDF: FC<{
     }> = [];
 
     let currentDayIndex = 0;
+    let currentRowIndex = 0;
 
-    // First page - exactly 20 rows total
+    // First page - exactly 19 rows total
     const firstPage = { rows: [] as any[], hasHeader: true };
     let firstPageRowCount = 1; // Start with 1 for the table header
 
-    // Fill first page with complete day groups up to exactly 20 rows
+    // Fill first page
     while (currentDayIndex < dayGroups.length && firstPageRowCount < FIRST_PAGE_ROWS) {
       const dayGroup = dayGroups[currentDayIndex];
-      const dayRowCount = dayGroup.rows.length;
-
-      // Check if this day group fits in the remaining space
       const remainingRows = FIRST_PAGE_ROWS - firstPageRowCount;
 
-      if (dayRowCount <= remainingRows) {
-        // Add day separator (except for first day)
-        if (currentDayIndex > 0) {
+      // Add day separator (except for first day)
+      if (currentDayIndex > 0 && currentRowIndex === 0) {
+        if (remainingRows >= 1) {
+          // Check if there's space for separator
           firstPage.rows.push({ type: "daySeparator" });
-          firstPageRowCount += 1; // Separator counts as 1 row
+          firstPageRowCount += 1;
         }
+      }
 
-        // Add all data rows for this day
-        firstPage.rows.push(...dayGroup.rows);
-        firstPageRowCount += dayRowCount;
+      // Add as many rows from this day group as possible
+      const rowsToAdd = Math.min(dayGroup.rows.length - currentRowIndex, remainingRows);
+
+      for (let i = 0; i < rowsToAdd; i++) {
+        firstPage.rows.push(dayGroup.rows[currentRowIndex + i]);
+        firstPageRowCount += 1;
+      }
+
+      currentRowIndex += rowsToAdd;
+
+      // If we've processed all rows in this day group, move to next day
+      if (currentRowIndex >= dayGroup.rows.length) {
         currentDayIndex++;
+        currentRowIndex = 0;
       } else {
-        // Day doesn't fit, move to next page
+        // Day group doesn't fit completely, break to next page
         break;
       }
     }
@@ -233,27 +247,36 @@ const SchedulePDF: FC<{
       const page = { rows: [] as any[], hasHeader: false };
       let pageRowCount = 0;
 
-      // Fill page with complete day groups up to exactly 28 rows
+      // Fill page
       while (currentDayIndex < dayGroups.length && pageRowCount < OTHER_PAGES_ROWS) {
         const dayGroup = dayGroups[currentDayIndex];
-        const dayRowCount = dayGroup.rows.length;
-
-        // Check if this day group fits in the remaining space
         const remainingRows = OTHER_PAGES_ROWS - pageRowCount;
 
-        if (dayRowCount <= remainingRows) {
-          // Add day separator (except when page is empty)
-          if (page.rows.length > 0) {
+        // Add day separator if we're starting a new day and page is not empty
+        if (currentRowIndex === 0 && page.rows.length > 0) {
+          if (remainingRows >= 1) {
+            // Check if there's space for separator
             page.rows.push({ type: "daySeparator" });
-            pageRowCount += 1; // Separator counts as 1 row
+            pageRowCount += 1;
           }
+        }
 
-          // Add all data rows for this day
-          page.rows.push(...dayGroup.rows);
-          pageRowCount += dayRowCount;
+        // Add as many rows from this day group as possible
+        const rowsToAdd = Math.min(dayGroup.rows.length - currentRowIndex, remainingRows);
+
+        for (let i = 0; i < rowsToAdd; i++) {
+          page.rows.push(dayGroup.rows[currentRowIndex + i]);
+          pageRowCount += 1;
+        }
+
+        currentRowIndex += rowsToAdd;
+
+        // If we've processed all rows in this day group, move to next day
+        if (currentRowIndex >= dayGroup.rows.length) {
           currentDayIndex++;
+          currentRowIndex = 0;
         } else {
-          // Day doesn't fit, move to next page
+          // Day group doesn't fit completely, break to next page
           break;
         }
       }
@@ -351,7 +374,16 @@ const SchedulePDF: FC<{
           </Text>
         </View>
         <View style={[styles.tableCol, styles.w35]}>
-          <Text style={styles.cellText}>-</Text>
+          <Text style={[styles.cellText, { fontSize: 7 }]}>
+            {item.isNoMeterReader
+              ? "-"
+              : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
+                ? item.meterReader.zoneBooks
+                    .map((zb: ZonebookWithDates) => zb.area?.name) // Extract area names
+                    .filter((areaName: string) => areaName && areaName.trim() !== "") // Remove empty/null area names
+                    .join("/  ") // Join with commas only for non-empty values
+                : "-"}
+          </Text>
         </View>
         <View style={[styles.tableCol, styles.w10]}>
           <Text style={styles.cellText}>{item.isNoMeterReader ? "-" : "0"}</Text>
@@ -431,31 +463,31 @@ export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) =
   });
 
   // Function to compute day numbers with weekend grouping
-  const computeDayNumbers = (entries: BilledMeterReadingSchedule[]) => {
-    const dayNumbers: number[] = [];
-    let currentDayNumber = 0;
+  // const computeDayNumbers = (entries: BilledMeterReadingSchedule[]) => {
+  //   const dayNumbers: number[] = [];
+  //   let currentDayNumber = 0;
 
-    for (let i = 0; i < entries.length; i++) {
-      const currentDate = new Date(entries[i].readingDate);
+  //   for (let i = 0; i < entries.length; i++) {
+  //     const currentDate = new Date(entries[i].readingDate);
 
-      if (i === 0) {
-        currentDayNumber = 1;
-        dayNumbers.push(currentDayNumber);
-        continue;
-      }
+  //     if (i === 0) {
+  //       currentDayNumber = 1;
+  //       dayNumbers.push(currentDayNumber);
+  //       continue;
+  //     }
 
-      const previousDate = new Date(entries[i - 1].readingDate);
+  //     const previousDate = new Date(entries[i - 1].readingDate);
 
-      if (isSunday(currentDate) && isSaturday(previousDate)) {
-        dayNumbers.push(currentDayNumber);
-      } else {
-        currentDayNumber++;
-        dayNumbers.push(currentDayNumber);
-      }
-    }
+  //     if (isSunday(currentDate) && isSaturday(previousDate)) {
+  //       dayNumbers.push(currentDayNumber);
+  //     } else {
+  //       currentDayNumber++;
+  //       dayNumbers.push(currentDayNumber);
+  //     }
+  //   }
 
-    return dayNumbers;
-  };
+  //   return dayNumbers;
+  // };
 
   // Generate PDF when data is loaded
   useEffect(() => {
@@ -475,11 +507,9 @@ export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) =
       }
 
       const sortedData = data.sort((a, b) => (a.readingDate > b.readingDate ? 1 : -1));
-      const dayNumbers = computeDayNumbers(sortedData);
+      // const dayNumbers = computeDayNumbers(sortedData);
 
-      const blob = await pdf(
-        <SchedulePDF data={sortedData} yearMonth={yearMonth} dayNumbers={dayNumbers} />,
-      ).toBlob();
+      const blob = await pdf(<SchedulePDF data={sortedData} yearMonth={yearMonth} />).toBlob();
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
     } catch (error) {
@@ -531,7 +561,7 @@ export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) =
 
   // Sort data by reading date
   const sortedData = data.sort((a, b) => (a.readingDate > b.readingDate ? 1 : -1));
-  const dayNumbers = computeDayNumbers(sortedData);
+  // const dayNumbers = computeDayNumbers(sortedData);
 
   return (
     <div className="flex flex-col p-8">

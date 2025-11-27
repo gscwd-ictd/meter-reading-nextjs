@@ -2,11 +2,27 @@
 "use client";
 
 import { useState, useMemo, FunctionComponent, useEffect } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@mr/components/ui/Command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import { Check, ChevronDown, MapPinCheckIcon, MapPinIcon, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  MapPinIcon,
+  X,
+  PlusCircleIcon,
+  CircleXIcon,
+  CheckCircle,
+  Ban,
+} from "lucide-react";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
@@ -18,6 +34,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogClose,
 } from "@mr/components/ui/Dialog";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { format } from "date-fns";
@@ -29,7 +47,6 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import { SplittedDates } from "./SplittedDates";
 import { NormalDates } from "./NormalDates";
 import { toast } from "sonner";
-import { RemoveZonebookAlertDialog } from "./RemoveZonebookAlertDialog";
 
 type MeterReaderZonebooks = {
   assigned: ZonebookWithDates[];
@@ -48,8 +65,14 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const [selectedBook, setSelectedBook] = useState<string>("");
   const [zoneIsOpen, setZoneIsOpen] = useState<boolean>(false);
   const [bookIsOpen, setBookIsOpen] = useState<boolean>(false);
+  const [zoneInput, setZoneInput] = useState<string>("");
+  const [bookInput, setBookInput] = useState<string>("");
   const [hasFetchedZonebooks, setHasFetchedZonebooks] = useState<boolean>(false);
   const [hasAnEmptyDueDate, setHasAnEmptyDueDate] = useState<boolean>(false);
+  const [addDialogOpen, setAddDialogOpen] = useState<boolean>(false);
+  const [removeDialogOpen, setRemoveDialogOpen] = useState<boolean>(false);
+  const [zonebookToAdd, setZonebookToAdd] = useState<ZonebookWithDates | null>(null);
+  const [zonebookToRemove, setZonebookToRemove] = useState<ZonebookWithDates | null>(null);
 
   // this is the existing selected zonebooks for the selected meter reader
   const [assignedZonebooks, setAssignedZonebooks] = useState<ZonebookWithDates[]>([]);
@@ -63,7 +86,6 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const reset = useSchedulesStore((state) => state.reset);
-  const selectedZonebook = useSchedulesStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useSchedulesStore((state) => state.setSelectedZonebook);
   const queryClient = useQueryClient();
 
@@ -73,20 +95,18 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
     zonebooks.some((item) => item.dueDate === undefined || item.dueDate === null);
 
   // new meter reader assigned and unassigned zonebooks pool
-  const { data: meterReaderData, isLoading } = useQuery({
+  const {
+    data: meterReaderData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["get-meter-reader-zonebooks-by-exact-date", selectedMeterReader?.scheduleMeterReaderId],
     queryFn: async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/zone-books`,
-        );
-
-        return res.data as MeterReaderZonebooks;
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error("Something went wrong. Please try again in a few seconds...");
-        }
-      }
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/zone-books`,
+      );
+      console.log(res.data);
+      return res.data as MeterReaderZonebooks;
     },
 
     enabled:
@@ -95,6 +115,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       selectedMeterReader?.scheduleMeterReaderId !== null,
     staleTime: 0,
     gcTime: 0,
+    retry: 2,
   });
 
   // new zones, should target unassigned
@@ -113,6 +134,12 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       .map((zb) => zb.book);
     return Array.from(new Set(allBooksForSelectedZone));
   }, [selectedZone, unassignedZonebooks]);
+
+  const filteredZones = zones?.filter((option) => option.toLowerCase().includes(zoneInput.toLowerCase()));
+
+  const filteredBooks = booksForZone?.filter((option) =>
+    option.toLowerCase().includes(bookInput.toLowerCase()),
+  );
 
   // post mutation
   const postMeterReaderZonebooks = useMutation({
@@ -200,47 +227,74 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
     }
   };
 
-  // handle add zonebook from tempPool
-  const handleAddZonebook = () => {
+  // Handle add zonebook confirmation
+  const handleAddZonebook = (entry: ZonebookWithDates) => {
+    setZonebookToAdd(entry);
+    setAddDialogOpen(true);
+  };
+
+  const confirmAddZonebook = () => {
+    if (!zonebookToAdd) return;
+
     const zoneBooksToBeAssigned = [...assignedZonebooks!];
 
     zoneBooksToBeAssigned.push({
-      area: selectedZonebook?.area!,
-      book: selectedZonebook?.book!,
-      zone: selectedZonebook?.zone!,
-      zoneBook: selectedZonebook?.zoneBook!,
-      dueDate: Array.isArray(selectedScheduleEntry?.dueDate) ? undefined : selectedScheduleEntry?.dueDate,
-      disconnectionDate: Array.isArray(selectedScheduleEntry?.disconnectionDate)
-        ? undefined
-        : selectedScheduleEntry?.disconnectionDate,
-      day: null,
+      area: zonebookToAdd.area!,
+      book: zonebookToAdd.book!,
+      zone: zonebookToAdd.zone!,
+      zoneBook: zonebookToAdd.zoneBook!,
+      // Preserve the existing dueDate from the zonebook, only set to undefined if it doesn't exist
+      dueDate:
+        zonebookToAdd.dueDate !== undefined
+          ? zonebookToAdd.dueDate
+          : Array.isArray(selectedScheduleEntry?.dueDate)
+            ? undefined
+            : selectedScheduleEntry?.dueDate,
+      // Same for disconnectionDate
+      disconnectionDate:
+        zonebookToAdd.disconnectionDate !== undefined
+          ? zonebookToAdd.disconnectionDate
+          : Array.isArray(selectedScheduleEntry?.disconnectionDate)
+            ? undefined
+            : selectedScheduleEntry?.disconnectionDate,
+      day: zonebookToAdd.day !== undefined ? zonebookToAdd.day : null,
     });
 
     setAssignedZonebooks(zoneBooksToBeAssigned);
 
-    // setHasAnEmptyDueDate(hasEmptyDueDate(zoneBooksToBeAssigned));
-
     const newUnassignedZonebooks = [...unassignedZonebooks];
-    // filter the unassigned with the selected zonebook
-
-    setUnassignedZonebooks(newUnassignedZonebooks.filter((zb) => zb.zoneBook !== selectedZonebook?.zoneBook));
+    setUnassignedZonebooks(newUnassignedZonebooks.filter((zb) => zb.zoneBook !== zonebookToAdd.zoneBook));
 
     setSelectedBook("");
     setSelectedZone("");
     setSelectedZonebook(null);
+    setZoneInput("");
+    setBookInput("");
+
+    setAddDialogOpen(false);
+    setZonebookToAdd(null);
   };
 
-  // handle delete zonebook row
-  const handleDelete = (zonebook: string) => {
-    const tempAssignedZonebooks = [...assignedZonebooks];
-    setAssignedZonebooks(zoneBookSorter(tempAssignedZonebooks.filter((zb) => zb.zoneBook !== zonebook)));
+  // Handle remove zonebook confirmation
+  const handleRemoveZonebook = (entry: ZonebookWithDates) => {
+    setZonebookToRemove(entry);
+    setRemoveDialogOpen(true);
+  };
 
-    // setHasAnEmptyDueDate(hasEmptyDueDate(tempAssignedZonebooks.filter((zb) => zb.zoneBook !== zonebook)));
+  const confirmRemoveZonebook = () => {
+    if (!zonebookToRemove) return;
+
+    const tempAssignedZonebooks = [...assignedZonebooks];
+    setAssignedZonebooks(
+      zoneBookSorter(tempAssignedZonebooks.filter((zb) => zb.zoneBook !== zonebookToRemove.zoneBook)),
+    );
 
     const tempUnassignedZonebooks = [...unassignedZonebooks];
-    const foundZonebook = tempAssignedZonebooks.find((zb) => zb.zoneBook === zonebook);
-    tempUnassignedZonebooks.push(foundZonebook!);
+    tempUnassignedZonebooks.push(zonebookToRemove);
     setUnassignedZonebooks(ZonebookSorter(tempUnassignedZonebooks));
+
+    setRemoveDialogOpen(false);
+    setZonebookToRemove(null);
   };
 
   const handleZoneSelect = (zone: string) => {
@@ -254,18 +308,13 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
     setSelectedZonebook(unassignedZonebooks?.find((zb) => zb.zone === selectedZone && zb.book === book)!);
   };
 
-  const handleZonebookSelect = (zoneBook: ZonebookWithDates) => {
-    setSelectedZonebook(zoneBook);
-    setSelectedZone(zoneBook.zone);
-    setSelectedBook(zoneBook.book);
-  };
-
   // Add clear option handler for zone
   const handleClearZone = () => {
     setSelectedZone("");
     setSelectedBook("");
     setSelectedZonebook(null);
     setZoneIsOpen(false);
+    setZoneInput("");
   };
 
   // Add clear option handler for book
@@ -273,19 +322,31 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
     setSelectedBook("");
     setSelectedZonebook(null);
     setBookIsOpen(false);
+    setBookInput("");
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setSelectedZone("");
+    setSelectedBook("");
+    setSelectedZonebook(null);
+    setZoneInput("");
+    setBookInput("");
   };
 
   // useEffect for checking if fetched
   useEffect(() => {
-    if (meterReaderData && !hasFetchedZonebooks && entryZonebookSelectorIsOpen && !isLoading) {
+    if (meterReaderData && !hasFetchedZonebooks && entryZonebookSelectorIsOpen && !isLoading && !isError) {
       setAssignedZonebooks(ZonebookSorter(meterReaderData.assigned));
 
-      const unassigned = meterReaderData.unassigned.filter(
-        (zonebook) =>
-          !meterReaderData.assigned.some((a) => a.zone === zonebook.zone && a.book === zonebook.book),
-      );
+      // const unassigned = meterReaderData.unassigned.filter(
+      //   (zonebook) =>
+      //     !meterReaderData.assigned.some((a) => a.zone === zonebook.zone && a.book === zonebook.book),
+      // );
 
-      setUnassignedZonebooks(ZonebookSorter(unassigned));
+      setUnassignedZonebooks(ZonebookSorter(meterReaderData.unassigned));
+
+      // setUnassignedZonebooks(ZonebookSorter(unassigned));
       setHasFetchedZonebooks(true);
     }
   }, [meterReaderData, hasFetchedZonebooks, entryZonebookSelectorIsOpen, isLoading, setAssignedZonebooks]);
@@ -297,31 +358,32 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   }, [assignedZonebooks, entryZonebookSelectorIsOpen]);
 
   return (
-    <Dialog
-      open={entryZonebookSelectorIsOpen}
-      onOpenChange={() => {
-        setEntryZonebookSelectorIsOpen(!entryZonebookSelectorIsOpen);
-        setSelectedBook("");
-        setSelectedZone("");
-        setSelectedZonebook(null);
-        setAssignedZonebooks([]);
-        setUnassignedZonebooks([]);
-        setHasFetchedZonebooks(false);
-        setSelectedMeterReader(null);
-
-        // refetchEntry!();
-      }}
-      modal
-    >
-      <DialogContent
-        className="h-[100%] min-w-full overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[95%] lg:min-w-[60%]"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
+    <>
+      <Dialog
+        open={entryZonebookSelectorIsOpen}
+        onOpenChange={() => {
+          setEntryZonebookSelectorIsOpen(!entryZonebookSelectorIsOpen);
+          setSelectedBook("");
+          setSelectedZone("");
+          setSelectedZonebook(null);
+          setAssignedZonebooks([]);
+          setUnassignedZonebooks([]);
+          setHasFetchedZonebooks(false);
+          setSelectedMeterReader(null);
+          setZoneInput("");
+          setBookInput("");
+        }}
+        modal
       >
-        <DialogHeader className="gap-0">
-          <DialogTitle className="flex flex-col gap-0 text-start">
-            <div className="space-y-0">
-              <div className="flex items-center gap-1 text-xl font-bold dark:text-white">
+        <DialogContent
+          className="max-h-[100vh] overflow-y-auto sm:max-w-6xl lg:max-h-[85vh] lg:max-w-7xl dark:bg-gray-900 dark:text-gray-100"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          hideClose
+        >
+          <DialogHeader className="pb-4">
+            <DialogTitle className="flex flex-col gap-2 text-start text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <div className="flex items-center gap-2">
                 <Avatar>
                   <AvatarImage
                     src={
@@ -334,13 +396,11 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                   />
                   <AvatarFallback>{selectedMeterReader?.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-
                 {selectedMeterReader?.name}
               </div>
-              <div className="text-muted-foreground text-sm">
+              <div className="text-sm font-normal text-gray-600 dark:text-gray-400">
                 Reading Date: {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
               </div>
-
               <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
                 {Array.isArray(selectedScheduleEntry?.dueDate) &&
                   Array.isArray(selectedScheduleEntry.disconnectionDate) && (
@@ -359,312 +419,594 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                     />
                   )}
               </div>
-            </div>
-          </DialogTitle>
+            </DialogTitle>
+            <DialogDescription className="text-start text-sm text-gray-600 dark:text-gray-400">
+              <span className="flex flex-col gap-2">
+                <span>Select a zonebook and press the add button to assign</span>
+              </span>
+            </DialogDescription>
+          </DialogHeader>
 
-          <DialogDescription className="text-start text-[0.5rem] text-gray-500 sm:text-[0.5rem] md:text-[0.5rem] lg:text-xs">
-            Select a zonebook and press add to assign, don&apos;t forget to press apply to finalize.
-          </DialogDescription>
-        </DialogHeader>
+          {/* Proper Responsive Grid */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Available Zonebooks - Left Side */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Available Zonebooks
+                  </h3>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {unassignedZonebooks.length}
+                  </span>
+                </div>
+              </div>
 
-        <Command className="flex h-[16rem] flex-col gap-2 overflow-y-auto">
-          <div className="grid w-full grid-cols-3 items-end gap-2">
-            {/* Zone Combobox */}
-            <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
-              <PopoverTrigger asChild className="flex flex-col gap-1">
-                <div>
-                  <Label
-                    htmlFor="zone"
-                    className="text-primary text-left text-sm font-bold group-hover:cursor-pointer"
-                  >
+              {/* Filter Controls - Above the table */}
+              <div className="grid grid-cols-1 gap-4 rounded-lg sm:grid-cols-3">
+                {/* Zone Combobox */}
+                <div className="space-y-2">
+                  <Label htmlFor="zone" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Zone
                   </Label>
-                  <Button variant="outline" role="combobox" className="w-full justify-between">
-                    {selectedZone || "Select zone"}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent avoidCollisions className="p-0" side="top">
-                <Command>
-                  <CommandInput placeholder="Search zones..." />
-                  <CommandEmpty>No zone found.</CommandEmpty>
-                  <CommandGroup
-                    className="h-auto max-h-[12rem] overflow-auto"
-                    onWheel={(e) => e.stopPropagation()}
-                  >
-                    {/* Add Clear option */}
-                    <CommandItem
-                      key="clear-zone"
-                      value="clear"
-                      onSelect={handleClearZone}
-                      className="text-muted-foreground"
-                    >
-                      <X className="mr-2 h-4 w-4" />
-                      Clear selection
-                    </CommandItem>
-                    {zones?.map((zone) => (
-                      <CommandItem
-                        key={zone}
-                        value={zone}
-                        onSelect={() => {
-                          handleZoneSelect(zone);
-                          setZoneIsOpen(false);
-                        }}
+                  <Popover open={zoneIsOpen} onOpenChange={setZoneIsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
                       >
-                        <Check
-                          className={cn("mr-2 h-4 w-4", selectedZone === zone ? "opacity-100" : "opacity-0")}
+                        <span
+                          className={
+                            selectedZone
+                              ? "text-gray-900 dark:text-gray-100"
+                              : "text-gray-500 dark:text-gray-400"
+                          }
+                        >
+                          {selectedZone || "Select zone"}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      avoidCollisions
+                      className="w-full p-0 dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search zones..."
+                          value={zoneInput}
+                          onValueChange={setZoneInput}
+                          className="border-0 dark:bg-gray-800 dark:text-gray-200"
                         />
-                        {zone}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                        <CommandEmpty className="py-3 text-center text-sm text-gray-500 dark:text-gray-400">
+                          No zone found.
+                        </CommandEmpty>
+                        <CommandList
+                          className="max-h-[12rem] overflow-auto"
+                          onWheel={(e) => e.stopPropagation()}
+                        >
+                          <CommandItem
+                            key="clear-zone"
+                            value="clear"
+                            onSelect={handleClearZone}
+                            className="text-sm text-gray-500 dark:text-gray-400 dark:hover:bg-gray-700"
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear selection
+                          </CommandItem>
+                          {filteredZones?.map((zone) => (
+                            <CommandItem
+                              key={zone}
+                              value={zone}
+                              onSelect={() => {
+                                handleZoneSelect(zone);
+                                setZoneIsOpen(false);
+                              }}
+                              className="text-sm dark:text-gray-200 dark:hover:bg-gray-700"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedZone === zone ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {zone}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-            {/* Book Combobox */}
-            <Popover open={bookIsOpen} onOpenChange={setBookIsOpen}>
-              <PopoverTrigger asChild className="flex flex-col gap-1">
-                <div>
-                  <Label
-                    htmlFor="book"
-                    className="text-primary text-left text-sm font-bold group-hover:cursor-pointer"
-                  >
+                {/* Book Combobox */}
+                <div className="space-y-2">
+                  <Label htmlFor="book" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Book
+                  </Label>
+                  <Popover open={bookIsOpen} onOpenChange={setBookIsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                        disabled={!selectedZone}
+                      >
+                        <span
+                          className={
+                            selectedBook
+                              ? "text-gray-900 dark:text-gray-100"
+                              : "text-gray-500 dark:text-gray-400"
+                          }
+                        >
+                          {selectedBook || "Select book"}
+                        </span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0 dark:border-gray-700 dark:bg-gray-800">
+                      <Command shouldFilter={false}>
+                        <CommandInput
+                          placeholder="Search books..."
+                          value={bookInput}
+                          onValueChange={setBookInput}
+                          className="border-0 dark:bg-gray-800 dark:text-gray-200"
+                        />
+                        <CommandEmpty className="py-3 text-center text-sm text-gray-500 dark:text-gray-400">
+                          No book found.
+                        </CommandEmpty>
+                        <CommandList
+                          className="max-h-[12rem] overflow-auto"
+                          onWheel={(e) => e.stopPropagation()}
+                        >
+                          <CommandItem
+                            key="clear-book"
+                            value="clear"
+                            onSelect={handleClearBook}
+                            className="text-sm text-gray-500 dark:text-gray-400 dark:hover:bg-gray-700"
+                          >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear selection
+                          </CommandItem>
+                          {filteredBooks?.map((book) => (
+                            <CommandItem
+                              key={book}
+                              value={book}
+                              onSelect={() => {
+                                handleBookSelect(book);
+                                setBookIsOpen(false);
+                              }}
+                              className="text-sm dark:text-gray-200 dark:hover:bg-gray-700"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedBook === book ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              {book}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* Clear Filters Button */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700 opacity-0 dark:text-gray-300">
+                    Action
                   </Label>
                   <Button
                     variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                    disabled={!selectedZone}
+                    onClick={handleClearFilters}
+                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                   >
-                    {selectedBook || "Select book"}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    Clear Filters
                   </Button>
                 </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" side="top">
-                <Command>
-                  <CommandInput placeholder="Search books..." />
-                  <CommandEmpty>No book found.</CommandEmpty>
-                  <CommandGroup
-                    className="h-auto max-h-[12rem] overflow-auto"
-                    onWheel={(e) => e.stopPropagation()}
-                  >
-                    {/* Add Clear option */}
-                    <CommandItem
-                      key="clear-book"
-                      value="clear"
-                      onSelect={handleClearBook}
-                      className="text-muted-foreground"
-                    >
-                      <X className="mr-2 h-4 w-4" />
-                      Clear selection
-                    </CommandItem>
-                    {booksForZone.map((book) => (
-                      <CommandItem
-                        key={book}
-                        value={book}
-                        onSelect={() => {
-                          handleBookSelect(book);
-                          setBookIsOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn("mr-2 h-4 w-4", selectedBook === book ? "opacity-100" : "opacity-0")}
-                        />
-                        {book}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+              </div>
 
-            {/* Add Button */}
-            <Button
-              disabled={selectedZonebook === null ? true : false}
-              onClick={handleAddZonebook}
-              className="dark:text-white dark:disabled:text-black"
-            >
-              Add
-            </Button>
-          </div>
+              <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                <div className="relative h-88 overflow-y-auto">
+                  <Table>
+                    <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm dark:bg-gray-700">
+                      <TableRow>
+                        <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Day
+                        </TableHead>
+                        <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Zone
+                        </TableHead>
+                        <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Book
+                        </TableHead>
+                        <TableHead className="min-w-[120px] py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Area
+                        </TableHead>
 
-          {isLoading ? (
-            <div className="text-primary flex h-full w-full items-center justify-center">
-              Loading zone books <LoadingSpinner className="text-primary" />
-            </div>
-          ) : (
-            <CommandGroup
-              className="h-[16rem] overflow-auto rounded border"
-              onWheel={(e) => e.stopPropagation()}
-            >
-              {!selectedZone && !selectedBook && !unassignedZonebooks && isLoading ? (
-                <div>
-                  <LoadingSpinner />
+                        <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Action
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="py-16 text-center">
+                            <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                              <LoadingSpinner className="size-8" />
+                              <p className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                                Loading zonebooks...
+                              </p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : unassignedZonebooks && unassignedZonebooks.length > 0 ? (
+                        unassignedZonebooks
+                          .filter(
+                            (zb) =>
+                              (!selectedZone || zb.zone === selectedZone) &&
+                              (!selectedBook || zb.book === selectedBook),
+                          )
+                          .map((entry, index) => (
+                            <TableRow
+                              key={index}
+                              className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                            >
+                              <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                                {entry.day}
+                              </TableCell>
+                              <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                                {entry.zone}
+                              </TableCell>
+                              <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                                {entry.book}
+                              </TableCell>
+                              <TableCell className="max-w-[120px] min-w-[120px] py-3">
+                                <div
+                                  className="truncate text-gray-700 dark:text-gray-300"
+                                  title={entry.area?.name}
+                                >
+                                  {entry.area?.name}
+                                </div>
+                              </TableCell>
+
+                              <TableCell className="py-3">
+                                <button
+                                  onClick={() => handleAddZonebook(entry)}
+                                  className="rounded p-2 opacity-70 transition-all group-hover:opacity-100 hover:bg-blue-100 hover:opacity-100 dark:hover:bg-blue-900"
+                                  title="Add to assigned"
+                                >
+                                  <PlusCircleIcon className="size-5 fill-green-500 text-white dark:fill-green-600" />
+                                </button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="py-16 text-center">
+                            <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                              <CheckCircle className="size-16 text-gray-300 dark:text-gray-600" />
+                              <div className="space-y-1">
+                                <p className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                                  All zonebooks assigned
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  All available zonebooks have been assigned
+                                </p>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
                 </div>
-              ) : !selectedZone && !selectedBook && unassignedZonebooks && !isLoading ? (
-                unassignedZonebooks.length > 0 &&
-                unassignedZonebooks.map((zb, idx) => (
-                  <CommandItem
-                    key={idx}
-                    value={selectedZonebook?.zoneBook}
-                    onSelect={() => handleZonebookSelect(zb)}
-                    className="grid h-[3rem] w-full grid-cols-12 items-center gap-0 rounded-none border-b text-sm"
-                  >
-                    <MapPinIcon className="text-primary size-5" />
-                    <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                      Zone {zb.zone}
-                    </span>
-                    <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                      Book {zb.book}
-                    </span>
-                    <span className="col-span-9 font-medium text-black dark:text-white">{zb.area.name}</span>
-                  </CommandItem>
-                ))
-              ) : selectedZone && !selectedBook && unassignedZonebooks && !isLoading ? (
-                unassignedZonebooks
-                  .filter((zb) => zb.zone === selectedZone)
-                  .map((zb, idx) => (
-                    <CommandItem
-                      key={idx}
-                      value={selectedZonebook?.zoneBook}
-                      onSelect={() => handleZonebookSelect(zb)}
-                      className="grid h-[3rem] w-full grid-cols-12 items-center gap-0"
-                    >
-                      <MapPinIcon className="text-primary size-5" />
-                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                        Zone {zb.zone}
-                      </span>
-                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                        Book {zb.book}
-                      </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">
-                        {zb.area.name}
-                      </span>
-                    </CommandItem>
-                  ))
-              ) : selectedZone && selectedBook && unassignedZonebooks && !isLoading ? (
-                unassignedZonebooks
-                  .filter((zb) => zb.zone === selectedZone && zb.book === selectedBook)
-                  .map((zb, idx) => (
-                    <CommandItem key={idx} className="grid h-[3rem] w-full grid-cols-12 items-center gap-0">
-                      <MapPinCheckIcon className="size-5 text-green-600" />
-                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                        Zone {zb.zone}
-                      </span>
-                      <span className="col-span-1 font-medium text-gray-600 dark:text-white">
-                        Book {zb.book}
-                      </span>
-                      <span className="col-span-9 font-medium text-black dark:text-white">
-                        {zb.area.name}
-                      </span>
-                    </CommandItem>
-                  ))
-              ) : null}
-            </CommandGroup>
-          )}
-        </Command>
+              </div>
+            </div>
 
-        <div className="flex flex-col gap-1">
-          <Label className="text-primary font-bold">Assigned Zonebooks</Label>
-          <div className="h-[22rem] overflow-auto rounded border p-0">
-            <Table className="table-auto text-sm" onWheel={(e) => e.stopPropagation()}>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-semibold text-gray-600"></TableHead>
-                  {/* <TableHead className="w-[100px] font-semibold text-gray-600">Zone-book</TableHead> */}
-                  <TableHead className="font-semibold text-gray-600">Zone</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Book</TableHead>
-                  <TableHead className="w-[10rem] font-semibold text-gray-600">Area</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Due</TableHead>
-                  <TableHead className="font-semibold text-gray-600">Disc</TableHead>
-                  <TableHead className="font-semibold text-gray-600"></TableHead>
-                </TableRow>
-              </TableHeader>
+            {/* Assigned Zonebooks - Right Side */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Assigned Zonebooks
+                  </h3>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {assignedZonebooks.length}
+                  </span>
+                </div>
+              </div>
 
-              <TableBody>
-                {!isLoading && assignedZonebooks && assignedZonebooks.length > 0 ? (
-                  assignedZonebooks.map((entry, idx) => (
-                    <TableRow key={idx} className="">
-                      <TableCell>
-                        <MapPinCheckIcon className="size-5 text-green-600" />
-                      </TableCell>
-                      {/* <TableCell>{entry.zoneBook}</TableCell> */}
-                      <TableCell>{entry.zone}</TableCell>
-                      <TableCell>{entry.book}</TableCell>
-                      <TableCell className="w-[10rem]">{entry.area?.name}</TableCell>
-                      <TableCell>
-                        {selectedScheduleEntry?.dueDate &&
-                        Array.isArray(selectedScheduleEntry.dueDate) &&
-                        Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
-                          <ScheduleEntryDueDateSelector
-                            zonebook={entry.zoneBook}
-                            zoneBooks={assignedZonebooks}
-                            setZonebooks={setAssignedZonebooks}
-                            dueDate={entry.dueDate}
-                            disconnectionDate={entry.disconnectionDate}
-                          />
-                        ) : selectedScheduleEntry?.dueDate &&
-                          !Array.isArray(selectedScheduleEntry.dueDate) ? (
-                          format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
-                        ) : (
-                          "else"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {selectedScheduleEntry?.disconnectionDate &&
-                        Array.isArray(selectedScheduleEntry.disconnectionDate)
-                          ? entry.dueDate && entry.disconnectionDate
-                            ? format(entry.disconnectionDate, "MMM dd, yyyy")
-                            : "-"
-                          : selectedScheduleEntry?.disconnectionDate &&
-                              !Array.isArray(selectedScheduleEntry.disconnectionDate)
-                            ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
-                            : null}
-                      </TableCell>
-                      <TableCell>
-                        {/* <button onClick={() => handleDelete(entry.zoneBook)}>
-                          <CircleXIcon className="fill-red-600 text-white" />
-                        </button> */}
-                        <RemoveZonebookAlertDialog
-                          zoneBook={entry.zoneBook}
-                          onDelete={() => handleDelete(entry.zoneBook)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="p-4">
-                      <div className="flex w-full items-center justify-center gap-2 text-center">
-                        <span className="text-primary">Loading assigned zonebooks</span>
-                        <LoadingSpinner className="text-primary" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center">
-                      No zone books added
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+              <div className="mt-0 rounded-lg border border-gray-200 bg-white lg:mt-25 dark:border-gray-700 dark:bg-gray-800">
+                <div className="relative h-88 overflow-y-auto">
+                  <Table className="w-full">
+                    <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm dark:bg-gray-700">
+                      <TableRow>
+                        <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Day
+                        </TableHead>
+                        <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Zone
+                        </TableHead>
+                        <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Book
+                        </TableHead>
+                        <TableHead className="min-w-[120px] py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Area
+                        </TableHead>
+
+                        <TableHead className="py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Due
+                        </TableHead>
+                        <TableHead className="py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Disc
+                        </TableHead>
+                        <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          Action
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {!isLoading && assignedZonebooks && assignedZonebooks.length > 0 ? (
+                        assignedZonebooks.map((entry, idx) => (
+                          <TableRow
+                            key={idx}
+                            className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                          >
+                            <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                              {entry.day}
+                            </TableCell>
+                            <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                              {entry.zone}
+                            </TableCell>
+                            <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
+                              {entry.book}
+                            </TableCell>
+                            <TableCell className="max-w-[120px] min-w-[120px] py-3">
+                              <div
+                                className="truncate text-gray-700 dark:text-gray-300"
+                                title={entry.area?.name}
+                              >
+                                {entry.area?.name}
+                              </div>
+                            </TableCell>
+
+                            <TableCell className="py-3">
+                              {selectedScheduleEntry?.dueDate &&
+                              Array.isArray(selectedScheduleEntry.dueDate) &&
+                              Array.isArray(selectedScheduleEntry.disconnectionDate) ? (
+                                <ScheduleEntryDueDateSelector
+                                  zonebook={entry.zoneBook}
+                                  zoneBooks={assignedZonebooks}
+                                  setZonebooks={setAssignedZonebooks}
+                                  dueDate={entry.dueDate}
+                                  disconnectionDate={entry.disconnectionDate}
+                                />
+                              ) : selectedScheduleEntry?.dueDate &&
+                                !Array.isArray(selectedScheduleEntry.dueDate) ? (
+                                format(selectedScheduleEntry.dueDate, "MMM dd, yyyy")
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell className="py-3">
+                              {selectedScheduleEntry?.disconnectionDate &&
+                              Array.isArray(selectedScheduleEntry.disconnectionDate)
+                                ? entry.dueDate && entry.disconnectionDate
+                                  ? format(entry.disconnectionDate, "MMM dd, yyyy")
+                                  : "-"
+                                : selectedScheduleEntry?.disconnectionDate &&
+                                    !Array.isArray(selectedScheduleEntry.disconnectionDate)
+                                  ? format(selectedScheduleEntry.disconnectionDate, "MMM dd, yyyy")
+                                  : "-"}
+                            </TableCell>
+                            <TableCell className="w-16 py-3">
+                              <button
+                                onClick={() => handleRemoveZonebook(entry)}
+                                className="rounded p-2 opacity-70 transition-all group-hover:opacity-100 hover:bg-gray-200 hover:opacity-100 dark:hover:bg-gray-600"
+                                title="Remove assignment"
+                              >
+                                <CircleXIcon className="size-5 fill-red-500 text-white dark:fill-red-600" />
+                              </button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="py-16 text-center">
+                            <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                              <LoadingSpinner className="size-8" />
+                              <p className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                                Loading assigned zonebooks...
+                              </p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={7} className="py-16 text-center">
+                            <div className="flex flex-col items-center gap-4 text-gray-500 dark:text-gray-400">
+                              <MapPinIcon className="size-16 text-gray-300 dark:text-gray-600" />
+                              <div className="space-y-1">
+                                <p className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                                  No zonebooks assigned
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  Add zonebooks from the list above
+                                </p>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <Button
-          className="h-[3rem] dark:text-white"
-          onClick={handleApplyAllZonebooks}
-          disabled={hasAnEmptyDueDate ? true : false}
-        >
-          Apply
-        </Button>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="flex items-end gap-2 pt-6">
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="h-[3rem] flex-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              className="h-[3rem] flex-1 dark:text-white"
+              onClick={handleApplyAllZonebooks}
+              disabled={hasAnEmptyDueDate || postMeterReaderZonebooks.isPending}
+            >
+              {postMeterReaderZonebooks.isPending ? (
+                <>
+                  <LoadingSpinner className="mr-2 size-4" />
+                  Applying...
+                </>
+              ) : (
+                "Apply Changes"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Zonebook Confirmation Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-md dark:bg-gray-900 dark:text-gray-100">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <PlusCircleIcon className="size-5 fill-green-500 text-white dark:fill-green-600" />
+              Add Zonebook
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
+              Are you sure you want to add this zonebook to the assigned list?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {zonebookToAdd && (
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Default Day:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToAdd.day}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Zone:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToAdd.zone}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Book:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToAdd.book}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Area:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToAdd.area?.name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setAddDialogOpen(false)}
+              className="flex-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmAddZonebook}
+              className="flex-1 bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+            >
+              <PlusCircleIcon className="mr-2 size-4" />
+              Add Zonebook
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Zonebook Confirmation Dialog */}
+      <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+        <DialogContent className="sm:max-w-md dark:bg-gray-900 dark:text-gray-100">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <CircleXIcon className="size-5 fill-red-500 text-white dark:fill-red-600" />
+              Remove Zonebook
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
+              Are you sure you want to remove this zonebook from the assigned list?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {zonebookToRemove && (
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Default Day:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToRemove.day}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Zone:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToRemove.zone}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Book:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToRemove.book}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Area:</span>
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                      {zonebookToRemove.area?.name}
+                    </span>
+                  </div>
+                  {zonebookToRemove.dueDate && (
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Due Date:</span>
+                      <span className="font-semibold text-green-600 dark:text-green-400">
+                        {format(zonebookToRemove.dueDate, "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setRemoveDialogOpen(false)}
+              className="flex-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+            <Button onClick={confirmRemoveZonebook} variant="destructive" className="flex-1">
+              <CircleXIcon className="mr-2 size-4" />
+              Remove Zonebook
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
