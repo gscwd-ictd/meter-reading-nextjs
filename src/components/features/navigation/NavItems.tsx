@@ -78,7 +78,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash("Loading...", child.url);
+                                showSplash();
                                 router.push(child.url!);
                               }}
                             >
@@ -99,14 +99,14 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                     }
                     onClick={() => {
                       if (item.title === "Schedules") {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         reset();
                         refetchData?.();
 
                         router.push(item.url!);
                       }
                       if (item.url) {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         router.push(item.url);
                       }
                     }}
@@ -186,7 +186,7 @@ export const NavMonitoringAndReports: FunctionComponent<
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash("Loading...", child.url);
+                                showSplash();
                                 router.push(child.url!);
                               }}
                             >
@@ -207,14 +207,14 @@ export const NavMonitoringAndReports: FunctionComponent<
                     }
                     onClick={() => {
                       if (item.title === "Schedules") {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         reset();
                         refetchData?.();
 
                         router.push(item.url!);
                       }
                       if (item.url) {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         router.push(item.url);
                       }
                     }}
@@ -293,7 +293,7 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash("Loading...", child.url);
+                                showSplash();
                                 router.push(child.url!);
                               }}
                             >
@@ -314,14 +314,14 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                     }
                     onClick={() => {
                       if (item.title === "Schedules") {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         reset();
                         refetchData?.();
 
                         router.push(item.url!);
                       }
                       if (item.url) {
-                        showSplash("Loading...", item.url);
+                        showSplash();
                         router.push(item.url);
                       }
                     }}
@@ -398,7 +398,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                               size="sm"
                               isActive={pathname.startsWith(child.url!)}
                               onClick={() => {
-                                showSplash("Loading...", child.url);
+                                showSplash();
                                 router.push(child.url!);
                               }}
                             >
@@ -416,7 +416,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                     onClick={() => {
                       if (item.title === "Schedule") reset();
                       if (item.url) {
-                        showSplash("Loading", item.url);
+                        showSplash();
                         router.push(item.url);
                       }
                     }}
