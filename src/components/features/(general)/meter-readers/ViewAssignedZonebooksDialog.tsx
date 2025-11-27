@@ -67,6 +67,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
                     <th className="px-4 py-2 text-left">Zone</th>
                     <th className="px-4 py-2 text-left">Book</th>
                     <th className="px-4 py-2 text-left">Area</th>
+                    <th className="px-4 py-2 text-left">Day</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -76,6 +77,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
                       <td className="px-4 py-2">{zb.zone}</td>
                       <td className="px-4 py-2">{zb.book}</td>
                       <td className="px-4 py-2">{zb.area.name ?? "N/A"}</td>
+                      <td className="px-4 py-2">{zb.day ?? "-"}</td>
                     </tr>
                   ))}
                 </tbody>

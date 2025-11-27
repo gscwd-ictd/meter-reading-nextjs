@@ -43,6 +43,8 @@ import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@mr/components/ui/Input";
+import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 
 type Props = {
   loading: boolean;
@@ -63,9 +65,9 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
 
   const zonebookSelectorIsOpen = useZonebookStore((state) => state.zonebookSelectorIsOpen);
   const setZonebookSelectorIsOpen = useZonebookStore((state) => state.setZonebookSelectorIsOpen);
-  const selectedZonebook = useZonebookStore((state) => state.selectedZonebook);
   const setSelectedZonebook = useZonebookStore((state) => state.setSelectedZonebook);
   const meterReaderZonebooks = useZonebookStore((state) => state.meterReaderZonebooks);
+  const selectedMeterReader = useMeterReadersStore((state) => state.selectedMeterReader);
   const setMeterReaderZonebooks = useZonebookStore((state) => state.setMeterReaderZonebooks);
   const tempFilteredZonebooks = useZonebookStore((state) => state.tempFilteredZonebooks);
   const setTempFilteredZonebooks = useZonebookStore((state) => state.setTempFilteredZonebooks);
@@ -232,8 +234,20 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="pb-4">
-            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              Assign Zonebooks
+            <DialogTitle className="flex gap-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <Avatar>
+                <AvatarImage
+                  src={
+                    selectedMeterReader?.photoUrl
+                      ? `${process.env.NEXT_PUBLIC_HRMS_IMAGES_SERVER}/${selectedMeterReader.photoUrl}`
+                      : undefined
+                  }
+                  alt={selectedMeterReader?.name}
+                  className="object-cover"
+                />
+                <AvatarFallback>{selectedMeterReader?.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <span className="flex items-center"> {selectedMeterReader?.name}</span>
             </DialogTitle>
             <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
               Select zonebooks and assign reading days (1-21)

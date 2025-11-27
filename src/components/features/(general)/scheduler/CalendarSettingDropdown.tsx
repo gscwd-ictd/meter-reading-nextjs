@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
 import { Ellipsis } from "lucide-react";
@@ -41,20 +40,19 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
+        {hasPopulatedMeterReaders && (
+          <DropdownMenuItem asChild>
+            <ResetScheduleAlertDialog />
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem asChild>
-          <ResetScheduleAlertDialog />
+          <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
         </DropdownMenuItem>
-        {!hasPopulatedMeterReaders && <DropdownMenuSeparator />}
-        {!hasPopulatedMeterReaders && (
-          <DropdownMenuItem asChild>
-            <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
-          </DropdownMenuItem>
-        )}
-        {!hasPopulatedMeterReaders && (
-          <DropdownMenuItem asChild>
-            <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
-          </DropdownMenuItem>
-        )}
+
+        <DropdownMenuItem asChild>
+          <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

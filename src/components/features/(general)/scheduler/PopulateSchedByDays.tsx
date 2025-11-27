@@ -30,14 +30,6 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
   schedule,
   scheduler,
 }) => {
-  const { data: meterReaders } = useQuery({
-    queryKey: ["get-all-meter-readers"],
-    queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
-      return res.data;
-    },
-  });
-
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
@@ -48,6 +40,14 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
   const monthYear = searchParams.get("date");
 
   const isDisabled = () => (hasPopulatedMeterReaders ? true : false);
+
+  const { data: meterReaders } = useQuery({
+    queryKey: ["get-all-meter-readers"],
+    queryFn: async () => {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/meter-readers?status=assigned`);
+      return res.data;
+    },
+  });
 
   const postSchedule = useMutation({
     mutationKey: ["set-schedule", monthYear],
@@ -63,7 +63,9 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
         };
       });
 
+      console.log("BEFORE: ", formattedFilteredSchedule);
       const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
+      console.log("RETURN: ", res.data);
       return res.data;
     },
     onSuccess: async () => {
@@ -87,11 +89,11 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
   const populateMeterReaders = async () => {
     const newSchedule = scheduler.assignMeterReadersWithDays(schedule, meterReaders);
 
-    const newSched = newSchedule.map((sched) => {
-      return { ...sched, meterReaders: sched.meterReaders } as MeterReadingEntryWithZonebooks;
-    });
-
-    setCurrentSchedule(newSched);
+    setCurrentSchedule(
+      newSchedule.map((sched) => {
+        return { ...sched, meterReaders: sched.meterReaders } as MeterReadingEntryWithZonebooks;
+      }),
+    );
 
     setHasPopulatedMeterReaders(true);
 
@@ -131,7 +133,7 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
     <AlertDialog>
       <AlertDialogTrigger
         disabled={isDisabled()}
-        className="flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white"
+        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white`}
       >
         {hasPopulatedMeterReaders ? (
           <CalendarCheck2 className="size-5" />
@@ -141,7 +143,7 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
         {!hasPopulatedMeterReaders ? (
           <span className={`${isDisabled() ? "line-through" : ""}`}>Fully Assigned: With Zone Books</span>
         ) : (
-          "Fetched Schedule"
+          "-"
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>

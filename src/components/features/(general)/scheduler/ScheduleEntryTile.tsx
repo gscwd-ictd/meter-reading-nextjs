@@ -77,6 +77,12 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
           setSelectedScheduleEntry(entry);
           setScheduleEntryDialogIsOpen(true);
         } else {
+          console.log("IS WITHIN MONTH: ", isWithinMonth);
+          console.log("HAS SCHEDULE: ", hasSchedule);
+          console.log(
+            "HAS PREVIOUS DUE AND DISC",
+            hasPreviousWithDueAndDisconnection(currentSchedule, entry.readingDate.toISOString()),
+          );
           e.preventDefault();
         }
       }}

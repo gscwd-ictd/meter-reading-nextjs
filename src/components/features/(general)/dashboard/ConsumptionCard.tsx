@@ -19,7 +19,9 @@ const chartConfig = {
 
 export const ConsumptionCard = () => {
   return (
-    <DashboardCard title="Consumption Pattern" className="col-span-3" size="sm">
+    <DashboardCard className="col-span-3" size="sm" title="Consumption Pattern">
+      {/* <div className="mb-2 text-base font-medium">Consumption Pattern</div> */}
+
       <ChartContainer config={chartConfig} className="flex h-[240px] w-full">
         <AreaChart
           accessibilityLayer
