@@ -1,80 +1,81 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
-type NavigationSplashContextType = {
-  showSplash: (text?: string, newPath?: string) => void;
+type SplashContextType = {
+  showSplash: (text?: string) => void;
   hideSplash: () => void;
   visible: boolean;
   text: string;
 };
 
-const NavigationSplashContext = createContext<NavigationSplashContextType | undefined>(undefined);
+const NavigationSplashContext = createContext<SplashContextType>({
+  showSplash: () => {},
+  hideSplash: () => {},
+  visible: false,
+  text: "Loading...",
+});
 
 export const useNavigationSplash = () => {
-  const context = useContext(NavigationSplashContext);
-  if (!context) throw new Error("useNavigationSplash must be used within NavigationSplashProvider");
-  return context;
+  return useContext(NavigationSplashContext);
 };
 
 export const NavigationSplashProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-
   const [visible, setVisible] = useState(false);
   const [text, setText] = useState("Loading...");
+  const timeoutRef = useRef<number | undefined>(0);
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastPathRef = useRef<string | null>(null);
-  const manualTriggerRef = useRef(false);
-  const initialSplashShownRef = useRef(false);
+  const showSplash = (msg?: string) => {
+    // console.log("Showing splash:", msg);
+    setText(msg || "Loading...");
+    setVisible(true);
 
-  const showSplash = useCallback(
-    (msg?: string, newPath?: string) => {
-      const currentPath = newPath ?? pathname;
-      const previousPath = lastPathRef.current;
-      const isSamePath = currentPath === previousPath;
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
 
-      const duration = isSamePath ? 600 : 1000;
+    // Safety timeout - always hide after 3 seconds
+    timeoutRef.current = window.setTimeout(() => {
+      // console.log("Safety timeout - hiding splash");
+      setVisible(false);
+    }, 3000);
+  };
 
-      setText(msg ?? "Loading...");
-      setVisible(true);
-      manualTriggerRef.current = true;
-
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        setVisible(false);
-        manualTriggerRef.current = false;
-      }, duration);
-
-      lastPathRef.current = currentPath;
-    },
-    [pathname],
-  );
-
-  const hideSplash = useCallback(() => {
+  const hideSplash = () => {
+    // console.log("Hiding splash manually");
     setVisible(false);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    manualTriggerRef.current = false;
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = undefined;
+    }
+  };
+
+  // Debug: log when pathname changes
+  // useEffect(() => {
+  //   console.log("Pathname changed to:", pathname);
+  // }, [pathname]);
+
+  // Hide splash automatically when route changes
+  useEffect(() => {
+    // console.log("Route change detected, hiding splash");
+    hideSplash();
+  }, [pathname]);
+
+  // Show splash on initial load only
+  useEffect(() => {
+    // console.log("Initial load - showing splash");
+    showSplash("Loading...");
   }, []);
 
-  // Trigger once on load
-  useEffect(() => {
-    if (!initialSplashShownRef.current) {
-      showSplash("Loading...", window.location.pathname);
-      initialSplashShownRef.current = true;
-    }
-  }, [showSplash]);
-
-  useEffect(() => {
-    if (!manualTriggerRef.current) return;
-    if (lastPathRef.current !== pathname) hideSplash();
-    lastPathRef.current = pathname;
-  }, [pathname, hideSplash]);
-
+  // Cleanup
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
