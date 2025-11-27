@@ -30,7 +30,7 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   return (
     <Card
       onClick={onCardClick}
-      className={`group relative overflow-hidden ${className} shadow-md transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"}`}
+      className={`group relative overflow-hidden ${className} shadow-xs transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"} border-gray-200/70`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -48,7 +48,9 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
         </div>
       )}
       <CardHeader>
-        <CardTitle className="text-base font-medium tracking-wide sm:text-xl lg:text-base">{title}</CardTitle>
+        <CardTitle className="text-lg font-medium tracking-tighter text-gray-800 sm:text-xl lg:text-lg">
+          {title}
+        </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>
