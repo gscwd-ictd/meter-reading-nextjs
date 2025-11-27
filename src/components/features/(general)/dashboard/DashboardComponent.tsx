@@ -40,7 +40,7 @@ export const DashboardComponent: FunctionComponent = () => {
         <DashboardCard
           title="Billed"
           className="border bg-cyan-200/30 dark:bg-gray-900"
-          icon={<ReceiptTextIcon className="text-cyan-700" />}
+          icon={<ReceiptTextIcon className="size-8 text-cyan-700 sm:size-6 md:size-6 lg:size-8" />}
         >
           <div className="dark:text-primary text-4xl font-bold text-gray-800">1500</div>
           <div className="text-sm text-gray-500">Billed for the month</div>
@@ -49,7 +49,7 @@ export const DashboardComponent: FunctionComponent = () => {
         <DashboardCard
           title="Unbilled"
           className="border bg-pink-100/70 dark:bg-gray-900"
-          icon={<SendIcon className="text-pink-600" />}
+          icon={<SendIcon className="size-8 text-pink-600 sm:size-6 md:size-6 lg:size-8" />}
         >
           <div className="dark:text-primary text-4xl font-bold text-gray-800">1000</div>
           <div className="text-sm text-gray-500">Unbilled for the month</div>
@@ -58,7 +58,7 @@ export const DashboardComponent: FunctionComponent = () => {
         <DashboardCard
           title="With Remarks"
           className="border bg-violet-200/60 dark:bg-gray-900"
-          icon={<TextQuoteIcon className="text-violet-700" />}
+          icon={<TextQuoteIcon className="size-8 text-violet-700 sm:size-6 md:size-6 lg:size-8" />}
         >
           <div className="dark:text-primary text-4xl font-bold text-gray-800">58</div>
           <div className="text-sm text-gray-500">With remarks for the month</div>
@@ -67,7 +67,7 @@ export const DashboardComponent: FunctionComponent = () => {
         <DashboardCard
           title="New Meters"
           className="border bg-sky-200/90 dark:bg-gray-900"
-          icon={<CircleGaugeIcon className="text-sky-600" />}
+          icon={<CircleGaugeIcon className="size-8 text-sky-600 sm:size-6 md:size-6 lg:size-8" />}
         >
           <div className="dark:text-primary text-4xl font-bold text-gray-800">5</div>
           <div className="text-sm text-gray-500">New meters for the month</div>
