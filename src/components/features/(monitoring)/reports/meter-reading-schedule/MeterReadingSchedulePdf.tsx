@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { FC, useState, useEffect } from "react";
@@ -560,7 +561,7 @@ export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) =
   }
 
   // Sort data by reading date
-  const sortedData = data.sort((a, b) => (a.readingDate > b.readingDate ? 1 : -1));
+  // const sortedData = data.sort((a, b) => (a.readingDate > b.readingDate ? 1 : -1));
   // const dayNumbers = computeDayNumbers(sortedData);
 
   return (

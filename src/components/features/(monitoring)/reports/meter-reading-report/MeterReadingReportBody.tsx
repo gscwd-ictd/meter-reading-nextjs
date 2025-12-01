@@ -10,7 +10,7 @@ import {
 } from "@mr/components/ui/Empty";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mr/components/ui/Select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mr/components/ui/Tabs";
-import { CircleGaugeIcon, FilterX, ReceiptTextIcon, SendIcon, TextQuoteIcon } from "lucide-react";
+import { CircleGaugeIcon, ReceiptTextIcon, SendIcon, TextQuoteIcon } from "lucide-react";
 import { FunctionComponent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { BilledTabReport } from "./billed/BilledTabReport";

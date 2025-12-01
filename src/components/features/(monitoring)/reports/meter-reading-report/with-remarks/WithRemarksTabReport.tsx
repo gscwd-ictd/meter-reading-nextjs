@@ -1,13 +1,5 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@mr/components/ui/Table";
-import { BilledAccount, WithRemarksAccount } from "@mr/lib/types/accounts";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+import { WithRemarksAccount } from "@mr/lib/types/accounts";
 import { FunctionComponent } from "react";
 
 const mockData: WithRemarksAccount[] = [
