@@ -13,7 +13,13 @@ type MeterReaderWithZonebooksReports = {
   totalAccounts: number;
   status: string;
   readingDate: string;
+  isCommitted: boolean;
 };
+
+interface ZonebookProgressTableProps {
+  data: MeterReaderWithZonebooksReports[];
+  onRowClick?: (zoneBook: string, data: MeterReaderWithZonebooksReports) => void;
+}
 
 const columns: ColumnDef<MeterReaderWithZonebooksReports>[] = [
   {
@@ -84,14 +90,28 @@ const columns: ColumnDef<MeterReaderWithZonebooksReports>[] = [
       </div>
     ),
   },
+  {
+    header: "Action",
+    cell: ({ row }) => {
+      if (row.original.status === "completed")
+        return <button className="rounded-md bg-green-600 px-3 py-1 text-xs text-white">Committed</button>;
+      return <button className="rounded-md bg-gray-200 px-3 py-1 text-xs text-gray-700">For commit</button>;
+    },
+  },
 ];
 
-export function ZonebookProgressTable({ data }: { data: MeterReaderWithZonebooksReports[] }) {
+export function ZonebookProgressTable({ data, onRowClick }: ZonebookProgressTableProps) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const handleRowClick = (row: MeterReaderWithZonebooksReports) => {
+    if (onRowClick) {
+      onRowClick(row.zoneBook, row);
+    }
+  };
 
   return (
     <Card className="shadow-md">
@@ -116,8 +136,13 @@ export function ZonebookProgressTable({ data }: { data: MeterReaderWithZonebooks
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                table.getRowModel().rows.map((row, idx) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-muted/50 cursor-pointer transition-colors"
+                    onClick={() => handleRowClick(row.original)}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-3">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
