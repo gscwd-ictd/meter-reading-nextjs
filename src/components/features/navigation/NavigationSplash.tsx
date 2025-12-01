@@ -8,7 +8,7 @@ export const NavigationSplash = () => {
 
   return (
     <>
-      <LoadingSplash show={visible} text={text} />
+      <LoadingSplash show={visible} text={text} dialHeight={8} backgroundOpacity={0.2} />
     </>
   );
 };
