@@ -24,6 +24,7 @@ CREATE OR REPLACE VIEW "public"."view_meter_reader_with_zone_book" AS (
     coalesce(
       jsonb_agg(
         distinct jsonb_build_object(
+          'day', mrzb.day,
           'zone', mrzb.zone,
           'book', mrzb.book,
           'zoneBook', mrzb.zone || '-' || mrzb.book,
@@ -73,6 +74,7 @@ CREATE OR REPLACE VIEW "public"."view_schedule_meter_reading_with_zone_book" AS 
         coalesce(
             jsonb_agg(
                 jsonb_build_object(
+                'day', szb.day,
                 'zone', szb.zone,
                 'book', szb.book,
                 'zoneBook', vzba.zone_book,
@@ -104,6 +106,7 @@ CREATE OR REPLACE VIEW "public"."view_schedule_meter_reading_with_zone_book" AS 
 CREATE OR REPLACE VIEW "public"."view_schedule_reading" AS (
   select
     s.id,
+    s.day,
     s.reading_date,
     s.due_date,
     s.disconnection_date,
@@ -167,7 +170,7 @@ left join lateral (
     limit 1
 ) rj on true
 
-group by s.id, s.reading_date, s.due_date, s.disconnection_date);--> statement-breakpoint
+group by s.id, s.day, s.reading_date, s.due_date, s.disconnection_date order by s.reading_date);--> statement-breakpoint
 
   CREATE OR REPLACE VIEW "public"."view_zone_book_schedule_reader" AS (
     select
@@ -176,6 +179,7 @@ group by s.id, s.reading_date, s.due_date, s.disconnection_date);--> statement-b
         vzbwa.book,
         vzbwa.area,
         coalesce(smr.meter_reader_id::text, '') as meter_reader_id,
+        szb.day,
         coalesce(s.reading_date::text, '') as reading_date,
         coalesce(szb.due_date::text, '') as due_date,
         coalesce(szb.disconnection_date::text,'') as disconnection_date,
@@ -205,6 +209,7 @@ CREATE OR REPLACE VIEW "public"."view_schedule_reading_account" AS (
   select
     s.reading_date as reading_date,
     smr.meter_reader_id as meter_reader_id,
+    now() at time zone  'Asia/Manila' as date_today,
     coalesce(
       json_agg(
           jsonb_build_object(
@@ -263,7 +268,9 @@ CREATE OR REPLACE VIEW "public"."view_schedule_reading_account" AS (
                         '[]'::jsonb
                     )
                     from billing_adjustments ba
-                  )
+                  ),
+                'isExist', exists( select 1 from reading_details rd where rd.account_number = vmr.account_no),
+                'dateToday', now() at time zone  'Asia/Manila'
                 )
               )
               from "viewMeterReading" vmr

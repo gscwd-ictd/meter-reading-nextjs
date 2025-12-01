@@ -125,6 +125,7 @@ export const viewScheduleMeterReadingZoneBook = pgView("view_schedule_meter_read
         coalesce(
             jsonb_agg(
                 jsonb_build_object(
+                'day', szb.day,
                 'zone', szb.zone,
                 'book', szb.book,
                 'zoneBook', vzba.zone_book,

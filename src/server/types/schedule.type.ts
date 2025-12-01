@@ -130,9 +130,11 @@ export const CreateMeterReaderScheduleReadingSchema = z.object({
 
 export const ScheduleMeterReaderZoneBookSchema = z.object({
   assigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true })
-    .extend({ dueDate: z.string(), disconnectionDate: z.string() })
+    .extend({ day: z.coerce.number().nullish(), dueDate: z.string(), disconnectionDate: z.string() })
     .array(),
-  unassigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true }).array(),
+  unassigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true })
+    .extend({ day: z.coerce.number().nullish() })
+    .array(),
 });
 
 export const CreateScheduleMeterReaderSchema = z.object({
