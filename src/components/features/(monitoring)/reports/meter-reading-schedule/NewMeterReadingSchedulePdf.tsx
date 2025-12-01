@@ -3,9 +3,8 @@
 import { FC } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format, parseISO, isSaturday, isSunday, addDays, isEqual } from "date-fns";
+import { format, isSaturday, isSunday } from "date-fns";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { Area } from "@mr/server/types/area.type";
 import { BilledMeterReadingSchedule } from "@mr/lib/types/schedule";
 
 type ScheduleTableProps = {

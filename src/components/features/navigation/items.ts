@@ -83,6 +83,10 @@ export const reportsNav: NavItem[] = [
         url: "/reports/meter-reading-schedule",
       },
       {
+        title: "Meter Reading Report",
+        url: "/reports/meter-reading-report",
+      },
+      {
         title: "Monthly Billing Summary",
         url: "/reports/monthly-billing-summary",
       },

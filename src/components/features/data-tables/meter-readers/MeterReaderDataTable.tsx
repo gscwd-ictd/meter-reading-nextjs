@@ -18,8 +18,8 @@ export const MeterReaderDataTable: FunctionComponent<MeterReaderDataTableProps> 
 
       return res.data;
     },
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    // refetchOnMount: false,
+    // refetchOnWindowFocus: false,
   });
 
   const meterReaderColumns = useMeterReaderColumns(meterReaders);

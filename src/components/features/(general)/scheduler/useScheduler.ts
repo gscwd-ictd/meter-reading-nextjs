@@ -28,6 +28,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Holiday, NonBusinessDays } from "./holidays";
 import { normalizeToYyyyMmDd } from "@mr/lib/functions/normalizeToYyyyMmDd";
+import formatAndSortDates from "@mr/lib/functions/dateArraySorter";
 
 type MeterReadingDate = { readingDate: Date };
 type DueDate = { readingDate: Date; dueDate: Date };
@@ -703,14 +704,18 @@ export const useScheduler = (holidays: Holiday[]) => {
           .filter((reader) => reader.restDay !== readingRestDay)
           .map((reader) => {
             const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
+            const sortedDueDates = formatAndSortDates(entry.dueDate);
+            const sortedDisconnectionDates = formatAndSortDates(entry.disconnectionDate);
 
             return {
               ...reader,
               reassignment: { zoneBooks: [], remarks: null },
               zoneBooks: assignedZoneBooks.map((zb) => ({
                 ...zb,
-                dueDate: entry.dueDate,
-                disconnectionDate: entry.disconnectionDate,
+                dueDate: !Array.isArray(entry.dueDate) ? formatDate(entry.dueDate) : sortedDueDates[0],
+                disconnectionDate: !Array.isArray(entry.disconnectionDate)
+                  ? formatDate(entry.disconnectionDate)
+                  : sortedDisconnectionDates[0],
               })),
             };
           })

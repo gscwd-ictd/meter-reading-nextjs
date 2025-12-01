@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import { StyleSheet, View, Image, Text, Font } from "@react-pdf/renderer";
+import { StyleSheet, View, Image, Text } from "@react-pdf/renderer";
 import GSCWDLogo from "@images/main_logo_transparent2_wBG.png";
 
 type HeaderProps = {

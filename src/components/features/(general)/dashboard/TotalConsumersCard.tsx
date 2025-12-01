@@ -14,7 +14,7 @@ export const TotalConsumersCard = () => {
   });
 
   return (
-    <div className="col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className="col-span-2 grid grid-cols-1 gap-6 sm:col-span-3 sm:grid-cols-2 sm:gap-4 md:col-span-3 md:grid-cols-1 md:gap-4 lg:col-span-2 lg:grid-cols-2 lg:gap-6">
       <DashboardCard
         title="Active"
         icon={<CheckCircle2 className="text-primary" />}

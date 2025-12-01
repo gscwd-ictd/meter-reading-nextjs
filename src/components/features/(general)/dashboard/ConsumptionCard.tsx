@@ -19,7 +19,12 @@ const chartConfig = {
 
 export const ConsumptionCard = () => {
   return (
-    <DashboardCard title="Consumption Pattern" className="col-span-3" size="sm">
+    <DashboardCard
+      className="col-span-3"
+      size="sm"
+      title="Consumption Pattern"
+      subtitle="Annual water consumption"
+    >
       <ChartContainer config={chartConfig} className="flex h-[240px] w-full">
         <AreaChart
           accessibilityLayer
@@ -32,8 +37,8 @@ export const ConsumptionCard = () => {
           <CartesianGrid
             vertical={false}
             horizontal={true}
-            stroke="#dfe3e7" // Custom color
-            strokeWidth={1} // Custom line thickness
+            stroke="#dfe3e7"
+            strokeWidth={1}
             strokeDasharray="0 0"
           />
           <XAxis
@@ -44,14 +49,23 @@ export const ConsumptionCard = () => {
             tickFormatter={(value) => value.slice(0, 4)}
           />
           <YAxis
+            tickLine={false} // Remove tick lines
+            axisLine={false} // Remove axis line (border)
+            tickMargin={8}
             ticks={[500000, 1000000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000, 4500000, 5000000]}
+            tickFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
           />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" hideLabel />} />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dot" hideLabel />}
+            formatter={(value) => [new Intl.NumberFormat("en-US").format(Number(value)), " Consumption"]}
+          />
           <Area
             dataKey="consumption"
             type="linear"
             fill="var(--color-consumption)"
             fillOpacity={0.4}
+            strokeWidth={4}
             stroke="var(--color-consumption)"
           />
         </AreaChart>
