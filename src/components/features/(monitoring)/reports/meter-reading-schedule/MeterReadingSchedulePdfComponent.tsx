@@ -1,9 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ScheduleTable } from "./TestMeterReadingSchedulePdf";
 import { YearMonthPickerWithSubmit } from "@mr/components/features/calendar/YearMonthPickerWithSubmit";
-import { NewScheduleTable } from "./NewMeterReadingSchedulePdf";
 import { MeterReadingSchedulePdf } from "./MeterReadingSchedulePdf";
 
 export const MeterReadingSchedulePdfComponent = () => {

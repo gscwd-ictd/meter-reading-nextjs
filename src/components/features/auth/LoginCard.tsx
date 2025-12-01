@@ -129,6 +129,7 @@ export const LoginCard: FunctionComponent = () => {
       }
     } catch (error) {
       toast.error("An error occurred during login");
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -210,7 +211,7 @@ export const LoginCard: FunctionComponent = () => {
 
           {/* Footer Links */}
           <div className="text-muted-foreground text-center text-sm">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <button
               type="button"
               className="text-primary font-medium hover:underline"
