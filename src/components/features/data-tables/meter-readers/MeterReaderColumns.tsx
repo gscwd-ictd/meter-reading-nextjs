@@ -53,7 +53,7 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       {
         accessorKey: "mobileNumber",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
-        cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.mobileNumber}</span>,
+        cell: ({ row }) => <span className="text-sm">{row.original.mobileNumber}</span>,
         enableColumnFilter: false,
       },
       {

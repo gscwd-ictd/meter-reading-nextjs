@@ -2,32 +2,16 @@
 "use client";
 
 import { useState, useMemo, FunctionComponent, useEffect } from "react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@mr/components/ui/Command";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import {
-  Check,
-  ChevronDown,
-  MapPinIcon,
-  X,
-  PlusCircleIcon,
-  CircleXIcon,
-  CheckCircle,
-  Ban,
-} from "lucide-react";
+import { Check, ChevronDown, MapPinIcon, X, PlusCircleIcon, CircleXIcon, CheckCircle } from "lucide-react";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
-import { ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
+import { ZonebookDaySorter, ZonebookSorter } from "@mr/lib/functions/zonebook-sorter";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +31,7 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import { SplittedDates } from "./SplittedDates";
 import { NormalDates } from "./NormalDates";
 import { toast } from "sonner";
+import { Badge } from "@mr/components/ui/Badge";
 
 type MeterReaderZonebooks = {
   assigned: ZonebookWithDates[];
@@ -337,7 +322,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
   // useEffect for checking if fetched
   useEffect(() => {
     if (meterReaderData && !hasFetchedZonebooks && entryZonebookSelectorIsOpen && !isLoading && !isError) {
-      setAssignedZonebooks(ZonebookSorter(meterReaderData.assigned));
+      setAssignedZonebooks(ZonebookDaySorter(meterReaderData.assigned));
 
       // const unassigned = meterReaderData.unassigned.filter(
       //   (zonebook) =>
@@ -399,7 +384,10 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                 {selectedMeterReader?.name}
               </div>
               <div className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                Reading Date: {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}
+                Reading Date: {format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")}{" "}
+                {selectedScheduleEntry && selectedScheduleEntry.day && (
+                  <Badge className="items-center text-xs">Day {selectedScheduleEntry?.day}</Badge>
+                )}
               </div>
               <div className="flex flex-col text-sm sm:flex-row sm:gap-6">
                 {Array.isArray(selectedScheduleEntry?.dueDate) &&
@@ -656,8 +644,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                               key={index}
                               className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                             >
-                              <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
-                                {entry.day}
+                              <TableCell className="py-3 text-xs font-semibold text-gray-500 dark:text-gray-100">
+                                {entry.day ? `#${entry.day}` : ""}
                               </TableCell>
                               <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
                                 {entry.zone}
@@ -757,8 +745,8 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
                             key={idx}
                             className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                           >
-                            <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
-                              {entry.day}
+                            <TableCell className="py-3 text-xs font-semibold text-gray-500 dark:text-gray-100">
+                              {entry.day ? `#${entry.day}` : ""}
                             </TableCell>
                             <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
                               {entry.zone}
