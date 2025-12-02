@@ -277,7 +277,7 @@ export const LoadingSplash: FunctionComponent<LoadingSplashProps> = ({
             >
               <div className="text-sm font-medium text-gray-600 dark:text-gray-300">{text}</div>
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <motion.span>{progressPercentage}</motion.span>
+                {/* <motion.span>{progressPercentage}</motion.span> */}
                 <div className="h-1 w-20 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                   <motion.div
                     className="h-full bg-gradient-to-r from-blue-500 to-blue-600"
