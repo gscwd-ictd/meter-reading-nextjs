@@ -2,28 +2,11 @@
 
 import { useState, useMemo } from "react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@mr/components/ui/Command";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import {
-  Ban,
-  Check,
-  CheckCircle,
-  ChevronDown,
-  CircleXIcon,
-  MapPinCheckIcon,
-  MapPinIcon,
-  PlusCircleIcon,
-  X,
-} from "lucide-react";
+import { Check, CheckCircle, ChevronDown, CircleXIcon, MapPinIcon, PlusCircleIcon, X } from "lucide-react";
 import { Zonebook, ZoneBookEntry } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
@@ -39,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
-import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@mr/components/ui/Input";
