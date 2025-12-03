@@ -176,7 +176,6 @@ export const ZonebookDailyProgressComponent = () => {
       return;
     }
     setSubmittedRange(dateRange);
-    console.log("Submitted date range:", dateRange);
   };
 
   const handleRowClick = (zoneBook: string, rowData: MeterReaderWithZonebooksReports) => {
