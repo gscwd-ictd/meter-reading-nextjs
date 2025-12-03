@@ -24,6 +24,8 @@ type EditMeterReaderDialogProps = {
   editMeterReaderDialogIsOpen: boolean;
   setEditMeterReaderDialogIsOpen: Dispatch<SetStateAction<boolean>>;
   selectedMeterReader: MeterReader;
+  dropdownIsOpen: boolean;
+  setDropdownIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 import { z } from "zod";
@@ -63,6 +65,8 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   editMeterReaderDialogIsOpen,
   setEditMeterReaderDialogIsOpen,
   selectedMeterReader,
+  dropdownIsOpen,
+  setDropdownIsOpen,
 }) => {
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
@@ -112,6 +116,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
+
     onMutate: () => {
       setIsSubmitting(true);
     },
@@ -241,6 +246,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       open={editMeterReaderDialogIsOpen}
       onOpenChange={() => {
         setEditMeterReaderDialogIsOpen(!editMeterReaderDialogIsOpen);
+        if (editMeterReaderDialogIsOpen) setDropdownIsOpen(!dropdownIsOpen);
         resetToDefaults();
       }}
     >
@@ -280,6 +286,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             onClick={() => {
               setEditMeterReaderDialogIsOpen(false);
               resetToDefaults();
+              if (editMeterReaderDialogIsOpen) setDropdownIsOpen(!dropdownIsOpen);
             }}
           >
             Cancel

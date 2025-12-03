@@ -90,7 +90,7 @@ export const ScheduleEntryZonebookSelector: FunctionComponent = () => {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/zone-books`,
       );
-      console.log(res.data);
+
       return res.data as MeterReaderZonebooks;
     },
 

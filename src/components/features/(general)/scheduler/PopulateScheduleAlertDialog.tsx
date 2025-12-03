@@ -128,9 +128,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
   };
 
   useEffect(() => {
-    console.log("IS POST A SUCCESS: ", postSchedule.isSuccess);
     if (postSchedule.isSuccess) {
-      console.log("TRIGGER NIGGERED");
       refetchData!();
       postSchedule.reset();
 
@@ -138,10 +136,6 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
       setHasFetchedThisMonthsSchedule(true);
     }
   }, [postSchedule, refetchData, setHasSchedule, setHasFetchedThisMonthsSchedule]);
-
-  useEffect(() => {
-    console.log("SCHED: ", hasSchedule);
-  }, [hasSchedule]);
 
   return (
     <AlertDialog>

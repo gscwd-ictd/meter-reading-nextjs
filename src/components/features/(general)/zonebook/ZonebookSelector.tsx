@@ -597,15 +597,15 @@ export default function ZoneBookSelector({ onSelectionChange, loading }: Props) 
                                 )}
                               </div>
                             </TableCell>
-                            <TableCell className="w-20 py-3 font-semibold text-gray-900 dark:text-gray-100">
+                            <TableCell className="w-20 py-3 font-medium text-gray-900 dark:text-gray-100">
                               {entry.zone}
                             </TableCell>
-                            <TableCell className="w-20 py-3 font-semibold text-gray-900 dark:text-gray-100">
+                            <TableCell className="w-20 py-3 font-medium text-gray-900 dark:text-gray-100">
                               {entry.book}
                             </TableCell>
                             <TableCell className="max-w-[120px] min-w-[120px] py-3">
                               <div
-                                className="truncate text-gray-700 dark:text-gray-300"
+                                className="truncate text-xs text-gray-700 dark:text-gray-300"
                                 title={entry.area?.name}
                               >
                                 {entry.area?.name}
