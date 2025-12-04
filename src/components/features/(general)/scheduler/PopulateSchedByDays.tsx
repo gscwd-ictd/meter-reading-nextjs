@@ -63,9 +63,8 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
         };
       });
 
-      console.log("BEFORE: ", formattedFilteredSchedule);
       const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
-      console.log("RETURN: ", res.data);
+
       return res.data;
     },
     onSuccess: async () => {

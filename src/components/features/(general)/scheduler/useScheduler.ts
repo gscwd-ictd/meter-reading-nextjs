@@ -741,7 +741,6 @@ export const useScheduler = (holidays: Holiday[]) => {
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    console.log("Day Assignments:");
     assignments.forEach((assignment) => {
       console.log(`${assignment.date}: Day ${assignment.dayNumber}`);
     });

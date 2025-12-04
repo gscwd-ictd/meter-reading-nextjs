@@ -2,28 +2,11 @@
 
 import { useState, useMemo } from "react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@mr/components/ui/Command";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@mr/components/ui/Command";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Button } from "@mr/components/ui/Button";
 import { cn } from "@mr/lib/utils";
-import {
-  Ban,
-  Check,
-  CheckCircle,
-  ChevronDown,
-  CircleXIcon,
-  MapPinCheckIcon,
-  MapPinIcon,
-  PlusCircleIcon,
-  X,
-} from "lucide-react";
+import { Check, CheckCircle, ChevronDown, CircleXIcon, MapPinIcon, PlusCircleIcon, X } from "lucide-react";
 import { Zonebook, ZoneBookEntry } from "@mr/lib/types/zonebook";
 import { Label } from "@mr/components/ui/Label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
@@ -39,7 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@mr/components/ui/Dialog";
-import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@mr/components/ui/Input";
@@ -446,9 +429,6 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                   <Table>
                     <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm dark:bg-gray-700">
                       <TableRow>
-                        <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
-                          Status
-                        </TableHead>
                         <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
                           Zone
                         </TableHead>
@@ -471,13 +451,6 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                             key={entry.zoneBook}
                             className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                           >
-                            <TableCell className="py-3">
-                              <div className="flex justify-center">
-                                <div className="flex size-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-                                  <MapPinIcon className="size-5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                              </div>
-                            </TableCell>
                             <TableCell className="py-3 font-semibold text-gray-900 dark:text-gray-100">
                               {entry.zone}
                             </TableCell>
@@ -564,8 +537,16 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                   <Table className="w-full">
                     <TableHeader className="sticky top-0 z-10 bg-gray-50 shadow-sm dark:bg-gray-700">
                       <TableRow>
-                        <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                        {/* <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
                           Status
+                        </TableHead> */}
+                        <TableHead className="w-32 py-3 font-semibold text-gray-700 dark:text-gray-300">
+                          <div className="flex items-center gap-1">
+                            Day
+                            <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                              (1-21)
+                            </span>
+                          </div>
                         </TableHead>
                         <TableHead className="w-20 py-3 font-semibold text-gray-700 dark:text-gray-300">
                           Zone
@@ -576,14 +557,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                         <TableHead className="min-w-[120px] py-3 font-semibold text-gray-700 dark:text-gray-300">
                           Area
                         </TableHead>
-                        <TableHead className="w-32 py-3 font-semibold text-gray-700 dark:text-gray-300">
-                          <div className="flex items-center gap-1">
-                            Day
-                            <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
-                              (1-21)
-                            </span>
-                          </div>
-                        </TableHead>
+
                         <TableHead className="w-16 py-3 font-semibold text-gray-700 dark:text-gray-300">
                           Action
                         </TableHead>
@@ -596,7 +570,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                             key={entry.zoneBook}
                             className="group border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                           >
-                            <TableCell className="w-16 py-3">
+                            {/* <TableCell className="w-16 py-3">
                               <div className="flex justify-center">
                                 {entry.day !== undefined && entry.day !== null ? (
                                   <div className="flex size-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
@@ -608,21 +582,7 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                                   </div>
                                 )}
                               </div>
-                            </TableCell>
-                            <TableCell className="w-20 py-3 font-semibold text-gray-900 dark:text-gray-100">
-                              {entry.zone}
-                            </TableCell>
-                            <TableCell className="w-20 py-3 font-semibold text-gray-900 dark:text-gray-100">
-                              {entry.book}
-                            </TableCell>
-                            <TableCell className="max-w-[120px] min-w-[120px] py-3">
-                              <div
-                                className="truncate text-gray-700 dark:text-gray-300"
-                                title={entry.area?.name}
-                              >
-                                {entry.area?.name}
-                              </div>
-                            </TableCell>
+                            </TableCell> */}
                             <TableCell className="w-32 py-3">
                               <div className="flex items-center gap-2">
                                 <div className="relative">
@@ -665,6 +625,21 @@ export default function EditZonebookSelector({ onSelectionChange, loading }: Pro
                                 </div>
                               </div>
                             </TableCell>
+                            <TableCell className="w-20 py-3 font-medium text-gray-900 dark:text-gray-100">
+                              {entry.zone}
+                            </TableCell>
+                            <TableCell className="w-20 py-3 font-medium text-gray-900 dark:text-gray-100">
+                              {entry.book}
+                            </TableCell>
+                            <TableCell className="max-w-[120px] min-w-[120px] py-3">
+                              <div
+                                className="truncate text-xs text-gray-700 dark:text-gray-300"
+                                title={entry.area?.name}
+                              >
+                                {entry.area?.name}
+                              </div>
+                            </TableCell>
+
                             <TableCell className="w-16 py-3">
                               <button
                                 onClick={() => handleRemoveZonebook(entry)}

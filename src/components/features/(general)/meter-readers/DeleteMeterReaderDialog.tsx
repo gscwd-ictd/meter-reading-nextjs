@@ -13,19 +13,23 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { UserRoundXIcon } from "lucide-react";
-import { FunctionComponent } from "react";
+import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { toast } from "sonner";
 
 type DeleteMeterReaderDialogProps = {
   selectedMeterReader: MeterReader;
   open: boolean;
   setOpen: (open: boolean) => void;
+  dropdownIsOpen: boolean;
+  setDropdownIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogProps> = ({
   selectedMeterReader,
   open,
   setOpen,
+  dropdownIsOpen,
+  setDropdownIsOpen,
 }) => {
   const queryClient = useQueryClient();
 
@@ -67,6 +71,7 @@ export const DeleteMeterReaderDialog: FunctionComponent<DeleteMeterReaderDialogP
       open={open}
       onOpenChange={() => {
         setOpen(!open);
+        if (open) setDropdownIsOpen(!dropdownIsOpen);
       }}
     >
       <AlertDialogTrigger asChild>

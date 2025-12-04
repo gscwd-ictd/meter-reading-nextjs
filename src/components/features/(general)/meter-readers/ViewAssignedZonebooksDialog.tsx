@@ -6,17 +6,22 @@ import { EyeIcon } from "lucide-react";
 import { MeterReader } from "@mr/lib/types/personnel";
 import axios from "axios";
 import { toast } from "sonner";
+import { Dispatch, SetStateAction } from "react";
 
 interface ViewAssignedZonebooksDialogProps {
   meterReader: MeterReader;
   open: boolean;
   setOpen: (open: boolean) => void;
+  dropdownIsOpen: boolean;
+  setDropdownIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogProps> = ({
   meterReader,
   open,
   setOpen,
+  dropdownIsOpen,
+  setDropdownIsOpen,
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["meterReaderDetails", meterReader.id],
@@ -36,7 +41,13 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setOpen(!open);
+        if (open) setDropdownIsOpen(!dropdownIsOpen);
+      }}
+    >
       <DialogTrigger asChild>
         <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-emerald-400">
           <EyeIcon className="size-4" />
