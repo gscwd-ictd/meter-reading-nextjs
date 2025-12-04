@@ -1,5 +1,6 @@
 import { meterReadingContext } from "@mr/server/context";
 import db from "@mr/server/db/connections";
+import { meterReaderZoneBook } from "@mr/server/db/schemas/meter-readers";
 import { reassignment, reassignmentView, reassignmentZoneBook } from "@mr/server/db/schemas/reassignment";
 import {
   scheduleMeterReaders,
@@ -412,6 +413,31 @@ export class ScheduleRepository implements IScheduleRepository {
             zone: item.zone,
             book: item.book,
             meterReaderId: item.meterReader.id,
+          })),
+        );
+
+        for (const item of zoneBooks) {
+          await tx
+            .delete(meterReaderZoneBook)
+            .where(and(eq(meterReaderZoneBook.zone, item.zone), eq(meterReaderZoneBook.book, item.book)));
+
+          await tx
+            .delete(scheduleZoneBooks)
+            .where(
+              and(
+                eq(scheduleZoneBooks.scheduleMeterReaderId, scheduleMeterReaderId),
+                eq(scheduleZoneBooks.zone, item.zone),
+                eq(scheduleZoneBooks.book, item.book),
+              ),
+            );
+        }
+
+        await tx.insert(meterReaderZoneBook).values(
+          zoneBooks.map((item) => ({
+            zone: item.zone,
+            book: item.book,
+            meterReaderId: item.meterReader.id,
+            day: item.day,
           })),
         );
       }

@@ -28,6 +28,7 @@ export const CreateReassignmentSchema = z.object({
   remarks: z.string(),
   zoneBooks: z
     .object({
+      day: z.coerce.number().nullish(),
       zone: z.string(),
       book: z.string(),
       meterReader: z.object({
