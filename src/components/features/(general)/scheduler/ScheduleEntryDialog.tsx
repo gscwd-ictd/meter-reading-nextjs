@@ -79,6 +79,7 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
+        console.log(res.data as MeterReadingEntryWithZonebooks);
         return res.data as MeterReadingEntryWithZonebooks;
       } catch (error) {
         console.log(error);
@@ -121,7 +122,9 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
                   ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
                   : null}{" "}
                 {selectedScheduleEntry && selectedScheduleEntry.day && (
-                  <Badge className="items-center text-xs">Day {selectedScheduleEntry?.day}</Badge>
+                  <Badge className="items-center text-xs dark:text-white">
+                    Day {selectedScheduleEntry?.day}
+                  </Badge>
                 )}
               </div>
 
