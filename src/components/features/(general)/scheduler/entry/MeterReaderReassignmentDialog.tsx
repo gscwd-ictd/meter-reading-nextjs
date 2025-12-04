@@ -26,6 +26,7 @@ type Zonebook = {
   zone: string;
   book: string;
   meterReader: { id: string };
+  day: number | null;
 };
 
 type ReassignmentToPut = {
@@ -87,7 +88,7 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
     return {
       ...reassignment,
       zoneBooks: reassignment.zoneBooks.map((zb) => {
-        return { zone: zb.zone, book: zb.book, meterReader: { id: zb.meterReader.id } };
+        return { zone: zb.zone, book: zb.book, meterReader: { id: zb.meterReader.id }, day: zb.day };
       }),
     };
   };
@@ -95,6 +96,7 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
   const putReassignmentMutation = useMutation({
     mutationKey: ["meter-reader-reassignment", selectedScheduleEntry?.id],
     mutationFn: async (reassignment: ReassignmentToPut) => {
+      console.log("FROM SOMETHING", reassignment);
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/reassignment`,
 
