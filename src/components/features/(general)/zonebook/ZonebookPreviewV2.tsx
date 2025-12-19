@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Badge } from "@mr/components/ui/Badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@mr/components/ui/Popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
-import { Zonebook } from "@mr/lib/types/zonebook";
-import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
+import { ZonebookWithDates } from "@mr/lib/types/zonebook";
+import { ZonebookFlatSorterV2 } from "@mr/lib/functions/zonebook-flat-sorter";
+import { formatDate } from "date-fns";
 
-export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
+export function ZonebookPreviewV2({ zonebooks }: { zonebooks: ZonebookWithDates[] }) {
   const previewCount = 3;
-  const shown = ZonebookFlatSorter(zonebooks.slice(0, previewCount));
+  const shown = ZonebookFlatSorterV2(zonebooks.slice(0, previewCount));
   const remaining = zonebooks.length - shown.length;
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -39,7 +40,15 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
             </Badge>
           </TooltipTrigger>
           <TooltipContent className="dark:text-white">
-            <span>{zb.area.name ? zb.area.name : "N/A"}</span>
+            {" "}
+            <div className="flex flex-col">
+              <span>Area: {zb.area.name ? zb.area.name : "N/A"}</span>
+              <span> Due Date: {zb.dueDate ? formatDate(zb.dueDate, "MMM dd, yyyy") : null}</span>
+              <span>
+                Disconnection Date:{" "}
+                {zb.disconnectionDate ? formatDate(zb.disconnectionDate, "MMM dd, yyyy") : null}
+              </span>
+            </div>
           </TooltipContent>
         </Tooltip>
       ))}
@@ -62,7 +71,12 @@ export function ZonebookPreview({ zonebooks }: { zonebooks: Zonebook[] }) {
                     </TooltipTrigger>
                     <TooltipContent className="dark:text-white">
                       <div className="flex flex-col">
-                        <span>{zb.area.name ? zb.area.name : "N/A"}</span>
+                        <span>Area: {zb.area.name ? zb.area.name : "N/A"}</span>
+                        <span> Due Date: {zb.dueDate ? formatDate(zb.dueDate, "MMM dd, yyyy") : null}</span>
+                        <span>
+                          Disconnection Date:{" "}
+                          {zb.disconnectionDate ? formatDate(zb.disconnectionDate, "MMM dd, yyyy") : null}
+                        </span>
                       </div>
                     </TooltipContent>
                   </Tooltip>

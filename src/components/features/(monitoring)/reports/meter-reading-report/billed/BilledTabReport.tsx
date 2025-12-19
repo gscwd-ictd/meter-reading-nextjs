@@ -87,23 +87,23 @@ export const BilledTabReport: FunctionComponent = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[200px]">Account No</TableHead>
-              <TableHead className="w-[200px]">Name</TableHead>
-              <TableHead>Zone</TableHead>
-              <TableHead>Book</TableHead>
-              <TableHead>Usage</TableHead>
-              <TableHead className="text-right">Billed Amount</TableHead>
+              <TableHead className="w-[200px] dark:text-black">Account No</TableHead>
+              <TableHead className="w-[200px] dark:text-black">Name</TableHead>
+              <TableHead className="dark:text-black">Zone</TableHead>
+              <TableHead className="dark:text-black">Book</TableHead>
+              <TableHead className="dark:text-black">Usage</TableHead>
+              <TableHead className="text-right dark:text-black">Billed Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {mockData.map((account) => (
               <TableRow key={account.accountNo}>
-                <TableCell className="font-medium">{account.accountNo}</TableCell>
-                <TableCell>{account.name}</TableCell>
-                <TableCell>{account.zone}</TableCell>
-                <TableCell>{account.book}</TableCell>
-                <TableCell>{account.usage}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="font-medium dark:text-black">{account.accountNo}</TableCell>
+                <TableCell className="dark:text-black">{account.name}</TableCell>
+                <TableCell className="dark:text-black">{account.zone}</TableCell>
+                <TableCell className="dark:text-black">{account.book}</TableCell>
+                <TableCell className="dark:text-black">{account.usage}</TableCell>
+                <TableCell className="text-right dark:text-black">
                   ₱{" "}
                   {account.billedAmount.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -117,7 +117,7 @@ export const BilledTabReport: FunctionComponent = () => {
       </div>
 
       {/* Separate footer div - NOT using TableFooter */}
-      <div className="mt-4 border-t bg-gray-50 px-4 py-3">
+      <div className="mt-4 border-t bg-gray-50 px-4 py-3 dark:bg-gray-700">
         <div className="flex items-center justify-between">
           <span className="font-medium">Total Billed Amount:</span>
           <span className="text-right font-bold underline underline-offset-2">

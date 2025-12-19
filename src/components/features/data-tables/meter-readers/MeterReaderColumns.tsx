@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 import { Badge } from "@mr/components/ui/Badge";
-import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
+import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
   const [meterReaderColumns, setMeterReaderColumns] = useState<ColumnDef<PersonnelColumn>[]>([]);
@@ -63,6 +63,7 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
         cell: ({ row }) => <ZonebookPreview zonebooks={ZonebookFlatSorter(row.original.zoneBooks)} />,
         enableColumnFilter: false,
       },
+
       {
         accessorKey: "restDay",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Rest Day" />,

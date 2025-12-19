@@ -73,7 +73,7 @@ export const mainNav: NavItem[] = [
 ];
 
 export const reportsNav: NavItem[] = [
-  { title: "Progress", url: "/progress", icon: CircleDashed },
+  { title: "Progress", url: "/progress/zonebooks", icon: CircleDashed },
   {
     title: "Reports",
     icon: FileText,

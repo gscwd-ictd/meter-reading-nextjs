@@ -4,6 +4,7 @@ import {
   ColumnDef,
   ColumnFiltersState,
   PaginationState,
+  Row,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -32,6 +33,7 @@ type DataTableProps<T> = {
   loading?: boolean;
   actionBtn?: ReactNode | ReactNode[];
   title: string;
+  onRowClick?: (row: Row<T>) => void;
 };
 
 type ColumnVisibilityToggleContextState = {
@@ -51,6 +53,7 @@ export function DataTable<T>({
   pageSize = 8,
   loading = false,
   actionBtn,
+  onRowClick,
   title = "",
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -154,7 +157,11 @@ export function DataTable<T>({
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    onClick={onRowClick ? () => onRowClick(row) : () => null}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="max-w-[30rem] truncate">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

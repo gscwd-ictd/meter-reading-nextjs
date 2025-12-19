@@ -45,7 +45,9 @@ export const SearchAreaCombobox: FunctionComponent<SearchAreaComboboxProps> = ({
           className={`flex w-full justify-start px-4`}
         >
           {selectedArea?.id ? (
-            <span className="flex items-center gap-2 text-sm">{selectedArea.name}</span>
+            <span className="flex max-w-full items-center gap-2 truncate text-sm" title={selectedArea.name}>
+              {selectedArea.name}
+            </span>
           ) : (
             <span className="flex items-center gap-2 text-sm">
               <ScanSearchIcon className="text-primary size-5" />

@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 
 // Rows per page configuration
 const FIRST_PAGE_ROWS = 20; // Exactly 18 rows total
-const OTHER_PAGES_ROWS = 26; // Exactly 28 rows total
+const OTHER_PAGES_ROWS = 25; // Exactly 25 rows total
 
 // PDF Document Component with pagination
 const SchedulePDF: FC<{
@@ -123,7 +123,7 @@ const SchedulePDF: FC<{
 }> = ({ data, yearMonth }) => {
   const formatDate = (yearMonth: string) => {
     const newDate = parse(yearMonth, "yyyy-MM", new Date());
-    return format(newDate, "MMMM, yyyy");
+    return format(newDate, "MMMM yyyy");
   };
 
   // Group data by day to keep days together
@@ -243,7 +243,7 @@ const SchedulePDF: FC<{
 
     pages.push(firstPage);
 
-    // Subsequent pages - exactly 28 rows each
+    // Subsequent pages - exactly 25 rows each
     while (currentDayIndex < dayGroups.length) {
       const page = { rows: [] as any[], hasHeader: false };
       let pageRowCount = 0;
@@ -375,7 +375,7 @@ const SchedulePDF: FC<{
           </Text>
         </View>
         <View style={[styles.tableCol, styles.w35]}>
-          <Text style={[styles.cellText, { fontSize: 7 }]}>
+          <Text style={[styles.cellText, { fontSize: 6 }]}>
             {item.isNoMeterReader
               ? "-"
               : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
