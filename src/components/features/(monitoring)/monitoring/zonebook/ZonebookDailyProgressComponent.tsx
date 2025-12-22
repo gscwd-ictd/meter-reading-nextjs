@@ -17,9 +17,20 @@ import { ZonebookProgressDataTable } from "./ZonebookProgressDataTable";
 import { useZonebookProgressStore } from "@mr/components/stores/useZonebookProgressStore";
 import { ZonebookProgressWithAccounts } from "@mr/lib/types/zonebook";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@mr/components/ui/AlertDialog";
 
 export const ZonebookDailyProgressComponent = () => {
   const [currentMonthYear, setCurrentMonthYear] = useState<string>(format(new Date(), "yyyy-MM"));
+  const [completeDialogIsOpen, setCompleteDialogIsOpen] = useState<boolean>(false);
   const zonebookProgressEntryDialogIsOpen = useZonebookProgressStore(
     (state) => state.zonebookProgressEntryDialogIsOpen,
   );
@@ -42,7 +53,6 @@ export const ZonebookDailyProgressComponent = () => {
         readingMonth: monthYear,
       });
 
-      console.log(res.data);
       return res.data as ZonebookProgressWithAccounts;
     },
     retry: 2,
@@ -108,7 +118,7 @@ export const ZonebookDailyProgressComponent = () => {
               )}
             </DialogDescription>
           </DialogHeader>
-
+          <span className="font-mono text-lg"> id: {selectedZonebookEntry.meterReader?.id}</span>
           {isLoading ? (
             <div className="flex h-full w-full justify-center">
               <LoadingSpinner size={64} className="text-primary" />
@@ -209,7 +219,6 @@ export const ZonebookDailyProgressComponent = () => {
               <p className="text-muted-foreground">No accounts found for this zonebook.</p>
             </div>
           )}
-
           {/* Commit button */}
           {selectedZonebookWithAccounts &&
             selectedZonebookWithAccounts.accounts &&
@@ -225,7 +234,7 @@ export const ZonebookDailyProgressComponent = () => {
                 )}
                 {selectedZonebookEntry?.isCommitted && (
                   <Button
-                    onClick={() => setZonebookProgressEntryDialogIsOpen(false)}
+                    onClick={() => setCompleteDialogIsOpen(true)}
                     className="w-full"
                     variant="secondary"
                     disabled
@@ -237,6 +246,23 @@ export const ZonebookDailyProgressComponent = () => {
             )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={completeDialogIsOpen} onOpenChange={setCompleteDialogIsOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your account and remove your data
+              from our servers.
+              <span>ID: {selectedZonebookEntry.meterReader?.id}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
