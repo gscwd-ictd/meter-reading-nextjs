@@ -1,3 +1,5 @@
+import { AccountDetails } from "./accounts";
+
 export type Zonebook = {
   zoneBook: string;
   zone: string;
@@ -33,3 +35,17 @@ export type ZoneBookEntry = {
   area?: { name: string };
   day?: number | null;
 };
+
+export type ZonebookProgress = {
+  meterReader: { id: string; name: string };
+  zone: string;
+  book: string;
+  totalRead: number;
+  totalAccounts: number;
+  statusProgress: string;
+  readingDate: string;
+  isCommitted: boolean;
+  isRead: boolean;
+};
+
+export type ZonebookProgressWithAccounts = ZonebookProgress & { accounts: AccountDetails[] };
