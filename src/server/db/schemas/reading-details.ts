@@ -1,4 +1,14 @@
-import { boolean, timestamp, integer, pgTable, real, text, varchar, unique } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  timestamp,
+  integer,
+  pgTable,
+  real,
+  text,
+  varchar,
+  unique,
+  index,
+} from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
 
 export const readingDetails = pgTable(
@@ -61,6 +71,12 @@ export const readingDetails = pgTable(
         t.meterReaderId,
         t.createdAt,
       ),
+      index("idx_rd_created").on(t.createdAt),
+      index("idx_rd_meter_reader").on(t.meterReaderId),
+      index("idx_rd_account_number").on(t.accountNumber),
+      index("idx_rd_acc_created").on(t.accountNumber, t.createdAt),
+      index("idx_rd_zone_book_reader_date").on(t.zoneCode, t.bookCode, t.meterReaderId, t.readingDate),
+      index("idx_rd_status").on(t.isRead, t.isCompleted),
     ];
   },
 );

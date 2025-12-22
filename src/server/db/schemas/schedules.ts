@@ -205,6 +205,8 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
       book: string;
       zoneBook: string;
       area: { id: string; name: string };
+      dueDate: object;
+      disconnectionDate: object;
     }[];
     reassignment: {
       remarks: string;
@@ -249,7 +251,9 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
               'book', szb.book,
               'day', szb.day,
               'zoneBook', vzbwa.zone_book,
-              'area', vzbwa.area
+              'area', vzbwa.area,
+              'dueDate', szb.due_date,
+              'disconnectionDate', szb.disconnection_date
           )
       ) as zone_books
       from schedule_zone_books szb
