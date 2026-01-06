@@ -7,15 +7,24 @@ export type Account = {
 
 export type AccountDetails = {
   id: number;
+  readingDate: string | null;
   accountNumber: string;
+  checkDigit: string;
   accountName: string;
-  address: string;
+  // address: string;
+  currentReading: number;
   previousReading: number;
-  currentReading: number | null;
-  consumption: number;
-  statusProgress: "read" | "pending" | "unbilled";
-  meterReader: string;
-  readingDate: string;
+  averageUsage: number;
+  billedAmount: number;
+  isRead: boolean;
+  isPosted: boolean;
+  isCompleted: boolean;
+  isCommitted: boolean;
+  remarks: string;
+  additionalRemarks: string;
+  // consumption: number;
+  // statusProgress: "read" | "pending" | "unbilled";
+  meterReader: { id: string; name: string };
 };
 
 export type BilledAccount = Account & {

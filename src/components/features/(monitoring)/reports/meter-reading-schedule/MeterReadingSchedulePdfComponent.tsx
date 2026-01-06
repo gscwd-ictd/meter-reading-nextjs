@@ -34,8 +34,6 @@ export const MeterReadingSchedulePdfComponent = () => {
         <YearMonthPickerWithSubmit value={yearMonth} onChange={setYearMonth} onSubmit={handleGenerate} />
       </div>
       <div className="mt-4 min-h-0 flex-1 overflow-auto">
-        {/* <ScheduleTable yearMonth={submittedYearMonth} /> */}
-        {/* <NewScheduleTable yearMonth={submittedYearMonth} /> */}
         <MeterReadingSchedulePdf yearMonth={submittedYearMonth} />
       </div>
     </div>

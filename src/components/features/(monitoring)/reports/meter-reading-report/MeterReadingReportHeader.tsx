@@ -3,8 +3,8 @@
 import { useFormContext } from "react-hook-form";
 import { Button } from "@mr/components/ui/Button";
 import { FormControl, FormField, FormItem } from "@mr/components/ui/Form";
-import { DateRangePickerWithPresets } from "./DateRangePickerWithPresets";
 import { SearchMeterReaderCombobox } from "@mr/components/features/(general)/meter-readers/SearchMeterReaderCombobox";
+import { YearMonthPicker } from "@mr/components/features/calendar/YearMonthPicker";
 
 export function MeterReadingReportHeader() {
   const form = useFormContext();
@@ -13,7 +13,7 @@ export function MeterReadingReportHeader() {
   const dateRange = watch("dateRange");
   const meterReader = watch("meterReader");
 
-  const isFormValid = dateRange && meterReader;
+  const isFormValid = dateRange;
   return (
     <div className="grid flex-shrink-0 grid-cols-1 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
       <div>
@@ -29,7 +29,8 @@ export function MeterReadingReportHeader() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <DateRangePickerWithPresets date={field.value} onDateChange={field.onChange} />
+                  {/* <DateRangePickerWithPresets date={field.value} onDateChange={field.onChange} /> */}
+                  <YearMonthPicker value={field.value} onChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -48,6 +49,7 @@ export function MeterReadingReportHeader() {
             className="h-[2.5rem] w-full px-6 lg:w-auto dark:text-white"
             size="sm"
             disabled={!isFormValid}
+            form="meter-reading-report-form"
           >
             Generate
           </Button>

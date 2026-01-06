@@ -8,16 +8,15 @@ import { MeterReadingReportBody } from "./MeterReadingReportBody";
 import { useState } from "react";
 
 const formSchema = z.object({
-  dateRange: z.object({
-    from: z.date(),
-    to: z.date(),
-  }),
-  meterReader: z.object({
-    name: z.string(),
-    positionTitle: z.string(),
-    employeeId: z.string(),
-    id: z.string(),
-  }),
+  monthYear: z.string(),
+  meterReader: z.optional(
+    z.object({
+      name: z.string(),
+      positionTitle: z.string(),
+      employeeId: z.string(),
+      id: z.string(),
+    }),
+  ),
 });
 
 export const MeterReadingReportComponent = () => {
@@ -27,7 +26,7 @@ export const MeterReadingReportComponent = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateRange: undefined,
+      monthYear: "",
       meterReader: undefined,
     },
   });
@@ -39,7 +38,11 @@ export const MeterReadingReportComponent = () => {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col space-y-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex h-full flex-col space-y-4"
+        id="meter-reading-report-form"
+      >
         <MeterReadingReportHeader />
         <MeterReadingReportBody isSubmitted={isSubmitted} />
       </form>

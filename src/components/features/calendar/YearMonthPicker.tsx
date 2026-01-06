@@ -9,10 +9,8 @@ import { useState } from "react";
 interface YearMonthPickerWithSubmitProps {
   value: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
 }
-
-export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMonthPickerWithSubmitProps) {
+export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitProps) {
   const [open, setOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -42,7 +40,9 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
             className="h-[2.5rem] w-[200px] justify-start text-left font-normal sm:w-auto md:w-auto lg:w-[200px]"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value || "Select year month"}
+            <span className={`${value ? "text-gray-800" : "text-gray-500"}`}>
+              {value || "Select year month"}
+            </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[260px] p-3">
@@ -70,15 +70,6 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
           </div>
         </PopoverContent>
       </Popover>
-
-      <Button
-        onClick={onSubmit}
-        disabled={!value}
-        className="h-[2.5rem] w-full px-6 sm:w-auto md:w-auto lg:w-auto dark:text-white"
-        size="sm"
-      >
-        Generate
-      </Button>
     </div>
   );
 }

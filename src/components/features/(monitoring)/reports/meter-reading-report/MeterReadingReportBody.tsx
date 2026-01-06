@@ -30,8 +30,6 @@ export const MeterReadingReportBody: FunctionComponent<MeterReadingReportBodyPro
   const dateRange = watch("dateRange");
   const meterReader = watch("meterReader");
 
-  const isFormValid = dateRange && meterReader;
-
   return (
     <>
       <div className="flex h-full flex-col sm:hidden md:flex lg:flex">
