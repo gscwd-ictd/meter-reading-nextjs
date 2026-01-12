@@ -5,13 +5,15 @@ import { Button } from "@mr/components/ui/Button";
 import { FormControl, FormField, FormItem } from "@mr/components/ui/Form";
 import { SearchMeterReaderCombobox } from "@mr/components/features/(general)/meter-readers/SearchMeterReaderCombobox";
 import { YearMonthPicker } from "@mr/components/features/calendar/YearMonthPicker";
+import { Spinner } from "@mr/components/ui/Spinner";
+import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 
 export function MeterReadingReportHeader() {
   const form = useFormContext();
   const { watch } = form;
+  const { fetchStatus } = useMeterReadingReportContext();
 
-  const monthYear = watch("dateRange");
-  const meterReader = watch("meterReader");
+  const monthYear = watch("yearMonth");
 
   const isFormValid = monthYear;
   return (
@@ -29,7 +31,6 @@ export function MeterReadingReportHeader() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  {/* <DateRangePickerWithPresets date={field.value} onDateChange={field.onChange} /> */}
                   <YearMonthPicker value={field.value} onChange={field.onChange} />
                 </FormControl>
               </FormItem>
@@ -38,7 +39,7 @@ export function MeterReadingReportHeader() {
         </div>
 
         {/* Meter Reader Field */}
-        <div className="flex-1">
+        <div className="">
           <SearchMeterReaderCombobox />
         </div>
 
@@ -51,7 +52,7 @@ export function MeterReadingReportHeader() {
             disabled={!isFormValid}
             form="meter-reading-report-form"
           >
-            Generate
+            Generate {fetchStatus === "fetching" ? <Spinner /> : fetchStatus === "idle" ? null : null}
           </Button>
         </div>
       </div>

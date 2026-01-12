@@ -5,11 +5,15 @@ import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
-import { useState } from "react";
-import { MeterReadingReportProvider } from "@mr/components/providers/MeterReadingReportProvider";
+import { useEffect, useState } from "react";
+import {
+  MeterReadingReportProvider,
+  useMeterReadingReportContext,
+} from "@mr/components/providers/MeterReadingReportProvider";
+import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
-  monthYear: z.string(),
+  monthYear: z.string().nullish(),
   meterReader: z.optional(
     z.object({
       name: z.string(),
@@ -21,8 +25,11 @@ const formSchema = z.object({
 });
 
 export const MeterReadingReportComponent = () => {
-  // subscribe if the generate button is clicked or not
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+
+  const date = searchParams.get("date");
+
+  const { setIsSubmitted } = useMeterReadingReportContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,6 +44,14 @@ export const MeterReadingReportComponent = () => {
     setIsSubmitted(true);
   };
 
+  useEffect(() => {
+    if (date) form.setValue("monthYear", date);
+  }, [date]);
+
+  useEffect(() => {
+    if (form.formState.errors) console.log(form.formState.errors);
+  }, [form.formState.errors]);
+
   return (
     <FormProvider {...form}>
       <form
@@ -44,10 +59,8 @@ export const MeterReadingReportComponent = () => {
         className="flex h-full flex-col space-y-4"
         id="meter-reading-report-form"
       >
-        <MeterReadingReportProvider>
-          <MeterReadingReportHeader />
-          <MeterReadingReportBody />
-        </MeterReadingReportProvider>
+        <MeterReadingReportHeader />
+        <MeterReadingReportBody />
       </form>
     </FormProvider>
   );

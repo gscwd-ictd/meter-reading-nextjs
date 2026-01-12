@@ -1,10 +1,3 @@
-export type Account = {
-  accountNo: string;
-  name: string;
-  zone: string;
-  book: string;
-};
-
 export type AccountDetails = {
   id: number;
   readingDate: string | null;
@@ -15,7 +8,6 @@ export type AccountDetails = {
   currentReading: number;
   previousReading: number;
   averageUsage: number;
-  billedAmount: number;
   isRead: boolean;
   isPosted: boolean;
   isCompleted: boolean;
@@ -25,10 +17,12 @@ export type AccountDetails = {
   // consumption: number;
   // statusProgress: "read" | "pending" | "unbilled";
   meterReader: { id: string; name: string };
+  zone: string;
+  book: string;
 };
 
-export type BilledAccount = Account & {
-  billedAmount: number;
+export type BilledAccount = AccountDetails & {
+  amount: number;
   usage: number;
 };
 
@@ -36,4 +30,13 @@ export type WithRemarksAccount = BilledAccount & {
   remarks: string;
 };
 
-export type UnbilledAccount = Account;
+export type UnbilledAccount = Pick<AccountDetails, "accountName" | "book" | "zone" | "accountNumber">;
+
+export const TAB_VALUES = {
+  BILLED: "billed",
+  UNBILLED: "unbilled",
+  WITH_REMARKS: "with-remarks",
+  NEW_METERS: "new-meters",
+} as const;
+
+export type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];

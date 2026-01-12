@@ -1,4 +1,5 @@
 import { MeterReadingReportComponent } from "@mr/components/features/(monitoring)/reports/meter-reading-report/MeterReaderReportComponent";
+import { MeterReadingReportProvider } from "@mr/components/providers/MeterReadingReportProvider";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -28,7 +29,9 @@ export default function MeterReadingReportPage() {
       <div className="flex h-full w-full flex-col justify-start">
         <div className="flex-1">
           {/* Add this wrapper */}
-          <MeterReadingReportComponent />
+          <MeterReadingReportProvider>
+            <MeterReadingReportComponent />
+          </MeterReadingReportProvider>
         </div>
       </div>
     </>
