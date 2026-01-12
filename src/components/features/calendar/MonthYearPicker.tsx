@@ -9,6 +9,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popov
 import { cn } from "@mr/lib/utils";
 import { Scheduler } from "../(general)/scheduler/useScheduler";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
 
 type MonthYearPickerProps = {
   currentMonthYear: string | null;
@@ -30,6 +31,7 @@ export function MonthYearPicker({
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const reset = useSchedulesStore((state) => state.reset);
   const refetchData = useSchedulesStore((state) => state.refetchData);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // Parse current selection
   const selectedDate = currentMonthYear ? parse(currentMonthYear, "yyyy-MM", new Date()) : null;
@@ -59,7 +61,17 @@ export function MonthYearPicker({
   };
 
   const handleYearChange = (increment: number) => {
-    setCurrentYear((prev) => prev + increment);
+    setIsAnimating(true);
+
+    // Start fade out
+    setTimeout(() => {
+      setCurrentYear((prev) => prev + increment);
+
+      // Fade in after year change
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 150);
+    }, 150);
   };
 
   return (
@@ -77,7 +89,7 @@ export function MonthYearPicker({
           ) : (
             <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
           )}
-          <span>{currentMonthYear ?? "Pick month"}</span>
+          <span>{currentMonthYear ? formatYearMonthToReadableDate(currentMonthYear) : "Pick month"}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[260px] p-3">
@@ -85,7 +97,11 @@ export function MonthYearPicker({
           <Button variant="ghost" size="icon" onClick={() => handleYearChange(-1)}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="font-medium">{currentYear}</span>
+          <span
+            className={`text-base font-medium transition-all duration-300 ${isAnimating ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
+          >
+            {currentYear}
+          </span>
           <Button variant="ghost" size="icon" onClick={() => handleYearChange(1)}>
             <ChevronRight className="h-4 w-4" />
           </Button>

@@ -17,18 +17,11 @@ import { BilledTabReport } from "./billed/BilledTabReport";
 import { UnBilledTabReport } from "./unbilled/UnbilledTabReport";
 import { WithRemarksTabReport } from "./with-remarks/WithRemarksTabReport";
 
-interface MeterReadingReportBodyProps {
-  isSubmitted: boolean;
-}
-
-export const MeterReadingReportBody: FunctionComponent<MeterReadingReportBodyProps> = ({ isSubmitted }) => {
+export const MeterReadingReportBody: FunctionComponent = () => {
   const [selectedTab, setSelectedTab] = useState<string>("billed");
 
   const form = useFormContext();
   const { watch } = form;
-
-  const dateRange = watch("dateRange");
-  const meterReader = watch("meterReader");
 
   return (
     <>

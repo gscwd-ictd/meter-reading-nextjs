@@ -5,6 +5,7 @@ import { Button } from "@mr/components/ui/Button";
 import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popover";
 import { format, setMonth, setYear } from "date-fns";
 import { useState } from "react";
+import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
 
 interface YearMonthPickerWithSubmitProps {
   value: string;
@@ -13,6 +14,7 @@ interface YearMonthPickerWithSubmitProps {
 export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitProps) {
   const [open, setOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Parse the current value if it exists
   const selectedDate = value ? new Date(`${value}-01`) : null;
@@ -28,7 +30,17 @@ export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitPr
   };
 
   const handleYearChange = (increment: number) => {
-    setCurrentYear((prev) => prev + increment);
+    setIsAnimating(true);
+
+    // Start fade out
+    setTimeout(() => {
+      setCurrentYear((prev) => prev + increment);
+
+      // Fade in after year change
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 150);
+    }, 150);
   };
 
   return (
@@ -41,28 +53,49 @@ export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitPr
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             <span className={`${value ? "text-gray-800" : "text-gray-500"}`}>
-              {value || "Select year month"}
+              {value ? formatYearMonthToReadableDate(value) : "Select year month"}
             </span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[260px] p-3">
           <div className="mb-3 flex items-center justify-between">
-            <Button variant="ghost" size="icon" onClick={() => handleYearChange(-1)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleYearChange(-1)}
+              disabled={isAnimating}
+              className="transition-colors hover:bg-gray-100"
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="font-medium">{currentYear}</span>
-            <Button variant="ghost" size="icon" onClick={() => handleYearChange(1)}>
+
+            <span
+              className={`text-base font-medium transition-all duration-300 ${isAnimating ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
+            >
+              {currentYear}
+            </span>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleYearChange(1)}
+              disabled={isAnimating}
+              className="transition-colors hover:bg-gray-100"
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div
+            className={`grid grid-cols-3 gap-2 transition-opacity duration-300 ${isAnimating ? "opacity-50" : "opacity-100"}`}
+          >
             {months.map((month, index) => (
               <Button
                 key={month}
                 variant={selectedYear === currentYear && selectedMonth === index ? "default" : "outline"}
                 onClick={() => handleMonthSelect(index)}
-                className="h-6 text-xs dark:text-white"
+                className="h-6 text-xs transition-all dark:text-white"
+                disabled={isAnimating}
               >
                 {month}
               </Button>

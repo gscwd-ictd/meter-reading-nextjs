@@ -5,6 +5,7 @@ import { Button } from "@mr/components/ui/Button";
 import { Popover, PopoverTrigger, PopoverContent } from "@mr/components/ui/Popover";
 import { format, setMonth, setYear } from "date-fns";
 import { useState } from "react";
+import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
 
 interface YearMonthPickerWithSubmitProps {
   value: string;
@@ -13,8 +14,9 @@ interface YearMonthPickerWithSubmitProps {
 }
 
 export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMonthPickerWithSubmitProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // Parse the current value if it exists
   const selectedDate = value ? new Date(`${value}-01`) : null;
@@ -30,7 +32,17 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
   };
 
   const handleYearChange = (increment: number) => {
-    setCurrentYear((prev) => prev + increment);
+    setIsAnimating(true);
+
+    // Start fade out
+    setTimeout(() => {
+      setCurrentYear((prev) => prev + increment);
+
+      // Fade in after year change
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 150);
+    }, 150);
   };
 
   return (
@@ -42,7 +54,7 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
             className="h-[2.5rem] w-[200px] justify-start text-left font-normal sm:w-auto md:w-auto lg:w-[200px]"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value || "Select year month"}
+            {value ? formatYearMonthToReadableDate(value) : "Select year month"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[260px] p-3">
@@ -50,7 +62,11 @@ export function YearMonthPickerWithSubmit({ value, onChange, onSubmit }: YearMon
             <Button variant="ghost" size="icon" onClick={() => handleYearChange(-1)}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="font-medium">{currentYear}</span>
+            <span
+              className={`text-base font-medium transition-all duration-300 ${isAnimating ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
+            >
+              {currentYear}
+            </span>
             <Button variant="ghost" size="icon" onClick={() => handleYearChange(1)}>
               <ChevronRight className="h-4 w-4" />
             </Button>

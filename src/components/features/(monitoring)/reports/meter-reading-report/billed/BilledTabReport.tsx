@@ -1,6 +1,9 @@
+import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { BilledAccount } from "@mr/lib/types/accounts";
+import { useQuery } from "@tanstack/react-query";
 import { FunctionComponent } from "react";
+import { useFormContext } from "react-hook-form";
 
 const mockData: BilledAccount[] = [
   {
@@ -79,6 +82,16 @@ const mockData: BilledAccount[] = [
 
 export const BilledTabReport: FunctionComponent = () => {
   const totalBilledAmount = mockData.reduce((sum, account) => sum + account.billedAmount, 0);
+  const { isSubmitted } = useMeterReadingReportContext();
+  const form = useFormContext();
+  const { watch } = form;
+
+  const yearMonth = watch("yearMonth");
+
+  const { data } = useQuery({
+    queryKey: ["get-billed-by-yearMonth", yearMonth],
+    queryFn: async () => {},
+  });
 
   return (
     <div className="flex h-full w-full flex-col">

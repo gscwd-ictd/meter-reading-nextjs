@@ -7,6 +7,7 @@ import axios from "axios";
 import { AccountDetails } from "@mr/lib/types/accounts";
 import { useAccountsColumns } from "./AccountsColumns";
 import { useZonebookProgressStore } from "@mr/components/stores/useZonebookProgressStore";
+import { useAccountsStore } from "@mr/components/stores/useAccountsStore";
 
 export const AccountsDataTable: FunctionComponent = () => {
   const [accounts, setAccounts] = useState<AccountDetails[]>([]);
@@ -16,6 +17,10 @@ export const AccountsDataTable: FunctionComponent = () => {
   );
   const monthYear = useZonebookProgressStore((state) => state.monthYear);
   const selectedZonebookEntry = useZonebookProgressStore((state) => state.selectedZonebookEntry);
+  const setAccountDetailsDialogIsOpen = useZonebookProgressStore(
+    (state) => state.setAccountDetailsDialogIsOpen,
+  );
+  const setSelectedAccount = useAccountsStore((state) => state.setSelectedAccount);
 
   const { data: selectedZonebookWithAccounts, isLoading } = useQuery({
     queryKey: [
@@ -56,6 +61,10 @@ export const AccountsDataTable: FunctionComponent = () => {
         columns={accountsColumn}
         loading={isLoading}
         title="Accounts"
+        onRowClick={(row) => {
+          setSelectedAccount(row.original);
+          setAccountDetailsDialogIsOpen(true);
+        }}
       />
     </Suspense>
   );

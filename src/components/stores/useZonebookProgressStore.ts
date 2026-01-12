@@ -11,6 +11,8 @@ type ZonebookProgressStore = {
   setSelectedZonebookEntry: (selectedZonebookEntry: ZonebookProgress) => void;
   zonebookProgressEntryDialogIsOpen: boolean;
   setZonebookProgressEntryDialogIsOpen: (zonebookProgressEntryDialogIsOpen: boolean) => void;
+  accountDetailsDialogIsOpen: boolean;
+  setAccountDetailsDialogIsOpen: (accountDetailsDialogIsOpen: boolean) => void;
 };
 
 export const useZonebookProgressStore = create<ZonebookProgressStore>((set) => ({
@@ -23,4 +25,6 @@ export const useZonebookProgressStore = create<ZonebookProgressStore>((set) => (
   zonebookProgressEntryDialogIsOpen: false,
   setZonebookProgressEntryDialogIsOpen: (zonebookProgressEntryDialogIsOpen) =>
     set({ zonebookProgressEntryDialogIsOpen }),
+  accountDetailsDialogIsOpen: false,
+  setAccountDetailsDialogIsOpen: (accountDetailsDialogIsOpen) => set({ accountDetailsDialogIsOpen }),
 }));

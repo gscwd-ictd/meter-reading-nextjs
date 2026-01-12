@@ -9,6 +9,7 @@ import { ZonebookProgress } from "@mr/lib/types/zonebook";
 import { useZonebookProgressStore } from "@mr/components/stores/useZonebookProgressStore";
 import { format, parse } from "date-fns";
 import { useSearchParams } from "next/navigation";
+import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
 
 type ZonebookProgressDataTableProps = {
   actionBtn: ReactNode | ReactNode[];
@@ -27,11 +28,6 @@ export const ZonebookProgressDataTable: FunctionComponent<ZonebookProgressDataTa
 
   // Get date from URL or use current date
   const urlMonthYear = searchParams.get("date");
-
-  const formatDate = (yearMonth: string) => {
-    const newDate = parse(yearMonth, "yyyy-MM", new Date());
-    return format(newDate, "MMMM yyyy");
-  };
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["get-zonebook-progress", monthYear],
@@ -56,7 +52,7 @@ export const ZonebookProgressDataTable: FunctionComponent<ZonebookProgressDataTa
         data={data ? data : []}
         columns={zonebookProgressColumns}
         loading={isLoading}
-        title={`Zonebook Progress  ${urlMonthYear ? `for ${formatDate(urlMonthYear)}` : ""}`}
+        title={`Zonebook Progress  ${urlMonthYear ? `for ${formatYearMonthToReadableDate(urlMonthYear)}` : ""}`}
         actionBtn={actionBtn}
         enableGlobalFilter={false}
         pageSize={12}

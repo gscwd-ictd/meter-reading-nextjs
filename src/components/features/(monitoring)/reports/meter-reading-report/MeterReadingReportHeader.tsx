@@ -10,10 +10,10 @@ export function MeterReadingReportHeader() {
   const form = useFormContext();
   const { watch } = form;
 
-  const dateRange = watch("dateRange");
+  const monthYear = watch("dateRange");
   const meterReader = watch("meterReader");
 
-  const isFormValid = dateRange;
+  const isFormValid = monthYear;
   return (
     <div className="grid flex-shrink-0 grid-cols-1 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
       <div>
@@ -25,7 +25,7 @@ export function MeterReadingReportHeader() {
         <div className="flex-1">
           <FormField
             control={form.control}
-            name="dateRange"
+            name="yearMonth"
             render={({ field }) => (
               <FormItem>
                 <FormControl>

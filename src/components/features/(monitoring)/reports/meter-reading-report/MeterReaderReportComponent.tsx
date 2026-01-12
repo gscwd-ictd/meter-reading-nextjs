@@ -6,6 +6,7 @@ import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
 import { useState } from "react";
+import { MeterReadingReportProvider } from "@mr/components/providers/MeterReadingReportProvider";
 
 const formSchema = z.object({
   monthYear: z.string(),
@@ -43,8 +44,10 @@ export const MeterReadingReportComponent = () => {
         className="flex h-full flex-col space-y-4"
         id="meter-reading-report-form"
       >
-        <MeterReadingReportHeader />
-        <MeterReadingReportBody isSubmitted={isSubmitted} />
+        <MeterReadingReportProvider>
+          <MeterReadingReportHeader />
+          <MeterReadingReportBody />
+        </MeterReadingReportProvider>
       </form>
     </FormProvider>
   );
