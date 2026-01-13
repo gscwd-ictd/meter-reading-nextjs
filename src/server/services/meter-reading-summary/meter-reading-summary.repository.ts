@@ -5,6 +5,7 @@ import {
   UnbilledSummary,
   UnbilledSummarySchema,
   WithRemarksSummary,
+  WithRemarksSummarySchema,
 } from "@mr/server/types/meter-reading-summary.type";
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
@@ -198,7 +199,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
       }),
     );
 
-    return UnbilledSummarySchema.array().parse(result);
+    return WithRemarksSummarySchema.array().parse(result);
   }
 
   // async findSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
