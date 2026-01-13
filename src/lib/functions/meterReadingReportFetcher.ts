@@ -1,0 +1,68 @@
+import axios from "axios";
+import {
+  BilledAccount,
+  MeterReadingReportParams,
+  NewMeterAccount,
+  UnbilledAccount,
+  WithRemarksAccount,
+} from "../types/accounts";
+
+export const fetchBilledAccounts = async (params: MeterReadingReportParams) => {
+  const { book, meterReaderId, monthYear, zone } = params;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/billed`, {
+    params: {
+      monthYear: monthYear ? monthYear : "",
+      zone: zone ? zone : "",
+      book: book ? book : "",
+      meterReaderId: meterReaderId ? meterReaderId : "",
+    },
+  });
+
+  return res.data as BilledAccount[];
+};
+
+export const fetchUnbilledAccounts = async (params: MeterReadingReportParams) => {
+  const { book, meterReaderId, monthYear, zone } = params;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/unbilled`, {
+    params: {
+      monthYear: monthYear ? monthYear : "",
+      zone: zone ? zone : "",
+      book: book ? book : "",
+      meterReaderId: meterReaderId ? meterReaderId : "",
+    },
+  });
+
+  return res.data as UnbilledAccount[];
+};
+
+export const fetchWithRemarksAccounts = async (params: MeterReadingReportParams) => {
+  const { book, meterReaderId, monthYear, zone } = params;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/with-remarks`, {
+    params: {
+      monthYear: monthYear ? monthYear : "",
+      zone: zone ? zone : "",
+      book: book ? book : "",
+      meterReaderId: meterReaderId ? meterReaderId : "",
+    },
+  });
+
+  return res.data as WithRemarksAccount[];
+};
+
+export const fetchNewMetersAccounts = async (params: MeterReadingReportParams) => {
+  const { book, meterReaderId, monthYear, zone } = params;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/new-meters`, {
+    params: {
+      monthYear: monthYear ? monthYear : "",
+      zone: zone ? zone : "",
+      book: book ? book : "",
+      meterReaderId: meterReaderId ? meterReaderId : "",
+    },
+  });
+
+  return res.data as NewMeterAccount[];
+};

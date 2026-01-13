@@ -79,7 +79,7 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
-        console.log(res.data as MeterReadingEntryWithZonebooks);
+
         return res.data as MeterReadingEntryWithZonebooks;
       } catch (error) {
         console.log(error);

@@ -30,6 +30,10 @@ export type WithRemarksAccount = BilledAccount & {
   remarks: string;
 };
 
+export type NewMeterAccount = BilledAccount & {
+  remarks: string;
+};
+
 export type UnbilledAccount = Pick<AccountDetails, "accountName" | "book" | "zone" | "accountNumber">;
 
 export const TAB_VALUES = {
@@ -40,3 +44,10 @@ export const TAB_VALUES = {
 } as const;
 
 export type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
+
+export type MeterReadingReportParams = {
+  monthYear: string;
+  zone: string;
+  book: string;
+  meterReaderId: string;
+};

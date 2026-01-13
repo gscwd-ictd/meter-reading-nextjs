@@ -52,7 +52,9 @@ export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitPr
             className="h-[2.5rem] w-[200px] justify-start text-left font-normal sm:w-auto md:w-auto lg:w-[200px]"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            <span className={`${value ? "text-gray-800" : "text-gray-500"}`}>
+            <span
+              className={`${value ? "text-gray-800 dark:text-white" : "text-gray-500 dark:text-gray-500"}`}
+            >
               {value ? formatYearMonthToReadableDate(value) : "Select year month"}
             </span>
           </Button>

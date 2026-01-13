@@ -2,13 +2,22 @@
 
 import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 import { Tabs, TabsList, TabsTrigger } from "@mr/components/ui/Tabs";
-import { CircleGaugeIcon, ReceiptTextIcon, SendIcon, TextQuoteIcon } from "lucide-react";
+import { CircleGaugeIcon, ReceiptTextIcon, SearchIcon, SendIcon, TextQuoteIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mr/components/ui/Select";
 import { MeterReadingReportTabsContent } from "./MeterReadingReportTabsContent";
 import { FunctionComponent } from "react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@mr/components/ui/Empty";
+import { Spinner } from "@mr/components/ui/Spinner";
 
 export const MeterReadingReportBody: FunctionComponent = () => {
-  const { isSubmitted, selectedTab, setSelectedTab } = useMeterReadingReportContext();
+  const { hasFetched, selectedTab, setSelectedTab, isGenerating } = useMeterReadingReportContext();
 
   // handle the selected tab
   const onSelectedTabValueChange = (selectedTab: string) => {
@@ -26,7 +35,7 @@ export const MeterReadingReportBody: FunctionComponent = () => {
   return (
     <>
       <div className="flex h-full flex-col sm:hidden md:flex lg:flex">
-        {isSubmitted && (
+        {hasFetched && !isGenerating ? (
           <Tabs
             value={selectedTab}
             onValueChange={(value) => onSelectedTabValueChange(value)}
@@ -62,6 +71,23 @@ export const MeterReadingReportBody: FunctionComponent = () => {
             {/* Tab Content Here */}
             <MeterReadingReportTabsContent />
           </Tabs>
+        ) : !hasFetched && !isGenerating ? (
+          <Empty className="flex h-full w-full">
+            <EmptyHeader className="text-center">
+              <EmptyMedia variant="icon">
+                <SearchIcon className="h-12 w-12 text-gray-400" />
+              </EmptyMedia>
+              <EmptyTitle className="mt-4 text-lg font-semibold">Filter month and year</EmptyTitle>
+              <EmptyDescription className="mt-0">
+                Try adjusting the year month or meter reader selection
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="mt-0">
+              <p className="text-xs text-gray-500">After finalizing, press the generate button</p>
+            </EmptyContent>
+          </Empty>
+        ) : (
+          <Spinner />
         )}
       </div>
 

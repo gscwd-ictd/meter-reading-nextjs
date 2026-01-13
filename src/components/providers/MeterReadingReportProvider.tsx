@@ -20,24 +20,24 @@ const TAB_VALUES = {
 type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 type MeterReadingReportState = {
-  isSubmitted: boolean;
-  setIsSubmitted: Dispatch<SetStateAction<boolean>>;
+  isGenerating: boolean;
+  setIsGenerating: Dispatch<SetStateAction<boolean>>;
   selectedTab: TabValue;
   setSelectedTab: Dispatch<SetStateAction<TabValue>>;
-  fetchStatus: string;
-  setFetchStatus: Dispatch<SetStateAction<string>>;
+  hasFetched: boolean;
+  setHasFetched: Dispatch<SetStateAction<boolean>>;
 };
 
 const MeterReadingReportContext = createContext({} as MeterReadingReportState);
 
 export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = ({ children }) => {
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TabValue>("billed");
-  const [fetchStatus, setFetchStatus] = useState<string>("");
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
 
   return (
     <MeterReadingReportContext.Provider
-      value={{ isSubmitted, setIsSubmitted, selectedTab, setSelectedTab, fetchStatus, setFetchStatus }}
+      value={{ isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched }}
     >
       {children}
     </MeterReadingReportContext.Provider>
@@ -45,8 +45,8 @@ export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = 
 };
 
 export const useMeterReadingReportContext = () => {
-  const { isSubmitted, setIsSubmitted, selectedTab, setSelectedTab, fetchStatus, setFetchStatus } =
+  const { isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched } =
     useContext(MeterReadingReportContext);
 
-  return { isSubmitted, setIsSubmitted, selectedTab, setSelectedTab, fetchStatus, setFetchStatus };
+  return { isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched };
 };

@@ -11,9 +11,9 @@ import { useMeterReadingReportContext } from "@mr/components/providers/MeterRead
 export function MeterReadingReportHeader() {
   const form = useFormContext();
   const { watch } = form;
-  const { fetchStatus } = useMeterReadingReportContext();
+  const { isGenerating } = useMeterReadingReportContext();
 
-  const monthYear = watch("yearMonth");
+  const monthYear = watch("monthYear");
 
   const isFormValid = monthYear;
   return (
@@ -27,7 +27,7 @@ export function MeterReadingReportHeader() {
         <div className="flex-1">
           <FormField
             control={form.control}
-            name="yearMonth"
+            name="monthYear"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
@@ -52,7 +52,7 @@ export function MeterReadingReportHeader() {
             disabled={!isFormValid}
             form="meter-reading-report-form"
           >
-            Generate {fetchStatus === "fetching" ? <Spinner /> : fetchStatus === "idle" ? null : null}
+            Generate {isGenerating ? <Spinner /> : null}
           </Button>
         </div>
       </div>
