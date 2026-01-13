@@ -62,7 +62,10 @@ export const readingDetails = pgTable(
     createdAt: timestamp("created_at").notNull(),
     isPosted: boolean("is_posted").notNull(), //added isPosted field for syncing purposes
     isCompleted: boolean("is_completed").notNull(), //added isCompleted field for marking reading as completed
-    isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as committed
+    isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as
+    datetimeCompleted: timestamp("datetime_completed").notNull(),
+    datetimeCommitted: timestamp("datetime_committed").notNull(),
+    datetimePosted: timestamp("datetime_posted").notNull(),
   },
   (t) => {
     return [
