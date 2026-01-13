@@ -36,24 +36,27 @@ export const ReadingAccountProgressSchema = z.object({
   }),
 });
 
+const currentMonthYear = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+};
+
 export const ReadingAccountQuerySchema = z.object({
   meterReaderId: z.string(),
   zone: z.coerce.string(),
   book: z.coerce.string(),
   readingMonth: z.coerce.string(),
-  /* 
-{
-    meterReaderId:
-    zone
-    book
-    readingMonth: 2025-12
-}
+});
 
-
-*/
+export const BilledAccountQuerySchema = z.object({
+  meterReaderId: z.string().optional(),
+  zone: z.coerce.string().optional(),
+  book: z.coerce.string().optional(),
+  readingMonth: z.coerce.string().default(currentMonthYear),
 });
 
 export type ReadingZoneBookProgress = z.infer<typeof ReadingZoneBookProgressSchema>;
 export type ReadingAccountProgress = z.infer<typeof ReadingAccountProgressSchema>;
 export type ReadingAccountQuery = z.infer<typeof ReadingAccountQuerySchema>;
+export type BilledAccountQuery = z.infer<typeof BilledAccountQuerySchema>;
 export type UpdateReadingProgress = z.infer<typeof ReadingAccountQuerySchema>;

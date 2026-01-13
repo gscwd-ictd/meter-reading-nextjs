@@ -10,7 +10,7 @@ import {
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress, viewReadingZoneBookProgress } from "@mr/server/db/schemas/reports";
 import { meterReadingContext } from "@mr/server/context";
-import { and, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { readingDetails } from "@mr/server/db/schemas/reading-details";
 import { accountHistory, usage } from "@mr/server/db/schemas/account-ledger";
 
@@ -105,7 +105,7 @@ export class ReportsRepository implements IReportsRepository {
             eq(readingDetails.meterReaderId, meterReaderId),
             eq(readingDetails.zoneCode, zone),
             eq(readingDetails.bookCode, book),
-            sql`reading_month >= ${start} AND reading_month < ${end}`,
+            sql`created_at >= ${start} AND created_at < ${end}`,
           ),
         );
 
@@ -123,7 +123,7 @@ export class ReportsRepository implements IReportsRepository {
                   eq(readingDetails.meterReaderId, meterReaderId),
                   eq(readingDetails.zoneCode, zone),
                   eq(readingDetails.bookCode, book),
-                  sql`reading_month >= ${start} AND reading_month < ${end}`,
+                  sql`created_at >= ${start} AND created_at < ${end}`,
                 ),
               ),
           ),
@@ -143,7 +143,7 @@ export class ReportsRepository implements IReportsRepository {
                   eq(readingDetails.meterReaderId, meterReaderId),
                   eq(readingDetails.zoneCode, zone),
                   eq(readingDetails.bookCode, book),
-                  sql`reading_month >= ${start} AND reading_month < ${end}`,
+                  sql`created_at >= ${start} AND created_at < ${end}`,
                 ),
               ),
           ),

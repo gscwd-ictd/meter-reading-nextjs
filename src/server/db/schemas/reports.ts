@@ -63,7 +63,7 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
      select
         date_trunc('month',created_at) as reading_month,
         meter_reader_id,
-        reading_date,
+        reading_date AT TIME ZONE 'Asia/Manila' as reading_date,
         account_number,
         check_digit,
         account_name,
