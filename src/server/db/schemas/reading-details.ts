@@ -1,4 +1,14 @@
-import { boolean, timestamp, integer, pgTable, real, text, varchar, unique } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  timestamp,
+  integer,
+  pgTable,
+  real,
+  text,
+  varchar,
+  unique,
+  index,
+} from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
 
 export const readingDetails = pgTable(
@@ -52,7 +62,10 @@ export const readingDetails = pgTable(
     createdAt: timestamp("created_at").notNull(),
     isPosted: boolean("is_posted").notNull(), //added isPosted field for syncing purposes
     isCompleted: boolean("is_completed").notNull(), //added isCompleted field for marking reading as completed
-    isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as committed
+    isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as
+    datetimeCompleted: timestamp("datetime_completed").notNull(),
+    datetimeCommitted: timestamp("datetime_committed").notNull(),
+    datetimePosted: timestamp("datetime_posted").notNull(),
   },
   (t) => {
     return [
@@ -61,6 +74,12 @@ export const readingDetails = pgTable(
         t.meterReaderId,
         t.createdAt,
       ),
+      index("idx_rd_created").on(t.createdAt),
+      index("idx_rd_meter_reader").on(t.meterReaderId),
+      index("idx_rd_account_number").on(t.accountNumber),
+      index("idx_rd_acc_created").on(t.accountNumber, t.createdAt),
+      index("idx_rd_zone_book_reader_date").on(t.zoneCode, t.bookCode, t.meterReaderId, t.readingDate),
+      index("idx_rd_status").on(t.isRead, t.isCompleted),
     ];
   },
 );

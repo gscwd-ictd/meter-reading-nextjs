@@ -20,6 +20,8 @@ import { billingAdjustmentHandler } from "./routes/billing-adjustments";
 import { dashboardHandler } from "./routes/dashboard";
 import { readingRemarkHandler } from "./routes/reading-remarks";
 import { uploadImageHandler } from "./routes/upload-image";
+import { reportsHandler } from "./routes/reports";
+import { meterReadingSummaryHandler } from "./routes/meter-reading-summary";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -61,6 +63,8 @@ function createApp() {
     dashboardHandler,
     readingRemarkHandler,
     uploadImageHandler,
+    reportsHandler,
+    meterReadingSummaryHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
