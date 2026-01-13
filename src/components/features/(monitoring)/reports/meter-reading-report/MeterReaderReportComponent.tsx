@@ -5,43 +5,91 @@ import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
-  dateRange: z.object({
-    from: z.date(),
-    to: z.date(),
-  }),
-  meterReader: z.object({
-    name: z.string(),
-    positionTitle: z.string(),
-    employeeId: z.string(),
-    id: z.string(),
-  }),
+  monthYear: z.string().nullish(),
+  meterReader: z.optional(
+    z.object({
+      name: z.string(),
+      positionTitle: z.string(),
+      employeeId: z.string(),
+      id: z.string(),
+    }),
+  ),
 });
 
 export const MeterReadingReportComponent = () => {
-  // subscribe if the generate button is clicked or not
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+
+  const queryClient = useQueryClient();
+
+  const date = searchParams.get("date");
+
+  const { setIsGenerating, setHasFetched } = useMeterReadingReportContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateRange: undefined,
+      monthYear: "",
       meterReader: undefined,
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    setIsSubmitted(true);
+  const handleGenerateAll = async (data: z.infer<typeof formSchema>) => {
+    setIsGenerating(true);
+
+    try {
+      // show loading toast
+      toast.loading("Generating all reports...", { id: "generate-mr-reports" });
+
+      // refetch all queries in parallel
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ["get-billed-mr-report"] }),
+        queryClient.refetchQueries({ queryKey: ["get-unbilled-mr-report"] }),
+        // queryClient.refetchQueries({ queryKey: ["get-with-remarks-mr-report"] }),
+        // queryClient.refetchQueries({ queryKey: ["get-new-meters-mr-report"] }),
+      ]);
+
+      toast.success("All reports generated successfully!", {
+        id: "generate-mr-reports",
+        position: "top-right",
+        duration: 800,
+      });
+    } catch (error) {
+      toast.error("Failed to generate reports", {
+        id: "generate-mr-reports",
+        position: "top-right",
+        duration: 1000,
+      });
+    } finally {
+      setIsGenerating(false);
+      setHasFetched(true);
+      console.log(data);
+    }
   };
+
+  useEffect(() => {
+    if (date) form.setValue("monthYear", date);
+  }, [date]);
+
+  useEffect(() => {
+    if (form.formState.errors) console.log(form.formState.errors);
+  }, [form.formState.errors]);
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col space-y-4">
+      <form
+        onSubmit={form.handleSubmit(handleGenerateAll)}
+        className="flex h-full flex-col space-y-4"
+        id="meter-reading-report-form"
+      >
         <MeterReadingReportHeader />
-        <MeterReadingReportBody isSubmitted={isSubmitted} />
+        <MeterReadingReportBody />
       </form>
     </FormProvider>
   );

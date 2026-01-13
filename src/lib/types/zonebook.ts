@@ -45,7 +45,8 @@ export type ZonebookProgress = {
   statusProgress: string;
   readingDate: string;
   isCommitted: boolean;
-  isRead: boolean;
+  // isRead: boolean;
+  address: string;
 };
 
 export type ZonebookProgressWithAccounts = ZonebookProgress & { accounts: AccountDetails[] };

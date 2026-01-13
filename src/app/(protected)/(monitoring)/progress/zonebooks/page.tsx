@@ -27,8 +27,6 @@ export default function ZonebookProgressPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* <h3 className="mt-5 text-xl font-bold">Zonebook Progress Table</h3> */}
-
       <ZonebookDailyProgressComponent />
     </>
   );

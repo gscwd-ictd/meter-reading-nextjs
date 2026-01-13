@@ -16,19 +16,27 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
   useEffect(() => {
     const columns: ColumnDef<ZonebookProgress>[] = [
       {
-        accessorFn: (row) => `Zone ${row.zone} / Book ${row.book}`,
-        id: "zoneBook",
-        header: "Zone Book",
-        cell: ({ row }) => <div className="text-muted-foreground text-left">{row.getValue("zoneBook")}</div>,
-
-        meta: { exportLabel: "Zone / Book" },
+        accessorKey: "zone",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Zone" />,
+        cell: ({ row }) => <div className="text-muted-foreground text-left">Zone {row.original.zone}</div>,
+        meta: { exportLabel: "Zone" },
+        enableColumnFilter: true,
+        filterFn: filterFn,
       },
       {
-        accessorFn: (row) => row.meterReader.name,
-        id: "meterReader",
+        accessorKey: "book",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Book" />,
+        cell: ({ row }) => <div className="text-muted-foreground text-left">Book {row.original.book}</div>,
+        meta: { exportLabel: "Book" },
+        filterFn: filterFn,
+        enableColumnFilter: true,
+      },
+      {
+        accessorKey: "meterReader.name",
         header: "Meter Reader",
-        cell: ({ row }) => <div className="text-left font-medium">{row.getValue("meterReader")}</div>,
+        cell: ({ row }) => <div className="text-left font-medium">{row.original.meterReader.name}</div>,
         meta: { exportLabel: "Meter Reader" },
+        filterFn: filterFn,
       },
 
       {
@@ -53,6 +61,7 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
             </div>
           );
         },
+        filterFn: filterFn,
       },
       {
         accessorKey: "statusProgress",

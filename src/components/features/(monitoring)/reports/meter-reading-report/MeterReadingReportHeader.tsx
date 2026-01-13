@@ -3,17 +3,19 @@
 import { useFormContext } from "react-hook-form";
 import { Button } from "@mr/components/ui/Button";
 import { FormControl, FormField, FormItem } from "@mr/components/ui/Form";
-import { DateRangePickerWithPresets } from "./DateRangePickerWithPresets";
 import { SearchMeterReaderCombobox } from "@mr/components/features/(general)/meter-readers/SearchMeterReaderCombobox";
+import { YearMonthPicker } from "@mr/components/features/calendar/YearMonthPicker";
+import { Spinner } from "@mr/components/ui/Spinner";
+import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 
 export function MeterReadingReportHeader() {
   const form = useFormContext();
   const { watch } = form;
+  const { isGenerating } = useMeterReadingReportContext();
 
-  const dateRange = watch("dateRange");
-  const meterReader = watch("meterReader");
+  const monthYear = watch("monthYear");
 
-  const isFormValid = dateRange && meterReader;
+  const isFormValid = monthYear;
   return (
     <div className="grid flex-shrink-0 grid-cols-1 items-center sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
       <div>
@@ -25,11 +27,11 @@ export function MeterReadingReportHeader() {
         <div className="flex-1">
           <FormField
             control={form.control}
-            name="dateRange"
+            name="monthYear"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <DateRangePickerWithPresets date={field.value} onDateChange={field.onChange} />
+                  <YearMonthPicker value={field.value} onChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -37,7 +39,7 @@ export function MeterReadingReportHeader() {
         </div>
 
         {/* Meter Reader Field */}
-        <div className="flex-1">
+        <div className="">
           <SearchMeterReaderCombobox />
         </div>
 
@@ -48,8 +50,9 @@ export function MeterReadingReportHeader() {
             className="h-[2.5rem] w-full px-6 lg:w-auto dark:text-white"
             size="sm"
             disabled={!isFormValid}
+            form="meter-reading-report-form"
           >
-            Generate
+            Generate {isGenerating ? <Spinner /> : null}
           </Button>
         </div>
       </div>

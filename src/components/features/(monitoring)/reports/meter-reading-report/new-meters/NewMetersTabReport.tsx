@@ -8,24 +8,20 @@ import {
 } from "@mr/components/ui/Empty";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { TabsContent } from "@mr/components/ui/Tabs";
-import { WithRemarksAccount } from "@mr/lib/types/accounts";
+import { NewMeterAccount } from "@mr/lib/types/accounts";
 import { ReceiptTextIcon } from "lucide-react";
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent } from "react";
 
 type TabReportProps = {
-  data: WithRemarksAccount[] | undefined;
+  data: NewMeterAccount[] | undefined;
   isLoading: boolean;
 };
 
-export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, isLoading }) => {
-  const totalBilledAmount = useMemo(() => {
-    return data && data.reduce((sum, account) => sum + account.amount, 0);
-  }, [data]);
-
+export const NewMetersTabReport: FunctionComponent<TabReportProps> = ({ data, isLoading }) => {
   return (
     <>
       <TabsContent
-        value="with-remarks"
+        value="new-meters"
         className="flex h-full flex-col items-start justify-center rounded-md border bg-gray-50 p-6 dark:bg-gray-900"
       >
         {data && data.length > 0 && !isLoading ? (
@@ -67,18 +63,11 @@ export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, 
               </Table>
             </div>
 
-            {/* Separate footer div - NOT using TableFooter */}
+            {/* Separate footer div */}
             <div className="mt-4 border-t bg-gray-50 px-4 py-3">
               <div className="flex items-center justify-between">
-                <span className="font-medium">Total Billed Amount:</span>
-                <span className="text-right font-bold underline underline-offset-2">
-                  ₱{" "}
-                  {totalBilledAmount &&
-                    totalBilledAmount.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                </span>
+                <span className="font-medium">New meter accounts count:</span>
+                <span className="text-right font-bold underline underline-offset-2">{data.length}</span>
               </div>
             </div>
           </div>
@@ -88,10 +77,8 @@ export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, 
               <EmptyMedia variant="icon">
                 <ReceiptTextIcon className="h-12 w-12 text-gray-400" />
               </EmptyMedia>
-              <EmptyTitle className="mt-4 text-lg font-semibold">No Accounts with Remarks</EmptyTitle>
-              <EmptyDescription className="mt-0">
-                No accounts with remarks match your current filters
-              </EmptyDescription>
+              <EmptyTitle className="mt-4 text-lg font-semibold">New meter accounts</EmptyTitle>
+              <EmptyDescription className="mt-0">No new meters match your current filters</EmptyDescription>
             </EmptyHeader>
             <EmptyContent className="mt-0">
               <p className="text-xs text-gray-500">Try adjusting your date range or meter reader selection</p>

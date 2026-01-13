@@ -61,7 +61,7 @@ export const SearchMeterReaderCombobox: FunctionComponent = () => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="h-[2.5rem] w-full justify-start px-3"
+          className="h-[2.5rem] w-[200px] justify-start px-3"
           size="sm"
         >
           {selectedMeterReader ? (
@@ -99,7 +99,7 @@ export const SearchMeterReaderCombobox: FunctionComponent = () => {
         align="start"
         side="bottom"
         onWheel={(e) => e.stopPropagation()}
-        style={{ width: "var(--radix-popover-trigger-width)" }}
+        // style={{ width: "var(--radix-popover-trigger-width)" }}
       >
         {!meterReaders && (isLoading || isPending) ? (
           <div className="flex w-full items-center justify-center gap-2 p-4">
@@ -114,6 +114,17 @@ export const SearchMeterReaderCombobox: FunctionComponent = () => {
                 No meter reader found.
               </CommandEmpty>
               <CommandGroup>
+                <CommandItem
+                  value=""
+                  onSelect={() => {
+                    setValue("meterReader", undefined);
+                    setSelectedMeterReader(undefined);
+                  }}
+                >
+                  <div className="text-primary cursor-auto items-end px-2 font-medium hover:cursor-pointer hover:brightness-75">
+                    Clear
+                  </div>
+                </CommandItem>
                 {meterReaders &&
                   meterReaders?.data?.map((meterReader: MeterReader, index: number) => (
                     <CommandItem
