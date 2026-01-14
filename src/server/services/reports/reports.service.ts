@@ -99,7 +99,7 @@ export class ReportsRepository implements IReportsRepository {
     await db.pgConn.transaction(async (tx) => {
       await tx
         .update(readingDetails)
-        .set({ isCommitted: true })
+        .set({ isCommitted: true, datetimeCommitted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
         .where(
           and(
             eq(readingDetails.meterReaderId, meterReaderId),
@@ -113,19 +113,11 @@ export class ReportsRepository implements IReportsRepository {
         .update(accountHistory)
         .set({ isCommitted: true })
         .where(
-          inArray(
-            accountHistory.accountNumber,
-            tx
-              .select({ accountNumber: readingDetails.accountNumber })
-              .from(readingDetails)
-              .where(
-                and(
-                  eq(readingDetails.meterReaderId, meterReaderId),
-                  eq(readingDetails.zoneCode, zone),
-                  eq(readingDetails.bookCode, book),
-                  sql`created_at >= ${start} AND created_at < ${end}`,
-                ),
-              ),
+          and(
+            eq(accountHistory.meterReaderId, meterReaderId),
+            eq(accountHistory.zoneCode, zone),
+            eq(accountHistory.bookCode, book),
+            sql`created_at >= ${start} AND created_at < ${end}`,
           ),
         );
 
@@ -133,23 +125,15 @@ export class ReportsRepository implements IReportsRepository {
         .update(usage)
         .set({ isCommitted: true })
         .where(
-          inArray(
-            usage.accountNumber,
-            tx
-              .select({ accountNumber: readingDetails.accountNumber })
-              .from(readingDetails)
-              .where(
-                and(
-                  eq(readingDetails.meterReaderId, meterReaderId),
-                  eq(readingDetails.zoneCode, zone),
-                  eq(readingDetails.bookCode, book),
-                  sql`created_at >= ${start} AND created_at < ${end}`,
-                ),
-              ),
+          and(
+            eq(usage.meterReaderId, meterReaderId),
+            eq(usage.zoneCode, zone),
+            eq(usage.bookCode, book),
+            sql`created_at >= ${start} AND created_at < ${end}`,
           ),
         );
     });
 
-    return await this.updateReadingProgress(data);
+    return await this.findReadingAccountProgress(data);
   }
 }

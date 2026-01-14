@@ -69,8 +69,8 @@ export const readingDetails = pgTable(
   },
   (t) => {
     return [
-      unique("reading_details_account_name_meter_reader_id_created_at_unique").on(
-        t.accountName,
+      unique("reading_details_account_number_meter_reader_id_created_at_unique").on(
+        t.accountNumber,
         t.meterReaderId,
         t.createdAt,
       ),
