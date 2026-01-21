@@ -20,8 +20,10 @@ export const viewReadingZoneBookProgress = pgView("view_reading_zone_book_progre
         count(rd.account_number) as total_accounts,
         case
             when count(*) filter ( where rd.is_completed = true ) = count(rd.account_number)
-                then  'completed'
-                else 'in progress'
+                then 'completed'
+            when count(*) filter ( where rd.is_committed = true ) = count(rd.account_number)
+                then 'posted'
+            else 'in progress'
         end as status_progress,
         case
             when count(*) filter (where rd.is_committed = true) = count(rd.account_number)

@@ -35,8 +35,6 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
       const endYear = month === 12 ? year + 1 : year;
       const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
       conditions.push(sql`reading_month >= ${start} AND reading_month < ${end}`);
-
-      console.error(start, end);
     }
 
     const stmt = await db.pgConn

@@ -24,4 +24,8 @@ export class NewMeterService implements I_Crud<NewMeter> {
   async delete(id: string): Promise<{ status: string }> {
     return await this.newMeterRepository.delete(id);
   }
+
+  async getAllNewMeterByMeterReaderId(meterReaderId: string, readingMonth: string): Promise<NewMeter[]> {
+    return await this.newMeterRepository.getAllNewMeterByMeterReaderId(meterReaderId, readingMonth);
+  }
 }
