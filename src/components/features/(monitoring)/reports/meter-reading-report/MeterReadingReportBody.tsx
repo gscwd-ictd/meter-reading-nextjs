@@ -17,7 +17,7 @@ import {
 import { Spinner } from "@mr/components/ui/Spinner";
 
 export const MeterReadingReportBody: FunctionComponent = () => {
-  const { hasFetched, selectedTab, setSelectedTab, isGenerating } = useMeterReadingReportContext();
+  const { selectedTab, setSelectedTab, isGenerating, hasFetched } = useMeterReadingReportContext();
 
   // handle the selected tab
   const onSelectedTabValueChange = (selectedTab: string) => {
@@ -35,7 +35,7 @@ export const MeterReadingReportBody: FunctionComponent = () => {
   return (
     <>
       <div className="flex h-full flex-col sm:hidden md:flex lg:flex">
-        {hasFetched && !isGenerating ? (
+        {!isGenerating && hasFetched ? (
           <Tabs
             value={selectedTab}
             onValueChange={(value) => onSelectedTabValueChange(value)}
@@ -71,7 +71,7 @@ export const MeterReadingReportBody: FunctionComponent = () => {
             {/* Tab Content Here */}
             <MeterReadingReportTabsContent />
           </Tabs>
-        ) : !hasFetched && !isGenerating ? (
+        ) : !isGenerating && !hasFetched ? (
           <Empty className="flex h-full w-full">
             <EmptyHeader className="text-center">
               <EmptyMedia variant="icon">
@@ -87,7 +87,9 @@ export const MeterReadingReportBody: FunctionComponent = () => {
             </EmptyContent>
           </Empty>
         ) : (
-          <Spinner />
+          <div className="flex h-full w-full justify-center">
+            <Spinner />
+          </div>
         )}
       </div>
 

@@ -36,7 +36,7 @@ export const DashboardCard: FunctionComponent<DashboardCardProps> = ({
   return (
     <Card
       onClick={onCardClick}
-      className={`group relative overflow-hidden ${className} shadow-xs transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"} border-gray-200/70`}
+      className={`group relative overflow-hidden ${className} shadow-xs transition-all hover:shadow-md hover:brightness-98 ${size === "lg" ? "gap-3" : "gap-0"} border-gray-200/70 dark:border-gray-800`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

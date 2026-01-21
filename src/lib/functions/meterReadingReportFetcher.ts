@@ -12,13 +12,13 @@ export const fetchBilledAccounts = async (params: MeterReadingReportParams) => {
 
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/billed`, {
     params: {
-      monthYear: monthYear ? monthYear : "",
-      zone: zone ? zone : "",
-      book: book ? book : "",
-      meterReaderId: meterReaderId ? meterReaderId : "",
+      ...(monthYear && { readingMonth: monthYear }),
+      ...(zone && { zone }),
+      ...(book && { book }),
+      ...(meterReaderId && { meterReaderId }),
     },
   });
-
+  console.log("FROM FETCHER BILLED: ", res.data);
   return res.data as BilledAccount[];
 };
 
@@ -27,10 +27,10 @@ export const fetchUnbilledAccounts = async (params: MeterReadingReportParams) =>
 
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/unbilled`, {
     params: {
-      monthYear: monthYear ? monthYear : "",
-      zone: zone ? zone : "",
-      book: book ? book : "",
-      meterReaderId: meterReaderId ? meterReaderId : "",
+      ...(monthYear && { readingMonth: monthYear }),
+      ...(zone && { zone }),
+      ...(book && { book }),
+      ...(meterReaderId && { meterReaderId }),
     },
   });
 
@@ -42,10 +42,10 @@ export const fetchWithRemarksAccounts = async (params: MeterReadingReportParams)
 
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/with-remarks`, {
     params: {
-      monthYear: monthYear ? monthYear : "",
-      zone: zone ? zone : "",
-      book: book ? book : "",
-      meterReaderId: meterReaderId ? meterReaderId : "",
+      ...(monthYear && { readingMonth: monthYear }),
+      ...(zone && { zone }),
+      ...(book && { book }),
+      ...(meterReaderId && { meterReaderId }),
     },
   });
 
@@ -57,10 +57,10 @@ export const fetchNewMetersAccounts = async (params: MeterReadingReportParams) =
 
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/new-meters`, {
     params: {
-      monthYear: monthYear ? monthYear : "",
-      zone: zone ? zone : "",
-      book: book ? book : "",
-      meterReaderId: meterReaderId ? meterReaderId : "",
+      ...(monthYear && { readingMonth: monthYear }),
+      ...(zone && { zone }),
+      ...(book && { book }),
+      ...(meterReaderId && { meterReaderId }),
     },
   });
 

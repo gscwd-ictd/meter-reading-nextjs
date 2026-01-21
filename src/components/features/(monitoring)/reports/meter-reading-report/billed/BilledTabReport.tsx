@@ -1,3 +1,4 @@
+import { BilledDataTable } from "@mr/components/features/data-tables/meter-reading-report/billed/BilledDataTable";
 import {
   Empty,
   EmptyContent,
@@ -28,59 +29,7 @@ export const BilledTabReport: FunctionComponent<TabReportProps> = ({ data, isLoa
       className="flex h-full flex-col items-start justify-center rounded-md border bg-gray-50 p-6 dark:bg-gray-900"
     >
       {data && data.length > 0 && !isLoading ? (
-        <div className="flex h-full w-full flex-col">
-          {/* Table with scrollable body */}
-          <div className="flex-1 overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Account No</TableHead>
-                  <TableHead className="w-[200px]">Name</TableHead>
-                  <TableHead className="">Zone</TableHead>
-                  <TableHead className="">Book</TableHead>
-                  <TableHead className="">Usage</TableHead>
-                  <TableHead className="text-right">Billed Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data &&
-                  data.map((account, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="font-medium">{account.accountNumber}</TableCell>
-                      <TableCell className="">Account Name Here</TableCell>
-                      <TableCell className="">{account.zone}</TableCell>
-                      <TableCell className="">{account.book}</TableCell>
-                      <TableCell className="">{account.usage}</TableCell>
-                      <TableCell className="text-right">
-                        ₱{" "}
-                        {account &&
-                          account.amount &&
-                          account.amount.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Separate footer div - NOT using TableFooter */}
-          <div className="mt-4 border-t bg-gray-50 px-4 py-3 dark:bg-gray-700">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Total Billed Amount:</span>
-              <span className="text-right font-bold underline underline-offset-2">
-                ₱{" "}
-                {totalBilledAmount &&
-                  totalBilledAmount.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-              </span>
-            </div>
-          </div>
-        </div>
+        <BilledDataTable data={data} />
       ) : (
         <Empty className="flex h-full w-full">
           <EmptyHeader className="text-center">

@@ -5,11 +5,25 @@ import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  BilledAccount,
+  MeterReadingReportParams,
+  NewMeterAccount,
+  UnbilledAccount,
+  WithRemarksAccount,
+} from "@mr/lib/types/accounts";
+import {
+  fetchBilledAccounts,
+  fetchNewMetersAccounts,
+  fetchUnbilledAccounts,
+  fetchWithRemarksAccounts,
+} from "@mr/lib/functions/meterReadingReportFetcher";
+import useManualQuery from "@mr/hooks/use-manual-query";
 
 const formSchema = z.object({
   monthYear: z.string().nullish(),
@@ -25,12 +39,9 @@ const formSchema = z.object({
 
 export const MeterReadingReportComponent = () => {
   const searchParams = useSearchParams();
-
-  const queryClient = useQueryClient();
-
   const date = searchParams.get("date");
-
-  const { setIsGenerating, setHasFetched } = useMeterReadingReportContext();
+  const { setIsGenerating, setHasFetched, monthYear, setMonthYear, shouldFetch, setShouldFetch } =
+    useMeterReadingReportContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,36 +51,79 @@ export const MeterReadingReportComponent = () => {
     },
   });
 
+  const router = useRouter();
+
+  const params: MeterReadingReportParams = {
+    monthYear: monthYear ? monthYear : "",
+    meterReaderId: form.watch("meterReader.id"),
+    zone: "",
+    book: "",
+  };
+
+  // Queries enabled only when shouldFetch is true
+  const queries = {
+    billed: useQuery<BilledAccount[]>({
+      queryKey: ["get-billed-mr-report", monthYear || ""],
+      queryFn: () => fetchBilledAccounts(params),
+      enabled: shouldFetch,
+      retry: 1,
+    }),
+    unbilled: useQuery<UnbilledAccount[]>({
+      queryKey: ["get-unbilled-mr-report", monthYear || ""],
+      queryFn: () => fetchUnbilledAccounts(params),
+      enabled: shouldFetch,
+      retry: 1,
+    }),
+    withRemarks: useQuery<WithRemarksAccount[]>({
+      queryKey: ["get-with-remarks-mr-report", monthYear || ""],
+      queryFn: () => fetchWithRemarksAccounts(params),
+      enabled: shouldFetch,
+      retry: 1,
+    }),
+    newMeters: useQuery<NewMeterAccount[]>({
+      queryKey: ["get-new-meters-mr-report", monthYear || ""],
+      queryFn: () => fetchNewMetersAccounts(params),
+      enabled: shouldFetch,
+      retry: 1,
+    }),
+  };
+
   const handleGenerateAll = async (data: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
+    setMonthYear(data.monthYear !== undefined ? data.monthYear! : "");
+    setShouldFetch(true); // This triggers all queries
 
     try {
       // show loading toast
-      toast.loading("Generating all reports...", { id: "generate-mr-reports" });
+      toast.loading("Generating all reports...", {
+        id: "generate-mr-reports",
+        position: "top-right",
+      });
 
-      // refetch all queries in parallel
+      // Wait for all queries to complete
       await Promise.all([
-        queryClient.refetchQueries({ queryKey: ["get-billed-mr-report"] }),
-        queryClient.refetchQueries({ queryKey: ["get-unbilled-mr-report"] }),
-        // queryClient.refetchQueries({ queryKey: ["get-with-remarks-mr-report"] }),
-        // queryClient.refetchQueries({ queryKey: ["get-new-meters-mr-report"] }),
+        queries.billed.refetch(),
+        queries.unbilled.refetch(),
+        queries.withRemarks.refetch(),
+        queries.newMeters.refetch(),
       ]);
+
+      setIsGenerating(false);
+      setHasFetched(true);
 
       toast.success("All reports generated successfully!", {
         id: "generate-mr-reports",
         position: "top-right",
-        duration: 800,
       });
+
+      console.log(data);
     } catch (error) {
+      setIsGenerating(false);
+      setShouldFetch(false);
       toast.error("Failed to generate reports", {
         id: "generate-mr-reports",
         position: "top-right",
-        duration: 1000,
       });
-    } finally {
-      setIsGenerating(false);
-      setHasFetched(true);
-      console.log(data);
     }
   };
 
@@ -77,9 +131,14 @@ export const MeterReadingReportComponent = () => {
     if (date) form.setValue("monthYear", date);
   }, [date]);
 
+  // Sync URL when generatedMonthYear changes (except on user submit)
   useEffect(() => {
-    if (form.formState.errors) console.log(form.formState.errors);
-  }, [form.formState.errors]);
+    // Don't do anything on initial mount
+    if (monthYear) {
+      // If no URL param but we have store value, update URL
+      router.replace(`/reports/meter-reading-report?date=${monthYear}`);
+    }
+  }, [monthYear, router]);
 
   return (
     <FormProvider {...form}>

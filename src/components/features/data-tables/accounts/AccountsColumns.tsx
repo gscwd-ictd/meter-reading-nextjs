@@ -55,6 +55,7 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
           </span>
         ),
         enableColumnFilter: false,
+        enableSorting: true,
       },
       {
         accessorKey: "readingDate",
@@ -70,8 +71,12 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
       {
         accessorKey: "remarks",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Remarks" />,
-        cell: ({ row }) => <span className="text-sm">{row.original.remarks}</span>,
-        enableColumnFilter: false,
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.remarks ? row.original.remarks : "—"}</span>
+        ),
+        enableColumnFilter: true,
+        filterFn: filterFn,
+        meta: { exportLabel: "Remarks" },
       },
       {
         accessorKey: "isRead",

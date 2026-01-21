@@ -3,70 +3,123 @@
 import { BilledTabReport } from "./billed/BilledTabReport";
 import { UnBilledTabReport } from "./unbilled/UnbilledTabReport";
 import { WithRemarksTabReport } from "./with-remarks/WithRemarksTabReport";
-import { useQuery } from "@tanstack/react-query";
-import { BilledAccount, MeterReadingReportParams } from "@mr/lib/types/accounts";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  fetchBilledAccounts,
-  fetchNewMetersAccounts,
-  fetchUnbilledAccounts,
-  fetchWithRemarksAccounts,
-} from "@mr/lib/functions/meterReadingReportFetcher";
+  BilledAccount,
+  MeterReadingReportParams,
+  NewMeterAccount,
+  UnbilledAccount,
+  WithRemarksAccount,
+} from "@mr/lib/types/accounts";
 import { useFormContext } from "react-hook-form";
-import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 import { NewMetersTabReport } from "./new-meters/NewMetersTabReport";
+import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 
 export const MeterReadingReportTabsContent = () => {
-  const { isGenerating } = useMeterReadingReportContext();
-
   const form = useFormContext();
   const { watch } = form;
+  const queryClient = useQueryClient();
+
+  const { monthYear } = useMeterReadingReportContext();
 
   // form the params object
   const params: MeterReadingReportParams = {
-    monthYear: watch("monthYear"),
+    monthYear: monthYear,
     zone: watch("zone"),
     book: watch("book"),
     meterReaderId: watch("meterReader.id"),
   };
 
-  // create an object for all queries
   const queries = {
-    billed: useQuery<BilledAccount[]>({
-      queryKey: ["get-billed-mr-report"],
-      queryFn: () => fetchBilledAccounts(params),
-      enabled: isGenerating,
-    }),
-    unbilled: useQuery({
-      queryKey: ["get-unbilled-mr-report"],
-      queryFn: () => fetchUnbilledAccounts(params),
-      enabled: isGenerating,
-    }),
-    withRemarks: useQuery({
-      queryKey: ["get-with-remarks-mr-report"],
-      queryFn: () => fetchWithRemarksAccounts(params),
-      enabled: isGenerating,
-    }),
-    newMeters: useQuery({
-      queryKey: ["get-new-meters-mr-report"],
-      queryFn: () => fetchNewMetersAccounts(params),
+    billed: {
+      data: queryClient.getQueryData<BilledAccount[]>([
+        "get-billed-mr-report",
+        params.monthYear ? params.monthYear : "",
+      ]),
+      isLoading:
+        queryClient.getQueryState(["get-billed-mr-report", params.monthYear ? params.monthYear : ""])
+          ?.status === "pending"
+          ? true
+          : false,
+    },
 
-      enabled: isGenerating,
-    }),
+    unbilled: {
+      data: queryClient.getQueryData<UnbilledAccount[]>([
+        "get-unbilled-mr-report",
+        params.monthYear ? params.monthYear : "",
+      ]),
+      isLoading:
+        queryClient.getQueryState(["get-unbilled-mr-report", params.monthYear ? params.monthYear : ""])
+          ?.status === "pending"
+          ? true
+          : false,
+    },
+    withRemarks: {
+      data: queryClient.getQueryData<WithRemarksAccount[]>([
+        "get-with-remarks-mr-report",
+        params.monthYear ? params.monthYear : "",
+      ]),
+      isLoading:
+        queryClient.getQueryState(["get-with-remarks-mr-report", params.monthYear ? params.monthYear : ""])
+          ?.status === "pending"
+          ? true
+          : false,
+    },
+    newMeters: {
+      data: queryClient.getQueryData<NewMeterAccount[]>([
+        "get-with-remarks-mr-report",
+        params.monthYear ? params.monthYear : "",
+      ]),
+      isLoading:
+        queryClient.getQueryState(["get-new-meters-mr-report", params.monthYear ? params.monthYear : ""])
+          ?.status === "pending"
+          ? true
+          : false,
+    },
   };
 
   return (
     <>
       {/* Billed Tab */}
-      <BilledTabReport data={queries.billed.data} isLoading={queries.billed.isLoading} />
-
+      <BilledTabReport
+        data={queries.billed.data ? queries.billed.data : undefined}
+        isLoading={queries.billed.isLoading}
+      />
       {/* Unbilled Tab */}
-      <UnBilledTabReport data={queries.unbilled.data} isLoading={queries.unbilled.isLoading} />
-
+      <UnBilledTabReport
+        data={queries.unbilled.data ? queries.unbilled.data : undefined}
+        isLoading={queries.unbilled.isLoading}
+      />
       {/* With Remarks Tab */}
-      <WithRemarksTabReport data={queries.withRemarks.data} isLoading={queries.withRemarks.isLoading} />
-
+      <WithRemarksTabReport
+        data={queries.withRemarks.data ? queries.withRemarks.data : undefined}
+        isLoading={queries.withRemarks.isLoading}
+      />
       {/* New Meters Tab */}
-      <NewMetersTabReport data={queries.newMeters.data} isLoading={queries.newMeters.isLoading} />
+      <NewMetersTabReport
+        data={queries.newMeters.data ? queries.newMeters.data : undefined}
+        isLoading={queries.newMeters.isLoading}
+      />
     </>
   );
 };
+
+// {
+//   /* Billed Tab */
+// }
+// <BilledTabReport data={queries.billed.data} isLoading={queries.billed.isLoading} />;
+
+// {
+//   /* Unbilled Tab */
+// }
+// <UnBilledTabReport data={queries.unbilled.data} isLoading={queries.unbilled.isLoading} />;
+
+// {
+//   /* With Remarks Tab */
+// }
+// <WithRemarksTabReport data={queries.withRemarks.data} isLoading={queries.withRemarks.isLoading} />;
+
+// {
+//   /* New Meters Tab */
+// }
+// <NewMetersTabReport data={queries.newMeters.data} isLoading={queries.newMeters.isLoading} />;

@@ -49,10 +49,17 @@ export function MeterReadingReportHeader() {
             type="submit"
             className="h-[2.5rem] w-full px-6 lg:w-auto dark:text-white"
             size="sm"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isGenerating}
             form="meter-reading-report-form"
           >
-            Generate {isGenerating ? <Spinner /> : null}
+            {isGenerating ? (
+              <>
+                Generating
+                <Spinner />
+              </>
+            ) : (
+              "Generate"
+            )}
           </Button>
         </div>
       </div>

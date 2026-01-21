@@ -26,6 +26,10 @@ type MeterReadingReportState = {
   setSelectedTab: Dispatch<SetStateAction<TabValue>>;
   hasFetched: boolean;
   setHasFetched: Dispatch<SetStateAction<boolean>>;
+  monthYear: string;
+  setMonthYear: Dispatch<SetStateAction<string>>;
+  shouldFetch: boolean;
+  setShouldFetch: Dispatch<SetStateAction<boolean>>;
 };
 
 const MeterReadingReportContext = createContext({} as MeterReadingReportState);
@@ -34,10 +38,23 @@ export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = 
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TabValue>("billed");
   const [hasFetched, setHasFetched] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [monthYear, setMonthYear] = useState<string>("");
 
   return (
     <MeterReadingReportContext.Provider
-      value={{ isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched }}
+      value={{
+        isGenerating,
+        setIsGenerating,
+        selectedTab,
+        setSelectedTab,
+        hasFetched,
+        setHasFetched,
+        monthYear,
+        setMonthYear,
+        shouldFetch,
+        setShouldFetch,
+      }}
     >
       {children}
     </MeterReadingReportContext.Provider>
@@ -45,8 +62,29 @@ export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = 
 };
 
 export const useMeterReadingReportContext = () => {
-  const { isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched } =
-    useContext(MeterReadingReportContext);
+  const {
+    isGenerating,
+    setIsGenerating,
+    selectedTab,
+    setSelectedTab,
+    hasFetched,
+    setHasFetched,
+    monthYear,
+    setMonthYear,
+    shouldFetch,
+    setShouldFetch,
+  } = useContext(MeterReadingReportContext);
 
-  return { isGenerating, setIsGenerating, selectedTab, setSelectedTab, hasFetched, setHasFetched };
+  return {
+    isGenerating,
+    setIsGenerating,
+    selectedTab,
+    setSelectedTab,
+    hasFetched,
+    setHasFetched,
+    monthYear,
+    setMonthYear,
+    shouldFetch,
+    setShouldFetch,
+  };
 };
