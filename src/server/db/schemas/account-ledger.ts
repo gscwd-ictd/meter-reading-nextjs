@@ -12,6 +12,8 @@ export const accountHistory = pgTable("account_history", {
   accountNumber: varchar("account_number")
     .references(() => readingDetails.accountNumber)
     .notNull(),
+  zoneCode: varchar("zone_code").notNull(),
+  bookCode: varchar("book_code").notNull(),
   firstService: text("first_service"),
   secondService: text("second_service"),
   thirdService: text("third_service"),
@@ -30,6 +32,8 @@ export const usage = pgTable("usage", {
   accountNumber: varchar("account_number")
     .references(() => readingDetails.accountNumber)
     .notNull(),
+  zoneCode: varchar("zone_code").notNull(),
+  bookCode: varchar("book_code").notNull(),
   month1Usage: real("month_1_usage").notNull(),
   month2Usage: real("month_2_usage").notNull(),
   month3Usage: real("month_3_usage").notNull(),

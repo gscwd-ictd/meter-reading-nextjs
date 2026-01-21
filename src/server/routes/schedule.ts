@@ -6,7 +6,6 @@ import {
   CreateMonthScheduleSchema,
   CreateReassignmentSchema,
   CreateScheduleMeterReaderSchema,
-  ReassignmentSchema,
   ScheduleQuerySchema,
 } from "../types/schedule.type";
 

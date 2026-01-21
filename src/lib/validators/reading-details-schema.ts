@@ -53,6 +53,9 @@ export const CreateReadingDetailsSchema = z4.object({
   isPosted: z4.boolean().nullish(),
   isCompleted: z4.boolean().nullish(),
   isCommitted: z4.boolean().nullish(),
+  datetimeCompleted: z4.coerce.date().nullish(),
+  datetimeCommitted: z4.coerce.date().nullish(),
+  datetimePosted: z4.coerce.date().nullish(),
 });
 
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()

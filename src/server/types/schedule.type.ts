@@ -55,7 +55,11 @@ export const ScheduleSchema = z.object({
         zoneBook: true,
         area: true,
       })
-        .extend({ day: z.coerce.number().nullish() })
+        .extend({
+          day: z.coerce.number().nullish(),
+          dueDate: DateValueSchema.nullish(),
+          disconnectionDate: DateValueSchema.nullish(),
+        })
         .array(),
       reassignment: ReassignmentSchema.optional(),
     })
@@ -86,7 +90,11 @@ export const ScheduleReadingSchema = z.object({
         zoneBook: true,
         area: true,
       })
-        .extend({ day: z.coerce.number().nullish() })
+        .extend({
+          day: z.coerce.number().nullish(),
+          dueDate: DateValueSchema.nullish(),
+          disconnectionDate: DateValueSchema.nullish(),
+        })
         .array(),
       reassignment: ReassignmentSchema.optional(),
     })
