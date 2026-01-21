@@ -10,9 +10,11 @@ import {
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress, viewReadingZoneBookProgress } from "@mr/server/db/schemas/reports";
 import { meterReadingContext } from "@mr/server/context";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { readingDetails } from "@mr/server/db/schemas/reading-details";
 import { accountHistory, usage } from "@mr/server/db/schemas/account-ledger";
+import { format } from "date-fns";
+import { AccountReadingDetails } from "@mr/server/types/reading-details.type";
 
 export class ReportsRepository implements IReportsRepository {
   async findReadingZoneBookProgress(month: number, year: number): Promise<ReadingZoneBookProgress[]> {
@@ -96,44 +98,116 @@ export class ReportsRepository implements IReportsRepository {
     const endYear = month === 12 ? year + 1 : year;
     const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
 
-    await db.pgConn.transaction(async (tx) => {
-      await tx
-        .update(readingDetails)
-        .set({ isCommitted: true, datetimeCommitted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
-        .where(
-          and(
-            eq(readingDetails.meterReaderId, meterReaderId),
-            eq(readingDetails.zoneCode, zone),
-            eq(readingDetails.bookCode, book),
-            sql`created_at >= ${start} AND created_at < ${end}`,
-          ),
-        );
+    try {
+      await db.pgConn.transaction(async (tx) => {
+        await tx
+          .update(readingDetails)
+          .set({ isCommitted: true, datetimeCommitted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
+          .where(
+            and(
+              eq(readingDetails.meterReaderId, meterReaderId),
+              eq(readingDetails.zoneCode, zone),
+              eq(readingDetails.bookCode, book),
+              sql`created_at >= ${start} AND created_at < ${end}`,
+            ),
+          );
 
-      await tx
-        .update(accountHistory)
-        .set({ isCommitted: true })
-        .where(
-          and(
-            eq(accountHistory.meterReaderId, meterReaderId),
-            eq(accountHistory.zoneCode, zone),
-            eq(accountHistory.bookCode, book),
-            sql`created_at >= ${start} AND created_at < ${end}`,
-          ),
-        );
+        await tx
+          .update(accountHistory)
+          .set({ isCommitted: true })
+          .where(
+            and(
+              eq(accountHistory.meterReaderId, meterReaderId),
+              eq(accountHistory.zoneCode, zone),
+              eq(accountHistory.bookCode, book),
+              sql`created_at >= ${start} AND created_at < ${end}`,
+            ),
+          );
 
-      await tx
-        .update(usage)
-        .set({ isCommitted: true })
-        .where(
-          and(
-            eq(usage.meterReaderId, meterReaderId),
-            eq(usage.zoneCode, zone),
-            eq(usage.bookCode, book),
-            sql`created_at >= ${start} AND created_at < ${end}`,
-          ),
-        );
-    });
+        await tx
+          .update(usage)
+          .set({ isCommitted: true })
+          .where(
+            and(
+              eq(usage.meterReaderId, meterReaderId),
+              eq(usage.zoneCode, zone),
+              eq(usage.bookCode, book),
+              sql`created_at >= ${start} AND created_at < ${end}`,
+            ),
+          );
 
-    return await this.findReadingAccountProgress(data);
+        const accountDetails = await tx
+          .select()
+          .from(readingDetails)
+          .where(
+            and(
+              eq(readingDetails.isRead, true),
+              eq(readingDetails.isCompleted, true),
+              eq(readingDetails.isCommitted, true),
+              eq(readingDetails.meterReaderId, meterReaderId),
+              eq(readingDetails.zoneCode, zone),
+              eq(readingDetails.bookCode, book),
+              sql`created_at >= ${start} AND created_at < ${end}`,
+              sql`current_reading - previous_reading >= 0`,
+            ),
+          );
+
+        const meterReader = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(meterReaderId);
+
+        await Promise.all(
+          accountDetails.map(async (item) => {
+            await tx
+              .update(readingDetails)
+              .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
+              .where(eq(readingDetails.id, item.id));
+            return await this.postedAccounts(item, meterReader.name);
+          }),
+        );
+      });
+
+      return await this.findReadingAccountProgress(data);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async postedAccounts(data: AccountReadingDetails, meterReaderName: string): Promise<string> {
+    const readingDate = data.readingDate ? format(data.readingDate, "MM/dd/yyyy") : "";
+    const dueDate = data.dueDate ? format(data.dueDate, "MM/dd/yyyy") : "";
+    const disconnectionDate = data.disconnectionDate ? format(data.disconnectionDate, "MM/dd/yyyy") : "";
+    const timeStart = data.timeStart ? format(data.timeStart, "MM/dd/yyyy h:mm a") : "";
+    const timeEnd = data.timeEnd ? format(data.timeEnd, "MM/dd/yyyy h:mm a") : "";
+    const currentUsage = (data.currentReading ?? 0) - (data.previousReading ?? 0);
+
+    try {
+      //TODO: change meterReader field
+      const res = await db.mssqlConn.query`
+          EXEC post2Ledger
+            @accountNo = ${data.accountNumber},
+            @readingDate = ${readingDate},
+            @billDate = ${readingDate},
+            @dueDate = ${dueDate},
+            @disconDate = ${disconnectionDate},
+            @presentReading = ${data.currentReading},
+            @previousReading = ${data.previousReading},
+            @presentUsage = ${currentUsage},
+            @billedAmount = ${data.billedAmount},
+            @penaltyAmount = ${data.penaltyAmount},
+            @meterReader = ${meterReaderName},
+            @seniorDiscount = ${data.seniorDiscount},
+            @changeMeterAmount = ${data.changeMeterAmount},
+            @arrears = ${data.arrears},
+            @remarks = ${data.remarks},
+            @timeStart = ${timeStart},
+            @timeEnd = ${timeEnd}`;
+      console.log(res);
+
+      return "";
+    } catch (error) {
+      throw error;
+    }
   }
 }

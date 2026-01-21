@@ -28,4 +28,10 @@ export const newMetersHandler = new Hono()
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
     return c.json(await newMeterService.delete(id));
+  })
+  .get("/meter-reader/:id/reading-date/:reading", async (c) => {
+    const id = c.req.param("id");
+    const reading = c.req.param("reading");
+
+    return c.json(await newMeterService.getAllNewMeterByMeterReaderId(id, reading));
   });

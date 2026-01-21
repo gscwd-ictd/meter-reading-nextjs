@@ -82,7 +82,8 @@ export const consumerDetailsView = pgView("view_consumer_details", {
     from "viewMeterReading" vmr
     left join "viewConsumer_previous_4_months" vcu on vmr.account_no = vcu.account_no
     left join "viewCustomer_ledger_services" vls on vmr.account_no = vls.account_no
-    left join "meter_lat_long" mll on vmr.account_no = mll.accountno
+    left join ( select distinct on (accountno) * from "meter_lat_long" 
+      order by accountno, ogc_fid desc ) mll on vmr.account_no = mll.accountno
 `);
 
 export const scheduleReadingAccountView = pgView("view_schedule_reading_account", {
@@ -159,7 +160,12 @@ export const scheduleReadingAccountView = pgView("view_schedule_reading_account"
               from "viewMeterReading" vmr
               left join "viewConsumer_previous_4_months" vcu on vmr.account_no = vcu.account_no
               left join "viewCustomer_ledger_services" vls on vmr.account_no = vls.account_no
-              left join "meter_lat_long" mll on vmr.account_no = mll.accountno
+              left join (
+                  select distinct on (accountno)
+                      *
+                  from "meter_lat_long"
+                  order by accountno, ogc_fid desc
+              ) mll on vmr.account_no = mll.accountno
               where vmr.zone_code::text = szb.zone and vmr.book_code::text = szb.book
             )
           )

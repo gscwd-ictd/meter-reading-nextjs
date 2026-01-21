@@ -2,7 +2,7 @@ import { newMeters } from "@mr/server/db/schemas/new-meters";
 import { I_Crud } from "../interfaces/crud";
 import { NewMeter } from "../validators/new-meter-schema";
 import db from "@mr/server/db/connections";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class NewMeterRepository implements I_Crud<NewMeter> {
@@ -46,6 +46,26 @@ export class NewMeterRepository implements I_Crud<NewMeter> {
     try {
       await db.pgConn.delete(newMeters).where(eq(newMeters.id, id));
       return { status: "successful" };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllNewMeterByMeterReaderId(meterReaderId: string, readingMonth: string): Promise<NewMeter[]> {
+    try {
+      const [year, month] = readingMonth.split("-").map(Number);
+      const start = `${year}-${month.toString().padStart(2, "0")}-01`;
+      const endMonth = month === 12 ? 1 : month + 1;
+      const endYear = month === 12 ? year + 1 : year;
+      const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
+      const res = await db.pgConn
+        .select()
+        .from(newMeters)
+        .where(
+          and(eq(newMeters.meterReaderId, meterReaderId), sql`dateTime >= ${start} AND dateTime < ${end}`),
+        );
+
+      return res;
     } catch (error) {
       throw error;
     }
