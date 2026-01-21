@@ -14,6 +14,7 @@ export type AccountDetails = {
   isCommitted: boolean;
   remarks: string;
   additionalRemarks: string;
+  amount: number;
   // consumption: number;
   // statusProgress: "read" | "pending" | "unbilled";
   meterReader: { id: string; name: string };
@@ -22,7 +23,6 @@ export type AccountDetails = {
 };
 
 export type BilledAccount = AccountDetails & {
-  amount: number;
   usage: number;
 };
 

@@ -10,12 +10,12 @@ import {
   DialogTitle,
 } from "@mr/components/ui/Dialog";
 import { Badge } from "@mr/components/ui/Badge";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ZonebookProgressDataTable } from "./ZonebookProgressDataTable";
 import { useZonebookProgressStore } from "@mr/components/stores/useZonebookProgressStore";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { AccountDetails } from "@mr/lib/types/accounts";
+import { AccountDetails, MeterReadingReportParams } from "@mr/lib/types/accounts";
 import { AccountsDataTable } from "@mr/components/features/data-tables/accounts/AccountsDataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
@@ -30,6 +30,8 @@ import {
 } from "lucide-react";
 import { YearMonthPicker } from "@mr/components/features/calendar/YearMonthPicker";
 import { useAccountsStore } from "@mr/components/stores/useAccountsStore";
+import { meterReadingReportMutation } from "@mr/lib/functions/meterReadingReportMutation";
+import { toast } from "sonner";
 
 export const ZonebookDailyProgressComponent: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -52,6 +54,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
 
   const setMonthYear = useZonebookProgressStore((state) => state.setMonthYear);
   const monthYear = useZonebookProgressStore((state) => state.monthYear);
+  const refetch = useZonebookProgressStore((state) => state.refetch);
 
   // Get date from URL or use current date
   const urlMonthYear = searchParams.get("date");
@@ -59,8 +62,44 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
   const selectedZonebookEntry = useZonebookProgressStore((state) => state.selectedZonebookEntry);
   const router = useRouter();
 
+  // form the params object
+  const params: MeterReadingReportParams = {
+    monthYear: monthYear,
+    zone: selectedZonebookEntry?.zone ? selectedZonebookEntry.zone : "",
+    book: selectedZonebookEntry?.book ? selectedZonebookEntry.book : "",
+    meterReaderId:
+      selectedZonebookEntry.meterReader && selectedZonebookEntry.meterReader.id
+        ? selectedZonebookEntry.meterReader.id
+        : "",
+  };
+
+  // mutate function to commit zonebook
+  const mutateCommit = useMutation({
+    mutationKey: [
+      "commit-meter-reading-progress",
+      monthYear,
+      selectedZonebookEntry?.meterReader?.id,
+      selectedZonebookEntry?.zone,
+      selectedZonebookEntry?.book,
+    ],
+    mutationFn: async (meterReadingReportParams: MeterReadingReportParams) =>
+      meterReadingReportMutation(meterReadingReportParams),
+    onError: (error) => {
+      toast.error("Error", { description: error ? error.message : "", position: "top-right" });
+    },
+    onSuccess: () => {
+      setCompleteDialogIsOpen(false);
+      setZonebookProgressEntryDialogIsOpen(false);
+      refetch?.();
+      toast.success("Success", {
+        description: `You have successfully committed for ${monthYear ? formatYearMonthToReadableDate(monthYear) : ""}`,
+        position: "top-right",
+      });
+    },
+  });
+
   // alert confirmation action
-  const handleComplete = () => {};
+  const handleComplete = () => mutateCommit.mutateAsync(params);
 
   // Initialize store from URL on first mount
   useEffect(() => {
@@ -108,6 +147,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
           actionBtn={<YearMonthPicker value={monthYear} onChange={setMonthYear} />}
         />
       </div>
+
       {/* Dialog for showing accounts */}
       <Dialog open={zonebookProgressEntryDialogIsOpen} onOpenChange={setZonebookProgressEntryDialogIsOpen}>
         <DialogContent className="flex max-h-[95%] flex-col overflow-y-auto sm:max-w-6xl lg:max-w-[90%] dark:bg-gray-900 dark:text-gray-100">
@@ -240,10 +280,10 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                           {selectedZonebookEntry.statusProgress !== "in progress" &&
                             !selectedZonebookEntry?.isCommitted && (
                               <Button
-                                onClick={() => setZonebookProgressEntryDialogIsOpen(false)}
-                                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                                onClick={() => setCompleteDialogIsOpen(true)}
+                                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:text-white dark:hover:bg-green-600"
                               >
-                                <CheckCircle className="mr-2 h-4 w-4" />
+                                <CheckCircle className="h-4 w-4" />
                                 Commit Zonebook
                               </Button>
                             )}
@@ -290,7 +330,9 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
             {/* Clean modern header */}
             <div className="mb-8 flex items-start justify-between">
               <div>
-                <DialogTitle className="text-xl font-semibold text-gray-900">Commit zonebook</DialogTitle>
+                <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Commit zonebook
+                </DialogTitle>
                 <p className="mt-1 text-sm text-gray-500">Review before finalizing</p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
@@ -311,7 +353,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
               <div className="rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-400">
                       Zone {selectedZonebookEntry.zone} • Book {selectedZonebookEntry.book}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -320,7 +362,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-medium tracking-wide text-gray-500 uppercase">Accounts</div>
-                    <div className="text-xl font-semibold text-gray-900">
+                    <div className="text-xl font-semibold text-gray-900 dark:text-gray-400">
                       {selectedZonebookWithAccounts && selectedZonebookWithAccounts.length}
                     </div>
                   </div>
@@ -333,9 +375,9 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   <div className="flex flex-col items-center rounded-lg border border-gray-200 p-3">
                     <div className="mb-2 flex items-center">
                       <div className="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
-                      <span className="text-sm font-medium text-gray-900">Billed</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">Billed</span>
                     </div>
-                    <div className="text-2xl font-semibold text-gray-900">
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-gray-400">
                       {selectedZonebookWithAccounts &&
                         selectedZonebookWithAccounts.filter((a) => a.isRead).length}
                     </div>
@@ -346,9 +388,9 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   <div className="flex flex-col items-center rounded-lg border border-gray-200 p-3">
                     <div className="mb-2 flex items-center">
                       <div className="mr-2 h-2 w-2 rounded-full bg-gray-400"></div>
-                      <span className="text-sm font-medium text-gray-900">Unbilled</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">Unbilled</span>
                     </div>
-                    <div className="text-2xl font-semibold text-gray-900">
+                    <div className="text-2xl font-semibold text-gray-900 dark:text-gray-400">
                       {selectedZonebookWithAccounts &&
                         selectedZonebookWithAccounts.filter((a) => !a.isRead).length}
                     </div>
@@ -383,15 +425,19 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
             {/* Buttons - better aligned */}
             <div className="mt-8 flex items-center justify-end gap-3">
               <Button
-                className="px-5 py-2 text-gray-700 hover:bg-gray-50"
+                className="px-5 py-2 hover:brightness-75 dark:text-white"
                 onClick={() => {
                   setCompleteDialogIsOpen(false);
                 }}
               >
                 Cancel
               </Button>
-              <Button onClick={handleComplete} className="bg-gray-900 px-5 py-2 text-white hover:bg-gray-800">
-                Commit zonebook
+              <Button
+                onClick={handleComplete}
+                className="bg-green-800 px-5 py-2 text-white hover:bg-green-700 active:bg-green-600 dark:text-white"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Commit Zonebook
               </Button>
             </div>
           </div>
@@ -454,10 +500,15 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   </div>
                   <div className="flex flex-col items-end justify-center rounded-lg bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/20 dark:to-gray-800">
                     <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                      ₱{" "}
-                      {selectedAccount &&
-                        selectedAccount.billedAmount &&
-                        selectedAccount.billedAmount.toFixed(2)}
+                      {selectedAccount.amount > 0 &&
+                      Math.max(0, selectedAccount.currentReading - selectedAccount.previousReading) > 0 ? (
+                        <span>
+                          {" "}
+                          ₱ {selectedAccount && selectedAccount.amount && selectedAccount.amount.toFixed(2)}
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">Billed Amount</div>
                   </div>
@@ -517,16 +568,6 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                     </div>
                   </div>
                   <div
-                    className={`rounded-md p-3 ${selectedAccount.isPosted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Posted</span>
-                      <div
-                        className={`h-2 w-2 rounded-full ${selectedAccount.isPosted ? "bg-green-500" : "bg-gray-400"}`}
-                      ></div>
-                    </div>
-                  </div>
-                  <div
                     className={`rounded-md p-3 ${selectedAccount.isCompleted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
                   >
                     <div className="flex items-center justify-between">
@@ -543,6 +584,16 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                       <span className="text-sm">Committed</span>
                       <div
                         className={`h-2 w-2 rounded-full ${selectedAccount.isCommitted ? "bg-green-500" : "bg-gray-400"}`}
+                      ></div>
+                    </div>
+                  </div>
+                  <div
+                    className={`rounded-md p-3 ${selectedAccount.isPosted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Posted</span>
+                      <div
+                        className={`h-2 w-2 rounded-full ${selectedAccount.isPosted ? "bg-green-500" : "bg-gray-400"}`}
                       ></div>
                     </div>
                   </div>
@@ -623,7 +674,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
 
           <DialogFooter className="border-t pt-4">
             <Button
-              className="rounded-lg px-5 py-2 font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="rounded-lg px-5 py-2 font-medium text-white dark:hover:brightness-75"
               onClick={() => {
                 setAccountDetailsDialogIsOpen(false);
               }}

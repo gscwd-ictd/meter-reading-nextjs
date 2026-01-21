@@ -10,8 +10,9 @@ import { formatYearMonthToReadableDate } from "@mr/lib/functions/formatDate";
 interface YearMonthPickerWithSubmitProps {
   value: string;
   onChange: (value: string) => void;
+  onClick?: () => void;
 }
-export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitProps) {
+export function YearMonthPicker({ value, onChange, onClick }: YearMonthPickerWithSubmitProps) {
   const [open, setOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -50,6 +51,7 @@ export function YearMonthPicker({ value, onChange }: YearMonthPickerWithSubmitPr
           <Button
             variant="outline"
             className="h-[2.5rem] w-[200px] justify-start text-left font-normal sm:w-auto md:w-auto lg:w-[200px]"
+            onClick={onClick}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             <span
