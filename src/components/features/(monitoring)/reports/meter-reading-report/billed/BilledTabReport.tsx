@@ -29,7 +29,15 @@ export const BilledTabReport: FunctionComponent<TabReportProps> = ({ data, isLoa
       className="flex h-full flex-col items-start justify-center rounded-md border bg-gray-50 p-6 dark:bg-gray-900"
     >
       {data && data.length > 0 && !isLoading ? (
-        <BilledDataTable data={data} />
+        <BilledDataTable
+          data={data}
+          header={
+            <div className="flex w-full items-center justify-end gap-2 text-right">
+              <span className="font-normal">Total: </span>
+              <span className="font-medium">{totalBilledAmount}</span>
+            </div>
+          }
+        />
       ) : (
         <Empty className="flex h-full w-full">
           <EmptyHeader className="text-center">

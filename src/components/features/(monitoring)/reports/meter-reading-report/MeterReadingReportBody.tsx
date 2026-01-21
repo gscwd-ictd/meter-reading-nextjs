@@ -87,8 +87,8 @@ export const MeterReadingReportBody: FunctionComponent = () => {
             </EmptyContent>
           </Empty>
         ) : (
-          <div className="flex h-full w-full justify-center">
-            <Spinner />
+          <div className="flex h-full w-full items-center justify-center">
+            <Spinner className="size-16" />
           </div>
         )}
       </div>

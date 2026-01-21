@@ -27,6 +27,11 @@ export const useBilledColumns = (data: BilledAccount[]) => {
         header: "Book",
         enableColumnFilter: true,
       },
+      {
+        accessorKey: "amount",
+        cell: (column) => <span >{column.row.original.amount}</span>,
+        header: "Billed Amount",
+      },
     ];
 
     setBilledAccounts(cols);

@@ -16,7 +16,15 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@mr/components/ui/Table";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { Input } from "../Input";
 
@@ -31,6 +39,8 @@ type DataTableProps<T> = {
   actionBtn?: ReactNode | ReactNode[];
   title: string;
   onRowClick?: (row: Row<T>) => void;
+  footer?: ReactNode | ReactNode[];
+  header?: ReactNode | ReactNode[];
 };
 
 type ColumnVisibilityToggleContextState = {
@@ -52,6 +62,8 @@ export function SimpleDataTable<T>({
   actionBtn,
   onRowClick,
   title = "",
+  header,
+  footer,
 }: DataTableProps<T>) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -109,6 +121,7 @@ export function SimpleDataTable<T>({
           )}
         </div>
       </ColumnVisibilityToggleContext.Provider>
+      {header ? header : null}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -144,6 +157,7 @@ export function SimpleDataTable<T>({
             </TableRow>
           )}
         </TableBody>
+        {footer && <TableFooter>{footer}</TableFooter>}
       </Table>
     </div>
   );

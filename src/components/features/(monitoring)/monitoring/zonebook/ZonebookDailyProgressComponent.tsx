@@ -500,7 +500,15 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   </div>
                   <div className="flex flex-col items-end justify-center rounded-lg bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/20 dark:to-gray-800">
                     <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                      ₱ {selectedAccount && selectedAccount.amount && selectedAccount.amount.toFixed(2)}
+                      {selectedAccount.amount > 0 &&
+                      Math.max(0, selectedAccount.currentReading - selectedAccount.previousReading) > 0 ? (
+                        <span>
+                          {" "}
+                          ₱ {selectedAccount && selectedAccount.amount && selectedAccount.amount.toFixed(2)}
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">Billed Amount</div>
                   </div>
@@ -560,16 +568,6 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                     </div>
                   </div>
                   <div
-                    className={`rounded-md p-3 ${selectedAccount.isPosted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Posted</span>
-                      <div
-                        className={`h-2 w-2 rounded-full ${selectedAccount.isPosted ? "bg-green-500" : "bg-gray-400"}`}
-                      ></div>
-                    </div>
-                  </div>
-                  <div
                     className={`rounded-md p-3 ${selectedAccount.isCompleted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
                   >
                     <div className="flex items-center justify-between">
@@ -586,6 +584,16 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                       <span className="text-sm">Committed</span>
                       <div
                         className={`h-2 w-2 rounded-full ${selectedAccount.isCommitted ? "bg-green-500" : "bg-gray-400"}`}
+                      ></div>
+                    </div>
+                  </div>
+                  <div
+                    className={`rounded-md p-3 ${selectedAccount.isPosted ? "bg-green-50 dark:bg-green-900/20" : "bg-gray-50 dark:bg-gray-700/50"}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Posted</span>
+                      <div
+                        className={`h-2 w-2 rounded-full ${selectedAccount.isPosted ? "bg-green-500" : "bg-gray-400"}`}
                       ></div>
                     </div>
                   </div>
