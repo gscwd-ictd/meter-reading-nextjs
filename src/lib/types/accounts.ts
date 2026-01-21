@@ -1,5 +1,5 @@
 export type AccountDetails = {
-  id: number;
+  id: string;
   readingDate: string | null;
   accountNumber: string;
   checkDigit: string;

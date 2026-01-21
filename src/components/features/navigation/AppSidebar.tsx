@@ -19,7 +19,7 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
   const { state, isMobile } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar" {...props}>
+    <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
         <div
           className={`flex items-center ${state === "collapsed" ? "justify-center" : "justify-start"} gap-2`}
