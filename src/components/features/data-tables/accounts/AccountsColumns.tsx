@@ -144,7 +144,7 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
         ),
         enableColumnFilter: true,
         filterFn: filterFn,
-        meta: { exportLabel: "Posted?" },
+        meta: { exportLabel: "Posted" },
       },
     ];
 
