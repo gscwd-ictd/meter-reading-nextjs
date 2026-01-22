@@ -5,9 +5,66 @@ import { useRouter } from "next/navigation";
 import { FunctionComponent } from "react";
 
 const mockReadingWithRemarks: Array<Omit<WithRemarksAccount, "billedAmount" | "usage">> = [
-  { accountNo: "457487545", zone: "1", book: "62", name: "Elizabeth Lopez", remarks: "PE Leak Before Meter" },
-  { accountNo: "524878444", zone: "2", book: "1", name: "John Doe", remarks: "Stuck-up Meter" },
-  { accountNo: "225487325", zone: "6", book: "5", name: "Aleena Fischer", remarks: "Tilted Meter" },
+  {
+    id: "001",
+    readingDate: "01-03-2026 00:00:00",
+    accountNumber: "457487545",
+    zone: "1",
+    book: "62",
+    accountName: "Elizabeth Lopez",
+    remarks: "PE Leak Before Meter",
+    additionalRemarks: "",
+    amount: 5000,
+    averageUsage: 50,
+    checkDigit: "3",
+    currentReading: 5003,
+    previousReading: 4950,
+    meterReader: { id: "0213213", name: "Elizabeth Lopez" },
+    isCommitted: false,
+    isCompleted: false,
+    isPosted: false,
+    isRead: false,
+  },
+  {
+    id: "002",
+    readingDate: "01-03-2026 00:00:00",
+    accountNumber: "524878444",
+    zone: "2",
+    book: "1",
+    accountName: "John Doe",
+    remarks: "Stuck-up Meter",
+    additionalRemarks: "",
+    amount: 5000,
+    averageUsage: 50,
+    checkDigit: "3",
+    currentReading: 5003,
+    previousReading: 4950,
+    meterReader: { id: "0213213", name: "Elizabeth Lopez" },
+    isCommitted: false,
+    isCompleted: false,
+    isPosted: false,
+    isRead: false,
+  },
+  {
+    id: "003",
+    accountNumber: "225487325",
+    readingDate: "01-03-2026 00:00:00",
+    zone: "6",
+    book: "5",
+    accountName: "Aleena Fischer",
+    remarks: "Tilted Meter",
+    additionalRemarks: "",
+    amount: 5000,
+    averageUsage: 50,
+    checkDigit: "3",
+    currentReading: 5003,
+    previousReading: 4950,
+    meterReader: { id: "0213213", name: "Elizabeth Lopez" },
+    isCommitted: false,
+    isCompleted: false,
+    isPosted: false,
+    isRead: false,
+  },
 ];
 
 export const WithRemarksProgressCard: FunctionComponent = () => {
@@ -39,11 +96,11 @@ export const WithRemarksProgressCard: FunctionComponent = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span className="text-xs font-semibold text-gray-800 dark:text-white">
-                          {reading.accountNo}
+                          {reading.accountNumber}
                         </span>
                         <span className="text-lg text-green-600">•</span>
                         <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                          {reading.name}
+                          {reading.accountName}
                         </span>
                       </div>
                       <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">{reading.remarks}</div>
