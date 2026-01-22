@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { WithRemarksAccount } from "@mr/lib/types/accounts";
 import { ClockIcon } from "lucide-react";

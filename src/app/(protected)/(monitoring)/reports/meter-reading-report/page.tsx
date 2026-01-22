@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@mr/components/ui/Breadcrumb";
+import { Suspense } from "react";
 export default function MeterReadingReportPage() {
   return (
     <>
@@ -29,9 +30,11 @@ export default function MeterReadingReportPage() {
       <div className="flex h-full w-full flex-col justify-start">
         <div className="flex-1">
           {/* Add this wrapper */}
-          <MeterReadingReportProvider>
-            <MeterReadingReportComponent />
-          </MeterReadingReportProvider>
+          <Suspense fallback={<>Loading...</>}>
+            <MeterReadingReportProvider>
+              <MeterReadingReportComponent />
+            </MeterReadingReportProvider>
+          </Suspense>
         </div>
       </div>
     </>
