@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
+import { Suspense } from "react";
 
 export default function ZonebookProgressPage() {
   return (
@@ -27,7 +28,9 @@ export default function ZonebookProgressPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <ZonebookDailyProgressComponent />
+      <Suspense fallback={<>Loading...</>}>
+        <ZonebookDailyProgressComponent />
+      </Suspense>
     </>
   );
 }
