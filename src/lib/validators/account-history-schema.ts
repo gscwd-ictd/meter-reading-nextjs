@@ -10,7 +10,7 @@ export const CreateAccountHistorySchema = z4.object({
   secondService: z4.string().nullish(),
   thirdService: z4.string().nullish(),
   dateTime: z4.coerce.date(),
-  isCommitted: z4.boolean().nullish(),
+  isCommitted: z4.coerce.boolean().nullish(),
   //createdAt: z4.date(),
 });
 

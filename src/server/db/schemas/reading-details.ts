@@ -40,7 +40,7 @@ export const readingDetails = pgTable(
     address: text("address").notNull(),
     dateInstalled: timestamp("date_installed"),
     disconnectionType: varchar("disconnection_type").notNull(),
-    readingDate: timestamp("reading_date"),
+    readingDate: timestamp("reading_date", { mode: "date", withTimezone: true }),
     dueDate: timestamp("due_date"),
     disconnectionDate: timestamp("disconnection_date"),
     reconnectionDate: timestamp("reconnection_date"),
