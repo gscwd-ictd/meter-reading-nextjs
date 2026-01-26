@@ -1,11 +1,11 @@
 import { I_Crud } from "../interfaces/crud";
 import { NewMeterRepository } from "../repositories/NewMeterRepository";
-import { CreateNewMeter, NewMeter } from "../validators/new-meter-schema";
+import { NewMeter } from "../validators/new-meter-schema";
 
 export class NewMeterService implements I_Crud<NewMeter> {
   constructor(private readonly newMeterRepository: NewMeterRepository) {}
 
-  async create(dto: CreateNewMeter): Promise<NewMeter> {
+  async create(dto: NewMeter): Promise<NewMeter> {
     return await this.newMeterRepository.create(dto);
   }
 
