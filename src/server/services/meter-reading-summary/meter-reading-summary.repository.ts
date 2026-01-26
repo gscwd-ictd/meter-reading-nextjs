@@ -203,4 +203,40 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
   // async findSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
   //   return "";
   // }
+
+  async mobileSummaryReport(data: { meterReaderId: string; datetimeCompleted: string }): Promise<string> {
+    const billed = await db.pgConn
+      .select()
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
+        ),
+      );
+    const unbilled = await db.pgConn
+      .select()
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
+        ),
+      );
+    const remarks = await db.pgConn
+      .select()
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
+        ),
+      );
+
+    return {
+      billed: billed,
+      unbilled: unbilled,
+      remarks: remarks,
+    };
+  }
 }
