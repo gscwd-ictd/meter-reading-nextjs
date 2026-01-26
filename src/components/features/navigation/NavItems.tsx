@@ -15,6 +15,7 @@ import { NavItem } from "./items";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { useNavigationSplash } from "./NavigationSplashProvider";
+import Link from "next/link";
 
 type NavProps = {
   items: NavItem[];
@@ -58,14 +59,17 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                         item.children.some((child) => pathname.startsWith(child.url!))
                       }
                       onClick={() => toggleSubmenu(item.title)}
+                      asChild
                     >
-                      {item.icon && <item.icon />}
-                      <span className="flex-1 font-sans font-medium">{item.title}</span>
-                      {isSubmenuOpen ? (
-                        <ChevronDownIcon className="h-4 w-4 opacity-70" />
-                      ) : (
-                        <ChevronRightIcon className="h-4 w-4 opacity-70" />
-                      )}
+                      <a href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span className="flex-1 font-sans font-medium">{item.title}</span>
+                        {isSubmenuOpen ? (
+                          <ChevronDownIcon className="h-4 w-4 opacity-70" />
+                        ) : (
+                          <ChevronRightIcon className="h-4 w-4 opacity-70" />
+                        )}
+                      </a>
                     </SidebarMenuButton>
 
                     {isSubmenuOpen && (
@@ -81,9 +85,16 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                                 showSplash();
                                 router.push(child.url!);
                               }}
+                              asChild
                             >
-                              {child.icon && <child.icon />}
-                              <span className="text-sm font-medium">{child.title}</span>
+                              <Link
+                                href={child.url ? child.url : ""}
+                                target="_self"
+                                className="flex w-full items-center gap-2 text-gray-900"
+                              >
+                                {child.icon && <child.icon />}
+                                <span className="text-sm font-medium">{child.title}</span>
+                              </Link>
                             </SidebarMenuButton>
                           ))}
                       </div>
@@ -98,6 +109,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                         : pathname.startsWith(item.url || "")
                     }
                     onClick={() => {
+                      // this is a special route, it should call the ff functions upon pressing
                       if (item.title === "Schedules") {
                         showSplash();
                         reset();
@@ -110,12 +122,21 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                         router.push(item.url);
                       }
                     }}
+                    asChild
                   >
-                    {item.icon && <item.icon />}
-                    <span className="text-sm font-medium">{item.title}</span>
-                    {item.count && (
-                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
-                    )}
+                    <Link
+                      href={item.url ? item.url : ""}
+                      target="_self"
+                      className="flex w-full items-center gap-2 text-gray-900"
+                    >
+                      {item.icon && <item.icon className="size-4" />}
+                      <span className="text-sm font-medium">{item.title}</span>
+                      {item.count && (
+                        <SidebarMenuBadge className="bg-destructive text-white">
+                          {item.count}
+                        </SidebarMenuBadge>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
@@ -189,9 +210,16 @@ export const NavMonitoringAndReports: FunctionComponent<
                                 showSplash();
                                 router.push(child.url!);
                               }}
+                              asChild
                             >
-                              {child.icon && <child.icon />}
-                              <span className="text-sm font-medium">{child.title}</span>
+                              <Link
+                                href={child.url ? child.url : ""}
+                                target="_self"
+                                className="flex w-full items-center gap-2 text-gray-900"
+                              >
+                                {child.icon && <child.icon />}
+                                <span className="text-sm font-medium">{child.title}</span>
+                              </Link>
                             </SidebarMenuButton>
                           ))}
                       </div>
@@ -218,12 +246,21 @@ export const NavMonitoringAndReports: FunctionComponent<
                         router.push(item.url);
                       }
                     }}
+                    asChild
                   >
-                    {item.icon && <item.icon />}
-                    <span className="text-sm font-medium">{item.title}</span>
-                    {item.count && (
-                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
-                    )}
+                    <Link
+                      href={item.url ? item.url : ""}
+                      target="_self"
+                      className="flex w-full items-center gap-2 text-gray-900"
+                    >
+                      {item.icon && <item.icon className="size-4" />}
+                      <span className="text-sm font-medium">{item.title}</span>
+                      {item.count && (
+                        <SidebarMenuBadge className="bg-destructive text-white">
+                          {item.count}
+                        </SidebarMenuBadge>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
@@ -296,9 +333,16 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                                 showSplash();
                                 router.push(child.url!);
                               }}
+                              asChild
                             >
-                              {child.icon && <child.icon />}
-                              <span>{child.title}</span>
+                              <Link
+                                href={child.url ? child.url : ""}
+                                target="_self"
+                                className="flex w-full items-center gap-2 text-gray-900"
+                              >
+                                {child.icon && <child.icon />}
+                                <span className="text-sm font-medium">{child.title}</span>
+                              </Link>
                             </SidebarMenuButton>
                           ))}
                       </div>
@@ -325,12 +369,21 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                         router.push(item.url);
                       }
                     }}
+                    asChild
                   >
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                    {item.count && (
-                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
-                    )}
+                    <Link
+                      href={item.url ? item.url : ""}
+                      target="_self"
+                      className="flex w-full items-center gap-2 text-gray-900"
+                    >
+                      {item.icon && <item.icon className="size-4" />}
+                      <span className="text-sm font-medium">{item.title}</span>
+                      {item.count && (
+                        <SidebarMenuBadge className="bg-destructive text-white">
+                          {item.count}
+                        </SidebarMenuBadge>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
@@ -401,9 +454,16 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                                 showSplash();
                                 router.push(child.url!);
                               }}
+                              asChild
                             >
-                              {child.icon && <child.icon />}
-                              <span className="">{child.title}</span>
+                              <Link
+                                href={child.url ? child.url : ""}
+                                target="_self"
+                                className="flex w-full items-center gap-2 text-gray-900"
+                              >
+                                {child.icon && <child.icon />}
+                                <span className="text-sm font-medium">{child.title}</span>
+                              </Link>
                             </SidebarMenuButton>
                           ))}
                       </div>
@@ -420,12 +480,21 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                         router.push(item.url);
                       }
                     }}
+                    asChild
                   >
-                    {item.icon && <item.icon />}
-                    <span className="font-medium">{item.title}</span>
-                    {item.count && (
-                      <SidebarMenuBadge className="bg-destructive text-white">{item.count}</SidebarMenuBadge>
-                    )}
+                    <Link
+                      href={item.url ? item.url : ""}
+                      target="_self"
+                      className="flex w-full items-center gap-2 text-gray-900"
+                    >
+                      {item.icon && <item.icon className="size-4" />}
+                      <span className="text-sm font-medium">{item.title}</span>
+                      {item.count && (
+                        <SidebarMenuBadge className="bg-destructive text-white">
+                          {item.count}
+                        </SidebarMenuBadge>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 )}
               </SidebarMenuItem>
