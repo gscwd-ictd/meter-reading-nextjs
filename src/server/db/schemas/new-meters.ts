@@ -1,4 +1,4 @@
-import { index, pgTable, real, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, real, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
 
 export const newMeters = pgTable(
@@ -11,6 +11,7 @@ export const newMeters = pgTable(
     meterNumber: varchar("meter_number").notNull(),
     image: text("image"),
     dateTime: timestamp("date_time", { mode: "date" }).notNull(),
+    isCommitted: boolean("is_committed").notNull(),
     meterReaderId: uuid("meter_reader_id")
       .references(() => meterReaders.id, { onDelete: "no action" })
       .notNull(),
