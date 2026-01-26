@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, integer, pgView, varchar } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgView, varchar } from "drizzle-orm/pg-core";
 
 export const viewReadingZoneBookProgress = pgView("view_reading_zone_book_progress", {
   readingMonth: varchar("reading_month"),
@@ -56,8 +56,11 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
   billedAmount: integer("billed_amount"),
   isRead: boolean("is_read"),
   isPosted: boolean("is_posted"),
+  datetimePosted: date("datetime_posted"),
   isCompleted: boolean("is_completed"),
+  datetimeCompleted: date("datetime_completed"),
   isCommitted: boolean("is_committed"),
+  datetimeCommitted: date("datetime_committed"),
   remarks: varchar("remarks"),
   additionalRemarks: varchar("additional_remarks"),
   createdAt: varchar("created_at"),
@@ -77,8 +80,11 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
         billed_amount,
         is_read,
         is_posted,
+        datetime_posted AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_posted,
         is_completed,
+        datetime_completed AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_completed,
         is_committed,
+        datetime_committed AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_committed,
         remarks,
         additional_remarks,
         created_at

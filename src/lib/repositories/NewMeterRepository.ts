@@ -1,12 +1,12 @@
 import { newMeters } from "@mr/server/db/schemas/new-meters";
 import { I_Crud } from "../interfaces/crud";
-import { NewMeter } from "../validators/new-meter-schema";
+import { CreateNewMeter, NewMeter } from "../validators/new-meter-schema";
 import db from "@mr/server/db/connections";
 import { and, eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class NewMeterRepository implements I_Crud<NewMeter> {
-  async create(dto: NewMeter): Promise<NewMeter> {
+  async create(dto: CreateNewMeter): Promise<NewMeter> {
     try {
       const res = await db.pgConn.insert(newMeters).values(dto).returning();
       return res[0];

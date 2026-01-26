@@ -9,4 +9,5 @@ export interface IMeterReadingSummaryRepository {
   findBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]>;
   findUnbilledSummary(query: BilledAccountQuery): Promise<UnbilledSummary[]>;
   findWithRemarksSummary(query: BilledAccountQuery): Promise<WithRemarksSummary[]>;
+  mobileSummaryReport(data: { meterReaderId: string; datetimeCompleted: string }): Promise<string>;
 }

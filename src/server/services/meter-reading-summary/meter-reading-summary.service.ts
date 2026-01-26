@@ -21,4 +21,8 @@ export class MeterReadingSummaryService implements IMeterReadingSummaryService {
   async getWithRemarksSummary(query: BilledAccountQuery): Promise<WithRemarksSummary[]> {
     return await this.getWithRemarksSummary(query);
   }
+
+  async mobileSummaryReport(data: { meterReaderId: string; datetimeCompleted: string }): Promise<string> {
+    return await this.repository.mobileSummaryReport(data);
+  }
 }

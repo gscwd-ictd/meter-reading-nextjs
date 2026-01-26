@@ -46,6 +46,41 @@ export const SummaryReportSchema = z.object({
   }),
 });
 
+export const MobileSummaryReportSchema = z.object({
+  billed: z.object({
+    accounts: z
+      .object({
+        accountNumber: z.string(),
+        previousReading: z.coerce.number(),
+        usage: z.coerce.number(),
+        amount: z.coerce.number(),
+      })
+      .array(),
+    totalAccounts: z.coerce.number(),
+    totalBilledAmount: z.coerce.number(),
+    totalUsage: z.coerce.number(),
+  }),
+  unbilled: z.object({
+    accounts: z
+      .object({
+        accountNumber: z.string(),
+        name: z.coerce.string(),
+      })
+      .array(),
+    totalAccounts: z.coerce.number(),
+  }),
+  remarks: z.object({
+    accounts: z
+      .object({
+        accountNumber: z.string(),
+        remarks: z.coerce.string(),
+      })
+      .array(),
+    totalAccounts: z.coerce.number(),
+  }),
+});
+
 export type BilledSummary = z.infer<typeof BilledSummarySchema>;
 export type UnbilledSummary = z.infer<typeof UnbilledSummarySchema>;
 export type WithRemarksSummary = z.infer<typeof WithRemarksSummarySchema>;
+export type MobileSummaryReport = z.infer<typeof MobileSummaryReportSchema>;
