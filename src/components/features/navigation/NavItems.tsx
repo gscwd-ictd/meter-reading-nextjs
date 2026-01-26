@@ -90,7 +90,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                               <Link
                                 href={child.url ? child.url : ""}
                                 target="_self"
-                                className="flex w-full items-center gap-2 text-gray-900"
+                                className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                               >
                                 {child.icon && <child.icon />}
                                 <span className="text-sm font-medium">{child.title}</span>
@@ -127,7 +127,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                     <Link
                       href={item.url ? item.url : ""}
                       target="_self"
-                      className="flex w-full items-center gap-2 text-gray-900"
+                      className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
                       <span className="text-sm font-medium">{item.title}</span>
@@ -215,7 +215,7 @@ export const NavMonitoringAndReports: FunctionComponent<
                               <Link
                                 href={child.url ? child.url : ""}
                                 target="_self"
-                                className="flex w-full items-center gap-2 text-gray-900"
+                                className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                               >
                                 {child.icon && <child.icon />}
                                 <span className="text-sm font-medium">{child.title}</span>
@@ -251,7 +251,7 @@ export const NavMonitoringAndReports: FunctionComponent<
                     <Link
                       href={item.url ? item.url : ""}
                       target="_self"
-                      className="flex w-full items-center gap-2 text-gray-900"
+                      className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
                       <span className="text-sm font-medium">{item.title}</span>
@@ -338,7 +338,7 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                               <Link
                                 href={child.url ? child.url : ""}
                                 target="_self"
-                                className="flex w-full items-center gap-2 text-gray-900"
+                                className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                               >
                                 {child.icon && <child.icon />}
                                 <span className="text-sm font-medium">{child.title}</span>
@@ -374,7 +374,7 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                     <Link
                       href={item.url ? item.url : ""}
                       target="_self"
-                      className="flex w-full items-center gap-2 text-gray-900"
+                      className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
                       <span className="text-sm font-medium">{item.title}</span>
@@ -459,7 +459,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                               <Link
                                 href={child.url ? child.url : ""}
                                 target="_self"
-                                className="flex w-full items-center gap-2 text-gray-900"
+                                className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                               >
                                 {child.icon && <child.icon />}
                                 <span className="text-sm font-medium">{child.title}</span>
@@ -485,7 +485,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                     <Link
                       href={item.url ? item.url : ""}
                       target="_self"
-                      className="flex w-full items-center gap-2 text-gray-900"
+                      className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
                       <span className="text-sm font-medium">{item.title}</span>
