@@ -5,11 +5,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BilledAccount,
   MeterReadingReportParams,
@@ -40,8 +39,7 @@ const formSchema = z.object({
 export const MeterReadingReportComponent = () => {
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
-  const { setIsGenerating, setHasFetched, monthYear, setMonthYear, shouldFetch, setShouldFetch } =
-    useMeterReadingReportContext();
+  const { setIsGenerating, setHasFetched, monthYear, setMonthYear } = useMeterReadingReportContext();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,28 +60,28 @@ export const MeterReadingReportComponent = () => {
 
   // Queries enabled only when shouldFetch is true
   const queries = {
-    billed: useQuery<BilledAccount[]>({
+    billed: useManualQuery<BilledAccount[]>({
       queryKey: ["get-billed-mr-report", monthYear || ""],
       queryFn: () => fetchBilledAccounts(params),
-      enabled: shouldFetch,
+
       retry: 1,
     }),
-    unbilled: useQuery<UnbilledAccount[]>({
+    unbilled: useManualQuery<UnbilledAccount[]>({
       queryKey: ["get-unbilled-mr-report", monthYear || ""],
       queryFn: () => fetchUnbilledAccounts(params),
-      enabled: shouldFetch,
+
       retry: 1,
     }),
-    withRemarks: useQuery<WithRemarksAccount[]>({
+    withRemarks: useManualQuery<WithRemarksAccount[]>({
       queryKey: ["get-with-remarks-mr-report", monthYear || ""],
       queryFn: () => fetchWithRemarksAccounts(params),
-      enabled: shouldFetch,
+
       retry: 1,
     }),
-    newMeters: useQuery<NewMeterAccount[]>({
+    newMeters: useManualQuery<NewMeterAccount[]>({
       queryKey: ["get-new-meters-mr-report", monthYear || ""],
       queryFn: () => fetchNewMetersAccounts(params),
-      enabled: shouldFetch,
+
       retry: 1,
     }),
   };
@@ -91,7 +89,6 @@ export const MeterReadingReportComponent = () => {
   const handleGenerateAll = async (data: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
     setMonthYear(data.monthYear !== undefined ? data.monthYear! : "");
-    setShouldFetch(true); // This triggers all queries
 
     try {
       // show loading toast
@@ -102,10 +99,10 @@ export const MeterReadingReportComponent = () => {
 
       // Wait for all queries to complete
       await Promise.all([
-        queries.billed.refetch(),
-        queries.unbilled.refetch(),
-        queries.withRemarks.refetch(),
-        queries.newMeters.refetch(),
+        queries.billed.execute(),
+        queries.unbilled.execute(),
+        queries.withRemarks.execute(),
+        queries.newMeters.execute(),
       ]);
 
       setIsGenerating(false);
@@ -119,7 +116,6 @@ export const MeterReadingReportComponent = () => {
       console.log(data);
     } catch (error) {
       setIsGenerating(false);
-      setShouldFetch(false);
       toast.error("Failed to generate reports", {
         id: "generate-mr-reports",
         position: "top-right",

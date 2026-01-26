@@ -61,7 +61,6 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
             </div>
           );
         },
-        filterFn: filterFn,
       },
       {
         accessorKey: "statusProgress",
@@ -83,6 +82,7 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
             </Badge>
           );
         },
+        filterFn: filterFn,
         meta: { exportLabel: "Progress" },
       },
       //   {

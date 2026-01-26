@@ -1,34 +1,43 @@
-"use client";
-import { QueryKey, useQuery, useQueryClient } from "@tanstack/react-query";
+// hooks/use-manual-query.ts
 import { useCallback, useState } from "react";
+import { useQuery, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
 
-export default function useManualQuery<T>(options: {
-  queryKey: QueryKey;
-  queryFn: () => Promise<T>;
-  enabled: boolean;
-}) {
-  const [shouldFetch, setShouldFetch] = useState(false);
+type ManualQueryMethods = {
+  execute: () => Promise<any>;
+  isLoading: boolean;
+};
 
-  const query = useQuery<T>({
-    queryKey: options.queryKey,
-    queryFn: options.queryFn,
-    enabled: shouldFetch,
-    // Retry configuration if needed
-    retry: 1,
+export type UseManualQueryResult<TData = unknown, TError = unknown> = UseQueryResult<TData, TError> &
+  ManualQueryMethods;
+
+export default function useManualQuery<TData = unknown, TError = unknown>(
+  options: Omit<UseQueryOptions<TData, TError>, "enabled">,
+): UseManualQueryResult<TData, TError> {
+  const [enabled, setEnabled] = useState(false);
+  const [manualLoading, setManualLoading] = useState(false);
+
+  const query = useQuery<TData, TError>({
+    ...options,
+    enabled: enabled,
   });
 
-  const trigger = useCallback(() => {
-    setShouldFetch(true);
-  }, []);
+  const execute = useCallback(async (): Promise<TData | undefined> => {
+    try {
+      setManualLoading(true);
+      setEnabled(true);
 
-  const reset = useCallback(() => {
-    setShouldFetch(false);
-  }, []);
+      await query.refetch();
+      return query.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setManualLoading(false);
+    }
+  }, [query]);
 
   return {
     ...query,
-    trigger,
-    reset,
-    isTriggered: shouldFetch,
-  };
+    execute,
+    isLoading: manualLoading || query.isLoading,
+  } as UseManualQueryResult<TData, TError>;
 }
