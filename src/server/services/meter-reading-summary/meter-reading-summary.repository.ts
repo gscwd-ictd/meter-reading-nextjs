@@ -203,4 +203,8 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
   // async findSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
   //   return "";
   // }
+
+  async mobileReport(data: { meterReaderId: string; readingDate: string }): Promise<string> {
+    return "";
+  }
 }
