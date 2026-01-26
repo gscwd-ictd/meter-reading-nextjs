@@ -9,7 +9,7 @@ import {
 } from "@mr/server/types/meter-reading-summary.type";
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { meterReadingContext } from "@mr/server/context";
 import { BilledAccountQuery } from "@mr/server/types/report.type";
 
@@ -211,24 +211,33 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
       .where(
         and(
           eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          eq(viewReadingAccountProgress.isRead, true),
+          eq(viewReadingAccountProgress.isCompleted, true),
           sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
         ),
       );
+
     const unbilled = await db.pgConn
       .select()
       .from(viewReadingAccountProgress)
       .where(
         and(
           eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          eq(viewReadingAccountProgress.isRead, false),
+          eq(viewReadingAccountProgress.isCompleted, true),
           sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
         ),
       );
-    const remarks = await db.pgConn
+
+    const withRemarks = await db.pgConn
       .select()
       .from(viewReadingAccountProgress)
       .where(
         and(
           eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          ne(viewReadingAccountProgress.remarks, "Normal Reading"),
+          ne(viewReadingAccountProgress.remarks, ""),
+          isNotNull(viewReadingAccountProgress.remarks),
           sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
         ),
       );
@@ -236,7 +245,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     return {
       billed: billed,
       unbilled: unbilled,
-      remarks: remarks,
+      withRemarks: withRemarks,
     };
   }
 }

@@ -7,6 +7,7 @@ export const CreateNewMeterSchema = z4.object({
   image: z4.string().nullish(),
   dateTime: z4.coerce.date(),
   meterReaderId: z4.uuid(),
+  isCommitted: z4.boolean(),
 });
 
 export const UpdateNewMeterSchema = CreateNewMeterSchema.partial().omit({
