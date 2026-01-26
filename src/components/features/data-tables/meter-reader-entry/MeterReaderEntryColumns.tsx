@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderEntryRowActions } from "./MeterReaderEntryRowActions";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
@@ -18,6 +18,10 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
 
   const isMobile = useIsMobile();
 
+  const filterFn: FilterFn<MeterReaderWithZonebooks> = (row, columnId, filterValue) => {
+    // filterValue is an array of selected options
+    return filterValue.includes(row.getValue(columnId));
+  };
   useEffect(() => {
     let cols: ColumnDef<MeterReaderWithZonebooks>[] = [];
 
@@ -65,10 +69,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
           ),
           enableColumnFilter: true,
           meta: { exportLabel: "Remarks" },
-          filterFn: (row, filterValue) => {
-            const remarks = row.original.reassignment?.remarks || "";
-            return remarks.toLocaleLowerCase().includes(filterValue.toLowerCase());
-          },
+          filterFn: filterFn,
         },
         {
           id: "actions",
