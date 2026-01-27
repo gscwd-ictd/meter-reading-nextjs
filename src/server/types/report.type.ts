@@ -55,8 +55,14 @@ export const BilledAccountQuerySchema = z.object({
   readingMonth: z.coerce.string().default(currentMonthYear),
 });
 
+export const MobileSummaryQuerySchema = z.object({
+  meterReaderId: z.uuid(),
+  datetimeCompleted: z.coerce.string(),
+});
+
 export type ReadingZoneBookProgress = z.infer<typeof ReadingZoneBookProgressSchema>;
 export type ReadingAccountProgress = z.infer<typeof ReadingAccountProgressSchema>;
 export type ReadingAccountQuery = z.infer<typeof ReadingAccountQuerySchema>;
 export type BilledAccountQuery = z.infer<typeof BilledAccountQuerySchema>;
 export type UpdateReadingProgress = z.infer<typeof ReadingAccountQuerySchema>;
+export type MobileSummaryQuery = z.infer<typeof MobileSummaryQuerySchema>;
