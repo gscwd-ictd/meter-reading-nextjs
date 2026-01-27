@@ -53,7 +53,7 @@ export const MeterReadingReportComponent = () => {
 
   const params: MeterReadingReportParams = {
     monthYear: monthYear ? monthYear : "",
-    meterReaderId: form.watch("meterReader.id"),
+    meterReaderId: form.watch("meterReader.id") !== undefined ? form.watch("meterReader.id") : "",
     zone: "",
     book: "",
   };
