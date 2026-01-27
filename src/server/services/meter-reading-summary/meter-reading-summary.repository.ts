@@ -2,6 +2,8 @@ import { IMeterReadingSummaryRepository } from "@mr/server/interfaces/meter-read
 import {
   BilledSummary,
   BilledSummarySchema,
+  MobileSummaryReport,
+  MobileSummaryReportSchema,
   UnbilledSummary,
   UnbilledSummarySchema,
   WithRemarksSummary,
@@ -11,7 +13,7 @@ import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
 import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { meterReadingContext } from "@mr/server/context";
-import { BilledAccountQuery } from "@mr/server/types/report.type";
+import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.type";
 
 export class MeterReadingSummaryRepository implements IMeterReadingSummaryRepository {
   async findBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
@@ -43,9 +45,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
         checkDigit: viewReadingAccountProgress.checkDigit,
         accountName: viewReadingAccountProgress.accountName,
         currentReading: viewReadingAccountProgress.currentReading,
-        usage: sql<number>`
-              ${viewReadingAccountProgress.currentReading}
-              - ${viewReadingAccountProgress.previousReading}`,
+        usage: viewReadingAccountProgress.usage,
         amount: viewReadingAccountProgress.billedAmount,
         zone: viewReadingAccountProgress.zone,
         book: viewReadingAccountProgress.book,
@@ -106,9 +106,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
         checkDigit: viewReadingAccountProgress.checkDigit,
         accountName: viewReadingAccountProgress.accountName,
         currentReading: viewReadingAccountProgress.currentReading,
-        usage: sql<number>`
-              ${viewReadingAccountProgress.currentReading}
-              - ${viewReadingAccountProgress.previousReading}`,
+        usage: viewReadingAccountProgress.usage,
         amount: viewReadingAccountProgress.billedAmount,
         zone: viewReadingAccountProgress.zone,
         book: viewReadingAccountProgress.book,
@@ -169,9 +167,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
         checkDigit: viewReadingAccountProgress.checkDigit,
         accountName: viewReadingAccountProgress.accountName,
         currentReading: viewReadingAccountProgress.currentReading,
-        usage: sql<number>`
-              ${viewReadingAccountProgress.currentReading}
-              - ${viewReadingAccountProgress.previousReading}`,
+        usage: viewReadingAccountProgress.usage,
         amount: viewReadingAccountProgress.billedAmount,
         zone: viewReadingAccountProgress.zone,
         book: viewReadingAccountProgress.book,
@@ -204,7 +200,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
   //   return "";
   // }
 
-  async mobileSummaryReport(data: { meterReaderId: string; datetimeCompleted: string }): Promise<string> {
+  async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {
     const billed = await db.pgConn
       .select()
       .from(viewReadingAccountProgress)
@@ -217,6 +213,30 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
         ),
       );
 
+    const [totalBilled] = await db.pgConn
+      .select({
+        totalAccounts: sql<number>`count(${viewReadingAccountProgress.accountNumber})`,
+        totalBilledAmount: sql<number>`coalesce(sum(${viewReadingAccountProgress.billedAmount}), 0)`,
+        totalUsage: sql<number>`
+                  coalesce(sum(
+                    CASE 
+                      WHEN ${viewReadingAccountProgress.currentReading} IS NULL THEN 0
+                      WHEN ${viewReadingAccountProgress.previousReading} IS NULL THEN 0
+                      WHEN ${viewReadingAccountProgress.currentReading} <= ${viewReadingAccountProgress.previousReading} THEN 0
+                      ELSE ${viewReadingAccountProgress.currentReading} - ${viewReadingAccountProgress.previousReading}
+                    END
+                  ), 0)`,
+      })
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          eq(viewReadingAccountProgress.isCompleted, true),
+          eq(viewReadingAccountProgress.isRead, true),
+          sql`date(${viewReadingAccountProgress.datetimeCompleted}) = date(${data.datetimeCompleted})`,
+        ),
+      );
+
     const unbilled = await db.pgConn
       .select()
       .from(viewReadingAccountProgress)
@@ -226,6 +246,20 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
           eq(viewReadingAccountProgress.isRead, false),
           eq(viewReadingAccountProgress.isCompleted, true),
           sql`date( ${viewReadingAccountProgress.datetimeCompleted} ) = ${data.datetimeCompleted} `,
+        ),
+      );
+
+    const [totalUnbilled] = await db.pgConn
+      .select({
+        totalAccounts: sql<number>`count(${viewReadingAccountProgress.accountNumber})`,
+      })
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          eq(viewReadingAccountProgress.isCompleted, true),
+          eq(viewReadingAccountProgress.isRead, false),
+          sql`date(${viewReadingAccountProgress.datetimeCompleted}) = date(${data.datetimeCompleted})`,
         ),
       );
 
@@ -242,10 +276,35 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
         ),
       );
 
-    return {
-      billed: billed,
-      unbilled: unbilled,
-      withRemarks: withRemarks,
-    };
+    const [totalWithRemarks] = await db.pgConn
+      .select({
+        totalAccounts: sql<number>`count(${viewReadingAccountProgress.accountNumber})`,
+      })
+      .from(viewReadingAccountProgress)
+      .where(
+        and(
+          eq(viewReadingAccountProgress.meterReaderId, data.meterReaderId),
+          ne(viewReadingAccountProgress.remarks, "Normal Reading"),
+          ne(viewReadingAccountProgress.remarks, ""),
+          sql`date(${viewReadingAccountProgress.datetimeCompleted}) = date(${data.datetimeCompleted})`,
+        ),
+      );
+
+    return MobileSummaryReportSchema.parse({
+      billed: {
+        accounts: billed,
+        totalAccounts: totalBilled.totalAccounts,
+        totalBilledAmount: totalBilled.totalBilledAmount,
+        totalUsage: totalBilled.totalUsage,
+      },
+      unbilled: {
+        accounts: unbilled,
+        totalAccounts: totalUnbilled.totalAccounts,
+      },
+      withRemarks: {
+        accounts: withRemarks,
+        totalAccounts: totalWithRemarks.totalAccounts,
+      },
+    });
   }
 }

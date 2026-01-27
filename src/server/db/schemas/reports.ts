@@ -53,6 +53,7 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
   currentReading: integer("current_reading"),
   previousReading: integer("previous_reading"),
   averageUsage: integer("average_usage"),
+  usage: integer("usage"),
   billedAmount: integer("billed_amount"),
   isRead: boolean("is_read"),
   isPosted: boolean("is_posted"),
@@ -76,6 +77,10 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
         book_code,
         current_reading,
         previous_reading,
+        case
+            when current_reading = 0 then  0
+            else current_reading - previous_reading
+        end as usage,
         average_usage,
         billed_amount,
         is_read,

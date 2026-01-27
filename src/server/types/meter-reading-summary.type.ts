@@ -53,7 +53,7 @@ export const MobileSummaryReportSchema = z.object({
         accountNumber: z.string(),
         previousReading: z.coerce.number(),
         usage: z.coerce.number(),
-        amount: z.coerce.number(),
+        billedAmount: z.coerce.number(),
       })
       .array(),
     totalAccounts: z.coerce.number(),
@@ -64,12 +64,12 @@ export const MobileSummaryReportSchema = z.object({
     accounts: z
       .object({
         accountNumber: z.string(),
-        name: z.coerce.string(),
+        accountName: z.coerce.string(),
       })
       .array(),
     totalAccounts: z.coerce.number(),
   }),
-  remarks: z.object({
+  withRemarks: z.object({
     accounts: z
       .object({
         accountNumber: z.string(),

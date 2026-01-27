@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { meterReadingContext } from "../context";
 import { zValidator } from "@hono/zod-validator";
-import { BilledAccountQuerySchema } from "../types/report.type";
+import { BilledAccountQuerySchema, MobileSummaryQuerySchema } from "../types/report.type";
 
 const meterReadingSummaryService = meterReadingContext.getMeterReadingSummaryService();
 
@@ -27,8 +27,8 @@ const meterReadingSummaryRoutes = new Hono()
     return c.json("new-meter", 200);
   })
 
-  .get("/mobile", async (c) => {
-    const data = { meterReaderId: "3c2f91fe-db2b-4003-bfab-40f5b67813f5", datetimeCompleted: "2026-01-26" };
+  .post("/mobile", zValidator("json", MobileSummaryQuerySchema), async (c) => {
+    const data = c.req.valid("json");
     const result = await meterReadingSummaryService.mobileSummaryReport(data);
 
     return c.json(result);
