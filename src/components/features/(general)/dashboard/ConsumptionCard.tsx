@@ -8,6 +8,7 @@ const chartData = [
   { year: "2022", consumption: 2902795 },
   { year: "2023", consumption: 3365744 },
   { year: "2024", consumption: 4888872 },
+  { year: "2025", consumption: 5646657 },
 ];
 
 const chartConfig = {

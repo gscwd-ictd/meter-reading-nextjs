@@ -13,17 +13,17 @@ import { ConsumersByCategory } from "./ConsumersByCategory";
 
 export const DashboardComponent: FunctionComponent = () => {
   return (
-    <div className="mt-4 flex w-full flex-col gap-6 sm:gap-4 md:gap-4 lg:gap-6">
-      {/* Welcome */}
-      <div className="mb-1 flex items-center justify-between">
+    <div className="flex h-full w-full flex-1 flex-col gap-4">
+      {/* Welcome back  */}
+      <div className="flex items-center justify-between">
         <div className="text-xl font-bold text-gray-800 dark:text-white">Welcome back</div>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
         </div>
       </div>
 
-      {/* Top KPIs */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 sm:gap-4 md:grid-cols-1 md:gap-4 lg:grid-cols-4 lg:gap-6">
+      {/* Four cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4">
         {/* Billed */}
         <BilledCard />
 
@@ -37,18 +37,17 @@ export const DashboardComponent: FunctionComponent = () => {
         <NewMetersCard />
       </div>
 
-      {/* Consumers & Readings Section */}
-      <div className="grid grid-cols-1 gap-6 sm:gap-4 md:gap-4 lg:grid-cols-5 lg:gap-6">
+      {/* Consumption and Consumer Cards */}
+      <div className="grid grid-cols-5 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-5">
         {/* Consumption */}
         <ConsumptionCard />
 
         {/* Total Consumers */}
-        {/* <TotalConsumersCard /> */}
         <ConsumersByCategory />
       </div>
 
-      {/* Bottom Part */}
-      <div className="grid min-h-0 grid-cols-1 gap-6 sm:gap-4 md:gap-4 lg:grid-cols-5 lg:gap-6">
+      {/* Consumption and Consumer Cards */}
+      <div className="grid grid-cols-5 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-5">
         {/* Monthly Progress */}
         <MonthlyProgressCard />
 

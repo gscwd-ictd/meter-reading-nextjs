@@ -54,29 +54,27 @@ export function ConsumersByCategory() {
     <DashboardCard
       title="Consumers by Category"
       subtitle="Total number of consumers per category"
-      className="col-span-2 border bg-white dark:bg-gray-900"
+      className="col-span-2 bg-white sm:col-span-1 md:col-span-1 lg:col-span-2 dark:bg-gray-900"
     >
       <div className="relative mb-6 flex h-40 items-center justify-center">
-        <div className="h-full w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={categoriesWithPercentages}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={80}
-                innerRadius={50}
-                dataKey="value"
-              >
-                {categoriesWithPercentages.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} className="stroke-white stroke-1" />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={categoriesWithPercentages}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={renderCustomizedLabel}
+              outerRadius={80}
+              innerRadius={50}
+              dataKey="value"
+            >
+              {categoriesWithPercentages.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} className="stroke-white stroke-1" />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
 
         {/* Simple Center Total */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-center">
