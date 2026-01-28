@@ -55,7 +55,7 @@ export const fetchWithRemarksAccounts = async (params: MeterReadingReportParams)
 export const fetchNewMetersAccounts = async (params: MeterReadingReportParams) => {
   const { book, meterReaderId, monthYear, zone } = params;
 
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/new-meters`, {
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/new-meters`, {
     params: {
       ...(monthYear && { readingMonth: monthYear }),
       ...(zone && { zone }),

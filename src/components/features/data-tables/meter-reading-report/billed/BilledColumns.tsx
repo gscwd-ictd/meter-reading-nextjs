@@ -28,8 +28,13 @@ export const useBilledColumns = (data: BilledAccount[]) => {
         enableColumnFilter: true,
       },
       {
+        accessorKey: "usage",
+        cell: (column) => <span>{column.row.original.usage}</span>,
+        header: "Usage",
+      },
+      {
         accessorKey: "amount",
-        cell: (column) => <span >{column.row.original.amount}</span>,
+        cell: (column) => <span>{column.row.original.amount}</span>,
         header: "Billed Amount",
       },
     ];

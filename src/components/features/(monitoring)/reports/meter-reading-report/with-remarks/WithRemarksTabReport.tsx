@@ -19,7 +19,7 @@ type TabReportProps = {
 
 export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, isLoading }) => {
   const totalBilledAmount = useMemo(() => {
-    return data && data.reduce((sum, account) => sum + account.amount, 0);
+    return data && data.reduce((sum, account) => sum + account.billedAmount, 0);
   }, [data]);
 
   return (
@@ -55,8 +55,8 @@ export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, 
                         <TableCell>{account.usage}</TableCell>
                         <TableCell className="italic">{account.remarks}</TableCell>
                         <TableCell className="text-right">
-                          ₱{" "}
-                          {account.amount.toLocaleString("en-US", {
+                          {account.billedAmount && ` ₱`}
+                          {account.billedAmount.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}

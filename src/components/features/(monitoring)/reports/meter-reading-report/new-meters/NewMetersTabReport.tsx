@@ -9,6 +9,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { TabsContent } from "@mr/components/ui/Tabs";
 import { NewMeterAccount } from "@mr/lib/types/accounts";
+import { format } from "date-fns";
 import { ReceiptTextIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 
@@ -31,32 +32,23 @@ export const NewMetersTabReport: FunctionComponent<TabReportProps> = ({ data, is
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[200px]">Account No</TableHead>
-                    <TableHead className="w-[200px]">Name</TableHead>
-                    <TableHead>Zone</TableHead>
-                    <TableHead>Book</TableHead>
-                    <TableHead>Usage</TableHead>
-                    <TableHead>Remarks</TableHead>
-                    <TableHead className="text-right">Billed Amount</TableHead>
+                    <TableHead className="w-[200px]">Meter No</TableHead>
+                    <TableHead className="w-[200px]">Current Reading</TableHead>
+                    <TableHead>Date Time</TableHead>
+                    <TableHead>Meter Reader</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data &&
                     data.map((account) => (
-                      <TableRow key={account.accountNumber}>
-                        <TableCell className="font-medium">{account.accountNumber}</TableCell>
-                        <TableCell>{account.accountName}</TableCell>
-                        <TableCell>{account.zone}</TableCell>
-                        <TableCell>{account.book}</TableCell>
-                        <TableCell>{account.usage}</TableCell>
-                        <TableCell className="italic">{account.remarks}</TableCell>
-                        <TableCell className="text-right">
-                          ₱{" "}
-                          {account.amount.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
+                      <TableRow key={account.meterNumber}>
+                        <TableCell>{account.meterNumber}</TableCell>
+                        <TableCell>{account.currentReading}</TableCell>
+                        <TableCell>
+                          {account.dateTime ? format(account.dateTime, "MMM dd, yyyy hh:mm:a") : ""}
                         </TableCell>
+
+                        <TableCell>{account.meterReader ? account.meterReader.name : "-"}</TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
@@ -66,7 +58,7 @@ export const NewMetersTabReport: FunctionComponent<TabReportProps> = ({ data, is
             {/* Separate footer div */}
             <div className="mt-4 border-t bg-gray-50 px-4 py-3">
               <div className="flex items-center justify-between">
-                <span className="font-medium">New meter accounts count:</span>
+                <span className="font-medium">New meters count:</span>
                 <span className="text-right font-bold underline underline-offset-2">{data.length}</span>
               </div>
             </div>
@@ -77,7 +69,7 @@ export const NewMetersTabReport: FunctionComponent<TabReportProps> = ({ data, is
               <EmptyMedia variant="icon">
                 <ReceiptTextIcon className="h-12 w-12 text-gray-400" />
               </EmptyMedia>
-              <EmptyTitle className="mt-4 text-lg font-semibold">New meter accounts</EmptyTitle>
+              <EmptyTitle className="mt-4 text-lg font-semibold">New meters</EmptyTitle>
               <EmptyDescription className="mt-0">No new meters match your current filters</EmptyDescription>
             </EmptyHeader>
             <EmptyContent className="mt-0">

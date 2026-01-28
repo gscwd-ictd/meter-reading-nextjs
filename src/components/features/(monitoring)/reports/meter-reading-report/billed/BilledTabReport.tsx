@@ -20,7 +20,7 @@ type TabReportProps = {
 
 export const BilledTabReport: FunctionComponent<TabReportProps> = ({ data, isLoading }) => {
   const totalBilledAmount = useMemo(() => {
-    return data && data.reduce((sum, account) => sum + account.amount, 0);
+    return data && data.reduce((sum, account) => sum + account.billedAmount, 0);
   }, [data]);
 
   return (
