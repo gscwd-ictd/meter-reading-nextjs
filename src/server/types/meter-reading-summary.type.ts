@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import z4, { z } from "zod/v4";
 
 export const BilledSummarySchema = z.object({
   accountNumber: z.coerce.string(),
@@ -7,14 +7,20 @@ export const BilledSummarySchema = z.object({
   book: z.string(),
   currentReading: z.coerce.number(),
   usage: z.coerce.number(),
-  amount: z.coerce.number(),
+  billedAmount: z.coerce.number(),
   meterReader: z.object({
     id: z.string(),
     name: z.string(),
   }),
 });
 
-export const UnbilledSummarySchema = BilledSummarySchema;
+export const UnbilledSummarySchema = BilledSummarySchema.omit({
+  currentReading: true,
+  usage: true,
+  billedAmount: true,
+}).extend({
+  accountName: z4.string(),
+});
 
 export const WithRemarksSummarySchema = z.object({
   accountNumber: z.coerce.string(),
@@ -25,24 +31,6 @@ export const WithRemarksSummarySchema = z.object({
   meterReader: z.object({
     id: z.string(),
     name: z.string(),
-  }),
-});
-
-export const SummaryReportQuerySchema = z.object({
-  meterReaderId: z.string(),
-  readingDate: z.string(),
-});
-
-export const SummaryReportSchema = z.object({
-  meterReader: z.object({
-    id: z.string(),
-    name: z.string(),
-  }),
-  billed: BilledSummarySchema.omit({
-    meterReader: true,
-  }),
-  unbilled: UnbilledSummarySchema.omit({
-    meterReader: true,
   }),
 });
 

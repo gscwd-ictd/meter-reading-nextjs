@@ -5,9 +5,7 @@ import {
   UpdateReadingDetailsSchema,
 } from "@mr/lib/validators/reading-details-schema";
 import { zValidator } from "@hono/zod-validator";
-import db from "@mr/server/db/connections";
 import { Hono } from "hono";
-import { format } from "date-fns";
 
 const readingDetailsRepository = new ReadingDetailsRepository();
 const readingDetailsService = new ReadingDetailsService(readingDetailsRepository);
