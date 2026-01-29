@@ -14,12 +14,13 @@ export type AccountDetails = {
   isCommitted: boolean;
   remarks: string;
   additionalRemarks: string;
-  amount: number;
+  billedAmount: number;
   // consumption: number;
   // statusProgress: "read" | "pending" | "unbilled";
   meterReader: { id: string; name: string };
   zone: string;
   book: string;
+  meterNumber: string;
 };
 
 export type BilledAccount = AccountDetails & {
@@ -32,9 +33,13 @@ export type WithRemarksAccount = BilledAccount & {
 
 export type NewMeterAccount = BilledAccount & {
   remarks: string;
+  dateTime: string;
 };
 
-export type UnbilledAccount = Pick<AccountDetails, "accountName" | "book" | "zone" | "accountNumber">;
+export type UnbilledAccount = Pick<
+  AccountDetails,
+  "accountName" | "book" | "zone" | "accountNumber" | "checkDigit" | "meterReader"
+>;
 
 export const TAB_VALUES = {
   BILLED: "billed",

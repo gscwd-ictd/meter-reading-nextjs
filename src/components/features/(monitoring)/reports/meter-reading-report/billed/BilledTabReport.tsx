@@ -7,8 +7,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@mr/components/ui/Empty";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { TabsContent } from "@mr/components/ui/Tabs";
+import { formatToPHP } from "@mr/lib/functions/formatNumberToCurrency";
 import { BilledAccount } from "@mr/lib/types/accounts";
 import { ReceiptTextIcon } from "lucide-react";
 import { FunctionComponent, useMemo } from "react";
@@ -20,7 +20,7 @@ type TabReportProps = {
 
 export const BilledTabReport: FunctionComponent<TabReportProps> = ({ data, isLoading }) => {
   const totalBilledAmount = useMemo(() => {
-    return data && data.reduce((sum, account) => sum + account.amount, 0);
+    return data && data.reduce((sum, account) => sum + account.billedAmount, 0);
   }, [data]);
 
   return (
@@ -34,7 +34,7 @@ export const BilledTabReport: FunctionComponent<TabReportProps> = ({ data, isLoa
           header={
             <div className="flex w-full items-center justify-end gap-2 text-right">
               <span className="font-normal">Total: </span>
-              <span className="font-medium">{totalBilledAmount}</span>
+              <span className="font-medium">{totalBilledAmount ? formatToPHP(totalBilledAmount) : ""}</span>
             </div>
           }
         />

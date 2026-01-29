@@ -27,6 +27,7 @@ import {
 } from "@mr/components/ui/Table";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { Input } from "../Input";
+import { DataTablePagination } from "../data-table/data-table-pagination";
 
 type DataTableProps<T> = {
   columns: Array<ColumnDef<T, unknown>>;
@@ -104,7 +105,7 @@ export function SimpleDataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-md">
+    <div className="flex h-full w-full flex-1 flex-col overflow-hidden rounded-md">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
         <div className="flex flex-col justify-start gap-2 sm:flex-col md:flex-col lg:flex-row">
           {enableGlobalFilter && (
@@ -122,43 +123,51 @@ export function SimpleDataTable<T>({
         </div>
       </ColumnVisibilityToggleContext.Provider>
       {header ? header : null}
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div className="flex-1 overflow-auto">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-        {footer && <TableFooter>{footer}</TableFooter>}
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+          {footer && <TableFooter>{footer}</TableFooter>}
+        </Table>
+      </div>
+
+      {enablePagination && (
+        <div className="mt-auto pt-4">
+          <DataTablePagination table={table} />
+        </div>
+      )}
     </div>
   );
 }
