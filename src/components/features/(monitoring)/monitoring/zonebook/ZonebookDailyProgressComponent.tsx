@@ -32,6 +32,7 @@ import { YearMonthPicker } from "@mr/components/features/calendar/YearMonthPicke
 import { useAccountsStore } from "@mr/components/stores/useAccountsStore";
 import { meterReadingReportMutation } from "@mr/lib/functions/meterReadingReportMutation";
 import { toast } from "sonner";
+import { Spinner } from "@mr/components/ui/Spinner";
 
 export const ZonebookDailyProgressComponent: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -435,9 +436,16 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
               <Button
                 onClick={handleComplete}
                 className="bg-green-800 px-5 py-2 text-white hover:bg-green-700 active:bg-green-600 dark:text-white"
+                disabled={mutateCommit.isPending ? true : false}
               >
                 <CheckCircle className="h-4 w-4" />
-                Commit Zonebook
+                {mutateCommit.isPending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    Committing <Spinner />
+                  </span>
+                ) : (
+                  "Commit Zonebook"
+                )}
               </Button>
             </div>
           </div>
@@ -500,11 +508,15 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                   </div>
                   <div className="flex flex-col items-end justify-center rounded-lg bg-gradient-to-r from-blue-50 to-white p-4 dark:from-blue-950/20 dark:to-gray-800">
                     <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {selectedAccount.amount > 0 &&
+                      {selectedAccount.billedAmount &&
+                      selectedAccount.billedAmount > 0 &&
                       Math.max(0, selectedAccount.currentReading - selectedAccount.previousReading) > 0 ? (
                         <span>
                           {" "}
-                          ₱ {selectedAccount && selectedAccount.amount && selectedAccount.amount.toFixed(2)}
+                          ₱{" "}
+                          {selectedAccount &&
+                            selectedAccount.billedAmount &&
+                            selectedAccount.billedAmount.toFixed(2)}
                         </span>
                       ) : (
                         "N/A"

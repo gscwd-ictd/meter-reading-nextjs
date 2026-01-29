@@ -67,7 +67,7 @@ export const MeterReadingReportTabsContent = () => {
     },
     newMeters: {
       data: queryClient.getQueryData<NewMeterAccount[]>([
-        "get-with-remarks-mr-report",
+        "get-new-meters-mr-report",
         params.monthYear ? params.monthYear : "",
       ]),
       isLoading:
@@ -103,23 +103,3 @@ export const MeterReadingReportTabsContent = () => {
     </>
   );
 };
-
-// {
-//   /* Billed Tab */
-// }
-// <BilledTabReport data={queries.billed.data} isLoading={queries.billed.isLoading} />;
-
-// {
-//   /* Unbilled Tab */
-// }
-// <UnBilledTabReport data={queries.unbilled.data} isLoading={queries.unbilled.isLoading} />;
-
-// {
-//   /* With Remarks Tab */
-// }
-// <WithRemarksTabReport data={queries.withRemarks.data} isLoading={queries.withRemarks.isLoading} />;
-
-// {
-//   /* New Meters Tab */
-// }
-// <NewMetersTabReport data={queries.newMeters.data} isLoading={queries.newMeters.isLoading} />;
