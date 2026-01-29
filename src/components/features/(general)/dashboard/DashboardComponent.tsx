@@ -13,9 +13,9 @@ import { ConsumersByCategory } from "./ConsumersByCategory";
 
 export const DashboardComponent: FunctionComponent = () => {
   return (
-    <div className="flex h-full w-full flex-1 flex-col gap-4">
+    <div className="-mb-4 flex h-full w-full flex-1 flex-col gap-4">
       {/* Welcome back  */}
-      <div className="flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between">
         <div className="text-xl font-bold text-gray-800 dark:text-white">Welcome back</div>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}

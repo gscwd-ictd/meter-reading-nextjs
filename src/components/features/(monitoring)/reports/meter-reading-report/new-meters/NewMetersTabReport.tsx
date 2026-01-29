@@ -1,3 +1,4 @@
+import { NewMetersDataTable } from "@mr/components/features/data-tables/meter-reading-report/new-meters/NewMetersDataTable";
 import {
   Empty,
   EmptyHeader,
@@ -6,10 +7,8 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@mr/components/ui/Empty";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mr/components/ui/Table";
 import { TabsContent } from "@mr/components/ui/Tabs";
 import { NewMeterAccount } from "@mr/lib/types/accounts";
-import { format } from "date-fns";
 import { ReceiptTextIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 
@@ -26,43 +25,17 @@ export const NewMetersTabReport: FunctionComponent<TabReportProps> = ({ data, is
         className="flex h-full flex-col items-start justify-center rounded-md border bg-gray-50 p-6 dark:bg-gray-900"
       >
         {data && data.length > 0 && !isLoading ? (
-          <div className="flex h-full w-full flex-col">
-            {/* Table with scrollable body */}
-            <div className="flex-1 overflow-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Meter No</TableHead>
-                    <TableHead className="w-[200px]">Current Reading</TableHead>
-                    <TableHead>Date Time</TableHead>
-                    <TableHead>Meter Reader</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data &&
-                    data.map((account) => (
-                      <TableRow key={account.meterNumber}>
-                        <TableCell>{account.meterNumber}</TableCell>
-                        <TableCell>{account.currentReading}</TableCell>
-                        <TableCell>
-                          {account.dateTime ? format(account.dateTime, "MMM dd, yyyy hh:mm:a") : ""}
-                        </TableCell>
-
-                        <TableCell>{account.meterReader ? account.meterReader.name : "-"}</TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Separate footer div */}
-            <div className="mt-4 border-t bg-gray-50 px-4 py-3">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">New meters count:</span>
-                <span className="text-right font-bold underline underline-offset-2">{data.length}</span>
+          <NewMetersDataTable
+            data={data}
+            header={
+              <div className="flex w-full items-center justify-end gap-2 text-right">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">New meters count:</span>
+                  <span className="text-right font-bold underline underline-offset-2">{data.length}</span>
+                </div>
               </div>
-            </div>
-          </div>
+            }
+          />
         ) : (
           <Empty className="flex h-full w-full">
             <EmptyHeader className="text-center">

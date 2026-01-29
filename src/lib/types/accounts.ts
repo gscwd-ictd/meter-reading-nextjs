@@ -36,7 +36,10 @@ export type NewMeterAccount = BilledAccount & {
   dateTime: string;
 };
 
-export type UnbilledAccount = Pick<AccountDetails, "accountName" | "book" | "zone" | "accountNumber">;
+export type UnbilledAccount = Pick<
+  AccountDetails,
+  "accountName" | "book" | "zone" | "accountNumber" | "checkDigit" | "meterReader"
+>;
 
 export const TAB_VALUES = {
   BILLED: "billed",
