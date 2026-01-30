@@ -87,10 +87,10 @@ export const WithRemarksProgressCard: FunctionComponent = () => {
         <div className="overflow-y-auto">
           <div className="flex flex-col gap-2">
             {/* Add more items to test scrolling */}
-            {mockReadingWithRemarks.map((reading, idx) => {
+            {mockReadingWithRemarks.map((reading) => {
               return (
                 <div
-                  key={idx}
+                  key={reading.accountNumber}
                   className="rounded-lg border border-gray-200/60 bg-gray-50/50 p-3 transition-colors hover:bg-gray-100/50 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
                 >
                   <div className="flex items-start justify-between">

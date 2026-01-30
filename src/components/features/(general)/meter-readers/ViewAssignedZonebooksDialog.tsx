@@ -7,6 +7,7 @@ import { MeterReader } from "@mr/lib/types/personnel";
 import axios from "axios";
 import { toast } from "sonner";
 import { Dispatch, SetStateAction } from "react";
+import { ViewAssignedZonebooksDataTable } from "../../data-tables/meter-readers/assigned-zonebooks/ViewAssignedZonebooksDataTable";
 
 interface ViewAssignedZonebooksDialogProps {
   meterReader: MeterReader;
@@ -70,30 +71,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
               <Skeleton className="h-6 w-full" />
             </div>
           ) : (
-            <div className="h-full overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted text-muted-foreground sticky top-0 z-10">
-                  <tr>
-                    <th className="px-4 py-2 text-left">Zonebook</th>
-                    <th className="px-4 py-2 text-left">Zone</th>
-                    <th className="px-4 py-2 text-left">Book</th>
-                    <th className="px-4 py-2 text-left">Area</th>
-                    <th className="px-4 py-2 text-left">Day</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data?.zoneBooks?.map((zb, index) => (
-                    <tr key={index} className="border-t">
-                      <td className="px-4 py-2 font-medium">{zb.zoneBook}</td>
-                      <td className="px-4 py-2">{zb.zone}</td>
-                      <td className="px-4 py-2">{zb.book}</td>
-                      <td className="px-4 py-2">{zb.area.name ?? "N/A"}</td>
-                      <td className="px-4 py-2">{zb.day ?? "-"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ViewAssignedZonebooksDataTable data={data?.zoneBooks ? data.zoneBooks : []} />
           )}
         </div>
       </DialogContent>
