@@ -156,15 +156,20 @@ export class ReportsRepository implements IReportsRepository {
           .getMeterReaderService()
           .getMeterReaderDetailsById(meterReaderId);
 
-        await Promise.all(
-          accountDetails.map(async (item) => {
-            await tx
-              .update(readingDetails)
-              .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
-              .where(eq(readingDetails.id, item.id));
-            return await this.postedAccounts(item, meterReader.name);
-          }),
-        );
+        const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        // Process sequentially with delay
+        for (const item of accountDetails) {
+          await tx
+            .update(readingDetails)
+            .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
+            .where(eq(readingDetails.id, item.id));
+
+          await this.postedAccounts(item, meterReader.name);
+
+          // Add delay (e.g., 100ms between each account)
+          await delay(100);
+        }
       });
 
       return await this.findReadingAccountProgress(data);
