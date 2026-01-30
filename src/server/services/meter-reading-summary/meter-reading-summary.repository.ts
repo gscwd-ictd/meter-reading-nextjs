@@ -17,7 +17,10 @@ import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.
 
 export class MeterReadingSummaryRepository implements IMeterReadingSummaryRepository {
   async findBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
-    const conditions = [eq(viewReadingAccountProgress.isRead, true)];
+    const conditions = [
+      eq(viewReadingAccountProgress.isRead, true),
+      eq(viewReadingAccountProgress.isCommitted, true),
+    ];
 
     if (query.meterReaderId) {
       conditions.push(eq(viewReadingAccountProgress.meterReaderId, query.meterReaderId));
@@ -40,17 +43,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     }
 
     const stmt = await db.pgConn
-      .select({
-        accountNumber: viewReadingAccountProgress.accountNumber,
-        checkDigit: viewReadingAccountProgress.checkDigit,
-        accountName: viewReadingAccountProgress.accountName,
-        currentReading: viewReadingAccountProgress.currentReading,
-        usage: viewReadingAccountProgress.usage,
-        amount: viewReadingAccountProgress.billedAmount,
-        zone: viewReadingAccountProgress.zone,
-        book: viewReadingAccountProgress.book,
-        meterReaderId: viewReadingAccountProgress.meterReaderId,
-      })
+      .select()
       .from(viewReadingAccountProgress)
       .where(and(...conditions));
 
@@ -101,17 +94,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     }
 
     const stmt = await db.pgConn
-      .select({
-        accountNumber: viewReadingAccountProgress.accountNumber,
-        checkDigit: viewReadingAccountProgress.checkDigit,
-        accountName: viewReadingAccountProgress.accountName,
-        currentReading: viewReadingAccountProgress.currentReading,
-        usage: viewReadingAccountProgress.usage,
-        amount: viewReadingAccountProgress.billedAmount,
-        zone: viewReadingAccountProgress.zone,
-        book: viewReadingAccountProgress.book,
-        meterReaderId: viewReadingAccountProgress.meterReaderId,
-      })
+      .select()
       .from(viewReadingAccountProgress)
       .where(and(...conditions));
 
@@ -162,17 +145,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     }
 
     const stmt = await db.pgConn
-      .select({
-        accountNumber: viewReadingAccountProgress.accountNumber,
-        checkDigit: viewReadingAccountProgress.checkDigit,
-        accountName: viewReadingAccountProgress.accountName,
-        currentReading: viewReadingAccountProgress.currentReading,
-        usage: viewReadingAccountProgress.usage,
-        amount: viewReadingAccountProgress.billedAmount,
-        zone: viewReadingAccountProgress.zone,
-        book: viewReadingAccountProgress.book,
-        meterReaderId: viewReadingAccountProgress.meterReaderId,
-      })
+      .select()
       .from(viewReadingAccountProgress)
       .where(and(...conditions));
 

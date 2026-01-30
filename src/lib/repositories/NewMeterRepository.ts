@@ -4,6 +4,7 @@ import db from "@mr/server/db/connections";
 import { and, eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { NewMeter } from "../validators/new-meter-schema";
+import { meterReadingContext } from "@mr/server/context";
 
 export class NewMeterRepository implements I_Crud<NewMeter> {
   async create(dto: NewMeter): Promise<NewMeter> {
@@ -16,7 +17,25 @@ export class NewMeterRepository implements I_Crud<NewMeter> {
   }
 
   async getAll(): Promise<NewMeter[]> {
-    return await db.pgConn.select().from(newMeters);
+    const newmeter = await db.pgConn.select().from(newMeters);
+
+    const result = await Promise.all(
+      newmeter.map(async (item) => {
+        const details = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(item.meterReaderId);
+
+        return {
+          meterReader: {
+            id: details.id,
+            name: details.name,
+          },
+          ...item,
+        };
+      }),
+    );
+
+    return result;
   }
 
   async getById(id: string): Promise<NewMeter> {
