@@ -12,6 +12,7 @@ import {
   endOfWeek,
   format,
   getDay,
+  getMonth,
   isBefore,
   isSameDay,
   isSameMonth,
@@ -747,6 +748,47 @@ export const useScheduler = (holidays: Holiday[]) => {
   };
 
   // Pre-calculate day numbers for all working days
+  // const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
+  //   const dayMap = new Map<string, number>();
+  //   const workingDays = schedule
+  //     .filter((entry) => entry.dueDate || entry.disconnectionDate)
+  //     .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
+
+  //   let dayCounter = 1;
+  //   let i = 0;
+
+  //   while (i < workingDays.length) {
+  //     const current = workingDays[i];
+  //     if (!current) break;
+
+  //     const currentDayOfWeek = getDay(current.readingDate);
+  //     const next = workingDays[i + 1];
+
+  //     // Check if this is Saturday and next is consecutive Sunday
+  //     const isConsecutiveWeekendPair =
+  //       currentDayOfWeek === 6 &&
+  //       next &&
+  //       getDay(next.readingDate) === 0 &&
+  //       isSameDay(next.readingDate, addDays(current.readingDate, 1));
+
+  //     if (isConsecutiveWeekendPair) {
+  //       // Assign same day number to Saturday-Sunday pair
+  //       dayMap.set(current.readingDate.toISOString(), dayCounter);
+  //       dayMap.set(next.readingDate.toISOString(), dayCounter);
+  //       i += 2;
+  //     } else {
+  //       // Single day assignment
+  //       dayMap.set(current.readingDate.toISOString(), dayCounter);
+  //       i += 1;
+  //     }
+
+  //     // Move to next day number in cycle
+  //     dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+  //   }
+
+  //   return dayMap;
+  // };
+
   const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
     const dayMap = new Map<string, number>();
     const workingDays = schedule
@@ -754,32 +796,76 @@ export const useScheduler = (holidays: Holiday[]) => {
       .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
 
     let dayCounter = 1;
+    let currentMonth = -1;
+    let isFirstDayOfMonth = true;
     let i = 0;
 
     while (i < workingDays.length) {
       const current = workingDays[i];
       if (!current) break;
 
-      const currentDayOfWeek = getDay(current.readingDate);
+      const readingDate = current.readingDate;
+      const month = getMonth(readingDate);
+
+      // Check if this is a new month
+      if (month !== currentMonth) {
+        dayCounter = 1;
+        currentMonth = month;
+        isFirstDayOfMonth = true;
+      }
+
+      const currentDayOfWeek = getDay(readingDate);
       const next = workingDays[i + 1];
 
-      // Check if this is Saturday and next is consecutive Sunday
+      // Check if this is the special case: First day of month is Sunday
+      if (isFirstDayOfMonth && currentDayOfWeek === 0) {
+        // First working day of month is Sunday
+        dayMap.set(readingDate.toISOString(), dayCounter);
+
+        // Check if next day is Monday and consecutive
+        if (next) {
+          const nextDayOfWeek = getDay(next.readingDate);
+          const areConsecutive = isSameDay(next.readingDate, addDays(readingDate, 1));
+
+          if (areConsecutive && nextDayOfWeek === 1) {
+            // Monday gets same day number as Sunday
+            dayMap.set(next.readingDate.toISOString(), dayCounter);
+            i += 2;
+            isFirstDayOfMonth = false;
+
+            // Increment day counter for next day
+            dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+            continue;
+          }
+        }
+
+        // No consecutive Monday, just process Sunday
+        i += 1;
+        isFirstDayOfMonth = false;
+        dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+        continue;
+      }
+
+      // Regular processing (not first-day-of-month Sunday)
       const isConsecutiveWeekendPair =
-        currentDayOfWeek === 6 &&
+        currentDayOfWeek === 6 && // Saturday
         next &&
-        getDay(next.readingDate) === 0 &&
-        isSameDay(next.readingDate, addDays(current.readingDate, 1));
+        getDay(next.readingDate) === 0 && // Sunday
+        isSameDay(next.readingDate, addDays(readingDate, 1));
 
       if (isConsecutiveWeekendPair) {
         // Assign same day number to Saturday-Sunday pair
-        dayMap.set(current.readingDate.toISOString(), dayCounter);
+        dayMap.set(readingDate.toISOString(), dayCounter);
         dayMap.set(next.readingDate.toISOString(), dayCounter);
         i += 2;
       } else {
         // Single day assignment
-        dayMap.set(current.readingDate.toISOString(), dayCounter);
+        dayMap.set(readingDate.toISOString(), dayCounter);
         i += 1;
       }
+
+      // Update flags
+      isFirstDayOfMonth = false;
 
       // Move to next day number in cycle
       dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
