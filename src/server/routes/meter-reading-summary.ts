@@ -19,8 +19,10 @@ const meterReadingSummaryRoutes = new Hono()
     return c.json(result, 200);
   })
 
-  .get("/remarks", async (c) => {
-    return c.json("remarks", 200);
+  .get("/remarks", zValidator("query", BilledAccountQuerySchema), async (c) => {
+    const query = c.req.valid("query");
+    const result = await meterReadingSummaryService.getWithRemarksSummary(query);
+    return c.json(result, 200);
   })
 
   .get("/new-meter", async (c) => {

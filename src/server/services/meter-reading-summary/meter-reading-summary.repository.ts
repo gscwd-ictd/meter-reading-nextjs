@@ -122,6 +122,9 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     const conditions = [
       eq(viewReadingAccountProgress.isRead, false),
       eq(viewReadingAccountProgress.isCommitted, true),
+      ne(viewReadingAccountProgress.remarks, "Normal Reading"),
+      ne(viewReadingAccountProgress.remarks, ""),
+      isNotNull(viewReadingAccountProgress.remarks),
     ];
 
     if (query.meterReaderId) {
