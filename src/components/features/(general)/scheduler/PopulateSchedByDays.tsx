@@ -94,6 +94,12 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
       }),
     );
 
+    // console.log(
+    //   newSchedule.map((sched) => {
+    //     return { ...sched, meterReaders: sched.meterReaders } as MeterReadingEntryWithZonebooks;
+    //   }),
+    // );
+
     setHasPopulatedMeterReaders(true);
 
     // mutate here
