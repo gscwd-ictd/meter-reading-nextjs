@@ -159,5 +159,6 @@ export const holidays = [
 
 export const NonBusinessDays: Day[] = [
   { id: "001", date: "01-01", name: "New Year" },
-  { id: "002", date: "12-25", name: "Christmas Day" },
+  { id: "002", date: "02-17", name: "Chinese New Year 2026" }, //! REMOVE THIS. THIS IS ONLY FOR 2026
+  { id: "003", date: "12-25", name: "Christmas Day" },
 ];
