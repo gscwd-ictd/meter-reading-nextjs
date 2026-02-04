@@ -69,7 +69,7 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
      select
         date_trunc('month',created_at) as reading_month,
         meter_reader_id,
-        reading_date AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as reading_date,
+        reading_date AT TIME ZONE 'Asia/Manila' as reading_date,
         account_number,
         check_digit,
         account_name,
@@ -85,14 +85,14 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
         billed_amount,
         is_read,
         is_posted,
-        datetime_posted AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_posted,
+        datetime_posted AT TIME ZONE 'Asia/Manila' as datetime_posted,
         is_completed,
-        datetime_completed AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_completed,
+        datetime_completed AT TIME ZONE 'Asia/Manila' as datetime_completed,
         is_committed,
-        datetime_committed AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_committed,
+        datetime_committed AT TIME ZONE 'Asia/Manila' as datetime_committed,
         remarks,
         additional_remarks,
-        created_at
+        created_at AT TIME ZONE 'Asia/Manila' as created_at
     from 
         reading_details
     order by 
