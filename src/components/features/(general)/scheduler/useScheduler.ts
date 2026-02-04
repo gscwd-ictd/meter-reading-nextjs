@@ -11,6 +11,7 @@ import {
   endOfMonth,
   endOfWeek,
   format,
+  getDate,
   getDay,
   getMonth,
   isBefore,
@@ -685,26 +686,118 @@ export const useScheduler = (holidays: Holiday[]) => {
     [],
   );
 
+  //! V1 assignMeterReadersWithDays
+  // const assignMeterReadersWithDays = useCallback(
+  //   (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
+  //     // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
+
+  //     // Pre-calculate day number mapping for the entire schedule
+  //     const dayNumberMap = calculateDayNumberMap(schedule);
+
+  //     return schedule.map((entry) => {
+  //       if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
+  //         return { ...entry, meterReaders: [] };
+  //       }
+
+  //       const readingRestDay = getDayName(entry.readingDate);
+  //       const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
+
+  //       // @ts-ignore
+  //       const assignedMeterReaders: MeterReaderWithZonebooks[] = meterReaders
+  //         .filter((reader) => reader.restDay !== readingRestDay)
+  //         .map((reader) => {
+  //           const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
+  //           const sortedDueDates = formatAndSortDates(entry.dueDate);
+  //           const sortedDisconnectionDates = formatAndSortDates(entry.disconnectionDate);
+
+  //           return {
+  //             ...reader,
+  //             reassignment: { zoneBooks: [], remarks: null },
+  //             zoneBooks: assignedZoneBooks.map((zb) => ({
+  //               ...zb,
+  //               dueDate: !Array.isArray(entry.dueDate) ? formatDate(entry.dueDate) : sortedDueDates[0],
+  //               disconnectionDate: !Array.isArray(entry.disconnectionDate)
+  //                 ? formatDate(entry.disconnectionDate)
+  //                 : sortedDisconnectionDates[0],
+  //             })),
+  //           };
+  //         })
+  //         .filter((reader) => reader.zoneBooks.length > 0);
+
+  //       return {
+  //         ...entry,
+  //         meterReaders: assignedMeterReaders,
+  //         day,
+  //       };
+  //     });
+  //   },
+  //   [],
+  // );
+
   const assignMeterReadersWithDays = useCallback(
     (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
-      // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
-
-      // Pre-calculate day number mapping for the entire schedule
+      // Calculate day numbers ONCE (normal calculation)
       const dayNumberMap = calculateDayNumberMap(schedule);
+
+      // Pre-calculate: Check if each month starts on Sunday
+      const monthStartsOnSunday = new Map<number, boolean>();
+
+      schedule.forEach((entry) => {
+        const month = getMonth(entry.readingDate);
+        const date = getDate(entry.readingDate);
+        const dayOfWeek = getDay(entry.readingDate);
+
+        if (date === 1) {
+          monthStartsOnSunday.set(month, dayOfWeek === 0);
+        }
+      });
 
       return schedule.map((entry) => {
         if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
           return { ...entry, meterReaders: [] };
         }
 
-        const readingRestDay = getDayName(entry.readingDate);
-        const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
+        const readingDate = entry.readingDate;
+        const readingRestDay = getDayName(readingDate);
+        const day = dayNumberMap.get(readingDate.toISOString()) || 1;
+
+        // Get the month and check if it starts on Sunday
+        const month = getMonth(readingDate);
+        const monthStartsSunday = monthStartsOnSunday.get(month) || false;
 
         // @ts-ignore
         const assignedMeterReaders: MeterReaderWithZonebooks[] = meterReaders
           .filter((reader) => reader.restDay !== readingRestDay)
           .map((reader) => {
-            const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
+            // Determine which zonebook day to use
+            let zoneBookDay = day;
+            let hasZoneBooks = true;
+
+            // SPECIAL RULE: For Saturday-rest-day readers when month starts on Sunday
+            if (reader.restDay === "saturday" && monthStartsSunday) {
+              const date = getDate(readingDate);
+              const dayOfWeek = getDay(readingDate);
+
+              if (date === 1 && dayOfWeek === 0) {
+                // Feb 1 (Sunday) - Day 1: Use Day 1 zonebooks
+                zoneBookDay = 1;
+              } else {
+                // For all other days: Saturday-rest-day readers are ONE DAY AHEAD
+                zoneBookDay = day + 1;
+
+                // If zoneBookDay exceeds 21, this reader gets NO zonebooks for this day
+                if (zoneBookDay > 21) {
+                  hasZoneBooks = false;
+                }
+              }
+            }
+
+            // If no zonebooks, return null to be filtered out
+            if (!hasZoneBooks) {
+              return null;
+            }
+
+            const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === zoneBookDay);
             const sortedDueDates = formatAndSortDates(entry.dueDate);
             const sortedDisconnectionDates = formatAndSortDates(entry.disconnectionDate);
 
@@ -720,18 +813,17 @@ export const useScheduler = (holidays: Holiday[]) => {
               })),
             };
           })
-          .filter((reader) => reader.zoneBooks.length > 0);
+          .filter((reader) => reader !== null && reader.zoneBooks.length > 0) as MeterReaderWithZonebooks[];
 
         return {
           ...entry,
           meterReaders: assignedMeterReaders,
-          day,
+          day, // Always show the normal day number
         };
       });
     },
     [],
   );
-
   // Helper to log the day assignments
   const logDayAssignments = (schedule: MeterReadingSchedule[]) => {
     const dayMap = calculateDayNumberMap(schedule);
@@ -789,7 +881,97 @@ export const useScheduler = (holidays: Holiday[]) => {
   //   return dayMap;
   // };
 
-  const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
+  //! V1 calculateDayNumberMap
+  // const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
+  //   const dayMap = new Map<string, number>();
+  //   const workingDays = schedule
+  //     .filter((entry) => entry.dueDate || entry.disconnectionDate)
+  //     .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
+
+  //   let dayCounter = 1;
+  //   let currentMonth = -1;
+  //   let isFirstDayOfMonth = true;
+  //   let i = 0;
+
+  //   while (i < workingDays.length) {
+  //     const current = workingDays[i];
+  //     if (!current) break;
+
+  //     const readingDate = current.readingDate;
+  //     const month = getMonth(readingDate);
+
+  //     // Check if this is a new month
+  //     if (month !== currentMonth) {
+  //       dayCounter = 1;
+  //       currentMonth = month;
+  //       isFirstDayOfMonth = true;
+  //     }
+
+  //     const currentDayOfWeek = getDay(readingDate);
+  //     const next = workingDays[i + 1];
+
+  //     // Check if this is the special case: First day of month is Sunday
+  //     if (isFirstDayOfMonth && currentDayOfWeek === 0) {
+  //       // First working day of month is Sunday
+  //       dayMap.set(readingDate.toISOString(), dayCounter);
+
+  //       // Check if next day is Monday and consecutive
+  //       if (next) {
+  //         const nextDayOfWeek = getDay(next.readingDate);
+  //         const areConsecutive = isSameDay(next.readingDate, addDays(readingDate, 1));
+
+  //         if (areConsecutive && nextDayOfWeek === 1) {
+  //           // Monday gets same day number as Sunday
+  //           dayMap.set(next.readingDate.toISOString(), dayCounter);
+  //           i += 2;
+  //           isFirstDayOfMonth = false;
+
+  //           // Increment day counter for next day
+  //           dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+  //           continue;
+  //         }
+  //       }
+
+  //       // No consecutive Monday, just process Sunday
+  //       i += 1;
+  //       isFirstDayOfMonth = false;
+  //       dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+  //       continue;
+  //     }
+
+  //     // Regular processing (not first-day-of-month Sunday)
+  //     const isConsecutiveWeekendPair =
+  //       currentDayOfWeek === 6 && // Saturday
+  //       next &&
+  //       getDay(next.readingDate) === 0 && // Sunday
+  //       isSameDay(next.readingDate, addDays(readingDate, 1));
+
+  //     if (isConsecutiveWeekendPair) {
+  //       // Assign same day number to Saturday-Sunday pair
+  //       dayMap.set(readingDate.toISOString(), dayCounter);
+  //       dayMap.set(next.readingDate.toISOString(), dayCounter);
+  //       i += 2;
+  //     } else {
+  //       // Single day assignment
+  //       dayMap.set(readingDate.toISOString(), dayCounter);
+  //       i += 1;
+  //     }
+
+  //     // Update flags
+  //     isFirstDayOfMonth = false;
+
+  //     // Move to next day number in cycle
+  //     dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+  //   }
+
+  //   return dayMap;
+  // };
+
+  // Modified function that takes restDay into account
+  const calculateDayNumberMap = (
+    schedule: MeterReadingSchedule[],
+    restDay: string | null = null,
+  ): Map<string, number> => {
     const dayMap = new Map<string, number>();
     const workingDays = schedule
       .filter((entry) => entry.dueDate || entry.disconnectionDate)
@@ -799,6 +981,9 @@ export const useScheduler = (holidays: Holiday[]) => {
     let currentMonth = -1;
     let isFirstDayOfMonth = true;
     let i = 0;
+
+    // Check if restDay is Saturday
+    const isSaturdayRestDay = restDay === "Saturday";
 
     while (i < workingDays.length) {
       const current = workingDays[i];
@@ -817,8 +1002,21 @@ export const useScheduler = (holidays: Holiday[]) => {
       const currentDayOfWeek = getDay(readingDate);
       const next = workingDays[i + 1];
 
-      // Check if this is the special case: First day of month is Sunday
-      if (isFirstDayOfMonth && currentDayOfWeek === 0) {
+      // SPECIAL RULE: If rest day is Saturday and first day of month is Sunday
+      if (isSaturdayRestDay && isFirstDayOfMonth && currentDayOfWeek === 0) {
+        // First working day of month is Sunday
+        dayMap.set(readingDate.toISOString(), dayCounter);
+
+        // For Saturday rest day: Monday does NOT get same day number
+        // Monday gets next day number (Day 2 assigned to position 1)
+        i += 1;
+        isFirstDayOfMonth = false;
+        dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
+        continue;
+      }
+
+      // NORMAL RULE: If NOT Saturday rest day, apply Sunday-Monday pairing
+      if (!isSaturdayRestDay && isFirstDayOfMonth && currentDayOfWeek === 0) {
         // First working day of month is Sunday
         dayMap.set(readingDate.toISOString(), dayCounter);
 
@@ -828,7 +1026,7 @@ export const useScheduler = (holidays: Holiday[]) => {
           const areConsecutive = isSameDay(next.readingDate, addDays(readingDate, 1));
 
           if (areConsecutive && nextDayOfWeek === 1) {
-            // Monday gets same day number as Sunday
+            // Monday gets same day number as Sunday (normal case)
             dayMap.set(next.readingDate.toISOString(), dayCounter);
             i += 2;
             isFirstDayOfMonth = false;
@@ -846,7 +1044,7 @@ export const useScheduler = (holidays: Holiday[]) => {
         continue;
       }
 
-      // Regular processing (not first-day-of-month Sunday)
+      // Regular Saturday-Sunday pairing (applies to all)
       const isConsecutiveWeekendPair =
         currentDayOfWeek === 6 && // Saturday
         next &&
