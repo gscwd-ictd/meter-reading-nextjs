@@ -87,12 +87,12 @@ export const viewReadingAccountProgress = pgView("view_reading_account_progress"
         is_posted,
         datetime_posted AT TIME ZONE 'Asia/Manila' as datetime_posted,
         is_completed,
-        datetime_completed AT TIME ZONE 'Asia/Manila' as datetime_completed,
+        datetime_completed AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as datetime_completed,
         is_committed,
         datetime_committed AT TIME ZONE 'Asia/Manila' as datetime_committed,
         remarks,
         additional_remarks,
-        created_at AT TIME ZONE 'Asia/Manila' as created_at
+        created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila' as created_at
     from 
         reading_details
     order by 
