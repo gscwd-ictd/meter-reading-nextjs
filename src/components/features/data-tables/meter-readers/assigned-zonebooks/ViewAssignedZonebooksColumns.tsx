@@ -14,14 +14,10 @@ export const useAssignedZonebooksColumns = (data: Zonebook[]) => {
   useEffect(() => {
     const cols: ColumnDef<Zonebook>[] = [
       {
-        id: "zonebook",
-        accessorFn: (row) => `${row.zone}-${row.book}`,
-        cell: (column) => (
-          <span>
-            {column.row.original.zone}-{column.row.original.book}
-          </span>
-        ),
-        header: "Zonebook",
+        accessorKey: "day",
+        cell: (column) => <span>{column.row.original.day}</span>,
+        header: "Day",
+        filterFn: filterFn,
         enableColumnFilter: true,
       },
       {
@@ -41,13 +37,6 @@ export const useAssignedZonebooksColumns = (data: Zonebook[]) => {
       {
         accessorKey: "area.name",
         cell: (column) => <span>{column.row.original.area.name}</span>,
-        header: "Area",
-        filterFn: filterFn,
-        enableColumnFilter: true,
-      },
-      {
-        accessorKey: "day",
-        cell: (column) => <span>{column.row.original.day}</span>,
         header: "Area",
         filterFn: filterFn,
         enableColumnFilter: true,

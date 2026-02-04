@@ -127,7 +127,7 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
         ),
         enableColumnFilter: true,
         filterFn: filterFn,
-        meta: { exportLabel: "Commited" },
+        meta: { exportLabel: "Committed" },
       },
       {
         accessorKey: "isPosted",
