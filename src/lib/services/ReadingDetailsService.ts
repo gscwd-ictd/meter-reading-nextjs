@@ -1,6 +1,6 @@
 import { I_Crud } from "../interfaces/crud";
 import { ReadingDetailsRepository } from "../repositories/ReadingDetailsRepository";
-import { ReadingDetails } from "../validators/reading-details-schema";
+import { ReadingDetails, UpdateReadingAccountsCompleted } from "../validators/reading-details-schema";
 
 export class ReadingDetailsService implements I_Crud<ReadingDetails> {
   constructor(private readonly readingDetailsRepository: ReadingDetailsRepository) {}
@@ -23,5 +23,9 @@ export class ReadingDetailsService implements I_Crud<ReadingDetails> {
 
   async delete(id: string): Promise<{ status: string }> {
     return await this.readingDetailsRepository.delete(id);
+  }
+
+  async updateReadingAccountsCompleted(dto: UpdateReadingAccountsCompleted): Promise<{ message: string }> {
+    return await this.readingDetailsRepository.updateReadingAccountsCompleted(dto);
   }
 }

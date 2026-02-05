@@ -2,6 +2,7 @@ import { ReadingDetailsRepository } from "@mr/lib/repositories/ReadingDetailsRep
 import { ReadingDetailsService } from "@mr/lib/services/ReadingDetailsService";
 import {
   CreateReadingDetailsSchema,
+  UpdateReadingAccountsCompletedSchema,
   UpdateReadingDetailsSchema,
 } from "@mr/lib/validators/reading-details-schema";
 import { zValidator } from "@hono/zod-validator";
@@ -99,4 +100,14 @@ export const readingDetailsHandler = new Hono()
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
     return c.json(await readingDetailsService.delete(id));
-  });
+  })
+  .patch(
+    "/mobile/reading-accounts/complete",
+    zValidator("json", UpdateReadingAccountsCompletedSchema),
+    async (c) => {
+      const body = c.req.valid("json");
+
+      const result = await readingDetailsService.updateReadingAccountsCompleted(body);
+      return c.json(result);
+    },
+  );

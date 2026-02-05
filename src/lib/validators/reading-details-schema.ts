@@ -1,5 +1,3 @@
-import { is } from "drizzle-orm";
-import z from "zod/v3";
 import z4 from "zod/v4";
 
 export const CreateReadingDetailsSchema = z4.object({
@@ -58,6 +56,17 @@ export const CreateReadingDetailsSchema = z4.object({
   datetimePosted: z4.coerce.date().nullish(),
 });
 
+export const UpdateReadingAccountsCompletedSchema = z4.object({
+  meterReaderId: z4.uuid(),
+  zoneBooks: z4
+    .object({
+      zone: z4.string(),
+      book: z4.string(),
+    })
+    .array(),
+  readingMonth: z4.string(),
+});
+
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
   .omit({
     id: true,
@@ -67,6 +76,8 @@ export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
   });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
+
+export type UpdateReadingAccountsCompleted = z4.infer<typeof UpdateReadingAccountsCompletedSchema>;
 
 // const test: ReadingDetails = {
 //   longlat,
