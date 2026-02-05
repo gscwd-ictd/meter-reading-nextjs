@@ -2,9 +2,9 @@
 
 import { readingDetails } from "@mr/server/db/schemas/reading-details";
 import { I_Crud } from "../interfaces/crud";
-import { ReadingDetails } from "../validators/reading-details-schema";
+import { ReadingDetails, UpdateReadingAccountsCompleted } from "../validators/reading-details-schema";
 import db from "@mr/server/db/connections";
-import { eq } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ReadingDetailsRepository implements I_Crud<ReadingDetails> {
@@ -55,5 +55,36 @@ export class ReadingDetailsRepository implements I_Crud<ReadingDetails> {
     } catch (error) {
       throw error;
     }
+  }
+
+  async updateReadingAccountsCompleted(dto: UpdateReadingAccountsCompleted): Promise<{ message: string }> {
+    const [year, month] = dto.readingMonth.split("-").map(Number);
+    const start = `${year}-${month.toString().padStart(2, "0")}-01`;
+    const endMonth = month === 12 ? 1 : month + 1;
+    const endYear = month === 12 ? year + 1 : year;
+    const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
+
+    const now = new Date();
+
+    if (!dto.zoneBooks.length) {
+      return { message: "No zone books provided" };
+    }
+
+    await db.pgConn
+      .update(readingDetails)
+      .set({ isCompleted: true, datetimeCompleted: now })
+      .where(
+        and(
+          eq(readingDetails.meterReaderId, dto.meterReaderId),
+          sql`created_at >= ${start} AND created_at < ${end}`,
+          or(
+            ...dto.zoneBooks.map((zb) =>
+              and(eq(readingDetails.zoneCode, zb.zone), eq(readingDetails.bookCode, zb.book)),
+            ),
+          ),
+        ),
+      );
+
+    return { message: "Reading accounts updated successfully" };
   }
 }
