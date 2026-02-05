@@ -37,11 +37,11 @@ export const NavigationSplashProvider = ({ children }: { children: React.ReactNo
       window.clearTimeout(timeoutRef.current);
     }
 
-    // Safety timeout - always hide after 3 seconds
+    // Safety timeout - always hide after 1.5 seconds
     timeoutRef.current = window.setTimeout(() => {
       // console.log("Safety timeout - hiding splash");
       setVisible(false);
-    }, 3000);
+    }, 1500);
   };
 
   const hideSplash = () => {
