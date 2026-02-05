@@ -58,7 +58,11 @@ export class ReadingDetailsRepository implements I_Crud<ReadingDetails> {
   }
 
   async updateReadingAccountsCompleted(dto: UpdateReadingAccountsCompleted): Promise<{ message: string }> {
-    const [year, month] = dto.readingMonth.split("-").map(Number);
+    // Parse the datetime string and extract year and month
+    const date = new Date(dto.readingMonth);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // getMonth() returns 0-11, so add 1
+
     const start = `${year}-${month.toString().padStart(2, "0")}-01`;
     const endMonth = month === 12 ? 1 : month + 1;
     const endYear = month === 12 ? year + 1 : year;
