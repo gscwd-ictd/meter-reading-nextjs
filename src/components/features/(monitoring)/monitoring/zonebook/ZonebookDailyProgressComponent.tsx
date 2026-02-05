@@ -325,8 +325,23 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
       </Dialog>
 
       {/* Complete Dialog */}
-      <Dialog open={completeDialogIsOpen} onOpenChange={setCompleteDialogIsOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog
+        open={completeDialogIsOpen}
+        onOpenChange={(open) => {
+          if (mutateCommit.isPending) {
+            return;
+          }
+          setCompleteDialogIsOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-md"
+          onInteractOutside={(e) => {
+            if (mutateCommit.isPending) {
+              e.preventDefault();
+            }
+          }}
+        >
           <div className="p-0">
             {/* Clean modern header */}
             <div className="mb-8 flex items-start justify-between">
@@ -428,8 +443,10 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
               <Button
                 className="px-5 py-2 hover:brightness-75 dark:text-white"
                 onClick={() => {
+                  if (mutateCommit.isPending) return; // Additional safety
                   setCompleteDialogIsOpen(false);
                 }}
+                disabled={mutateCommit.isPending} // Optional: disable button visually
               >
                 Cancel
               </Button>

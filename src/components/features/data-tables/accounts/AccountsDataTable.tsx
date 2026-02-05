@@ -43,6 +43,8 @@ export const AccountsDataTable: FunctionComponent = () => {
       return res.data as AccountDetails[];
     },
     retry: 2,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
   });
 
   const accountsColumn = useAccountsColumns(accounts);
