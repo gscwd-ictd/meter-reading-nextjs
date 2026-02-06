@@ -3,6 +3,7 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { Progress } from "@mr/components/ui/Progress";
 import { ZonebookProgress } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 
 export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined) => {
@@ -28,6 +29,18 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
         header: ({ column }) => <DataTableColumnHeader column={column} title="Book" />,
         cell: ({ row }) => <div className="text-muted-foreground text-left">Book {row.original.book}</div>,
         meta: { exportLabel: "Book" },
+        filterFn: filterFn,
+        enableColumnFilter: true,
+      },
+      {
+        accessorKey: "scheduleDate",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Sched. Date" />,
+        cell: ({ row }) => (
+          <div className="text-muted-foreground text-left">
+            {row.original.scheduleDate ? format(row.original.scheduleDate, "MMM dd, yyyy") : ""}
+          </div>
+        ),
+        meta: { exportLabel: "Sched. Date" },
         filterFn: filterFn,
         enableColumnFilter: true,
       },

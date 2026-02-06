@@ -45,6 +45,7 @@ export type ZonebookProgress = {
   statusProgress: string;
   readingDate: string;
   isCommitted: boolean;
+  scheduleDate: string;
   // isRead: boolean;
   address: string;
 };
