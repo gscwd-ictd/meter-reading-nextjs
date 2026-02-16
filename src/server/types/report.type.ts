@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 
 export const ReadingZoneBookProgressSchema = z.object({
+  scheduleDate: z.coerce.string(),
   zone: z.string(),
   book: z.string(),
   meterReader: z.object({

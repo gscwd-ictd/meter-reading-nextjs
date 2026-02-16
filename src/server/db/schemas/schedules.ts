@@ -290,3 +290,35 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
   ) rj on true
 
   group by s.id, s.day, s.reading_date, s.due_date, s.disconnection_date order by s.reading_date`);
+
+export const viewSchedule = pgView("view_schedule", {
+  scheduleId: uuid("schedule_id"),
+  scheduleReadingDate: date("reading_date"),
+  scheduleDueDate: date("schedule_due_date"),
+  scheduleDisconnectionDate: date("schedule_disconnection_date"),
+  scheduleDay: integer("schedule_day"),
+  meterReaderId: uuid("meter_reader_id"),
+  zone: varchar("zone"),
+  book: varchar("book"),
+  zoneBookDueDate: date("zone_book_due_date"),
+  zoneBookDisconnectionDate: date("zone_book_disconnection_date"),
+  zoneBookDay: integer("zone_book_day"),
+}).as(sql`
+  select 
+    s.id as schedule_id,
+    s.reading_date,
+    s.due_date as schedule_due_date,
+    s.disconnection_date as schedule_disconnection_date,
+    s.day as schedule_day,
+    smr.meter_reader_id,
+    szb.zone,
+    szb.book,
+    szb.day as zone_book_day,
+    szb.due_date as zone_book_due_date,
+    szb.disconnection_date as zone_book_disconnection_date
+  from schedules s
+  inner join schedule_meter_readers smr 
+    on s.id = smr.schedule_id
+  inner join schedule_zone_books szb 
+    on smr.id = szb.schedule_meter_reader_id
+`);
