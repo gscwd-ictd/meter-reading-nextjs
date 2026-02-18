@@ -18,7 +18,7 @@ export const fetchBilledAccounts = async (params: MeterReadingReportParams) => {
       ...(meterReaderId && { meterReaderId }),
     },
   });
-  console.log("FROM FETCHER BILLED: ", res.data);
+
   return res.data as BilledAccount[];
 };
 

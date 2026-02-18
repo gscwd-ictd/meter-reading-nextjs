@@ -49,7 +49,7 @@ export const ZonebookProgressDataTable: FunctionComponent<ZonebookProgressDataTa
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <DataTable
-        data={data ? data : []}
+        data={data ? data.sort((a, b) => (a.scheduleDate > b.scheduleDate ? -1 : 1)) : []}
         columns={zonebookProgressColumns}
         loading={isLoading}
         title={`Zonebook Progress  ${urlMonthYear ? `for ${formatYearMonthToReadableDate(urlMonthYear)}` : ""}`}

@@ -10,15 +10,15 @@ export const WithRemarksCard: FunctionComponent = () => {
     <DashboardCard
       title="With Remarks"
       // className="border bg-violet-200/60 dark:bg-gray-900"
-      className={Styles.dark.background}
-      titleClassName={Styles.dark.titleClassName}
+      className={Styles.glassBlue.background}
+      titleClassName={Styles.glassBlue.titleClassName}
       icon={
-        <TextQuoteIcon className={Styles.dark.icon} />
+        <TextQuoteIcon className={Styles.glassBlue.icon} />
         // text-violet-400
       }
     >
-      <div className={Styles.dark.description}>58</div>
-      <div className={Styles.dark.text}>With remarks for the month</div>
+      <div className={Styles.glassBlue.description}>58</div>
+      <div className={Styles.glassBlue.text}>With remarks for the month</div>
     </DashboardCard>
   );
 };

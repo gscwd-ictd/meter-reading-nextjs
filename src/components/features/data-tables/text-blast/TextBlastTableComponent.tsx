@@ -4,6 +4,8 @@ import { AreaTextBlastTableComponent } from "./AreaTextBlastDataTable/AreaTextBl
 import { IndividualTextBlastTableComponent } from "./IndividualTextBlastDataTable/IndividualTextBlastTableComponent";
 
 export default function TextBlastTableComponent() {
+  const underMaintenance: boolean = true;
+
   return (
     <>
       <Tabs defaultValue="area">

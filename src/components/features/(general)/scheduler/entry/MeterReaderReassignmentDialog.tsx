@@ -96,7 +96,6 @@ export const MeterReaderReassignmentDialog: FunctionComponent = () => {
   const putReassignmentMutation = useMutation({
     mutationKey: ["meter-reader-reassignment", selectedScheduleEntry?.id],
     mutationFn: async (reassignment: ReassignmentToPut) => {
-      console.log("FROM SOMETHING", reassignment);
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_MR_BE}/schedules/meter-reader/${selectedMeterReader?.scheduleMeterReaderId}/reassignment`,
 
