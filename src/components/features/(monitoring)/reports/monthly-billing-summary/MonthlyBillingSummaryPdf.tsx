@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   w15: { width: "15%" },
   w12_5: { width: "12.5%" },
   w10: { width: "10%" },
+  w9: { width: "9%" },
   w7_5: { width: "7.5%" },
   w6: { width: "6%" },
   w5: { width: "5%" },
@@ -167,6 +168,56 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
       </View>
       <View style={[styles.tableColHeader, styles.w22_5, { borderLeft: 0, borderRight: 0 }]}>
         <Text style={styles.headerText}>Senior Amount</Text>
+      </View>
+    </View>
+  );
+
+  const BillAmountTableHeader = () => (
+    <View style={[styles.tableRow, styles.w100, { borderLeft: 0, borderRight: 0 }]}>
+      <View
+        style={[
+          styles.tableColHeader,
+          styles.w15,
+          { borderLeft: 0, borderRight: 0, justifyContent: "flex-start" },
+        ]}
+      >
+        <Text style={[styles.headerText, { textAlign: "left" }]}>Classification</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>3/8</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>1/2</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>3/4</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>1</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>1 1/2</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>2</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>2 1/2</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>3</Text>
+      </View>
+      <View style={[styles.tableColHeader, styles.w9, { borderLeft: 0, borderRight: 0 }]}>
+        <Text style={styles.headerText}>4</Text>
+      </View>
+      <View
+        style={[
+          styles.tableColHeader,
+          styles.w10,
+          { borderLeft: 0, borderRight: 0, justifyContent: "flex-start" },
+        ]}
+      >
+        <Text style={[styles.headerText, { textAlign: "left" }]}>Total</Text>
       </View>
     </View>
   );
@@ -456,7 +507,7 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
 
           {/* Table */}
           <View style={styles.table}>
-            <TableHeader />
+            <BillAmountTableHeader />
 
             {page.rows.map((row, rowIndex) => {
               if (row.type === "spacer") {
@@ -596,8 +647,11 @@ export const MonthlyBillingSummaryPdf: FunctionComponent<MonthlyBillingSummaryPd
     queryKey: ["schedule", yearMonth],
     queryFn: async () => {
       // const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
-      const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);
+      // const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);
       // https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d
+
+      const res = await axios.get(`https://api.npoint.io/70dcbd15a19e2b3b0574`);
+      console.log(res.data);
       return res.data;
     },
     enabled: !!yearMonth,
