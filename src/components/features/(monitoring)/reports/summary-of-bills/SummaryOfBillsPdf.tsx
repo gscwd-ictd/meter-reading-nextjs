@@ -139,6 +139,18 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     return format(newDate, "MMMM yyyy");
   };
 
+  const HorizontalLine = () => (
+    <View
+      style={{
+        width: "100%",
+        height: 1,
+        backgroundColor: "#000",
+        paddingHorizontal: 2,
+        marginTop: 2,
+      }}
+    />
+  );
+
   // Table Header Component
   const TableHeader = () => (
     <View style={[styles.tableRow, styles.w100, { borderLeft: 0, borderRight: 0 }]}>
@@ -162,6 +174,58 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       </View>
       <View style={[styles.tableColHeader, styles.w22_5, { borderLeft: 0, borderRight: 0 }]}>
         <Text style={styles.headerText}>Senior Amount</Text>
+      </View>
+    </View>
+  );
+
+  // Signatories
+  const SignatorySection = () => (
+    <View
+      style={{
+        marginTop: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        gap: 20,
+      }}
+    >
+      {/* Left side - Prepared by */}
+      <View style={{ width: "50%" }}>
+        <Text style={{ fontSize: 9, marginBottom: 5 }}>Prepared by:</Text>
+        <View style={{ marginTop: 15, flexDirection: "column", justifyContent: "center", width: "100%" }}>
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            MARK JOSEPH D. DANO
+          </Text>
+          <HorizontalLine />
+          <Text style={{ fontSize: 8, marginTop: 2, color: "#252525", textAlign: "center" }}>
+            CLERK PROCESSOR C
+          </Text>
+        </View>
+      </View>
+
+      {/* Right side - Noted by / Approved by */}
+      <View style={{ width: "50%" }}>
+        <Text style={{ fontSize: 9, marginBottom: 5 }}>Noted by:</Text>
+        <View style={{ marginTop: 15, flexDirection: "column", justifyContent: "center", width: "100%" }}>
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            SAMCELLE B. VALENZUELA
+          </Text>
+          <HorizontalLine />
+          <Text style={{ fontSize: 7, marginTop: 2, color: "#252525", textAlign: "center" }}>
+            DIVISION MANAGER A - BILLING AND ACCOUNTS DIVISION
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -297,13 +361,17 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       rows: any[];
       zoneSummary?: any;
       pageNumber: number;
+      hasSignatory: boolean;
     }> = [];
 
     let currentPageRows: any[] = [];
     let currentZoneSummary: any = null;
     let currentZone: number | null = null;
     let currentZoneData: any = null;
+
+    // Reserve 5 rows for signatory section on the last page
     const MAX_ROWS_PER_PAGE = 30;
+    const ROWS_RESERVED_FOR_SIGNATORY = 5; // Adjust based on your signatory height
 
     // Helper to add zone summary row at the BOTTOM with dotted border
     const addZoneTotalRow = (zone: any) => {
@@ -347,13 +415,21 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       });
     };
 
+    // Helper to check if we need a new page (considering if this might be the last page)
+    const needsNewPage = (isLastZone: boolean, isLastBook: boolean) => {
+      const baseMax =
+        isLastZone && isLastBook ? MAX_ROWS_PER_PAGE - ROWS_RESERVED_FOR_SIGNATORY : MAX_ROWS_PER_PAGE;
+      return currentPageRows.length >= baseMax;
+    };
+
     // Helper to start new page
-    const startNewPage = (zone?: any) => {
+    const startNewPage = (zone?: any, isLastPage = false) => {
       if (currentPageRows.length > 0) {
         pages.push({
           rows: [...currentPageRows],
           zoneSummary: currentZoneSummary,
           pageNumber: pages.length + 1,
+          hasSignatory: isLastPage,
         });
         currentPageRows = [];
       }
@@ -367,13 +443,12 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
 
     // Process each zone
     reportData.zones.forEach((zone: any, zoneIndex: number) => {
-      const zoneHasStarted = currentZone === zone.zone;
+      const isLastZone = zoneIndex === reportData.zones.length - 1;
 
-      if (!zoneHasStarted) {
+      if (currentZone !== zone.zone) {
         if (currentPageRows.length >= MAX_ROWS_PER_PAGE - 2) {
           startNewPage();
         }
-
         currentZone = zone.zone;
         currentZoneSummary = zone.zoneSummary;
         currentZoneData = zone;
@@ -381,14 +456,14 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
 
       // Add all books for this zone
       zone.books.forEach((book: any, bookIndex: number) => {
-        if (currentPageRows.length >= MAX_ROWS_PER_PAGE) {
-          pages.push({
-            rows: [...currentPageRows],
-            zoneSummary: currentZoneSummary,
-            pageNumber: pages.length + 1,
-          });
-          currentPageRows = [];
-          // ❌ CONTINUATION ROW REMOVED - nothing added here
+        const isLastBook = isLastZone && bookIndex === zone.books.length - 1;
+
+        if (needsNewPage(isLastZone, isLastBook)) {
+          // Check if this would be the last page
+          const wouldBeLastPage =
+            isLastZone && isLastBook && pages.length === 0 && currentPageRows.length === 0;
+
+          startNewPage(zone, wouldBeLastPage);
         }
 
         addBookRow(book, zone.zone);
@@ -407,8 +482,8 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     });
 
     // Add grand total row
-    if (currentPageRows.length >= MAX_ROWS_PER_PAGE) {
-      startNewPage();
+    if (currentPageRows.length >= MAX_ROWS_PER_PAGE - ROWS_RESERVED_FOR_SIGNATORY) {
+      startNewPage(undefined, true); // This will be the last page
     }
 
     currentPageRows.push({
@@ -424,11 +499,13 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       borderBottom: false,
     });
 
+    // Push the final page with signatory flag
     if (currentPageRows.length > 0) {
       pages.push({
         rows: [...currentPageRows],
         zoneSummary: currentZoneSummary,
         pageNumber: pages.length + 1,
+        hasSignatory: true, // Last page gets signatory
       });
     }
 
@@ -452,7 +529,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
             <Text style={styles.title}>As of {formatDate(yearMonth)}</Text>
           </View>
 
-          {/* Table */}
           {/* Table */}
           <View style={styles.table}>
             <TableHeader />
@@ -576,6 +652,13 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
               );
             })}
           </View>
+
+          {/* Signatory section - now part of the page content */}
+          {page.hasSignatory && (
+            <View style={{ marginTop: 20 }}>
+              <SignatorySection />
+            </View>
+          )}
         </Page>
       ))}
     </Document>
@@ -595,8 +678,10 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
     queryKey: ["schedule", yearMonth],
     queryFn: async () => {
       // const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
-      const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);
+      // const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);
       // https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d
+      const res = await axios.get(`https://api.npoint.io/d3e97b78fda05447e380`);
+      console.log(res.data);
       return res.data;
     },
     enabled: !!yearMonth,
