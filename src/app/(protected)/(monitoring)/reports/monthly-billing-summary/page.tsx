@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@mr/components/ui/Breadcrumb";
+import { Suspense } from "react";
 
 export default function MonthlyBillingSummaryPage() {
   const underMaintenance: boolean = false;
@@ -33,7 +34,9 @@ export default function MonthlyBillingSummaryPage() {
       {underMaintenance ? (
         <UnderMaintenanceComponent title="Monthly Billing Summary" />
       ) : (
-        <MonthlyBillingSummaryReportComponent />
+        <Suspense fallback={<>Loading...</>}>
+          <MonthlyBillingSummaryReportComponent />
+        </Suspense>
       )}
     </>
   );
