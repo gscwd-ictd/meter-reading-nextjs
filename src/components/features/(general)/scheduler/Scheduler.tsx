@@ -230,8 +230,9 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   // Create grid styles using inline style for dynamic row count
   const gridStyle = {
     display: "grid",
-    gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-    gridTemplateRows: `repeat(${numberOfWeeks}, minmax(0, 1fr))`,
+    gridTemplateColumns: "repeat(7, minmax(120px, 1fr))", // Increased minimum width
+    gridTemplateRows: `repeat(${numberOfWeeks}, minmax(140px, 1fr))`, // Better row height
+    gap: "1px", // Add subtle gap between cells
   };
 
   return (
@@ -310,12 +311,13 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
             <CalendarSettingDropdown scheduler={scheduler} />
           </section>
         </header>
-        <main className="flex h-full flex-1 flex-col overflow-hidden p-2">
-          {/* Calendar Header Section */}
-          <section className="grid grid-cols-7 bg-transparent text-xs font-semibold tracking-wide text-black uppercase dark:text-white">
+        <main className="flex h-full flex-1 flex-col overflow-hidden p-4">
+          {/* Increased padding */}
+          {/* Calendar Header with better styling */}
+          <section className="bg-muted/50 dark:bg-muted/20 text-muted-foreground grid grid-cols-7 rounded-t-lg text-sm font-semibold tracking-wide uppercase">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
-              <div key={index} className="border-none py-2 text-center">
-                {day}
+              <div key={index} className="flex items-center justify-center border-r py-3 last:border-r-0">
+                <span className="hover:text-foreground transition-colors">{day}</span>
               </div>
             ))}
           </section>
@@ -330,39 +332,46 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
               <section className="relative flex-1 overflow-hidden border-t" style={gridStyle}>
                 {/* Overlay loading indicator while fetching schedules */}
                 {isFetchingSchedule && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/20 dark:bg-transparent">
-                    <div className="text-primary flex items-center gap-2 text-xl">
-                      <LoadingSpinner className="size-12 animate-spin" /> Getting Schedules...
+                  <div className="bg-background/80 absolute inset-0 z-20 flex flex-col items-center justify-center backdrop-blur-sm">
+                    <div className="flex flex-col items-center gap-4">
+                      <LoadingSpinner className="text-primary size-12" />
+                      <div className="text-center">
+                        <p className="text-lg font-semibold">Loading Schedule</p>
+                        <p className="text-muted-foreground text-sm">
+                          {format(scheduler.currentDate, "MMMM yyyy")}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Skeleton grid cells during fetch */}
                 {isFetchingSchedule && !isReady && (
-                  <div className="absolute inset-0 z-10 grid grid-cols-7 gap-px p-1">
-                    {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => (
-                      <div
-                        key={idx}
-                        className="border-border bg-background grid grid-cols-1 grid-rows-5 gap-1 border border-dashed p-0"
-                      >
-                        <div className="flex justify-end">
-                          <Skeleton className="size-6 rounded-full p-2" />
-                        </div>
-                        <div className="flex w-full justify-center">
-                          <div className="flex w-1/3 justify-center">
+                  <div className="absolute inset-0 z-10 grid grid-cols-7 gap-1 p-1">
+                    {Array.from({ length: scheduler.calculateSchedule().length }).map((_, idx) => {
+                      const isWeekend = idx % 7 === 0 || idx % 7 === 6;
+                      return (
+                        <div
+                          key={idx}
+                          className={`animate-pulse rounded-lg border p-3 ${isWeekend ? "bg-muted/20" : "bg-background"}`}
+                        >
+                          <div className="mb-2 flex justify-between">
                             <Skeleton className="size-6 rounded-full" />
-                            <Skeleton className="-ml-2 size-6 rounded-full" />
-                            <Skeleton className="-ml-2 size-6 rounded-full" />
+                            <Skeleton className="h-5 w-8 rounded" />
+                          </div>
+                          <div className="space-y-1">
+                            <Skeleton className="h-3 w-full rounded" />
+                            <Skeleton className="h-3 w-2/3 rounded" />
+                            <div className="flex gap-1 pt-2">
+                              <Skeleton className="size-5 rounded-full" />
+                              <Skeleton className="size-5 rounded-full" />
+                              <Skeleton className="size-5 rounded-full" />
+                            </div>
                           </div>
                         </div>
-                        <Skeleton className="w-full" />
-                        <Skeleton className="w-full" />
-                        <div></div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
-
                 {/* Render actual calendar only when ready */}
                 {!isFetchingSchedule &&
                   isReady &&

@@ -11,15 +11,15 @@ export const NewMetersCard: FunctionComponent = () => {
       title="New Meters"
       // className="border bg-sky-200/90 dark:bg-gray-900"
       // className="border bg-white/50 dark:bg-gray-900"
-      className={Styles.dark.background}
-      titleClassName={Styles.dark.titleClassName}
+      className={Styles.light.background}
+      titleClassName={Styles.light.titleClassName}
       icon={
-        <CircleGaugeIcon className={Styles.dark.icon} />
+        <CircleGaugeIcon className={Styles.light.icon} />
         // text-sky-400
       }
     >
-      <div className={Styles.dark.description}>5</div>
-      <div className={Styles.dark.text}>New meters for the month</div>
+      <div className={Styles.light.description}>5</div>
+      <div className={Styles.light.text}>New meters for the month</div>
     </DashboardCard>
   );
 };

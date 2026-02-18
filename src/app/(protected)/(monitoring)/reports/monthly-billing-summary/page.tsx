@@ -1,4 +1,5 @@
 import { UnderMaintenanceComponent } from "@mr/components/features/(general)/UnderMaintenanceComponent";
+import { MonthlyBillingSummaryReportComponent } from "@mr/components/features/(monitoring)/reports/monthly-billing-summary/MonthlyBillingSummaryReportComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,7 +10,7 @@ import {
 } from "@mr/components/ui/Breadcrumb";
 
 export default function MonthlyBillingSummaryPage() {
-  const underMaintenance: boolean = true;
+  const underMaintenance: boolean = false;
 
   return (
     <>
@@ -20,14 +21,20 @@ export default function MonthlyBillingSummaryPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
+            <BreadcrumbPage>Reports</BreadcrumbPage>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbPage>Monthly Billing Summary</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">Monthly Billing Summary Reports</h3>
-      <div className="text-base font-medium text-gray-400">Generate Reports from Monthly Billing Summary</div>
-      {underMaintenance ? <UnderMaintenanceComponent title="Monthly Billing Summary" /> : <></>}
+      {underMaintenance ? (
+        <UnderMaintenanceComponent title="Monthly Billing Summary" />
+      ) : (
+        <MonthlyBillingSummaryReportComponent />
+      )}
     </>
   );
 }

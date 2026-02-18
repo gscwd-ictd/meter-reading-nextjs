@@ -1,4 +1,5 @@
 import { UnderMaintenanceComponent } from "@mr/components/features/(general)/UnderMaintenanceComponent";
+import { SummaryOfBillsReportComponent } from "@mr/components/features/(monitoring)/reports/summary-of-bills/SummaryOfBillsReportComponent";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,7 +11,7 @@ import {
 import React from "react";
 
 export default function SummaryOfBillsPage() {
-  const underMaintenance: boolean = true;
+  const underMaintenance: boolean = false;
   return (
     <>
       <Breadcrumb>
@@ -20,15 +21,20 @@ export default function SummaryOfBillsPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
+            <BreadcrumbPage>Reports</BreadcrumbPage>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbPage>Summary of Bills Reports</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h3 className="mt-5 text-xl font-bold">Summary of Bills Reports</h3>
-      <div className="text-base font-medium text-gray-400">Generate Reports from Summary of Bills</div>
-
-      {underMaintenance ? <UnderMaintenanceComponent title="Summary of Bills Reports" /> : <></>}
+      {underMaintenance ? (
+        <UnderMaintenanceComponent title="Summary of Bills Reports" />
+      ) : (
+        <SummaryOfBillsReportComponent />
+      )}
     </>
   );
 }

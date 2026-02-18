@@ -130,12 +130,12 @@ const SchedulePDF: FC<{
   const groupDataByDay = () => {
     const dayGroups: Array<{
       day: number;
-      dayNumber: number;
+      dayNumber: number; // This will now be zonebook day
       rows: Array<{
         type: "data";
         content: {
           entry: BilledMeterReadingSchedule;
-          dayNumber: number;
+          dayNumber: number; // Zonebook day
           meterReader?: { name: string; zoneBooks?: any[] };
           isNoMeterReader: boolean;
           originalIndex: number;
@@ -146,6 +146,8 @@ const SchedulePDF: FC<{
     data.forEach((entry, idx) => {
       const calendarDay = new Date(entry.readingDate).getDate();
       const sequentialDayNumber = entry.day as number | null; // From API
+      // Get day number from first zonebook of first meter reader (if exists)
+      let zoneBookDay = entry.day as number | null; // Fallback to API day
       const meterReaders = entry.meterReaders || [];
 
       // Find existing day group or create new one
@@ -153,7 +155,7 @@ const SchedulePDF: FC<{
       if (!dayGroup) {
         dayGroup = {
           day: calendarDay,
-          dayNumber: sequentialDayNumber!, // Use the day number from API
+          dayNumber: zoneBookDay!, // Use the day number from API
           rows: [],
         };
         dayGroups.push(dayGroup);
@@ -165,7 +167,7 @@ const SchedulePDF: FC<{
           type: "data",
           content: {
             entry,
-            dayNumber: sequentialDayNumber!, // Use the day number from API
+            dayNumber: zoneBookDay!, // Use the day number from API
             isNoMeterReader: true,
             originalIndex: idx,
           },
@@ -173,11 +175,19 @@ const SchedulePDF: FC<{
       } else {
         // Handle entries with meter readers
         meterReaders.forEach((reader) => {
+          // For each reader, use their zonebook day
+          let readerDayNumber = zoneBookDay!; // Default to entry's zonebook day
+
+          if (reader.zoneBooks?.length > 0) {
+            // Use the day from this reader's first zonebook
+            readerDayNumber = reader.zoneBooks[0].day!;
+          }
+
           dayGroup!.rows.push({
             type: "data",
             content: {
               entry,
-              dayNumber: sequentialDayNumber!, // Use the day number from API
+              dayNumber: readerDayNumber ? readerDayNumber : sequentialDayNumber!, // Use the day number from API
               meterReader: reader,
               isNoMeterReader: false,
               originalIndex: idx,

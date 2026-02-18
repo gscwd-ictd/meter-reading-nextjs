@@ -10,13 +10,13 @@ export const UnbilledCard: FunctionComponent = () => {
     <DashboardCard
       title="Unbilled"
       // className="border bg-pink-100/70 dark:bg-gray-900"
-      titleClassName={Styles.light.titleClassName}
-      className={Styles.light.background}
-      icon={<SendIcon className={Styles.light.icon} />}
+      titleClassName={Styles.glass.titleClassName}
+      className={Styles.glass.background}
+      icon={<SendIcon className={Styles.glass.icon} />}
       // text-pink-400
     >
-      <div className={Styles.light.description}>1000</div>
-      <div className={Styles.light.text}>Unbilled for the month</div>
+      <div className={Styles.glass.description}>1000</div>
+      <div className={Styles.glass.text}>Unbilled for the month</div>
     </DashboardCard>
   );
 };

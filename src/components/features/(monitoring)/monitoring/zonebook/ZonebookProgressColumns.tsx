@@ -37,7 +37,9 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
         header: ({ column }) => <DataTableColumnHeader column={column} title="Sched. Date" />,
         cell: ({ row }) => (
           <div className="text-muted-foreground text-left">
-            {row.original.scheduleDate ? format(row.original.scheduleDate, "MMM dd, yyyy") : ""}
+            {row.original.scheduleDate !== null && row.original.scheduleDate !== "null"
+              ? format(row.original.scheduleDate, "MMM dd, yyyy")
+              : "-"}
           </div>
         ),
         meta: { exportLabel: "Sched. Date" },
@@ -49,6 +51,7 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
         header: "Meter Reader",
         cell: ({ row }) => <div className="text-left font-medium">{row.original.meterReader.name}</div>,
         meta: { exportLabel: "Meter Reader" },
+        enableSorting: true,
         filterFn: filterFn,
       },
 
