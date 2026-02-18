@@ -8,6 +8,7 @@ export const viewReadingZoneBookProgress = pgView("view_reading_zone_book_progre
   meterReaderId: varchar("meter_reader_id").notNull(),
   totalRead: integer("total_read"),
   totalAccounts: integer("total_accounts"),
+  scheduleDate: varchar("reading_date"),
   statusProgress: varchar("status_progress"),
   isCommitted: boolean("is_committed"),
 }).as(sql`
@@ -18,6 +19,7 @@ export const viewReadingZoneBookProgress = pgView("view_reading_zone_book_progre
         rd.meter_reader_id,
         count(*) filter ( where rd.is_read = true ) total_read,
         count(rd.account_number) as total_accounts,
+        vs.reading_date,
         case
             when count(*) filter ( where rd.is_completed = true ) = count(rd.account_number)
                 then 'completed'
@@ -31,11 +33,13 @@ export const viewReadingZoneBookProgress = pgView("view_reading_zone_book_progre
                 else false
         end as is_committed
     from reading_details rd
+    left join view_schedule vs on vs.zone = lpad(rd.zone_code, 2, '0') and vs.book = rd.book_code
     group by 
         rd.zone_code,
         rd.book_code, 
         rd.meter_reader_id,
-        date_trunc('month', rd.created_at)
+        date_trunc('month', rd.created_at),
+        vs.reading_date
     order by
         rd.zone_code::int,
         rd.book_code::int

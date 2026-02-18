@@ -13,8 +13,9 @@ import { meterReadingContext } from "@mr/server/context";
 import { and, eq, sql } from "drizzle-orm";
 import { readingDetails } from "@mr/server/db/schemas/reading-details";
 import { accountHistory, usage } from "@mr/server/db/schemas/account-ledger";
-import { format } from "date-fns";
+import { addMonths, format, startOfMonth } from "date-fns";
 import { AccountReadingDetails } from "@mr/server/types/reading-details.type";
+import { ReadingDetails } from "@mr/lib/validators/reading-details-schema";
 
 export class ReportsRepository implements IReportsRepository {
   async findReadingZoneBookProgress(month: number, year: number): Promise<ReadingZoneBookProgress[]> {
@@ -26,7 +27,12 @@ export class ReportsRepository implements IReportsRepository {
     const stmt = await db.pgConn
       .select()
       .from(viewReadingZoneBookProgress)
-      .where(sql`reading_month >= ${start} AND reading_month < ${end}`);
+      .where(
+        and(
+          sql`reading_month >= ${start} AND reading_month < ${end}`,
+          sql`reading_date >= ${start} AND reading_date <${end}`,
+        ),
+      );
 
     // Map results to include meter reader details
     const result = await Promise.all(
@@ -89,17 +95,24 @@ export class ReportsRepository implements IReportsRepository {
     return ReadingAccountProgressSchema.array().parse(result);
   }
 
+  private getDateRange(readingMonth: string): { start: string; end: string } {
+    const [year, month] = readingMonth.split("-").map(Number);
+
+    const startDate = new Date(year, month - 1, 1);
+    const start = format(startOfMonth(startDate), "yyyy-MM-dd");
+    const end = format(addMonths(startDate, 1), "yyyy-MM-dd");
+
+    return { start, end };
+  }
+
   async updateReadingProgress(data: UpdateReadingProgress): Promise<ReadingAccountProgress[]> {
     const { meterReaderId, zone, book, readingMonth } = data;
 
-    const [year, month] = readingMonth.split("-").map(Number);
-    const start = `${year}-${month.toString().padStart(2, "0")}-01`;
-    const endMonth = month === 12 ? 1 : month + 1;
-    const endYear = month === 12 ? year + 1 : year;
-    const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
+    const dateRange = this.getDateRange(readingMonth);
+    const dateRangeCondition = sql`created_at >= ${dateRange.start} AND created_at < ${dateRange.end}`;
 
     try {
-      await db.pgConn.transaction(async (tx) => {
+      const accountsToPost = await db.pgConn.transaction(async (tx) => {
         await tx
           .update(readingDetails)
           .set({ isCommitted: true, datetimeCommitted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
@@ -108,7 +121,7 @@ export class ReportsRepository implements IReportsRepository {
               eq(readingDetails.meterReaderId, meterReaderId),
               eq(readingDetails.zoneCode, zone),
               eq(readingDetails.bookCode, book),
-              sql`created_at >= ${start} AND created_at < ${end}`,
+              dateRangeCondition,
             ),
           );
 
@@ -120,7 +133,7 @@ export class ReportsRepository implements IReportsRepository {
               eq(accountHistory.meterReaderId, meterReaderId),
               eq(accountHistory.zoneCode, zone),
               eq(accountHistory.bookCode, book),
-              sql`created_at >= ${start} AND created_at < ${end}`,
+              dateRangeCondition,
             ),
           );
 
@@ -132,11 +145,11 @@ export class ReportsRepository implements IReportsRepository {
               eq(usage.meterReaderId, meterReaderId),
               eq(usage.zoneCode, zone),
               eq(usage.bookCode, book),
-              sql`created_at >= ${start} AND created_at < ${end}`,
+              dateRangeCondition,
             ),
           );
 
-        const accountDetails = await tx
+        return await tx
           .select()
           .from(readingDetails)
           .where(
@@ -147,39 +160,48 @@ export class ReportsRepository implements IReportsRepository {
               eq(readingDetails.meterReaderId, meterReaderId),
               eq(readingDetails.zoneCode, zone),
               eq(readingDetails.bookCode, book),
-              sql`created_at >= ${start} AND created_at < ${end}`,
+              dateRangeCondition,
               sql`current_reading - previous_reading >= 0`,
             ),
           );
-
-        const meterReader = await meterReadingContext
-          .getMeterReaderService()
-          .getMeterReaderDetailsById(meterReaderId);
-
-        const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-        // Process sequentially with delay
-        for (const item of accountDetails) {
-          await tx
-            .update(readingDetails)
-            .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
-            .where(eq(readingDetails.id, item.id));
-
-          await this.postedAccounts(item, meterReader.name);
-
-          // Add delay (e.g., 100ms between each account)
-          await delay(100);
-        }
       });
+
+      // Post to MSSQL outside transaction
+      const meterReader = await meterReadingContext
+        .getMeterReaderService()
+        .getMeterReaderDetailsById(meterReaderId);
+
+      await this.postAccountsSequentially(accountsToPost, meterReader.name);
 
       return await this.findReadingAccountProgress(data);
     } catch (error) {
-      console.log(error);
-      throw error;
+      console.error("Failed to update reading progress:", error);
+      throw new Error(
+        `Reading progress update failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   }
 
-  async postedAccounts(data: AccountReadingDetails, meterReaderName: string): Promise<string> {
+  private async postAccountsSequentially(accounts: ReadingDetails[], meterReaderName: string): Promise<void> {
+    console.log(accounts);
+    for (const account of accounts) {
+      try {
+        await db.pgConn
+          .update(readingDetails)
+          .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
+          .where(eq(readingDetails.id, account.id));
+        await this.postedAccounts(account, meterReaderName);
+        // Add delay between each account
+        await new Promise((resolve) => setTimeout(resolve, 5500));
+      } catch (error) {
+        console.error(`Failed to post account ${account.accountNumber}:`, error);
+        // Consider: retry logic, dead letter queue, or continue with next
+        throw error;
+      }
+    }
+  }
+
+  async postedAccounts(data: AccountReadingDetails, meterReaderName: string): Promise<void> {
     const readingDate = data.readingDate ? format(data.readingDate, "MM/dd/yyyy") : "";
     const dueDate = data.dueDate ? format(data.dueDate, "MM/dd/yyyy") : "";
     const disconnectionDate = data.disconnectionDate ? format(data.disconnectionDate, "MM/dd/yyyy") : "";
@@ -187,8 +209,18 @@ export class ReportsRepository implements IReportsRepository {
     const timeEnd = data.timeEnd ? format(data.timeEnd, "MM/dd/yyyy h:mm a") : "";
     const currentUsage = (data.currentReading ?? 0) - (data.previousReading ?? 0);
 
+    let billNumber;
+    const date = new Date();
+    const monthYear = date.getFullYear() * 100 + (date.getMonth() + 1);
+    const maxBill = await db.mssqlConn
+      .query`select max(bill_no) as max_bill from transactions_history where bill_no like ${monthYear.toString() + "%"}`;
+    if (maxBill.recordset[0].max_bill != null) {
+      billNumber = maxBill.recordset[0].max_bill + 1;
+    } else {
+      billNumber = parseInt(monthYear.toString() + "000001");
+    }
+
     try {
-      //TODO: change meterReader field
       const res = await db.mssqlConn.query`
           EXEC post2Ledger
             @accountNo = ${data.accountNumber},
@@ -207,11 +239,13 @@ export class ReportsRepository implements IReportsRepository {
             @arrears = ${data.arrears},
             @remarks = ${data.remarks},
             @timeStart = ${timeStart},
-            @timeEnd = ${timeEnd}`;
-      console.log(res);
+            @timeEnd = ${timeEnd},
+            @billNo = ${billNumber}`;
 
-      return "";
+      console.log(maxBill);
+      console.log(`Successfully posted account ${data.accountNumber}`, res.recordsets);
     } catch (error) {
+      console.error(`MSSQL post2Ledger failed for account ${data.accountNumber}:`, error);
       throw error;
     }
   }
