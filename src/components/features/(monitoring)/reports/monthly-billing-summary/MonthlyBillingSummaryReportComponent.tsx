@@ -4,7 +4,6 @@ import { YearMonthPickerWithSubmit } from "@mr/components/features/calendar/Year
 import { useSearchParams } from "next/navigation";
 import { FunctionComponent, PropsWithChildren, useState } from "react";
 import { MonthlyBillingSummaryPdf } from "./MonthlyBillingSummaryPdf";
-// import { SummaryOfBillsPdf } from "./SummaryOfBillsPdf";
 
 export const MonthlyBillingSummaryReportComponent: FunctionComponent<PropsWithChildren> = ({ children }) => {
   const searchParams = useSearchParams();

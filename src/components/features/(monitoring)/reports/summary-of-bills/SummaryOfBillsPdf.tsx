@@ -203,7 +203,7 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
           </Text>
           <HorizontalLine />
           <Text style={{ fontSize: 8, marginTop: 2, color: "#252525", textAlign: "center" }}>
-            CLERK PROCESSOR C
+            CUSTOMER SERVICE ASSISTANT B
           </Text>
         </View>
       </View>
@@ -675,7 +675,7 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["schedule", yearMonth],
+    queryKey: ["summary-of-bills", yearMonth],
     queryFn: async () => {
       // const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
       // const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);

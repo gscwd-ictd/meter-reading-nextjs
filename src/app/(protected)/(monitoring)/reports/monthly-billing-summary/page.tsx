@@ -11,7 +11,7 @@ import {
 import { Suspense } from "react";
 
 export default function MonthlyBillingSummaryPage() {
-  const underMaintenance: boolean = true;
+  const underMaintenance: boolean = false;
 
   return (
     <>

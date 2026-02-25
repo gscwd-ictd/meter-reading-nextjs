@@ -93,7 +93,7 @@ export const PdfHeader: FunctionComponent<HeaderProps> = ({ isFixed, isoCode, wi
       {/* RIGHT */}
       <View style={[styles.w20, { paddingLeft: 30 }]}>
         {/* ISO CODE */}
-        {!isoCode ? (
+        {isoCode ? (
           <View style={[{ position: "absolute", right: 0 }]}>
             <Text style={{ fontSize: 8, fontFamily: "Helvetica" }}>{isoCode}</Text>
           </View>
