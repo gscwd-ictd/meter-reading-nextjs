@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { Holidays } from "./holidays";
+import { HolidayFromHrms } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -27,7 +27,7 @@ import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDial
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
-  holidays: Holidays;
+  holidays: HolidayFromHrms[];
 };
 
 export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holidaysLoaded }) => {
