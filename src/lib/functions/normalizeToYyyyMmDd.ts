@@ -1,6 +1,11 @@
 import { format, parse, isValid } from "date-fns";
 
 export function normalizeToYyyyMmDd(dateStr: string): string | undefined {
+  // Guard against undefined or null
+  if (!dateStr) {
+    return undefined;
+  }
+
   // Case 1: Already in yyyy-MM-dd
   const isoPattern = /^\d{4}-\d{2}-\d{2}$/;
   if (isoPattern.test(dateStr)) {
