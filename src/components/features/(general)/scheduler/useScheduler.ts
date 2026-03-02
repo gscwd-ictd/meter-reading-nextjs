@@ -66,7 +66,7 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
   };
 
   const holidayDates = useMemo(
-    () => holidays.map((holiday) => normalizeToYyyyMmDd(holiday.holidayDate)),
+    () => holidays.map((holiday) => normalizeToYyyyMmDd(holiday.date)),
 
     // format(parse(holiday.date, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd"
     [holidays],
