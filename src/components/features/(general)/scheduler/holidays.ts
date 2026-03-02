@@ -2,7 +2,7 @@ export type Holidays = typeof holidays;
 
 export type Day = { id: string; name: string; date: string };
 export type Holiday = Day & { type: string };
-export type HolidayFromHrms = Omit<Holiday, "date"> & { holidayDate: string };
+export type HolidayFromHrms = Omit<Holiday, "date"> & { date: string }; // changed from holidayDate to date
 
 export const holidays = [
   // {
