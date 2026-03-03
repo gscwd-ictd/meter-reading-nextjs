@@ -10,16 +10,17 @@ import {
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
-import { CalendarCheck2, CalendarDaysIcon, CalendarPlus } from "lucide-react";
+import { CalendarCheck2, CalendarDaysIcon } from "lucide-react";
 import { Scheduler } from "./useScheduler";
 import { FunctionComponent, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { MeterReader } from "@mr/lib/types/personnel";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { useSearchParams } from "next/navigation";
 import { toDatesOrDateOnly, toDateString } from "@mr/lib/functions/handleDateArrayOrObject";
 import { toast } from "sonner";
+import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
+import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
 
 type PopulateSchedByDaysAlertDialogProps = {
   schedule: MeterReadingSchedule[];
@@ -33,6 +34,7 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
   const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
+  const setScheduleDays = useSchedulesStore((state) => state.setScheduleDays);
   const setHasFetchedThisMonthsSchedule = useSchedulesStore((state) => state.setHasFetchedSchedule);
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const refetchData = useSchedulesStore((state) => state.refetchData);
@@ -127,7 +129,10 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
   useEffect(() => {
     if (postSchedule.isSuccess) {
       refetchData!();
+
       postSchedule.reset();
+      setCurrentSchedule(mergeScheduleIntoCalendar(schedule, postSchedule.data));
+      setScheduleDays(extractScheduleByDay(mergeScheduleIntoCalendar(schedule, postSchedule.data)));
 
       setHasSchedule(true);
       setHasFetchedThisMonthsSchedule(true);

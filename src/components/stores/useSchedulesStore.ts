@@ -1,5 +1,5 @@
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import { MeterReadingEntryWithZonebooks, ScheduleDay } from "@mr/lib/types/schedule";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
@@ -11,6 +11,10 @@ export type SplitDate = {
 type SchedulesStore = {
   currentSchedule: MeterReadingEntryWithZonebooks[];
   setCurrentSchedule: (currentSchedule: MeterReadingEntryWithZonebooks[]) => void;
+  calendarSchedule: MeterReadingEntryWithZonebooks[];
+  setCalendarSchedule: (calendarSchedule: MeterReadingEntryWithZonebooks[]) => void;
+  scheduleDays: Array<ScheduleDay>;
+  setScheduleDays: (scheduleDays: Array<ScheduleDay>) => void;
   calendarIsSet: boolean;
   setCalendarIsSet: (calendarIsSet: boolean) => void;
   selectedScheduleEntry: MeterReadingEntryWithZonebooks | null;
@@ -67,6 +71,10 @@ type SchedulesStore = {
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
   currentSchedule: [],
   setCurrentSchedule: (currentSchedule) => set({ currentSchedule }),
+  calendarSchedule: [],
+  setCalendarSchedule: (calendarSchedule) => set({ calendarSchedule }),
+  scheduleDays: [],
+  setScheduleDays: (scheduleDays) => set({ scheduleDays }),
   calendarIsSet: false,
   setCalendarIsSet: (calendarIsSet) => set({ calendarIsSet }),
   selectedScheduleEntry: null,

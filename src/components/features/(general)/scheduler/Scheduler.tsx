@@ -24,6 +24,7 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
+import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
@@ -37,7 +38,10 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const monthYear = searchParams.get("date");
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const scheduleDays = useSchedulesStore((state) => state.scheduleDays);
+  const calendarSchedule = useSchedulesStore((state) => state.calendarSchedule);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const setCalendarSchedule = useSchedulesStore((state) => state.setCalendarSchedule);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
@@ -46,6 +50,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const setScheduleDays = useSchedulesStore((state) => state.setScheduleDays);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const [activeContext, setActiveContext] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -95,7 +100,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${currentMonthYear}`);
-
+        console.log(res.data, "FROM FETCH");
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
@@ -127,6 +132,11 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     if (!calendarIsSet && currentMonthYear) {
       const initialDates = scheduler.splitDates(datesToSplit);
       setCurrentSchedule(
+        initialDates.map((sched) => {
+          return { ...sched, meterReaders: [] };
+        }),
+      );
+      setCalendarSchedule(
         initialDates.map((sched) => {
           return { ...sched, meterReaders: [] };
         }),
@@ -187,6 +197,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
 
     if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && currentMonthYear) {
       setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
+      setScheduleDays(extractScheduleByDay(mergeScheduleIntoCalendar(currentSchedule, schedule)));
       hasScheduleOption();
       setRefetchData(() => refetch);
       setLastFetchedMonthYear(currentMonthYear);
@@ -237,6 +248,19 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
 
   return (
     <>
+      <div>Calendar is set: {JSON.stringify(calendarIsSet)}</div>
+      <div> Is fetching: {JSON.stringify(isFetching)}</div>
+      <div> Is loading: {JSON.stringify(isLoading)}</div>
+      <div> Current Month Year {JSON.stringify(currentMonthYear)}</div>
+      <div> Schedule {JSON.stringify(schedule && schedule.length)}</div>
+      <div> Schedule Days: {JSON.stringify(scheduleDays && scheduleDays.length)}</div>
+      <button
+        onClick={() => console.log(calendarSchedule)}
+        className="bg-primary rounded px-3 py-2 text-white"
+      >
+        Log Calendar
+      </button>
+
       <div className="flex h-full flex-col overflow-hidden bg-transparent">
         <header className="flex items-center justify-between px-2">
           <section className="flex items-center gap-4">

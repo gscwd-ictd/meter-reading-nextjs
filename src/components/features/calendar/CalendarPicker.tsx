@@ -15,9 +15,9 @@ interface CalendarPickerProps {
   disconnectionDate: Date | undefined;
   setDueDate: Dispatch<SetStateAction<Date | undefined>>;
   setDisconnectionDate: Dispatch<SetStateAction<Date | undefined>>;
-
   nonBusinessDays?: { id: string; date: string; name: string }[]; // e.g., "01-01", "12-25"
   holidays?: { id: string; name: string; date: string; type: string }[]; // e.g., "2025-08-07"
+  disabled?: boolean;
 }
 
 const CalendarPicker: React.FC<CalendarPickerProps> = ({
@@ -28,6 +28,7 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
   setDisconnectionDate,
   nonBusinessDays = [],
   holidays = [],
+  disabled = false,
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -57,7 +58,7 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
 
       return disconnection;
     },
-    [nonBusinessDays, holidays], // Only change if these arrays change
+    [nonBusinessDays, holidays],
   );
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
       <div className="flex flex-col gap-2">
         <label className="text-primary text-sm font-medium">Due Date</label>
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild disabled={disabled}>
             <div className="relative">
               <Input
                 readOnly
@@ -119,14 +120,17 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
                     {format(calendarMonth.date, "MMMM yyyy")}
                   </span>
                 ),
-                DayButton: ({ day, modifiers, ...props }) => (
-                  <button
-                    {...props}
-                    className={`text-sm ${modifiers.selected ? "text-primary font-black" : "font-normal text-gray-700"}`}
-                  >
-                    {day.date.getDate()}
-                  </button>
-                ),
+                DayButton: ({ day, modifiers, ...props }) => {
+                  const { displayIndex, ...buttonProps } = props as any;
+                  return (
+                    <button
+                      {...buttonProps}
+                      className={`text-sm ${modifiers.selected ? "text-primary font-black" : "font-normal text-gray-700"}`}
+                    >
+                      {day.date.getDate()}
+                    </button>
+                  );
+                },
               }}
             />
           </PopoverContent>
