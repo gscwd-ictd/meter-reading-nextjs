@@ -21,7 +21,6 @@ import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { Spinner } from "@mr/components/ui/Spinner";
 import findLatestMonthlyScheduleWithDay from "@mr/lib/functions/findLatestMonthlyScheduleWithDay";
-import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 
 type SubmitMeterReadingEntryWithZonebooks = {
   readingDate: string;
@@ -155,17 +154,6 @@ export const AddCustomScheduleEntryDialog = () => {
           </div>
         </>
 
-        <Button
-          type="button"
-          onClick={() =>
-            console.log(
-              // scheduleDays.filter((day) => isSameDay(day.readingDate, selectedScheduleEntry?.readingDate!)),
-              findLatestMonthlyScheduleWithDay(scheduleDays)?.day! + 1,
-            )
-          }
-        >
-          Log schedule days
-        </Button>
         {/* Footer */}
         <DialogFooter className="pt-6">
           <Button
