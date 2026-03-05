@@ -48,7 +48,7 @@ export const readingDetails = pgTable(
     classification: varchar("classification").notNull(),
     arrears: real("arrears").notNull(),
     currentReading: real("current_reading"),
-    currentUsage: real("current_usage"),
+    currentUsage: integer("current_usage"),
     billedAmount: real("billed_amount"),
     remarks: varchar("remarks"),
     additionalRemarks: varchar("additional_remarks"),
