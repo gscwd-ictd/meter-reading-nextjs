@@ -31,6 +31,7 @@ export const CreateReadingDetailsSchema = z4.object({
   classification: z4.string(),
   arrears: z4.number(),
   currentReading: z4.number().nullish(),
+  currentUsage: z4.number().nullish(),
   billedAmount: z4.number().nullish(),
   remarks: z4.string().nullish(),
   additionalRemarks: z4.string().nullish(),
