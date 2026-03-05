@@ -23,8 +23,8 @@ import { MeterReadingSummaryRepository } from "./services/meter-reading-summary/
 import { MeterReadingSummaryService } from "./services/meter-reading-summary/meter-reading-summary.service";
 import { ReadingRemarkRepository } from "./services/reading-remarks/reading-remark.repository";
 import { ReadingRemarkService } from "./services/reading-remarks/reading-remark.service";
-import { ReportsService } from "./services/reports/reports.repository";
-import { ReportsRepository } from "./services/reports/reports.service";
+import { ReportsService } from "./services/reports/reports.service";
+import { ReportsRepository } from "./services/reports/reports.repository";
 import { ScheduleRepository } from "./services/schedule/schedule.repository";
 import { ScheduleService } from "./services/schedule/schedule.service";
 import { UploadImageRepository } from "./services/upload-image/upload-image.repository";

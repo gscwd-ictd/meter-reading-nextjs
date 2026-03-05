@@ -49,6 +49,7 @@ export const ScheduleSchema = z.object({
     .object({
       scheduleMeterReaderId: z.string(),
       id: z.string(),
+      billed: z.coerce.number(),
       zoneBooks: ZoneBookSchema.pick({
         zone: true,
         book: true,
@@ -84,6 +85,7 @@ export const ScheduleReadingSchema = z.object({
       mobileNumber: z.string(),
       assignment: z.string(),
       photoUrl: z.string(),
+      billed: z.coerce.number(),
       zoneBooks: ZoneBookSchema.pick({
         zone: true,
         book: true,
