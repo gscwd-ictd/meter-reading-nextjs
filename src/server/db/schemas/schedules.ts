@@ -208,6 +208,7 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
       dueDate: object;
       disconnectionDate: object;
     }[];
+    billed: number;
     reassignment: {
       remarks: string;
       zoneBooks: {
@@ -232,6 +233,7 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
                 'scheduleMeterReaderId', smr.id,
                 'id', smr.meter_reader_id,
                 'zoneBooks', coalesce(zb.zone_books, '[]'::jsonb),
+                'billed', coalesce(bc.billed_count, 0),
                 'reassignment', coalesce(rj.reassignment, jsonb_build_object(
                     'remarks', null,
                     'zoneBooks', '[]'::jsonb
@@ -262,6 +264,22 @@ export const viewScheduleReading = pgView("view_schedule_reading", {
       and szb.book = vzbwa.book
       where szb.schedule_meter_reader_id = smr.id
   ) zb on true
+
+  -- billed count lateral join
+  left join lateral (
+      select count(rd.account_number) as billed_count
+      from schedule_zone_books szb
+      inner join reading_details rd
+          on szb.zone = lpad(rd.zone_code, 2, '0')
+         and szb.book = rd.book_code
+         and rd.is_read = true
+         and rd.is_completed = true
+         and rd.is_committed = true
+         and rd.is_posted = true
+         and rd.created_at >= s.reading_date
+         and rd.created_at < s.reading_date + interval '1 month'
+      where szb.schedule_meter_reader_id = smr.id
+  ) bc on true
 
   -- reassignment lateral join
   left join lateral (
@@ -315,10 +333,14 @@ export const viewSchedule = pgView("view_schedule", {
     szb.book,
     szb.day as zone_book_day,
     szb.due_date as zone_book_due_date,
-    szb.disconnection_date as zone_book_disconnection_date
+    szb.disconnection_date as zone_book_disconnection_date,
+    ra.remarks as remarks
   from schedules s
   inner join schedule_meter_readers smr 
     on s.id = smr.schedule_id
   inner join schedule_zone_books szb 
     on smr.id = szb.schedule_meter_reader_id
+  left join reassignments ra 
+    on smr.id = ra.schedule_meter_reader_id 
+  order by s.day
 `);
