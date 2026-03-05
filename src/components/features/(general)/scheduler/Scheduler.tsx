@@ -2,7 +2,7 @@
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useScheduler } from "./useScheduler";
-import { Holidays } from "./holidays";
+import { HolidayFromHrms } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,10 +24,11 @@ import { ScheduleEntryDialog } from "./ScheduleEntryDialog";
 import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReaderDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
+import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
-  holidays: Holidays;
+  holidays: HolidayFromHrms[];
 };
 
 export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holidaysLoaded }) => {
@@ -38,6 +39,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
+  const setCalendarSchedule = useSchedulesStore((state) => state.setCalendarSchedule);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
@@ -46,6 +48,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const setRefetchData = useSchedulesStore((state) => state.setRefetchData);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const setScheduleDays = useSchedulesStore((state) => state.setScheduleDays);
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const [activeContext, setActiveContext] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
@@ -95,7 +98,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${currentMonthYear}`);
-
+        console.log(res.data, "FROM FETCH");
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
@@ -127,6 +130,11 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     if (!calendarIsSet && currentMonthYear) {
       const initialDates = scheduler.splitDates(datesToSplit);
       setCurrentSchedule(
+        initialDates.map((sched) => {
+          return { ...sched, meterReaders: [] };
+        }),
+      );
+      setCalendarSchedule(
         initialDates.map((sched) => {
           return { ...sched, meterReaders: [] };
         }),
@@ -187,6 +195,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
 
     if (calendarIsSet && schedule && schedule.length > 0 && !isFetching && !isLoading && currentMonthYear) {
       setCurrentSchedule(mergeScheduleIntoCalendar(currentSchedule, schedule));
+      setScheduleDays(extractScheduleByDay(mergeScheduleIntoCalendar(currentSchedule, schedule)));
       hasScheduleOption();
       setRefetchData(() => refetch);
       setLastFetchedMonthYear(currentMonthYear);

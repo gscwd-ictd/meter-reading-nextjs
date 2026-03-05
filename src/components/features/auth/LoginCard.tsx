@@ -138,16 +138,17 @@ export const LoginCard: FunctionComponent = () => {
   return (
     <>
       <AnimatedBackground />
-      <Card className="w-full max-w-md rounded-xl border border-white/20 bg-white/80 shadow-xl backdrop-blur-md dark:border-slate-700/30 dark:bg-slate-900/80">
-        <CardContent className="relative space-y-6 p-8">
-          {/* Header Section */}
-          <div className="flex flex-col items-center space-y-3 text-center">
+      <Card className="h-full w-full rounded-none border border-white/20 bg-white/80 shadow-xl backdrop-blur-md dark:border-slate-700/30 dark:bg-slate-900/80">
+        <CardContent className="flex h-full w-full flex-col justify-center space-y-6 p-16">
+          {/* <div className="flex flex-col items-center space-y-3 text-center">
             <div className="bg-primary/10 rounded-full p-4 backdrop-blur-sm">
               <GaugeCircleIcon className="text-primary size-8" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">MetraX</h1>
             <p className="text-muted-foreground text-sm">Meter Reading Application</p>
-          </div>
+          </div> */}
+
+          <div className="text-lg font-bold">Log into MetraX</div>
 
           {/* Login Form */}
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -195,7 +196,7 @@ export const LoginCard: FunctionComponent = () => {
             </div>
 
             {/* Submit Button */}
-            <Button type="submit" className="w-full backdrop-blur-sm" disabled={isLoading}>
+            <Button type="submit" className="w-full backdrop-blur-sm dark:text-white" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">

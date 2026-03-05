@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 110,
     marginLeft: -70,
-    marginTop: -20,
+    marginTop: -14,
     position: "absolute",
     center: 0,
     left: 1,
@@ -85,20 +85,20 @@ export const PdfBillingSummaryHeader: FunctionComponent<HeaderProps> = ({
   dateRange,
 }) => {
   return (
-    <View style={[styles.rowContainer, { paddingBottom: 30, paddingTop: 0 }]} fixed={isFixed}>
+    <View style={[styles.rowContainer, { paddingBottom: 20, paddingTop: 2 }]} fixed={isFixed}>
       {/* Logo */}
       <View style={[styles.w10, { textAlign: "center" }]}>
         <Image src={GSCWDLogo.src} style={[styles.gscwdLogo]} />
       </View>
 
       {/* Date Time */}
-      <View style={[styles.w20, { flexDirection: "column", justifyContent: "center", gap: 2 }]}>
-        <View style={[styles.w100, { flexDirection: "row", justifyContent: "flex-end", gap: 4 }]}>
-          <Text style={{ fontSize: 10 }}>Run Date</Text>
+      <View style={[styles.w20, { flexDirection: "column", justifyContent: "flex-start", gap: 0 }]}>
+        <View style={[styles.w100, { flexDirection: "row", justifyContent: "flex-start", gap: 4 }]}>
+          <Text style={{ fontSize: 10 }}>Run Date :</Text>
           <Text style={{ fontSize: 10 }}>{dateTime ? format(dateTime, "MM/dd/yyyy") : null}</Text>
         </View>
 
-        <View style={[styles.w100, { flexDirection: "row", justifyContent: "flex-end", gap: 4 }]}>
+        <View style={[styles.w100, { flexDirection: "row", justifyContent: "flex-start", gap: 4 }]}>
           <Text style={{ fontSize: 10 }}>Run Time :</Text>
           <Text style={{ fontSize: 10 }}>{dateTime ? format(dateTime, "hh:mm:ssa") : null}</Text>
         </View>
@@ -115,6 +115,10 @@ export const PdfBillingSummaryHeader: FunctionComponent<HeaderProps> = ({
         <Text style={{ fontSize: 10, paddingTop: 2 }}>Telephone No.: 552-3824; Telefax No.: 553-4960</Text>
         <Text style={{ fontSize: 10, paddingTop: 2 }}>Email Address: gscwaterdistrict@yahoo.com</Text>
         <Text style={[{ fontWeight: "bold", fontSize: "10", paddingTop: 2 }]}>BILLING SUMMARY</Text>
+        <Text style={{ fontSize: 10, fontWeight: "bold", paddingTop: 2, letterSpacing: 0.5 }}>
+          {dateRange && dateRange.from ? format(dateRange.from, "MM/dd/yyyy") : ""} to{" "}
+          {dateRange && dateRange.to ? format(dateRange.to, "MM/dd/yyyy") : ""}
+        </Text>
       </View>
 
       {/* RIGHT */}
@@ -125,19 +129,19 @@ export const PdfBillingSummaryHeader: FunctionComponent<HeaderProps> = ({
             <Text style={{ fontSize: 10, fontWeight: "Bold", fontFamily: "Helvetica" }}>{isoCode}</Text>
           </View>
         ) : null}
-        <View style={[styles.w100, { flexDirection: "row", justifyContent: "center" }]}>
+        <View style={[styles.w100, { flexDirection: "row", justifyContent: "flex-end" }]}>
           <Text style={{ fontSize: 11 }}>
             Page {page ? page.current : 1} of {page ? page.total : 1}
           </Text>
         </View>
-        <View
+        {/* <View
           style={[
             styles.w100,
             {
               flexDirection: "row",
               justifyContent: "flex-end",
               alignItems: "flex-end",
-              paddingRight: 10,
+              paddingRight: 0,
               height: "40px",
             },
           ]}
@@ -146,7 +150,7 @@ export const PdfBillingSummaryHeader: FunctionComponent<HeaderProps> = ({
             {dateRange && dateRange.from ? format(dateRange.from, "MM/dd/yyyy") : ""} to{" "}
             {dateRange && dateRange.to ? format(dateRange.to, "MM/dd/yyyy") : ""}
           </Text>
-        </View>
+        </View> */}
 
         {/* ISO LOGO */}
         {/* {withIsoLogo ? <Image src={IsoAccreditorLogo.src} style={[styles.isoLogo]} /> : null} */}

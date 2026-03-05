@@ -458,7 +458,7 @@ const SchedulePDF: FC<{
   );
 };
 
-export const MeterReadingSchedulePdf: FC<ScheduleTableProps> = ({ yearMonth }) => {
+export const MeterReadingSchedulePdfUpdated: FC<ScheduleTableProps> = ({ yearMonth }) => {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
