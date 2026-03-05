@@ -24,6 +24,7 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
       },
       {
         accessorKey: "isAverage",
+        accessorFn: (row) => (row.isAverage === true ? "Yes" : "No"),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Average" />,
         cell: ({ row }) => (
           <>
@@ -31,12 +32,14 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
           </>
         ),
         enableColumnFilter: true,
+        filterFn: filterFn,
         enableSorting: true,
         meta: { exportLabel: "Is Average" },
       },
 
       {
         accessorKey: "isZeroConsumption",
+        accessorFn: (row) => (row.isAverage === true ? "Yes" : "No"),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Zero Consumption" />,
         cell: ({ row }) => (
           <>
@@ -44,11 +47,13 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
           </>
         ),
         enableColumnFilter: true,
+        filterFn: filterFn,
         meta: { exportLabel: "Is Zero Consumption" },
         enableSorting: true,
       },
       {
         accessorKey: "isNegativeConsumption",
+        accessorFn: (row) => (row.isAverage === true ? "Yes" : "No"),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Negative Consumption" />,
         cell: ({ row }) => (
           <>
@@ -56,11 +61,13 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
           </>
         ),
         enableColumnFilter: true,
+        filterFn: filterFn,
         meta: { exportLabel: "Is Negative Consumption" },
         enableSorting: true,
       },
       {
         accessorKey: "isActive",
+        accessorFn: (row) => (row.isAverage === true ? "Yes" : "No"),
         header: ({ column }) => <DataTableColumnHeader column={column} title="Active" />,
         cell: ({ row }) => (
           <>
@@ -68,6 +75,7 @@ export const useReadingRemarksColumns = (data: ReadingRemark[] | undefined) => {
           </>
         ),
         enableColumnFilter: true,
+        filterFn: filterFn,
         meta: { exportLabel: "Is Active" },
         enableSorting: true,
       },

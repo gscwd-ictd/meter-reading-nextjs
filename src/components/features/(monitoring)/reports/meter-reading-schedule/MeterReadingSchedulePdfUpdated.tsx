@@ -397,10 +397,24 @@ const SchedulePDF: FC<{
           </Text>
         </View>
         <View style={[styles.tableCol, styles.w10]}>
-          <Text style={styles.cellText}>{item.isNoMeterReader ? "-" : "0"}</Text>
+          <Text style={styles.cellText}>
+            {item.isNoMeterReader
+              ? "-"
+              : !item.isNoMeterReader && item.meterReader?.billed
+                ? item.meterReader?.billed
+                : "-"}
+          </Text>
+          {/* <Text style={styles.cellText}>Billed test</Text> */}
         </View>
         <View style={[styles.tableCol, styles.w10]}>
-          <Text style={styles.cellText}>{item.isNoMeterReader ? "-" : "N/A"}</Text>
+          <Text style={styles.cellText}>
+            {item.isNoMeterReader
+              ? "-"
+              : !item.isNoMeterReader && item.meterReader?.remarks
+                ? item.meterReader?.remarks
+                : "N/A"}
+          </Text>
+          {/* <Text style={styles.cellText}>Remarks test</Text> */}
         </View>
       </View>
     );
@@ -465,7 +479,9 @@ export const MeterReadingSchedulePdfUpdated: FC<ScheduleTableProps> = ({ yearMon
   const { data, isLoading, isError } = useQuery<BilledMeterReadingSchedule[]>({
     queryKey: ["schedule", yearMonth],
     queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_MR_BE}/summary/meter-reading/schedule?date=${yearMonth}`,
+      );
       return res.data;
     },
     enabled: !!yearMonth,

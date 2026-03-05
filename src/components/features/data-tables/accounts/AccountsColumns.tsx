@@ -38,16 +38,19 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
         accessorKey: "previousReading",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Previous" />,
         cell: ({ row }) => <span className="text-sm">{row.original.previousReading}</span>,
+        filterFn: filterFn,
         enableColumnFilter: false,
       },
       {
         accessorKey: "currentReading",
+        filterFn: filterFn,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Current" />,
         cell: ({ row }) => <span className="text-sm">{row.original.currentReading}</span>,
         enableColumnFilter: false,
       },
       {
         id: "consumption",
+        filterFn: filterFn,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Consumption" />,
         cell: ({ row }) => (
           <span className="text-sm">
@@ -59,6 +62,7 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
       },
       {
         accessorKey: "readingDate",
+        filterFn: filterFn,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Reading Date" />,
         cell: ({ row }) => (
           <span className="text-xs">

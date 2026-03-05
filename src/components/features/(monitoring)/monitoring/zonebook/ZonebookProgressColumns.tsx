@@ -3,7 +3,7 @@ import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-c
 import { Progress } from "@mr/components/ui/Progress";
 import { ZonebookProgress } from "@mr/lib/types/zonebook";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { format } from "date-fns";
+import { format, formatDate, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 
 export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined) => {
@@ -34,6 +34,9 @@ export const useZonebookProgressColumns = (data: ZonebookProgress[] | undefined)
       },
       {
         accessorKey: "scheduleDate",
+        accessorFn: ({ scheduleDate }) => {
+          return format(parseISO(scheduleDate), "MMMM dd, yyyy");
+        },
         header: ({ column }) => <DataTableColumnHeader column={column} title="Sched. Date" />,
         cell: ({ row }) => (
           <div className="text-muted-foreground text-left">
