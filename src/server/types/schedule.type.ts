@@ -43,8 +43,8 @@ export const ScheduleSchema = z.object({
   id: z.string(),
   day: z.coerce.number().nullish(),
   readingDate: z.string(),
-  dueDate: DateValueSchema,
-  disconnectionDate: DateValueSchema,
+  dueDate: DateValueSchema.nullish(),
+  disconnectionDate: DateValueSchema.nullish(),
   meterReaders: z
     .object({
       scheduleMeterReaderId: z.string(),

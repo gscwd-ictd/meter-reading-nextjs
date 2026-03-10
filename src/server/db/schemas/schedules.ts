@@ -24,8 +24,8 @@ export const schedules = pgTable(
     id: uuid("id").defaultRandom().primaryKey().notNull(),
     day: integer("day"),
     readingDate: date("reading_date").unique().notNull(),
-    dueDate: jsonb("due_date").notNull(),
-    disconnectionDate: jsonb("disconnection_date").notNull(),
+    dueDate: jsonb("due_date"),
+    disconnectionDate: jsonb("disconnection_date"),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
       .defaultNow()

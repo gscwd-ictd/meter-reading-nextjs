@@ -23,6 +23,7 @@ export const ReadingAccountProgressSchema = z.object({
   book: z.coerce.string(),
   currentReading: z.coerce.number(),
   previousReading: z.coerce.number(),
+  usage: z.coerce.number(),
   averageUsage: z.coerce.number(),
   billedAmount: z.coerce.number(),
   isRead: z.coerce.boolean(),

@@ -9,4 +9,9 @@ export const dashboardHandler = new Hono()
   .get("/consumer-counts", async (c) => {
     const result = await dashboardService.countConsumer();
     return c.json(result);
+  })
+
+  .get("/monthly-reading-counts", async (c) => {
+    const result = await dashboardService.getMonthlyReadingCounts();
+    return c.json(result);
   });
