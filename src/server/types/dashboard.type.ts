@@ -7,4 +7,12 @@ export const ConsumerCountSchema = z.object({
   writeOff: z.coerce.number(),
 });
 
+export const MonthlyReadingCountsSchema = z.object({
+  billed: z.coerce.number(),
+  unbilled: z.coerce.number(),
+  remarks: z.coerce.number(),
+  newMeters: z.coerce.number(),
+});
+
 export type ConsumerCount = z.infer<typeof ConsumerCountSchema>;
+export type MonthlyReadingCounts = z.infer<typeof MonthlyReadingCountsSchema>;

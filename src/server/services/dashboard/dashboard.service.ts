@@ -8,4 +8,8 @@ export class DashboardService implements IDashboardService {
   async countConsumer(): Promise<ConsumerCount> {
     return this.repository.countConsumer();
   }
+
+  async getMonthlyReadingCounts(): Promise<any> {
+    return this.repository.getMonthlyReadingCounts();
+  }
 }
