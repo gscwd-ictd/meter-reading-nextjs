@@ -2,8 +2,15 @@ import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { CircleGaugeIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { Styles } from "./styles";
+import { Spinner } from "@mr/components/ui/Spinner";
 
-export const NewMetersCard: FunctionComponent = () => {
+type CardProps = {
+  isLoading?: boolean;
+  isFetched?: boolean;
+  data: number | undefined;
+};
+
+export const NewMetersCard: FunctionComponent<CardProps> = ({ data, isFetched, isLoading }) => {
   // useQuery function here
 
   return (
@@ -18,7 +25,15 @@ export const NewMetersCard: FunctionComponent = () => {
         // text-sky-400
       }
     >
-      <div className={Styles.light.description}>5</div>
+      <div className={Styles.light.description}>
+        {isLoading && !isFetched ? (
+          <Spinner className="size-10" />
+        ) : !isLoading && isFetched && data !== undefined ? (
+          data
+        ) : (
+          "-"
+        )}
+      </div>
       <div className={Styles.light.text}>New meters for the month</div>
     </DashboardCard>
   );

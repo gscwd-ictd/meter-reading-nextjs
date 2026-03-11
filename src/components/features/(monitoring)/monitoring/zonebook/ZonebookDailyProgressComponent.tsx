@@ -141,6 +141,25 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
     retry: 2,
   });
 
+  // negative consumption
+  const countNegativeUsage = () => {
+    return (
+      selectedZonebookWithAccounts &&
+      selectedZonebookWithAccounts.reduce((count, item) => {
+        return item.usage < 0 ? count + 1 : count;
+      }, 0)
+    );
+  };
+
+  // with remarks
+  const withRemarksCount = () => {
+    return (
+      selectedZonebookWithAccounts &&
+      selectedZonebookWithAccounts.reduce((count, item) => {
+        return item.remarks !== "Normal Reading" && item.remarks !== "" ? count + 1 : count;
+      }, 0)
+    );
+  };
   return (
     <>
       <div className="mt-4 space-y-4">
@@ -191,7 +210,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
               {/* Cards Section */}
               {!isLoading && selectedZonebookWithAccounts && selectedZonebookWithAccounts.length > 0 ? (
                 <>
-                  <div className="mt-0 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="mt-0 grid grid-cols-1 gap-4 sm:grid-cols-4">
                     {/* Summary Card */}
                     <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                       <div className="mb-3 flex items-center justify-between">
@@ -218,12 +237,12 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                             <span className="text-sm">Unbilled</span>
                           </div>
                           <span className="font-semibold text-yellow-600 dark:text-yellow-400">
-                            {selectedZonebookWithAccounts.filter((a) => !a.isRead).length}
+                            {selectedZonebookWithAccounts.filter((a) => !a.isRead && a.isCompleted).length}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between border-t pt-2 dark:border-gray-700">
-                          <span className="text-sm font-medium">Total Service Connections</span>
+                        <div className="flex items-center justify-between pt-2 dark:border-gray-700">
+                          <span className="text-sm font-medium">Total accounts for reading</span>
                           <span className="font-bold text-gray-800 dark:text-gray-200">
                             {selectedZonebookWithAccounts.length}
                           </span>
@@ -231,7 +250,31 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                       </div>
                     </div>
 
+                    {/* With Remarks Card */}
+                    <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                      <h3 className="mb-4 font-semibold text-amber-500 dark:text-amber-300">With Remarks</h3>
+                      <div className="space-y-2">
+                        <p className="text-3xl font-bold text-amber-500 dark:text-amber-400">
+                          {withRemarksCount()}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Accounts</p>
+                      </div>
+                    </div>
+
                     {/* Consumption Card */}
+                    <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                      <h3 className="mb-4 font-semibold text-red-700 dark:text-red-300">
+                        Negative Consumption
+                      </h3>
+                      <div className="space-y-2">
+                        <p className="text-3xl font-bold text-red-900 dark:text-red-400">
+                          {countNegativeUsage()}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Accounts</p>
+                      </div>
+                    </div>
+
+                    {/* Third Card Placeholder - You could add another metric here */}
                     <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                       <h3 className="mb-4 font-semibold text-gray-700 dark:text-gray-300">
                         Total Consumption
@@ -250,16 +293,6 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Cubic Meters</p>
                       </div>
                     </div>
-
-                    {/* Third Card Placeholder - You could add another metric here */}
-                    {/* <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-800/50">
-                      <h3 className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Additional Metrics
-                      </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
-                        Add more insights or statistics here
-                      </p>
-                    </div> */}
                   </div>
 
                   {/* Data Table Section */}

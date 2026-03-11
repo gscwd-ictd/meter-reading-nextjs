@@ -21,11 +21,10 @@ export type AccountDetails = {
   zone: string;
   book: string;
   meterNumber: string;
-};
-
-export type BilledAccount = AccountDetails & {
   usage: number;
 };
+
+export type BilledAccount = AccountDetails;
 
 export type WithRemarksAccount = BilledAccount & {
   remarks: string;

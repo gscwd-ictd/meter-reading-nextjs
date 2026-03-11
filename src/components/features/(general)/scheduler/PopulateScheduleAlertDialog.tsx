@@ -70,7 +70,6 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
           day: schedule.day,
         };
       });
-
       const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
       return res.data;
     },
@@ -141,7 +140,7 @@ export const PopulateScheduleAlertDialog: FunctionComponent<PopulateScheduleAler
     <AlertDialog>
       <AlertDialogTrigger
         disabled={isDisabled()}
-        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white`}
+        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:bg-gray-400 hover:text-white dark:text-white`}
       >
         {hasPopulatedMeterReaders ? (
           <CalendarCheck2 className="size-5" />

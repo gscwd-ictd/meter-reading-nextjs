@@ -2,8 +2,15 @@ import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { ReceiptTextIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { Styles } from "./styles";
+import { Spinner } from "@mr/components/ui/Spinner";
 
-export const BilledCard: FunctionComponent = () => {
+type CardProps = {
+  isLoading?: boolean;
+  isFetched?: boolean;
+  data: number | undefined;
+};
+
+export const BilledCard: FunctionComponent<CardProps> = ({ data, isFetched, isLoading }) => {
   // useQuery function here
   return (
     <DashboardCard
@@ -16,7 +23,15 @@ export const BilledCard: FunctionComponent = () => {
         // text-cyan-600
       }
     >
-      <div className={Styles.gradientBlue.description}>1500</div>
+      <div className={Styles.gradientBlue.description}>
+        {isLoading && !isFetched ? (
+          <Spinner className="size-10" />
+        ) : !isLoading && isFetched && data !== undefined ? (
+          data
+        ) : (
+          "-"
+        )}
+      </div>
       <div className={Styles.gradientBlue.text}>Billed for the month</div>
     </DashboardCard>
   );
