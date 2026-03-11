@@ -49,14 +49,10 @@ export const useAccountsColumns = (data: AccountDetails[]) => {
         enableColumnFilter: false,
       },
       {
-        id: "consumption",
+        accessorKey: "usage",
         filterFn: filterFn,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Consumption" />,
-        cell: ({ row }) => (
-          <span className="text-sm">
-            {row.original.currentReading ? row.original.currentReading - row.original.previousReading : "—"}
-          </span>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Usage" />,
+        cell: ({ row }) => <span className="text-sm">{row.original.usage}</span>,
         enableColumnFilter: false,
         enableSorting: true,
       },

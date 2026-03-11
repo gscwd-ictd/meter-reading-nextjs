@@ -98,7 +98,6 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${currentMonthYear}`);
-        console.log(res.data, "FROM FETCH");
         return res.data as MeterReadingEntryWithZonebooks[];
       } catch (error) {
         console.log(error);
