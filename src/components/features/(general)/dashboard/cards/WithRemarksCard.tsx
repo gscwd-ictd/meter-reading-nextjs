@@ -2,8 +2,15 @@ import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { TextQuoteIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { Styles } from "./styles";
+import { Spinner } from "@mr/components/ui/Spinner";
 
-export const WithRemarksCard: FunctionComponent = () => {
+type CardProps = {
+  isLoading?: boolean;
+  isFetched?: boolean;
+  data: number | undefined;
+};
+
+export const WithRemarksCard: FunctionComponent<CardProps> = ({ data, isFetched, isLoading }) => {
   // useQuery function here
 
   return (
@@ -17,7 +24,15 @@ export const WithRemarksCard: FunctionComponent = () => {
         // text-violet-400
       }
     >
-      <div className={Styles.glassBlue.description}>58</div>
+      <div className={Styles.glassBlue.description}>
+        {isLoading && !isFetched ? (
+          <Spinner className="size-10" />
+        ) : !isLoading && isFetched && data !== undefined ? (
+          data
+        ) : (
+          "-"
+        )}
+      </div>
       <div className={Styles.glassBlue.text}>With remarks for the month</div>
     </DashboardCard>
   );

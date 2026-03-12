@@ -10,8 +10,28 @@ import { UnbilledCard } from "./cards/UnbilledCard";
 import { NewMetersCard } from "./cards/NewMetersCard";
 import { WithRemarksCard } from "./cards/WithRemarksCard";
 import { ConsumersByCategory } from "./ConsumersByCategory";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+type ReadingCount = {
+  billed: number;
+  unbilled: number;
+  remarks: number;
+  newMeters: number;
+};
 
 export const DashboardComponent: FunctionComponent = () => {
+  const {
+    data: monthlyReadingCount,
+    isLoading,
+    isFetched,
+  } = useQuery({
+    queryKey: ["monthly-reading-counts"],
+    queryFn: async () => {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/dashboard/monthly-reading-counts`);
+      return res.data as ReadingCount;
+    },
+  });
   return (
     <div className="-mb-4 flex h-full w-full flex-1 flex-col gap-4">
       {/* Welcome back  */}
@@ -25,16 +45,16 @@ export const DashboardComponent: FunctionComponent = () => {
       {/* Four cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4">
         {/* Billed */}
-        <BilledCard />
+        <BilledCard isLoading={isLoading} isFetched={isFetched} data={monthlyReadingCount?.billed} />
 
         {/* Unbilled */}
-        <UnbilledCard />
+        <UnbilledCard isLoading={isLoading} isFetched={isFetched} data={monthlyReadingCount?.unbilled} />
 
         {/* With Remarks */}
-        <WithRemarksCard />
+        <WithRemarksCard isLoading={isLoading} isFetched={isFetched} data={monthlyReadingCount?.remarks} />
 
         {/* New Meters */}
-        <NewMetersCard />
+        <NewMetersCard isLoading={isLoading} isFetched={isFetched} data={monthlyReadingCount?.newMeters} />
       </div>
 
       {/* Consumption and Consumer Cards */}

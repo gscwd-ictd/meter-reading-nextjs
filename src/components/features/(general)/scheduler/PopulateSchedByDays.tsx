@@ -143,7 +143,7 @@ export const PopulateSchedByDays: FunctionComponent<PopulateSchedByDaysAlertDial
     <AlertDialog>
       <AlertDialogTrigger
         disabled={isDisabled()}
-        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:brightness-75 dark:text-white`}
+        className={`${isDisabled() ? "hidden" : "block"} flex w-full gap-2 px-2 py-1 text-sm hover:bg-gray-400 hover:text-white dark:text-white`}
       >
         {hasPopulatedMeterReaders ? (
           <CalendarCheck2 className="size-5" />
