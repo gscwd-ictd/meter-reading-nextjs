@@ -167,7 +167,7 @@ export class ReportsRepository implements IReportsRepository {
               eq(readingDetails.zoneCode, zone),
               eq(readingDetails.bookCode, book),
               dateRangeCondition,
-              sql`current_reading - previous_reading >= 0`,
+              sql`current_usage >= 0`,
             ),
           );
       });
@@ -177,7 +177,18 @@ export class ReportsRepository implements IReportsRepository {
         .getMeterReaderService()
         .getMeterReaderDetailsById(meterReaderId);
 
-      await this.postAccountsSequentially(accountsToPost, meterReader.name);
+      const reformatName = (fullName: string): string => {
+        const [lastName, rest] = fullName.split(", ");
+        const parts = rest.trim().split(" ");
+        const firstName = parts[0];
+        const middle = parts.slice(1).join(" ");
+        return `${firstName} ${middle} ${lastName}`.trim();
+      };
+
+      // "Artajo, Charlesbe D." → "Charlesbe D. Artajo"
+      const meterReaderName = reformatName(meterReader.name);
+
+      await this.postAccountsSequentially(accountsToPost, meterReaderName);
 
       return await this.findReadingAccountProgress(data);
     } catch (error) {
@@ -195,9 +206,10 @@ export class ReportsRepository implements IReportsRepository {
           .update(readingDetails)
           .set({ isPosted: true, datetimePosted: sql`NOW() AT TIME ZONE 'Asia/Manila'` })
           .where(eq(readingDetails.id, account.id));
+
         await this.postedAccounts(account, meterReaderName);
         // Add delay between each account
-        // await new Promise((resolve) => setTimeout(resolve, 5500));
+        //await new Promise((resolve) => setTimeout(resolve, 5500));
       } catch (error) {
         console.error(`Failed to post account ${account.accountNumber}:`, error);
         // Consider: retry logic, dead letter queue, or continue with next
@@ -212,7 +224,7 @@ export class ReportsRepository implements IReportsRepository {
     const disconnectionDate = data.disconnectionDate ? format(data.disconnectionDate, "MM/dd/yyyy") : "";
     const timeStart = data.timeStart ? format(data.timeStart, "MM/dd/yyyy h:mm a") : "";
     const timeEnd = data.timeEnd ? format(data.timeEnd, "MM/dd/yyyy h:mm a") : "";
-    const currentUsage = (data.currentReading ?? 0) - (data.previousReading ?? 0);
+    const currentUsage = data.currentUsage ?? 0;
 
     let billNumber;
     const date = new Date();
@@ -228,7 +240,6 @@ export class ReportsRepository implements IReportsRepository {
     try {
       const res = await db.mssqlConn.query`
           EXEC post2Ledger
-            @billNo = ${billNumber},
             @accountNo = ${data.accountNumber},
             @readingDate = ${readingDate},
             @billDate = ${readingDate},
@@ -245,7 +256,8 @@ export class ReportsRepository implements IReportsRepository {
             @arrears = ${data.arrears},
             @remarks = ${data.remarks},
             @timeStart = ${timeStart},
-            @timeEnd = ${timeEnd}`;
+            @timeEnd = ${timeEnd},
+            @billNo = ${billNumber.toString()}`;
 
       console.log(billNumber);
       console.log(res.recordset);

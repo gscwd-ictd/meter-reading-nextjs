@@ -1,12 +1,15 @@
 import { IDashboardRepository } from "@mr/server/interfaces/dashboard/dashboard.interface.repository";
 import {
   ConsumerCount,
+  CountReadingsByReaderZoneBook,
+  CountReadingsByReaderZoneBookSchema,
   MonthlyReadingCounts,
   MonthlyReadingCountsSchema,
 } from "@mr/server/types/dashboard.type";
 import db from "@mr/server/db/connections";
 import { countConsumerByStatusView } from "@mr/server/db/schemas/dashboard";
-import { sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
+import { readingDetails } from "@mr/server/db/schemas/reading-details";
 
 export class DashboardRepository implements IDashboardRepository {
   async countConsumer(): Promise<ConsumerCount> {
@@ -32,8 +35,7 @@ export class DashboardRepository implements IDashboardRepository {
       from 
         new_meters 
       where 
-        is_committed = true 
-        and date_time >= date_trunc('month', current_date)
+        date_time >= date_trunc('month', current_date)
         and date_time < date_trunc('month', current_date) + interval '1 month';
       `);
 
@@ -43,5 +45,30 @@ export class DashboardRepository implements IDashboardRepository {
     };
 
     return MonthlyReadingCountsSchema.parse(raw);
+  }
+
+  async mobileCountReadingsByReaderZoneBook(
+    meterReaderId: string,
+    zone: string,
+    book: string,
+  ): Promise<CountReadingsByReaderZoneBook> {
+    const sample = await db.pgConn.execute(sql`
+        select
+          count(*) as count
+        from 
+          reading_details
+        where
+          meter_reader_id = ${meterReaderId}
+        and 
+          zone_code = ${zone}
+        and
+          book_code = ${book}
+        and  
+          created_at >= date_trunc('month', current_date)
+        and
+          created_at < date_trunc('month', current_date) + interval '1 month';
+      `);
+
+    return CountReadingsByReaderZoneBookSchema.parse(sample.rows[0]);
   }
 }
