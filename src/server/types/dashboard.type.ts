@@ -14,5 +14,10 @@ export const MonthlyReadingCountsSchema = z.object({
   newMeters: z.coerce.number(),
 });
 
+export const CountReadingsByReaderZoneBookSchema = z.object({
+  count: z.coerce.number(),
+});
+
 export type ConsumerCount = z.infer<typeof ConsumerCountSchema>;
 export type MonthlyReadingCounts = z.infer<typeof MonthlyReadingCountsSchema>;
+export type CountReadingsByReaderZoneBook = z.infer<typeof CountReadingsByReaderZoneBookSchema>;

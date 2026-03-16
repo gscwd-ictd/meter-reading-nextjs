@@ -15,6 +15,7 @@ export const AccountReadingDetailsSchema = z4.object({
   remarks: z4.coerce.string().nullish(),
   timeStart: z4.coerce.date().nullish(),
   timeEnd: z4.coerce.date().nullish(),
+  currentUsage: z4.coerce.number().nullish(),
 });
 
 export type AccountReadingDetails = z4.infer<typeof AccountReadingDetailsSchema>;
