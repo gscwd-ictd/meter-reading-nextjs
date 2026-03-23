@@ -40,6 +40,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
   const noDueDiscDays = useSchedulesStore((state) => state.noDueDiscDays);
+  const setNoDueDiscDays = useSchedulesStore((state) => state.setNoDueDiscDays);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setCalendarSchedule = useSchedulesStore((state) => state.setCalendarSchedule);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
@@ -221,6 +222,8 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     setCurrentSchedule([]);
 
     setLastFetchedMonthYear(null);
+
+    setNoDueDiscDays([0, 6]);
   };
 
   // update the state of currentSchedule based on the fetched schedule
