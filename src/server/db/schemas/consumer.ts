@@ -153,7 +153,10 @@ export const scheduleReadingAccountView = pgView("view_schedule_reading_account"
                     )
                     from billing_adjustments ba
                   ),
-                  'isExist', exists( select 1 from reading_details rd where rd.account_number = vmr.account_no),
+                  'isExist', exists( 
+                   select 1 from reading_details rd where rd.account_number = vmr.account_no 
+                   and date_trunc('month', rd.created_at at time zone 'Asia/Manila') = date_trunc('month', now() at time zone 'Asia/Manila')
+                  ),
                   'dateToday', now() at time zone  'Asia/Manila'
                 )
               )
