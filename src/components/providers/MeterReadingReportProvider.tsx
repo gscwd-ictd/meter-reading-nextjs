@@ -26,8 +26,8 @@ type MeterReadingReportState = {
   setSelectedTab: Dispatch<SetStateAction<TabValue>>;
   hasFetched: boolean;
   setHasFetched: Dispatch<SetStateAction<boolean>>;
-  monthYear: string;
-  setMonthYear: Dispatch<SetStateAction<string>>;
+  monthYear: string | null;
+  setMonthYear: Dispatch<SetStateAction<string | null>>;
 };
 
 const MeterReadingReportContext = createContext({} as MeterReadingReportState);
@@ -36,7 +36,7 @@ export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = 
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TabValue>("billed");
   const [hasFetched, setHasFetched] = useState<boolean>(false);
-  const [monthYear, setMonthYear] = useState<string>("");
+  const [monthYear, setMonthYear] = useState<string | null>("");
 
   return (
     <MeterReadingReportContext.Provider

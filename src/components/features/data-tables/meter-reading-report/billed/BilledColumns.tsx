@@ -16,6 +16,12 @@ export const useBilledColumns = (data: BilledAccount[]) => {
         header: "Account No",
         enableColumnFilter: true,
       },
+      {
+        accessorKey: "meterReader.id",
+        cell: (column) => <span>{column.row.original.meterReader.name}</span>,
+        header: "Meter Reader",
+        enableColumnFilter: true,
+      },
       // {
       //   accessorKey: "accountName",
       //   cell: (column) => <span>{column.row.original.accountName}</span>,
@@ -34,6 +40,7 @@ export const useBilledColumns = (data: BilledAccount[]) => {
         header: "Book",
         enableColumnFilter: true,
       },
+
       {
         accessorKey: "usage",
         cell: (column) => <span>{column.row.original.usage}</span>,

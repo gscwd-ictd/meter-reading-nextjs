@@ -28,7 +28,7 @@ import {
 } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Holiday, HolidayFromHrms, NonBusinessDays } from "./holidays";
+import { HolidayFromHrms, NonBusinessDays } from "./holidays";
 import { normalizeToYyyyMmDd } from "@mr/lib/functions/normalizeToYyyyMmDd";
 import formatAndSortDates from "@mr/lib/functions/dateArraySorter";
 
@@ -38,7 +38,10 @@ type DisconnectionDate = { readingDate: Date; dueDate: Date; disconnectionDate: 
 
 export type Scheduler = ReturnType<typeof useScheduler>;
 
-export const useScheduler = (holidays: HolidayFromHrms[]) => {
+export const useScheduler = (
+  holidays: HolidayFromHrms[],
+  noDueDiscDays: number[] = [0, 6], // Default: Sunday (0) and Saturday (6) - no due/disconnection dates on these days
+) => {
   const searchParams = useSearchParams();
   const monthYear =
     searchParams.get("date") === null ? format(new Date(), "yyyy-MM") : searchParams.get("date");
@@ -67,8 +70,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
 
   const holidayDates = useMemo(
     () => holidays.map((holiday) => normalizeToYyyyMmDd(holiday.date)),
-
-    // format(parse(holiday.date, "MMMM dd, yyyy", new Date()), "yyyy-MM-dd"
     [holidays],
   );
 
@@ -81,6 +82,15 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     const mmdd = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     return NonBusinessDays.some((day) => day.date === mmdd);
   }, []);
+
+  // Check if a date should NOT have due dates or disconnection dates
+  const isNoDueDiscDay = useCallback(
+    (date: Date): boolean => {
+      const dayOfWeek = getDay(date);
+      return noDueDiscDays.includes(dayOfWeek);
+    },
+    [noDueDiscDays],
+  );
 
   const removeDuplicateDates = useCallback((dates: Date[]) => {
     const uniqueDates = new Map<string, Date>();
@@ -95,17 +105,22 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
 
   const adjustForHolidayOrWeekend = useCallback(
     (date: Date) => {
-      while (isHoliday(date) || isWeekend(date) || isNoDutyDay(date)) {
-        if (isHoliday(date) || isNoDutyDay(date)) {
-          date = addDays(date, 1);
-        }
-        if (isWeekend(date)) {
-          date = nextMonday(date);
+      let adjustedDate = date;
+      // Check if the date is a holiday, no duty day, or no due/disc day
+      while (isHoliday(adjustedDate) || isNoDutyDay(adjustedDate) || isNoDueDiscDay(adjustedDate)) {
+        const isWeekendDay = getDay(adjustedDate) === 0 || getDay(adjustedDate) === 6;
+
+        if (isWeekendDay) {
+          // Weekends move to next Monday
+          adjustedDate = nextMonday(adjustedDate);
+        } else {
+          // Holidays, No Duty Days, and other noDueDiscDays just add 1 day
+          adjustedDate = addDays(adjustedDate, 1);
         }
       }
-      return date;
+      return adjustedDate;
     },
-    [isHoliday, isNoDutyDay],
+    [isHoliday, isNoDutyDay, isNoDueDiscDay],
   );
 
   const getCalendarDays = useCallback(() => {
@@ -129,7 +144,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     return { monthStart, startOfReadingDate };
   }, [currentDate, isNoDutyDay]);
 
-  // ✅ Updated to always handle Sundays (no addSundayReadings needed)
   const calculateDueDates = useCallback((): DueDate[] => {
     const { monthStart, startOfReadingDate } = getStartingReadingDate();
     const dueDates: DueDate[] = [];
@@ -141,14 +155,15 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     while (isSameMonth(readingDate, monthStart) && slotCount < 21) {
       let dueDate: Date;
 
+      // Don't skip reading dates - all reading dates are valid
       if (!lastDueDate) {
         dueDate = addDays(readingDate, 15);
-        dueDate = adjustForHolidayOrWeekend(dueDate);
+        dueDate = adjustForHolidayOrWeekend(dueDate); // Adjust due date if it falls on noDueDiscDays
       } else if (isSunday(readingDate)) {
         dueDate = lastDueDate; // Sunday shares Saturday's due date
       } else {
         dueDate = addDays(lastDueDate, 1);
-        dueDate = adjustForHolidayOrWeekend(dueDate);
+        dueDate = adjustForHolidayOrWeekend(dueDate); // Adjust due date if it falls on noDueDiscDays
       }
 
       dueDates.push({ readingDate, dueDate });
@@ -177,61 +192,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     return dueDates;
   }, [adjustForHolidayOrWeekend, getStartingReadingDate]);
 
-  //! v2
-  // const calculateDueDates = useCallback((): DueDate[] => {
-  //   const { monthStart, startOfReadingDate } = getStartingReadingDate();
-  //   const dueDates: DueDate[] = [];
-
-  //   let readingDate = startOfReadingDate;
-  //   let slotCount = 0;
-  //   let lastDueDate: Date | null = null;
-
-  //   while (isSameMonth(readingDate, monthStart) && slotCount < 22) {
-  //     let dueDate: Date;
-
-  //     if (!lastDueDate) {
-  //       dueDate = addDays(readingDate, 15);
-  //       dueDate = adjustForHolidayOrWeekend(dueDate);
-  //     } else if (isSunday(readingDate)) {
-  //       dueDate = lastDueDate; // Sunday shares Saturday's due date
-  //     } else {
-  //       dueDate = addDays(lastDueDate, 1);
-  //       dueDate = adjustForHolidayOrWeekend(dueDate);
-  //     }
-
-  //     dueDates.push({ readingDate, dueDate });
-
-  //     // ✅ Slot counting logic
-  //     if (!isSunday(readingDate)) {
-  //       if (getDay(readingDate) === 6) {
-  //         // Saturday
-  //         const nextDay = addDays(readingDate, 1);
-  //         const isFirstDay = isSameDay(readingDate, monthStart);
-
-  //         if (!isFirstDay && isSameMonth(nextDay, monthStart) && getDay(nextDay) === 0) {
-  //           // Normal Sat-Sun pair → count as 1
-  //           slotCount++;
-  //         } else {
-  //           // First Saturday or no following Sunday → count separately
-  //           slotCount++;
-  //         }
-  //       } else {
-  //         slotCount++;
-  //       }
-  //     }
-
-  //     if (!isSunday(readingDate)) {
-  //       lastDueDate = dueDate;
-  //     }
-
-  //     readingDate = addDays(readingDate, 1);
-  //   }
-
-  //   return dueDates;
-  // }, [adjustForHolidayOrWeekend, getStartingReadingDate]);
-
-  //! v3
-
   const calculateDisconnectionDates = useCallback(
     (dueDates: DueDate[]): DisconnectionDate[] => {
       const disconnectionDates: DisconnectionDate[] = [];
@@ -251,13 +211,20 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
         let disconnectionDate = addDays(current.dueDate, 3);
         let disconnectionDateStr = format(disconnectionDate, "yyyy-MM-dd");
 
+        // Adjust disconnection date if it falls on noDueDiscDays, holidays, or no duty days
         while (
           isHoliday(disconnectionDate) ||
-          isWeekend(disconnectionDate) ||
           isNoDutyDay(disconnectionDate) ||
+          isNoDueDiscDay(disconnectionDate) ||
           usedDisconnectionDates.has(disconnectionDateStr)
         ) {
-          disconnectionDate = addDays(disconnectionDate, 1);
+          const isWeekendDay = getDay(disconnectionDate) === 0 || getDay(disconnectionDate) === 6;
+
+          if (isWeekendDay) {
+            disconnectionDate = nextMonday(disconnectionDate);
+          } else {
+            disconnectionDate = addDays(disconnectionDate, 1);
+          }
           disconnectionDateStr = format(disconnectionDate, "yyyy-MM-dd");
         }
 
@@ -278,7 +245,7 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
 
       return disconnectionDates;
     },
-    [isHoliday, isNoDutyDay],
+    [isHoliday, isNoDutyDay, isNoDueDiscDay],
   );
 
   const calculateSchedule = useCallback((): MeterReadingSchedule[] => {
@@ -297,370 +264,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     });
   }, [calculateDisconnectionDates, calculateDueDates, getCalendarDays]);
 
-  //! old code aug 6 2025
-  // const splitDates = useCallback(
-  //   (selectedDates: Date[]) => {
-  //     const schedule = calculateSchedule();
-  //     const uniqueDates = removeDuplicateDates(selectedDates);
-  //     const sortedSelectedDates = [...uniqueDates].sort(compareAsc);
-
-  //     let split = [...schedule];
-
-  //     //! old code aug 6 2025
-  //     // const findPreviousValidReading = (readings: MeterReadingSchedule[], idx: number) => {
-  //     //   let lookBack = 1;
-  //     //   while (idx - lookBack >= 0) {
-  //     //     const candidate = readings[idx - lookBack];
-  //     //     if (candidate?.dueDate || candidate?.disconnectionDate) return candidate;
-  //     //     lookBack++;
-  //     //   }
-  //     //   return undefined;
-  //     // };
-
-  //     const findPreviousValidReading = (
-  //       readings: MeterReadingSchedule[],
-  //       idx: number,
-  //       condition?: (r: MeterReadingSchedule) => boolean,
-  //     ) => {
-  //       let lookBack = 1;
-  //       while (idx - lookBack >= 0) {
-  //         const candidate = readings[idx - lookBack];
-  //         if (
-  //           candidate &&
-  //           (condition ? condition(candidate) : candidate.dueDate || candidate.disconnectionDate)
-  //         ) {
-  //           return candidate;
-  //         }
-  //         lookBack++;
-  //       }
-  //       return undefined;
-  //     };
-
-  //     for (let i = 0; i < sortedSelectedDates.length; i++) {
-  //       const result: MeterReadingSchedule[] = [];
-  //       let startIndex = 0;
-  //       const currentSelectedDate = sortedSelectedDates[i]!;
-
-  //       for (let j = startIndex; j < split.length; j++) {
-  //         if (isBefore(split[j]!.readingDate, currentSelectedDate)) {
-  //           result.push(split[j]!);
-  //         }
-
-  //         if (isSameDay(currentSelectedDate, split[j]?.readingDate as Date)) {
-  //           const curr = split[j];
-  //           const prev = findPreviousValidReading(split, j);
-
-  //           const currentReading: MeterReadingSchedule = {
-  //             readingDate: curr.readingDate,
-  //             dueDate: [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[],
-  //             disconnectionDate: [curr.disconnectionDate, prev?.disconnectionDate]
-  //               .filter(Boolean)
-  //               .slice(0, 2) as Date[],
-  //           };
-
-  //           result.push(currentReading);
-
-  //           startIndex = j + 1;
-
-  //           for (let k = startIndex; k < split.length; k++) {
-  //             const curr = split[k];
-  //             if (!curr?.dueDate && !curr?.disconnectionDate) {
-  //               result.push(curr!);
-  //               continue;
-  //             }
-
-  //             const prev = findPreviousValidReading(split, k);
-
-  //             //! previous code aug 6 2025
-  //             // const nextReadingDate: MeterReadingSchedule = {
-  //             //   readingDate: curr?.readingDate as Date,
-  //             //   dueDate: prev?.dueDate,
-  //             //   disconnectionDate: prev?.disconnectionDate,
-  //             // };
-
-  //             let newDueDate = prev?.dueDate;
-  //             let newDisconnectionDate = prev?.disconnectionDate;
-
-  //             // ✅ If current day is Sunday, copy Saturday's dates if available
-  //             if (isSunday(curr!.readingDate)) {
-  //               const lastSaturday = findPreviousValidReading(split, k, (d) => getDay(d.readingDate) === 6);
-  //               if (lastSaturday) {
-  //                 newDueDate = lastSaturday.dueDate;
-  //                 newDisconnectionDate = lastSaturday.disconnectionDate;
-  //               }
-  //             }
-
-  //             const nextReadingDate: MeterReadingSchedule = {
-  //               readingDate: curr!.readingDate,
-  //               dueDate: newDueDate,
-  //               disconnectionDate: newDisconnectionDate,
-  //             };
-
-  //             result.push(nextReadingDate);
-  //           }
-  //         }
-  //       }
-  //       split = [...result];
-  //     }
-  //     return split;
-  //   },
-  //   [calculateSchedule, removeDuplicateDates],
-  // );
-
-  //!  code v3
-  // const splitDates = useCallback(
-  //   (selectedDates: Date[]) => {
-  //     const schedule = calculateSchedule();
-
-  //     const uniqueDates = removeDuplicateDates(selectedDates);
-  //     const sortedSelectedDates = [...uniqueDates].sort(compareAsc);
-
-  //     let split = [...schedule];
-
-  //     const normalizeDate = (value: Date | Date[] | undefined): Date | undefined => {
-  //       if (!value) return undefined;
-  //       return Array.isArray(value) ? value[0] : value;
-  //     };
-
-  //     const findPreviousValidReading = (
-  //       readings: MeterReadingSchedule[],
-  //       idx: number,
-  //       condition?: (r: MeterReadingSchedule) => boolean,
-  //     ) => {
-  //       let lookBack = 1;
-  //       while (idx - lookBack >= 0) {
-  //         const candidate = readings[idx - lookBack];
-  //         if (
-  //           candidate &&
-  //           (condition ? condition(candidate) : candidate.dueDate || candidate.disconnectionDate)
-  //         ) {
-  //           return candidate;
-  //         }
-  //         lookBack++;
-  //       }
-  //       return undefined;
-  //     };
-
-  //     for (let i = 0; i < sortedSelectedDates.length; i++) {
-  //       const result: MeterReadingSchedule[] = [];
-  //       let startIndex = 0;
-
-  //       const currentSelectedDate = sortedSelectedDates[i]!;
-
-  //       for (let j = startIndex; j < split.length; j++) {
-  //         if (isBefore(split[j]!.readingDate, currentSelectedDate)) {
-  //           result.push(split[j]!);
-  //         }
-
-  //         if (isSameDay(currentSelectedDate, split[j]?.readingDate as Date)) {
-  //           const curr = split[j];
-  //           let prev = findPreviousValidReading(split, j);
-
-  //           const currentReading: MeterReadingSchedule = {
-  //             readingDate: curr.readingDate,
-  //             dueDate: [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[],
-  //             disconnectionDate: [curr.disconnectionDate, prev?.disconnectionDate]
-  //               .filter(Boolean)
-  //               .slice(0, 2) as Date[],
-  //           };
-
-  //           result.push(currentReading);
-
-  //           startIndex = j + 1;
-
-  //           for (let k = startIndex; k < split.length; k++) {
-  //             const curr = split[k];
-
-  //             if (!curr?.dueDate && !curr?.disconnectionDate) {
-  //               result.push(curr!);
-  //               continue;
-  //             }
-
-  //             let newDueDate: Date | undefined;
-  //             let newDisconnectionDate: Date | undefined;
-
-  //             const prevDue = normalizeDate(prev?.dueDate);
-  //             const prevDisc = normalizeDate(prev?.disconnectionDate);
-  //             const currDue = normalizeDate(curr?.dueDate);
-  //             const currDisc = normalizeDate(curr?.disconnectionDate);
-
-  //             if (isSunday(curr.readingDate)) {
-  //               // ✅ Sunday → Copy last Saturday's dates if available
-  //               const lastSaturday = findPreviousValidReading(
-  //                 result,
-  //                 result.length,
-  //                 (d) => getDay(d.readingDate) === 6,
-  //               );
-  //               if (lastSaturday) {
-  //                 newDueDate = normalizeDate(lastSaturday.dueDate);
-  //                 newDisconnectionDate = normalizeDate(lastSaturday.disconnectionDate);
-  //               } else {
-  //                 // If no Saturday, fallback to prev
-  //                 newDueDate = prevDue;
-  //                 newDisconnectionDate = prevDisc;
-  //               }
-  //             } else {
-  //               // ✅ Weekdays → Increment by 1 day from prev if possible
-  //               if (prevDue && prevDisc) {
-  //                 newDueDate = addDays(prevDue, 1);
-  //                 newDisconnectionDate = addDays(prevDisc, 1);
-  //               } else {
-  //                 // Fallback to original schedule
-  //                 newDueDate = currDue;
-  //                 newDisconnectionDate = currDisc;
-  //               }
-  //             }
-
-  //             const nextReadingDate: MeterReadingSchedule = {
-  //               readingDate: curr.readingDate,
-  //               dueDate: newDueDate,
-  //               disconnectionDate: newDisconnectionDate,
-  //             };
-
-  //             result.push(nextReadingDate);
-
-  //             // ✅ Update prev so subsequent days shift correctly
-  //             prev = nextReadingDate;
-  //           }
-  //         }
-  //       }
-
-  //       split = [...result];
-  //     }
-
-  //     return split;
-  //   },
-  //   [calculateSchedule, removeDuplicateDates],
-  // );
-
-  // code v4 (02-26-2026)
-  // const splitDates = useCallback(
-  //   (selectedDates: Date[]) => {
-  //     const schedule = calculateSchedule();
-
-  //     const uniqueDates = removeDuplicateDates(selectedDates);
-  //     const sortedSelectedDates = [...uniqueDates].sort(compareAsc);
-
-  //     let split = [...schedule];
-
-  //     const normalizeDate = (value: Date | Date[] | undefined): Date | undefined => {
-  //       if (!value) return undefined;
-  //       return Array.isArray(value) ? value[0] : value;
-  //     };
-
-  //     const findPreviousValidReading = (
-  //       readings: MeterReadingSchedule[],
-  //       idx: number,
-  //       condition?: (r: MeterReadingSchedule) => boolean,
-  //     ) => {
-  //       let lookBack = 1;
-  //       while (idx - lookBack >= 0) {
-  //         const candidate = readings[idx - lookBack];
-  //         if (
-  //           candidate &&
-  //           (condition ? condition(candidate) : candidate.dueDate || candidate.disconnectionDate)
-  //         ) {
-  //           return candidate;
-  //         }
-  //         lookBack++;
-  //       }
-  //       return undefined;
-  //     };
-
-  //     for (let i = 0; i < sortedSelectedDates.length; i++) {
-  //       const result: MeterReadingSchedule[] = [];
-  //       let startIndex = 0;
-
-  //       const currentSelectedDate = sortedSelectedDates[i]!;
-
-  //       for (let j = startIndex; j < split.length; j++) {
-  //         if (isBefore(split[j]!.readingDate, currentSelectedDate)) {
-  //           result.push(split[j]!);
-  //         }
-
-  //         if (isSameDay(currentSelectedDate, split[j]?.readingDate as Date)) {
-  //           const curr = split[j];
-  //           let prev = findPreviousValidReading(split, j);
-
-  //           const currentReading: MeterReadingSchedule = {
-  //             readingDate: curr.readingDate,
-  //             dueDate: [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[],
-  //             disconnectionDate: [curr.disconnectionDate, prev?.disconnectionDate]
-  //               .filter(Boolean)
-  //               .slice(0, 2) as Date[],
-  //           };
-
-  //           result.push(currentReading);
-
-  //           startIndex = j + 1;
-
-  //           for (let k = startIndex; k < split.length; k++) {
-  //             const curr = split[k];
-
-  //             if (!curr?.dueDate && !curr?.disconnectionDate) {
-  //               result.push(curr!);
-  //               continue;
-  //             }
-
-  //             let newDueDate: Date | undefined;
-  //             let newDisconnectionDate: Date | undefined;
-
-  //             const prevDue = normalizeDate(prev?.dueDate);
-  //             const prevDisc = normalizeDate(prev?.disconnectionDate);
-  //             const currDue = normalizeDate(curr?.dueDate);
-  //             const currDisc = normalizeDate(curr?.disconnectionDate);
-
-  //             if (isSunday(curr.readingDate)) {
-  //               // ✅ Sunday → Copy last Saturday's dates if available
-  //               const lastSaturday = findPreviousValidReading(
-  //                 result,
-  //                 result.length,
-  //                 (d) => getDay(d.readingDate) === 6,
-  //               );
-  //               if (lastSaturday) {
-  //                 newDueDate = normalizeDate(lastSaturday.dueDate);
-  //                 newDisconnectionDate = normalizeDate(lastSaturday.disconnectionDate);
-  //               } else {
-  //                 // Fallback to previous reading
-  //                 newDueDate = prevDue;
-  //                 newDisconnectionDate = prevDisc;
-  //               }
-  //             } else {
-  //               // ✅ Weekdays → Increment and adjust for holidays/weekends/non-duty days
-  //               if (prevDue && prevDisc) {
-  //                 newDueDate = adjustForHolidayOrWeekend(addDays(prevDue, 1)); // changed from addDays to adjust before adding
-  //                 newDisconnectionDate = adjustForHolidayOrWeekend(addDays(prevDisc, 1));
-  //               } else {
-  //                 // Fallback to original schedule
-  //                 newDueDate = currDue ? adjustForHolidayOrWeekend(currDue) : undefined; // changed from currDue to adjust before currDue
-  //                 newDisconnectionDate = currDisc ? adjustForHolidayOrWeekend(currDisc) : undefined;
-  //               }
-  //             }
-
-  //             const nextReadingDate: MeterReadingSchedule = {
-  //               readingDate: curr.readingDate,
-  //               dueDate: newDueDate,
-  //               disconnectionDate: newDisconnectionDate,
-  //             };
-
-  //             result.push(nextReadingDate);
-
-  //             // ✅ Update prev so subsequent days shift correctly
-  //             prev = nextReadingDate;
-  //           }
-  //         }
-  //       }
-
-  //       split = [...result];
-  //     }
-
-  //     return split;
-  //   },
-  //   [calculateSchedule, removeDuplicateDates, adjustForHolidayOrWeekend],
-  // );
-
-  //! code v5 02-26-2026
-  // code v7 (02-26-2026) - Fixed Saturday splitting with correct array order
   const splitDates = useCallback(
     (selectedDates: Date[]) => {
       const schedule = calculateSchedule();
@@ -890,54 +493,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
     [],
   );
 
-  //! V1 assignMeterReadersWithDays
-  // const assignMeterReadersWithDays = useCallback(
-  //   (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
-  //     // const meterReadersWithDays = addRandomDayNumbers(meterReaders);
-
-  //     // Pre-calculate day number mapping for the entire schedule
-  //     const dayNumberMap = calculateDayNumberMap(schedule);
-
-  //     return schedule.map((entry) => {
-  //       if (!Array.isArray(entry.dueDate) && (!entry.dueDate || !isValid(entry.dueDate))) {
-  //         return { ...entry, meterReaders: [] };
-  //       }
-
-  //       const readingRestDay = getDayName(entry.readingDate);
-  //       const day = dayNumberMap.get(entry.readingDate.toISOString()) || 1;
-
-  //       // @ts-ignore
-  //       const assignedMeterReaders: MeterReaderWithZonebooks[] = meterReaders
-  //         .filter((reader) => reader.restDay !== readingRestDay)
-  //         .map((reader) => {
-  //           const assignedZoneBooks = reader.zoneBooks.filter((zoneBook) => zoneBook.day === day);
-  //           const sortedDueDates = formatAndSortDates(entry.dueDate);
-  //           const sortedDisconnectionDates = formatAndSortDates(entry.disconnectionDate);
-
-  //           return {
-  //             ...reader,
-  //             reassignment: { zoneBooks: [], remarks: null },
-  //             zoneBooks: assignedZoneBooks.map((zb) => ({
-  //               ...zb,
-  //               dueDate: !Array.isArray(entry.dueDate) ? formatDate(entry.dueDate) : sortedDueDates[0],
-  //               disconnectionDate: !Array.isArray(entry.disconnectionDate)
-  //                 ? formatDate(entry.disconnectionDate)
-  //                 : sortedDisconnectionDates[0],
-  //             })),
-  //           };
-  //         })
-  //         .filter((reader) => reader.zoneBooks.length > 0);
-
-  //       return {
-  //         ...entry,
-  //         meterReaders: assignedMeterReaders,
-  //         day,
-  //       };
-  //     });
-  //   },
-  //   [],
-  // );
-
   const assignMeterReadersWithDays = useCallback(
     (schedule: MeterReadingSchedule[], meterReaders: MeterReader[]): MeterReadingEntryWithZonebooks[] => {
       // Calculate day numbers ONCE (normal calculation)
@@ -1042,134 +597,6 @@ export const useScheduler = (holidays: HolidayFromHrms[]) => {
       console.log(`${assignment.date}: Day ${assignment.dayNumber}`);
     });
   };
-
-  // Pre-calculate day numbers for all working days
-  // const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
-  //   const dayMap = new Map<string, number>();
-  //   const workingDays = schedule
-  //     .filter((entry) => entry.dueDate || entry.disconnectionDate)
-  //     .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
-
-  //   let dayCounter = 1;
-  //   let i = 0;
-
-  //   while (i < workingDays.length) {
-  //     const current = workingDays[i];
-  //     if (!current) break;
-
-  //     const currentDayOfWeek = getDay(current.readingDate);
-  //     const next = workingDays[i + 1];
-
-  //     // Check if this is Saturday and next is consecutive Sunday
-  //     const isConsecutiveWeekendPair =
-  //       currentDayOfWeek === 6 &&
-  //       next &&
-  //       getDay(next.readingDate) === 0 &&
-  //       isSameDay(next.readingDate, addDays(current.readingDate, 1));
-
-  //     if (isConsecutiveWeekendPair) {
-  //       // Assign same day number to Saturday-Sunday pair
-  //       dayMap.set(current.readingDate.toISOString(), dayCounter);
-  //       dayMap.set(next.readingDate.toISOString(), dayCounter);
-  //       i += 2;
-  //     } else {
-  //       // Single day assignment
-  //       dayMap.set(current.readingDate.toISOString(), dayCounter);
-  //       i += 1;
-  //     }
-
-  //     // Move to next day number in cycle
-  //     dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
-  //   }
-
-  //   return dayMap;
-  // };
-
-  //! V1 calculateDayNumberMap
-  // const calculateDayNumberMap = (schedule: MeterReadingSchedule[]): Map<string, number> => {
-  //   const dayMap = new Map<string, number>();
-  //   const workingDays = schedule
-  //     .filter((entry) => entry.dueDate || entry.disconnectionDate)
-  //     .sort((a, b) => compareAsc(a.readingDate, b.readingDate));
-
-  //   let dayCounter = 1;
-  //   let currentMonth = -1;
-  //   let isFirstDayOfMonth = true;
-  //   let i = 0;
-
-  //   while (i < workingDays.length) {
-  //     const current = workingDays[i];
-  //     if (!current) break;
-
-  //     const readingDate = current.readingDate;
-  //     const month = getMonth(readingDate);
-
-  //     // Check if this is a new month
-  //     if (month !== currentMonth) {
-  //       dayCounter = 1;
-  //       currentMonth = month;
-  //       isFirstDayOfMonth = true;
-  //     }
-
-  //     const currentDayOfWeek = getDay(readingDate);
-  //     const next = workingDays[i + 1];
-
-  //     // Check if this is the special case: First day of month is Sunday
-  //     if (isFirstDayOfMonth && currentDayOfWeek === 0) {
-  //       // First working day of month is Sunday
-  //       dayMap.set(readingDate.toISOString(), dayCounter);
-
-  //       // Check if next day is Monday and consecutive
-  //       if (next) {
-  //         const nextDayOfWeek = getDay(next.readingDate);
-  //         const areConsecutive = isSameDay(next.readingDate, addDays(readingDate, 1));
-
-  //         if (areConsecutive && nextDayOfWeek === 1) {
-  //           // Monday gets same day number as Sunday
-  //           dayMap.set(next.readingDate.toISOString(), dayCounter);
-  //           i += 2;
-  //           isFirstDayOfMonth = false;
-
-  //           // Increment day counter for next day
-  //           dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
-  //           continue;
-  //         }
-  //       }
-
-  //       // No consecutive Monday, just process Sunday
-  //       i += 1;
-  //       isFirstDayOfMonth = false;
-  //       dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
-  //       continue;
-  //     }
-
-  //     // Regular processing (not first-day-of-month Sunday)
-  //     const isConsecutiveWeekendPair =
-  //       currentDayOfWeek === 6 && // Saturday
-  //       next &&
-  //       getDay(next.readingDate) === 0 && // Sunday
-  //       isSameDay(next.readingDate, addDays(readingDate, 1));
-
-  //     if (isConsecutiveWeekendPair) {
-  //       // Assign same day number to Saturday-Sunday pair
-  //       dayMap.set(readingDate.toISOString(), dayCounter);
-  //       dayMap.set(next.readingDate.toISOString(), dayCounter);
-  //       i += 2;
-  //     } else {
-  //       // Single day assignment
-  //       dayMap.set(readingDate.toISOString(), dayCounter);
-  //       i += 1;
-  //     }
-
-  //     // Update flags
-  //     isFirstDayOfMonth = false;
-
-  //     // Move to next day number in cycle
-  //     dayCounter = dayCounter < 21 ? dayCounter + 1 : 1;
-  //   }
-
-  //   return dayMap;
-  // };
 
   // Modified function that takes restDay into account
   const calculateDayNumberMap = (
