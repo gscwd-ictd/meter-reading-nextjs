@@ -17,6 +17,12 @@ export const useUnbilledColumns = (data: UnbilledAccount[]) => {
         enableColumnFilter: true,
       },
       {
+        accessorKey: "meterReader.id",
+        cell: (column) => <span>{column.row.original.meterReader.name}</span>,
+        header: "Meter Reader",
+        enableColumnFilter: true,
+      },
+      {
         accessorKey: "accountName",
         cell: (column) => <span>{column.row.original.accountName}</span>,
         header: "Account Name",

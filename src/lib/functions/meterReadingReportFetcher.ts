@@ -1,3 +1,4 @@
+// meterReadingReportFetcher.ts
 import axios from "axios";
 import {
   BilledAccount,
@@ -10,13 +11,16 @@ import {
 export const fetchBilledAccounts = async (params: MeterReadingReportParams) => {
   const { book, meterReaderId, monthYear, zone } = params;
 
+  // Build params object only with defined values
+  const queryParams: Record<string, string> = {};
+
+  if (monthYear) queryParams.readingMonth = monthYear;
+  if (zone) queryParams.zone = zone;
+  if (book) queryParams.book = book;
+  if (meterReaderId) queryParams.meterReaderId = meterReaderId;
+
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/billed`, {
-    params: {
-      ...(monthYear && { readingMonth: monthYear }),
-      ...(zone && { zone }),
-      ...(book && { book }),
-      ...(meterReaderId && { meterReaderId }),
-    },
+    params: queryParams,
   });
 
   return res.data as BilledAccount[];
@@ -25,13 +29,16 @@ export const fetchBilledAccounts = async (params: MeterReadingReportParams) => {
 export const fetchUnbilledAccounts = async (params: MeterReadingReportParams) => {
   const { book, meterReaderId, monthYear, zone } = params;
 
+  // Build params object only with defined values
+  const queryParams: Record<string, string> = {};
+
+  if (monthYear) queryParams.readingMonth = monthYear;
+  if (zone) queryParams.zone = zone;
+  if (book) queryParams.book = book;
+  if (meterReaderId) queryParams.meterReaderId = meterReaderId;
+
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/unbilled`, {
-    params: {
-      ...(monthYear && { readingMonth: monthYear }),
-      ...(zone && { zone }),
-      ...(book && { book }),
-      ...(meterReaderId && { meterReaderId }),
-    },
+    params: queryParams,
   });
 
   return res.data as UnbilledAccount[];
@@ -40,13 +47,16 @@ export const fetchUnbilledAccounts = async (params: MeterReadingReportParams) =>
 export const fetchWithRemarksAccounts = async (params: MeterReadingReportParams) => {
   const { book, meterReaderId, monthYear, zone } = params;
 
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/with-remarks`, {
-    params: {
-      ...(monthYear && { readingMonth: monthYear }),
-      ...(zone && { zone }),
-      ...(book && { book }),
-      ...(meterReaderId && { meterReaderId }),
-    },
+  // Build params object only with defined values
+  const queryParams: Record<string, string> = {};
+
+  if (monthYear) queryParams.readingMonth = monthYear;
+  if (zone) queryParams.zone = zone;
+  if (book) queryParams.book = book;
+  if (meterReaderId) queryParams.meterReaderId = meterReaderId;
+
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/remarks`, {
+    params: queryParams,
   });
 
   return res.data as WithRemarksAccount[];
@@ -55,13 +65,16 @@ export const fetchWithRemarksAccounts = async (params: MeterReadingReportParams)
 export const fetchNewMetersAccounts = async (params: MeterReadingReportParams) => {
   const { book, meterReaderId, monthYear, zone } = params;
 
+  // Build params object only with defined values
+  const queryParams: Record<string, string> = {};
+
+  if (monthYear) queryParams.readingMonth = monthYear;
+  if (zone) queryParams.zone = zone;
+  if (book) queryParams.book = book;
+  if (meterReaderId) queryParams.meterReaderId = meterReaderId;
+
   const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/new-meters`, {
-    params: {
-      ...(monthYear && { readingMonth: monthYear }),
-      ...(zone && { zone }),
-      ...(book && { book }),
-      ...(meterReaderId && { meterReaderId }),
-    },
+    params: queryParams,
   });
 
   return res.data as NewMeterAccount[];

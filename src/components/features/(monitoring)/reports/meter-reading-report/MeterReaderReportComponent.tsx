@@ -23,6 +23,7 @@ import {
   fetchWithRemarksAccounts,
 } from "@mr/lib/functions/meterReadingReportFetcher";
 import useManualQuery from "@mr/hooks/use-manual-query";
+import { Button } from "@mr/components/ui/Button";
 
 const formSchema = z.object({
   monthYear: z.string().nullish(),
@@ -34,75 +35,82 @@ const formSchema = z.object({
       id: z.string(),
     }),
   ),
+  zone: z.string().nullish(),
+  book: z.string().nullish(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export const MeterReadingReportComponent = () => {
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
   const { setIsGenerating, setHasFetched, monthYear, setMonthYear } = useMeterReadingReportContext();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       monthYear: "",
       meterReader: undefined,
+      zone: "",
+      book: "",
     },
   });
 
   const router = useRouter();
 
-  const params: MeterReadingReportParams = {
-    monthYear: monthYear ? monthYear : "",
-    meterReaderId: form.watch("meterReader.id") !== undefined ? form.watch("meterReader.id") : "",
-    zone: "",
-    book: "",
-  };
+  // Initialize queries with the fetcher functions
+  const billedQuery = useManualQuery<BilledAccount[], MeterReadingReportParams>({
+    queryKey: ["get-billed-mr-report"],
+    queryFn: fetchBilledAccounts,
+    retry: 1,
+  });
 
-  // Queries enabled only when shouldFetch is true
-  const queries = {
-    billed: useManualQuery<BilledAccount[]>({
-      queryKey: ["get-billed-mr-report", monthYear || ""],
-      queryFn: () => fetchBilledAccounts(params),
+  const unbilledQuery = useManualQuery<UnbilledAccount[], MeterReadingReportParams>({
+    queryKey: ["get-unbilled-mr-report"],
+    queryFn: fetchUnbilledAccounts,
+    retry: 1,
+  });
 
-      retry: 1,
-    }),
-    unbilled: useManualQuery<UnbilledAccount[]>({
-      queryKey: ["get-unbilled-mr-report", monthYear || ""],
-      queryFn: () => fetchUnbilledAccounts(params),
+  const withRemarksQuery = useManualQuery<WithRemarksAccount[], MeterReadingReportParams>({
+    queryKey: ["get-with-remarks-mr-report"],
+    queryFn: fetchWithRemarksAccounts,
+    retry: 1,
+  });
 
-      retry: 1,
-    }),
-    withRemarks: useManualQuery<WithRemarksAccount[]>({
-      queryKey: ["get-with-remarks-mr-report", monthYear || ""],
-      queryFn: () => fetchWithRemarksAccounts(params),
+  const newMetersQuery = useManualQuery<NewMeterAccount[], MeterReadingReportParams>({
+    queryKey: ["get-new-meters-mr-report"],
+    queryFn: fetchNewMetersAccounts,
+    retry: 1,
+  });
 
-      retry: 1,
-    }),
-    newMeters: useManualQuery<NewMeterAccount[]>({
-      queryKey: ["get-new-meters-mr-report", monthYear || ""],
-      queryFn: () => fetchNewMetersAccounts(params),
-
-      retry: 1,
-    }),
-  };
-
-  const handleGenerateAll = async (data: z.infer<typeof formSchema>) => {
+  const handleGenerateAll = async (data: FormValues) => {
     setIsGenerating(true);
-    setMonthYear(data.monthYear !== undefined ? data.monthYear! : "");
+    const selectedMonthYear = data.monthYear !== undefined ? data.monthYear : "";
+    setMonthYear(selectedMonthYear);
+
+    // Build the params object conditionally
+    const paramsObject = {
+      monthYear: selectedMonthYear,
+      ...(form.watch("meterReader.id") && { meterReaderId: form.watch("meterReader.id") }),
+      ...(form.watch("book") && { book: form.watch("book") }),
+      ...(form.watch("zone") && { zone: form.watch("zone") }),
+    };
+
+    // Assert the type since we know it matches the structure
+    const currentParams = paramsObject as MeterReadingReportParams;
 
     try {
-      // show loading toast
       toast.loading("Generating all reports...", {
         id: "generate-mr-reports",
         position: "top-right",
       });
 
-      // Wait for all queries to complete
+      // Pass the current params to each execute function
       await Promise.all([
-        queries.billed.execute(),
-        queries.unbilled.execute(),
-        queries.withRemarks.execute(),
-        queries.newMeters.execute(),
+        billedQuery.execute(currentParams),
+        unbilledQuery.execute(currentParams),
+        withRemarksQuery.execute(currentParams),
+        // newMetersQuery.execute(currentParams),
       ]);
 
       setIsGenerating(false);
@@ -112,9 +120,8 @@ export const MeterReadingReportComponent = () => {
         id: "generate-mr-reports",
         position: "top-right",
       });
-
-      console.log(data);
     } catch (error) {
+      console.error("Generation error:", error);
       setIsGenerating(false);
       toast.error("Failed to generate reports", {
         id: "generate-mr-reports",
@@ -125,13 +132,11 @@ export const MeterReadingReportComponent = () => {
 
   useEffect(() => {
     if (date) form.setValue("monthYear", date);
-  }, [date]);
+  }, [date, form]);
 
-  // Sync URL when generatedMonthYear changes (except on user submit)
+  // Sync URL when monthYear changes
   useEffect(() => {
-    // Don't do anything on initial mount
     if (monthYear) {
-      // If no URL param but we have store value, update URL
       router.replace(`/reports/meter-reading-report?date=${monthYear}`);
     }
   }, [monthYear, router]);

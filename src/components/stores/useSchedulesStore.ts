@@ -13,6 +13,8 @@ type SchedulesStore = {
   setCurrentSchedule: (currentSchedule: MeterReadingEntryWithZonebooks[]) => void;
   calendarSchedule: MeterReadingEntryWithZonebooks[];
   setCalendarSchedule: (calendarSchedule: MeterReadingEntryWithZonebooks[]) => void;
+  noDueDiscDays: Array<number>;
+  setNoDueDiscDays: (noDueDiscDays: Array<number>) => void;
   scheduleDays: Array<ScheduleDay>;
   setScheduleDays: (scheduleDays: Array<ScheduleDay>) => void;
   calendarIsSet: boolean;
@@ -75,6 +77,8 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setCalendarSchedule: (calendarSchedule) => set({ calendarSchedule }),
   scheduleDays: [],
   setScheduleDays: (scheduleDays) => set({ scheduleDays }),
+  noDueDiscDays: [0, 6],
+  setNoDueDiscDays: (noDueDiscDays) => set({ noDueDiscDays }),
   calendarIsSet: false,
   setCalendarIsSet: (calendarIsSet) => set({ calendarIsSet }),
   selectedScheduleEntry: null,

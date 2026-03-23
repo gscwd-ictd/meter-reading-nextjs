@@ -3,7 +3,7 @@
 import { BilledTabReport } from "./billed/BilledTabReport";
 import { UnBilledTabReport } from "./unbilled/UnbilledTabReport";
 import { WithRemarksTabReport } from "./with-remarks/WithRemarksTabReport";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   BilledAccount,
   MeterReadingReportParams,
@@ -19,87 +19,47 @@ export const MeterReadingReportTabsContent = () => {
   const form = useFormContext();
   const { watch } = form;
   const queryClient = useQueryClient();
-
   const { monthYear } = useMeterReadingReportContext();
 
-  // form the params object
+  // Build params object with conditional inclusion
   const params: MeterReadingReportParams = {
     monthYear: monthYear,
-    zone: watch("zone"),
-    book: watch("book"),
-    meterReaderId: watch("meterReader.id"),
+    ...(watch("zone") && { zone: watch("zone") }),
+    ...(watch("book") && { book: watch("book") }),
+    ...(watch("meterReader.id") && { meterReaderId: watch("meterReader.id") }),
   };
 
-  const queries = {
-    billed: {
-      data: queryClient.getQueryData<BilledAccount[]>([
-        "get-billed-mr-report",
-        params.monthYear ? params.monthYear : "",
-      ]),
-      isLoading:
-        queryClient.getQueryState(["get-billed-mr-report", params.monthYear ? params.monthYear : ""])
-          ?.status === "pending"
-          ? true
-          : false,
-    },
+  // Get the latest data from the queries
+  const billedData = queryClient.getQueryData<BilledAccount[]>(["get-billed-mr-report", params]);
 
-    unbilled: {
-      data: queryClient.getQueryData<UnbilledAccount[]>([
-        "get-unbilled-mr-report",
-        params.monthYear ? params.monthYear : "",
-      ]),
-      isLoading:
-        queryClient.getQueryState(["get-unbilled-mr-report", params.monthYear ? params.monthYear : ""])
-          ?.status === "pending"
-          ? true
-          : false,
-    },
-    withRemarks: {
-      data: queryClient.getQueryData<WithRemarksAccount[]>([
-        "get-with-remarks-mr-report",
-        params.monthYear ? params.monthYear : "",
-      ]),
-      isLoading:
-        queryClient.getQueryState(["get-with-remarks-mr-report", params.monthYear ? params.monthYear : ""])
-          ?.status === "pending"
-          ? true
-          : false,
-    },
-    newMeters: {
-      data: queryClient.getQueryData<NewMeterAccount[]>([
-        "get-new-meters-mr-report",
-        params.monthYear ? params.monthYear : "",
-      ]),
-      isLoading:
-        queryClient.getQueryState(["get-new-meters-mr-report", params.monthYear ? params.monthYear : ""])
-          ?.status === "pending"
-          ? true
-          : false,
-    },
-  };
+  const unbilledData = queryClient.getQueryData<UnbilledAccount[]>(["get-unbilled-mr-report", params]);
+
+  const withRemarksData = queryClient.getQueryData<WithRemarksAccount[]>([
+    "get-with-remarks-mr-report",
+    params,
+  ]);
+
+  const newMetersData = queryClient.getQueryData<NewMeterAccount[]>(["get-new-meters-mr-report", params]);
+
+  // Check loading states
+  const billedState = queryClient.getQueryState(["get-billed-mr-report", params]);
+  const unbilledState = queryClient.getQueryState(["get-unbilled-mr-report", params]);
+  const withRemarksState = queryClient.getQueryState(["get-with-remarks-mr-report", params]);
+  const newMetersState = queryClient.getQueryState(["get-new-meters-mr-report", params]);
 
   return (
     <>
       {/* Billed Tab */}
-      <BilledTabReport
-        data={queries.billed.data ? queries.billed.data : undefined}
-        isLoading={queries.billed.isLoading}
-      />
+      <BilledTabReport data={billedData} isLoading={billedState?.status === "pending"} />
+
       {/* Unbilled Tab */}
-      <UnBilledTabReport
-        data={queries.unbilled.data ? queries.unbilled.data : undefined}
-        isLoading={queries.unbilled.isLoading}
-      />
+      <UnBilledTabReport data={unbilledData} isLoading={unbilledState?.status === "pending"} />
+
       {/* With Remarks Tab */}
-      <WithRemarksTabReport
-        data={queries.withRemarks.data ? queries.withRemarks.data : undefined}
-        isLoading={queries.withRemarks.isLoading}
-      />
+      <WithRemarksTabReport data={withRemarksData} isLoading={withRemarksState?.status === "pending"} />
+
       {/* New Meters Tab */}
-      <NewMetersTabReport
-        data={queries.newMeters.data ? queries.newMeters.data : undefined}
-        isLoading={queries.newMeters.isLoading}
-      />
+      <NewMetersTabReport data={newMetersData} isLoading={newMetersState?.status === "pending"} />
     </>
   );
 };

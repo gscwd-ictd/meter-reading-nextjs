@@ -50,8 +50,8 @@ export const TAB_VALUES = {
 export type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 export type MeterReadingReportParams = {
-  monthYear: string;
-  zone: string;
-  book: string;
-  meterReaderId: string;
+  monthYear: string | null;
+  zone?: string;
+  book?: string;
+  meterReaderId?: string;
 };
