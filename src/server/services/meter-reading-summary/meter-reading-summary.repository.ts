@@ -4,6 +4,8 @@ import {
   BilledSummarySchema,
   MobileSummaryReport,
   MobileSummaryReportSchema,
+  NewMeterSummary,
+  NewMeterSummarySchema,
   UnbilledSummary,
   UnbilledSummarySchema,
   WithRemarksSummary,
@@ -14,6 +16,7 @@ import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
 import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { meterReadingContext } from "@mr/server/context";
 import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.type";
+import { newMeters } from "@mr/server/db/schemas/new-meters";
 
 export class MeterReadingSummaryRepository implements IMeterReadingSummaryRepository {
   async findBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
@@ -172,9 +175,50 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     return WithRemarksSummarySchema.array().parse(result);
   }
 
-  // async findSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
-  //   return "";
-  // }
+  async findNewMeterSummary(query: BilledAccountQuery): Promise<NewMeterSummary[]> {
+    try {
+      const conditions = [];
+
+      if (query.meterReaderId) {
+        conditions.push(eq(newMeters.meterReaderId, query.meterReaderId));
+      }
+
+      if (query.readingMonth) {
+        const [year, month] = query.readingMonth.split("-").map(Number);
+        const start = `${year}-${month.toString().padStart(2, "0")}-01`;
+        const endMonth = month === 12 ? 1 : month + 1;
+        const endYear = month === 12 ? year + 1 : year;
+        const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
+        conditions.push(sql`date_time >= ${start} AND date_time < ${end}`);
+      }
+
+      const stmt = await db.pgConn
+        .select()
+        .from(newMeters)
+        .where(and(...conditions));
+
+      // Map results to include meter reader details
+      const result = await Promise.all(
+        stmt.map(async (item) => {
+          const details = await meterReadingContext
+            .getMeterReaderService()
+            .getMeterReaderDetailsById(item.meterReaderId);
+
+          return {
+            meterReader: {
+              id: details.id,
+              name: details.name,
+            },
+            ...item,
+          };
+        }),
+      );
+
+      return NewMeterSummarySchema.array().parse(result);
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {
     const billed = await db.pgConn

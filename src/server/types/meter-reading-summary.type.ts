@@ -68,7 +68,17 @@ export const MobileSummaryReportSchema = z.object({
   }),
 });
 
+export const NewMeterSummarySchema = z.object({
+  currentReading: z4.number().nullish(),
+  meterNumber: z4.string(),
+  meterReader: z4.object({
+    id: z4.string(),
+    name: z.string(),
+  }),
+});
+
 export type BilledSummary = z.infer<typeof BilledSummarySchema>;
 export type UnbilledSummary = z.infer<typeof UnbilledSummarySchema>;
 export type WithRemarksSummary = z.infer<typeof WithRemarksSummarySchema>;
+export type NewMeterSummary = z.infer<typeof NewMeterSummarySchema>;
 export type MobileSummaryReport = z.infer<typeof MobileSummaryReportSchema>;
