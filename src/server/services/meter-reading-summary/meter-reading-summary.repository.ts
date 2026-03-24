@@ -6,6 +6,8 @@ import {
   MobileSummaryReportSchema,
   NewMeterSummary,
   NewMeterSummarySchema,
+  Report,
+  ReportSchema,
   UnbilledSummary,
   UnbilledSummarySchema,
   WithRemarksSummary,
@@ -17,6 +19,12 @@ import { and, eq, isNotNull, ne, sql } from "drizzle-orm";
 import { meterReadingContext } from "@mr/server/context";
 import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.type";
 import { newMeters } from "@mr/server/db/schemas/new-meters";
+import {
+  RawRow,
+  transformBillAmount,
+  transformConsumption,
+  transformNoOfBills,
+} from "@mr/server/types/transform";
 
 export class MeterReadingSummaryRepository implements IMeterReadingSummaryRepository {
   async findBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
@@ -218,6 +226,26 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
     } catch (error) {
       throw error;
     }
+  }
+
+  async findMonthBillingSummary(readingMonth: string): Promise<Report> {
+    const [year, month] = readingMonth.split("-").map(Number);
+    const start = `${year}-${month.toString().padStart(2, "0")}-01`;
+    const endMonth = month === 12 ? 1 : month + 1;
+    const endYear = month === 12 ? year + 1 : year;
+    const end = `${endYear}-${endMonth.toString().padStart(2, "0")}-01`;
+
+    const [billAmountResult, noOfBillsResult, consumptionResult] = await Promise.all([
+      db.pgConn.execute(sql`select * from fn_bill_amount_by_classification_meter_size(${start}, ${end})`),
+      db.pgConn.execute(sql`select * from fn_bill_count_by_classification_meter_size(${start}, ${end})`),
+      db.pgConn.execute(sql`select * from fn_consumption_by_classification_meter_size(${start}, ${end})`),
+    ]);
+
+    return ReportSchema.parse({
+      billAmount: transformBillAmount(billAmountResult.rows as RawRow[]),
+      noOfBills: transformNoOfBills(noOfBillsResult.rows as RawRow[]),
+      consumption: transformConsumption(consumptionResult.rows as RawRow[]),
+    });
   }
 
   async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {

@@ -2,6 +2,7 @@ import {
   BilledSummary,
   MobileSummaryReport,
   NewMeterSummary,
+  Report,
   UnbilledSummary,
   WithRemarksSummary,
 } from "@mr/server/types/meter-reading-summary.type";
@@ -12,5 +13,6 @@ export interface IMeterReadingSummaryService {
   getUnbilledSummary(query: BilledAccountQuery): Promise<UnbilledSummary[]>;
   getWithRemarksSummary(query: BilledAccountQuery): Promise<WithRemarksSummary[]>;
   getNewMeterSummary(query: BilledAccountQuery): Promise<NewMeterSummary[]>;
+  getMonthBillingSummary(readingMonth: string): Promise<Report>;
   mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport>;
 }
