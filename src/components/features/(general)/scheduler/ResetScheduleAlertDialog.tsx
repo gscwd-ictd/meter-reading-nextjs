@@ -24,6 +24,7 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setDatesToSplit = useSchedulesStore((state) => state.setDatesToSplit);
   const setHasPopulatedMeterReaders = useSchedulesStore((state) => state.setHasPopulatedMeterReaders);
+  const setNoDueDiscDays = useSchedulesStore((state) => state.setNoDueDiscDays);
 
   const setScheduleHasSplittedDates = useSchedulesStore((state) => state.setScheduleHasSplittedDates);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
@@ -56,6 +57,8 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
     setCurrentSchedule([]);
 
     setLastFetchedMonthYear(null);
+
+    setNoDueDiscDays([0, 6]);
   };
 
   const removeMonthlySchedule = async () => {

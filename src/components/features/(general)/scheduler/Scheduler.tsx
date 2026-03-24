@@ -5,7 +5,7 @@ import { useScheduler } from "./useScheduler";
 import { HolidayFromHrms } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, SettingsIcon } from "lucide-react";
 import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
@@ -25,6 +25,7 @@ import { AddCustomMeterReaderDialog } from "../meter-readers/AddCustomMeterReade
 import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Tooltip";
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
 import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
+import { CalendarDateSettingDropdown } from "./CalendarDateSettingDropdown";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
@@ -38,6 +39,8 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const monthYear = searchParams.get("date");
   const calendarIsSet = useSchedulesStore((state) => state.calendarIsSet);
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const noDueDiscDays = useSchedulesStore((state) => state.noDueDiscDays);
+  const setNoDueDiscDays = useSchedulesStore((state) => state.setNoDueDiscDays);
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
   const setCalendarSchedule = useSchedulesStore((state) => state.setCalendarSchedule);
   const setCalendarIsSet = useSchedulesStore((state) => state.setCalendarIsSet);
@@ -53,7 +56,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const [activeContext, setActiveContext] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
 
-  const scheduler = useScheduler(holidays ?? []);
+  const scheduler = useScheduler(holidays, noDueDiscDays ?? []);
 
   const hasValidSchedule = (monthYear: string) => {
     return currentSchedule.some(
@@ -142,6 +145,39 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     }
   }, [calendarIsSet, currentMonthYear, scheduler, datesToSplit, setCalendarIsSet, setCurrentSchedule]);
 
+  // Add this useEffect to reset calendar when noDueDiscDays changes
+  useEffect(() => {
+    if (calendarIsSet && noDueDiscDays) {
+      // Reset the calendar state to force recalculation
+      setCalendarIsSet(false);
+      setDatesToSplit([]);
+      setHasPopulatedMeterReaders(false);
+      setScheduleHasSplittedDates(false);
+      setHasSchedule(false);
+      setCurrentSchedule([]);
+      setLastFetchedMonthYear(null);
+
+      // Small delay to ensure reset happens before recalculation
+      setTimeout(() => {
+        if (currentMonthYear) {
+          // This will trigger the calendar initialization effect
+          const initialDates = scheduler.splitDates(datesToSplit);
+          setCurrentSchedule(
+            initialDates.map((sched) => {
+              return { ...sched, meterReaders: [] };
+            }),
+          );
+          setCalendarSchedule(
+            initialDates.map((sched) => {
+              return { ...sched, meterReaders: [] };
+            }),
+          );
+          setCalendarIsSet(true);
+        }
+      }, 0);
+    }
+  }, [noDueDiscDays]); // This will run when noDueDiscDays changes
+
   // run this state setter if the there is a fetched schedule for the month
   const hasScheduleOption = useCallback(() => {
     // this should be true since this function is executed
@@ -186,6 +222,8 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
     setCurrentSchedule([]);
 
     setLastFetchedMonthYear(null);
+
+    setNoDueDiscDays([0, 6]);
   };
 
   // update the state of currentSchedule based on the fetched schedule
@@ -309,6 +347,8 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
           </section>
 
           <section className="flex items-center gap-4">
+            <CalendarDateSettingDropdown schedule={currentSchedule} scheduler={scheduler} />
+
             <MonthYearPicker
               currentMonthYear={currentMonthYear}
               setCurrentMonthYear={setCurrentMonthYear}
