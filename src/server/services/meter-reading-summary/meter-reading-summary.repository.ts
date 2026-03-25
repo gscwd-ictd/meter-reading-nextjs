@@ -12,6 +12,8 @@ import {
   UnbilledSummarySchema,
   WithRemarksSummary,
   WithRemarksSummarySchema,
+  ZoneBookSummaryRow,
+  ZoneBookSummaryRowSchema,
 } from "@mr/server/types/meter-reading-summary.type";
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
@@ -246,6 +248,42 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
       noOfBills: transformNoOfBills(noOfBillsResult.rows as RawRow[]),
       consumption: transformConsumption(consumptionResult.rows as RawRow[]),
     });
+  }
+
+  async findZoneBookSummary(readingMonth: string): Promise<ZoneBookSummaryRow[]> {
+    const [year, month] = readingMonth.split("-").map(Number);
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 1);
+
+    const result = await db.pgConn.execute(sql`
+          select
+              coalesce(zb.zone, 'grandTotal') as zone,
+              coalesce(zb.book, 'total') as book,
+              count(*) as count,
+              coalesce(sum(rd.current_usage)   filter (where rd.is_committed = true), 0) as total_consumption,
+              coalesce(sum(rd.billed_amount)   filter (where rd.is_committed = true), 0) as total_billed_amount,
+              coalesce(sum(rd.senior_discount) filter (where rd.is_committed = true), 0) as total_senior_discount
+          from zone_book zb
+          left join reading_details rd
+              on zb.zone = lpad(rd.zone_code, 2, '0')
+              and zb.book = rd.book_code
+              and rd.created_at >= ${start} and rd.created_at < ${end}
+          group by
+              rollup(zb.zone, zb.book)
+          order by
+              zb.zone::int nulls last,
+              zb.book::int nulls last`);
+
+    const rows = result.rows.map((row: any) => ({
+      zone: row.zone,
+      book: row.book,
+      count: row.count,
+      totalConsumption: row.total_consumption,
+      totalBilledAmount: row.total_billed_amount,
+      totalSeniorDiscount: row.total_senior_discount,
+    }));
+
+    return ZoneBookSummaryRowSchema.array().parse(rows);
   }
 
   async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {

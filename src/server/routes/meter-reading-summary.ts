@@ -43,6 +43,13 @@ const meterReadingSummaryRoutes = new Hono()
     return c.json(result, 200);
   })
 
+  .get("/zone-book", zValidator("query", summaryReadingQuerySchema), async (c) => {
+    const { readingMonth } = c.req.valid("query");
+
+    const result = await meterReadingSummaryService.getZoneBookSummary(readingMonth);
+    return c.json(result, 200);
+  })
+
   .post("/mobile", zValidator("json", MobileSummaryQuerySchema), async (c) => {
     const data = c.req.valid("json");
     const result = await meterReadingSummaryService.mobileSummaryReport(data);

@@ -124,13 +124,24 @@ export const ReportSchema = z.object({
   consumption: ConsumptionSchema,
 });
 
-export type BillAmount = z.infer<typeof BillAmountSchema>;
-export type NoOfBills = z.infer<typeof NoOfBillsSchema>;
-export type Consumption = z.infer<typeof ConsumptionSchema>;
-export type Report = z.infer<typeof ReportSchema>;
+export const ZoneBookSummaryRowSchema = z.object({
+  zone: z.string(),
+  book: z.string(),
+  count: z.coerce.number(),
+  totalConsumption: z.coerce.number(),
+  totalBilledAmount: z.coerce.number(),
+  totalSeniorDiscount: z.coerce.number(),
+});
 
 export type BilledSummary = z.infer<typeof BilledSummarySchema>;
 export type UnbilledSummary = z.infer<typeof UnbilledSummarySchema>;
 export type WithRemarksSummary = z.infer<typeof WithRemarksSummarySchema>;
 export type NewMeterSummary = z.infer<typeof NewMeterSummarySchema>;
 export type MobileSummaryReport = z.infer<typeof MobileSummaryReportSchema>;
+
+export type BillAmount = z.infer<typeof BillAmountSchema>;
+export type NoOfBills = z.infer<typeof NoOfBillsSchema>;
+export type Consumption = z.infer<typeof ConsumptionSchema>;
+export type Report = z.infer<typeof ReportSchema>;
+
+export type ZoneBookSummaryRow = z.infer<typeof ZoneBookSummaryRowSchema>;
