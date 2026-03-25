@@ -4,8 +4,10 @@ import {
   BilledSummary,
   MobileSummaryReport,
   NewMeterSummary,
+  Report,
   UnbilledSummary,
   WithRemarksSummary,
+  ZoneBookSummaryRow,
 } from "@mr/server/types/meter-reading-summary.type";
 import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.type";
 
@@ -26,6 +28,14 @@ export class MeterReadingSummaryService implements IMeterReadingSummaryService {
 
   async getNewMeterSummary(query: BilledAccountQuery): Promise<NewMeterSummary[]> {
     return await this.repository.findNewMeterSummary(query);
+  }
+
+  async getMonthBillingSummary(readingMonth: string): Promise<Report> {
+    return await this.repository.findMonthBillingSummary(readingMonth);
+  }
+
+  async getZoneBookSummary(readingMonth: string): Promise<ZoneBookSummaryRow[]> {
+    return await this.repository.findZoneBookSummary(readingMonth);
   }
 
   async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {
