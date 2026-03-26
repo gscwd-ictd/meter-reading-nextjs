@@ -81,7 +81,6 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
 
   const openReassignment = (meterReader: MeterReaderWithZonebooks) => {
     setSelectedMeterReader(meterReader);
-    console.log(meterReader);
     setMeterReaderZoneBookReassignmentDialogIsOpen(true);
   };
 

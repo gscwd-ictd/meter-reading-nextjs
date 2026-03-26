@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FunctionComponent, JSX, useEffect, useState } from "react";
 import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
-import { format, parse } from "date-fns";
+import { endOfMonth, format, isSameMonth, lastDayOfMonth, parse } from "date-fns";
 import { PdfBillingSummaryHeader } from "../PdfBillingSummaryHeader";
 
 type MonthlyBillingSummaryPdfProps = {
@@ -16,65 +16,28 @@ type BillingSizeType = {
   column: string;
 };
 
-type NoOfBillsType = {
-  classification: Array<{
-    name: string;
-    sizes: Array<
-      BillingSizeType & {
-        count: number;
-      }
-    >;
-    total: number; // Each classification has its own total
-  }>;
-  fittings: Array<BillingSizeType & { total: number }>;
-  grandTotal: number;
-};
-
-type ConsumptionType = {
-  classification: Array<{
-    name: string;
-    sizes: Array<
-      BillingSizeType & {
-        consumption: number;
-      }
-    >;
-    total: number; // Each classification has its own total
-  }>;
-  fittings: Array<BillingSizeType & { total: number }>;
-  grandTotal: number;
-};
-
-type BillAmountType = {
-  classification: Array<{
-    name: string;
-    sizes: Array<
-      BillingSizeType & {
-        amount: number;
-      }
-    >;
-    total: number; // Each classification has its own total
-  }>;
-  fittings: Array<BillingSizeType & { total: number }>;
-  grandTotal: number;
+// Updated type definitions for the new array structure
+type ClassificationData = {
+  name: string;
+  sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
+  total: number;
 };
 
 type RawBillingSummary = {
-  noOfBills: NoOfBillsType;
-  billAmount: BillAmountType;
-  consumption: ConsumptionType;
+  noOfBills: ClassificationData[];
+  billAmount: ClassificationData[];
+  consumption: ClassificationData[];
 };
-
-type InputDataType = RawBillingSummary;
 
 // Fixed pipe sizes in order
 const PIPE_SIZES = ["3/8", "1/2", "3/4", "1", "1 1/2", "2", "2 1/2", "3", "4"];
 
-// Fixed classifications in order
+// Fixed classifications in order (excluding grandTotal which will be handled separately)
 const CLASSIFICATIONS = [
   "COMMERCIAL",
-  "COMMERCIAL - A",
-  "COMMERCIAL - B",
-  "COMMERCIAL - C",
+  "COMMERCIAL-A",
+  "COMMERCIAL-B",
+  "COMMERCIAL-C",
   "GOVERNMENT",
   "RESIDENTIAL",
   "SPECIAL",
@@ -115,14 +78,14 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   table: {
-    width: "100%", // Ensure table takes full width
+    width: "100%",
     borderStyle: "solid",
     borderWidth: 0.5,
     borderColor: "#000",
   },
   tableRow: {
     flexDirection: "row",
-    width: "100%", // Ensure row takes full width
+    width: "100%",
     minHeight: 12,
     borderBottomWidth: 0.5,
     borderBottomColor: "#000",
@@ -141,7 +104,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderRow: {
     flexDirection: "row",
-    width: "100%", // Ensure header takes full width
+    width: "100%",
     backgroundColor: "#d3d3d3",
     borderBottomWidth: 1,
     borderBottomColor: "#000",
@@ -156,9 +119,7 @@ const styles = StyleSheet.create({
   tableColLast: {
     padding: 2,
     justifyContent: "center",
-    // No border right for last column
   },
-  // Maximized classification column - 18% width
   classificationCell: {
     width: "18%",
     padding: 2,
@@ -166,23 +127,19 @@ const styles = StyleSheet.create({
     borderRightWidth: 0.5,
     borderRightColor: "#000",
   },
-  // Size columns - 8...% each to total 72% (18% + 72% + 10% = 100%)
   sizeCell: {
-    width: "8%", // 72% ÷ 9 = 8...%
+    width: "8%",
     textAlign: "right",
     paddingRight: 0,
   },
-  // Total column - 10% on the far right
   totalCell: {
     width: "10%",
     textAlign: "right",
     paddingRight: 4,
     fontWeight: "bold",
-    // backgroundColor: "#f0f0f0",
   },
   headerText: {
     fontSize: 8,
-    // fontWeight: "bold",
     textAlign: "center",
     paddingLeft: 4,
   },
@@ -193,7 +150,6 @@ const styles = StyleSheet.create({
   classificationText: {
     fontSize: 8,
     textAlign: "left",
-    // fontWeight: "bold",
   },
   footer: {
     marginTop: 5,
@@ -236,7 +192,7 @@ const styles = StyleSheet.create({
 });
 
 interface MonthlyBillingSummaryPDFProps {
-  data: InputDataType;
+  data: RawBillingSummary;
   yearMonth: string;
 }
 
@@ -249,15 +205,24 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
     return format(newDate, "MMMM yyyy");
   };
 
+  // Helper function to get the target day of the month
+  function getTargetDate(yearMonth: string) {
+    // Parse the input as the first day of the month
+    const firstDayOfMonth = parse(yearMonth, "yyyy-MM", new Date());
+    const currentDate = new Date();
+
+    // Check if the yearMonth is the same as current month AND not greater than current date
+    if (isSameMonth(firstDayOfMonth, currentDate)) {
+      return currentDate;
+    }
+
+    // Otherwise, return the last day of the month
+    return endOfMonth(firstDayOfMonth);
+  }
+
   // Helper function to get value from sizes array for a specific column
   const getValueForColumn = (
-    classification:
-      | {
-          name: string;
-          sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
-          total: number;
-        }
-      | undefined,
+    classification: ClassificationData | undefined,
     column: string,
     metricType: "count" | "amount" | "consumption",
   ): number => {
@@ -265,42 +230,54 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
     const sizeItem = classification.sizes.find((s) => s.column === column);
     if (!sizeItem) return 0;
 
-    if (metricType === "count" && sizeItem.count !== undefined) return sizeItem.count;
-    if (metricType === "amount" && sizeItem.amount !== undefined) return sizeItem.amount;
-    if (metricType === "consumption" && sizeItem.consumption !== undefined) return sizeItem.consumption;
-    return 0;
+    // Handle each metric type correctly
+    switch (metricType) {
+      case "count":
+        return sizeItem.count !== undefined ? sizeItem.count : 0;
+      case "amount":
+        return sizeItem.amount !== undefined ? sizeItem.amount : 0;
+      case "consumption":
+        return sizeItem.consumption !== undefined ? sizeItem.consumption : 0;
+      default:
+        return 0;
+    }
   };
 
   // Helper function to format number
   const formatNumber = (num: number, min?: number, max?: number): string => {
     if (num === 0) return "0";
     return num.toLocaleString("en-US", {
-      // minimumFractionDigits: num % 1 === 0 ? 0 : 2,
       minimumFractionDigits: min !== undefined ? min : 2,
       maximumFractionDigits: max !== undefined ? max : 2,
     });
   };
 
-  // Create lookup maps for faster access
-  const createLookupMap = (data: {
-    classification: Array<{
-      name: string;
-      sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
-      total: number;
-    }>;
-  }) => {
-    const map = new Map();
-    if (data?.classification) {
-      data.classification.forEach((item) => {
-        map.set(item.name, item);
+  // Create lookup maps from arrays, filtering out grandTotal
+  const createLookupMap = (dataArray: ClassificationData[]) => {
+    const map = new Map<string, ClassificationData>();
+    if (dataArray) {
+      dataArray.forEach((item) => {
+        if (item.name !== "grandTotal") {
+          map.set(item.name, item);
+        }
       });
     }
     return map;
   };
 
+  // Get grand total from the array
+  const getGrandTotal = (dataArray: ClassificationData[]): number => {
+    const grandTotalItem = dataArray.find((item) => item.name === "grandTotal");
+    return grandTotalItem?.total || 0;
+  };
+
   const billAmountMap = createLookupMap(data.billAmount);
   const noOfBillsMap = createLookupMap(data.noOfBills);
   const consumptionMap = createLookupMap(data.consumption);
+
+  const grandTotalBillAmount = getGrandTotal(data.billAmount);
+  const grandTotalNoOfBills = getGrandTotal(data.noOfBills);
+  const grandTotalConsumption = getGrandTotal(data.consumption);
 
   // Table Header Component
   const TableHeader = () => (
@@ -319,21 +296,14 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
     </View>
   );
 
-  // Table Row Component for a specific metric type - USING THE PROVIDED TOTAL
+  // Table Row Component for a specific metric type
   const TableRows = (
     metricType: "count" | "amount" | "consumption",
-    dataMap: Map<
-      string,
-      {
-        name: string;
-        sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
-        total: number;
-      }
-    >,
+    dataMap: Map<string, ClassificationData>,
   ) => {
     return CLASSIFICATIONS.map((classification, rowIndex) => {
       const classificationData = dataMap.get(classification);
-      const total = classificationData?.total || 0; // Use the provided total from the data
+      const total = classificationData?.total || 0;
       const isEven = rowIndex % 2 === 0;
 
       return (
@@ -346,14 +316,14 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
             return (
               <View key={colIndex} style={[styles.sizeCell, styles.tableCol]}>
                 <Text style={styles.cellText}>
-                  {metricType == "count" ? formatNumber(value, 0, 0) : formatNumber(value)}
+                  {metricType === "count" ? formatNumber(value, 0, 0) : formatNumber(value)}
                 </Text>
               </View>
             );
           })}
           <View style={[styles.totalCell, styles.tableColLast]}>
             <Text style={[styles.cellText, { fontWeight: "bold" }]}>
-              {metricType == "count" ? formatNumber(total, 0, 0) : formatNumber(total)}
+              {metricType === "count" ? formatNumber(total, 0, 0) : formatNumber(total)}
             </Text>
           </View>
         </View>
@@ -361,20 +331,13 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
     });
   };
 
-  // Grand Total Row Component - USING THE PROVIDED GRAND TOTAL
+  // Grand Total Row Component
   const GrandTotalRow = (
     metricType: "count" | "amount" | "consumption",
-    dataMap: Map<
-      string,
-      {
-        name: string;
-        sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
-        total: number;
-      }
-    >,
-    grandTotalValue: number, // Pass the grand total from the data
+    dataMap: Map<string, ClassificationData>,
+    grandTotalValue: number,
   ) => {
-    // Calculate column totals (still need these since they're not provided)
+    // Calculate column totals
     const columnTotals = PIPE_SIZES.map((size) => {
       return CLASSIFICATIONS.reduce((sum, classification) => {
         const classificationData = dataMap.get(classification);
@@ -390,13 +353,13 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
         {columnTotals.map((total, index) => (
           <View key={index} style={[styles.sizeCell, styles.tableCol]}>
             <Text style={[styles.cellText, { fontWeight: "bold" }]}>
-              {metricType == "count" ? formatNumber(total, 0, 0) : formatNumber(total)}
+              {metricType === "count" ? formatNumber(total, 0, 0) : formatNumber(total)}
             </Text>
           </View>
         ))}
         <View style={[styles.totalCell, styles.tableColLast]}>
           <Text style={[styles.cellText, { fontWeight: "bold" }]}>
-            {metricType == "count" ? formatNumber(grandTotalValue, 0, 0) : formatNumber(grandTotalValue)}
+            {metricType === "count" ? formatNumber(grandTotalValue, 0, 0) : formatNumber(grandTotalValue)}
           </Text>
         </View>
       </View>
@@ -407,14 +370,7 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
   const renderTable = (
     title: string,
     metricType: "count" | "amount" | "consumption",
-    dataMap: Map<
-      string,
-      {
-        name: string;
-        sizes: Array<BillingSizeType & { count?: number; amount?: number; consumption?: number }>;
-        total: number;
-      }
-    >,
+    dataMap: Map<string, ClassificationData>,
     grandTotal: number,
   ) => {
     return (
@@ -436,21 +392,20 @@ const MonthlyBillingSummaryPDF: FunctionComponent<MonthlyBillingSummaryPDFProps>
           isoCode="CSD-014-1"
           page={{ current: 1, total: 1 }}
           dateTime={new Date()}
-          dateRange={{ from: new Date(yearMonth + "-01"), to: new Date() }}
+          dateRange={{
+            from: new Date(yearMonth + "-01"),
+            to: getTargetDate(yearMonth),
+          }}
         />
 
-        {/* Bill Amount Table - using grandTotal from data */}
-        {renderTable("BILL AMOUNT", "amount", billAmountMap, data.billAmount?.grandTotal || 0)}
+        {/* Bill Amount Table */}
+        {renderTable("BILL AMOUNT", "amount", billAmountMap, grandTotalBillAmount)}
 
-        {/* No. of Bills Table - using grandTotal from data */}
-        {renderTable("NO. OF BILLS", "count", noOfBillsMap, data.noOfBills?.grandTotal || 0)}
+        {/* No. of Bills Table */}
+        {renderTable("NO. OF BILLS", "count", noOfBillsMap, grandTotalNoOfBills)}
 
-        {/* Consumption Table - using grandTotal from data */}
-        {renderTable("CONSUMPTION", "consumption", consumptionMap, data.consumption?.grandTotal || 0)}
-
-        {/* <Text style={styles.footer}>
-          Generated on: {format(new Date(), "MMMM dd, yyyy hh:mm a")} for {formatDate(yearMonth)}
-        </Text> */}
+        {/* Consumption Table */}
+        {renderTable("CONSUMPTION", "consumption", consumptionMap, grandTotalConsumption)}
       </Page>
     </Document>
   );
@@ -468,8 +423,11 @@ export const MonthlyBillingSummaryPdf: FunctionComponent<MonthlyBillingSummaryPd
   const { data, isLoading, isError } = useQuery({
     queryKey: ["billing-summary", yearMonth],
     queryFn: async () => {
-      const res = await axios.get(`https://api.npoint.io/70dcbd15a19e2b3b0574`);
-      console.log(res.data);
+      // const res = await axios.get(`https://api.npoint.io/70dcbd15a19e2b3b0574`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_MR_BE}/summary/monthly-billing?readingMonth=${yearMonth}`,
+      );
+
       return res.data;
     },
     enabled: !!yearMonth,
