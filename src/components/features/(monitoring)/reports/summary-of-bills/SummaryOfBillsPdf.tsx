@@ -331,8 +331,10 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
 
       const zoneData = zoneMap.get(zone)!;
 
-      // Skip adding the "total" book entry as a regular row
-      if (record.book !== "total") {
+      const isTotalBook = record.book === "total" || record.book === "Total" || record.book === "TOTAL";
+
+      if (!isTotalBook) {
+        // Add to books array
         zoneData.books.push({
           book: record.book,
           count: record.count,
@@ -340,17 +342,41 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
           billAmount: record.totalBilledAmount,
           seniorAmount: record.totalSeniorDiscount,
         });
-      }
 
-      // Update zone summary (include total book entries)
-      zoneData.zoneSummary.totalCount += record.count;
-      zoneData.zoneSummary.totalUsage += record.totalConsumption;
-      zoneData.zoneSummary.totalBillAmount += record.totalBilledAmount;
-      zoneData.zoneSummary.totalSeniorAmount += record.totalSeniorDiscount;
-      zoneData.zoneSummary.bookCount++;
+        // Update zone summary with INDIVIDUAL BOOKS only (not including the total entry)
+        zoneData.zoneSummary.totalCount += record.count;
+        zoneData.zoneSummary.totalUsage += record.totalConsumption;
+        zoneData.zoneSummary.totalBillAmount += record.totalBilledAmount;
+        zoneData.zoneSummary.totalSeniorAmount += record.totalSeniorDiscount;
+        zoneData.zoneSummary.bookCount++;
+      } else {
+        // For total book entries, just increment bookCount but don't add to summary values
+        zoneData.zoneSummary.bookCount++;
+      }
     });
 
-    // Calculate grand totals
+    // Convert map to array and round values
+    const zones: ZoneData[] = Array.from(zoneMap.values()).map((zone) => {
+      // Round the summary values
+      zone.zoneSummary = {
+        ...zone.zoneSummary,
+        totalUsage: Math.round(zone.zoneSummary.totalUsage * 100) / 100,
+        totalBillAmount: Math.round(zone.zoneSummary.totalBillAmount * 100) / 100,
+        totalSeniorAmount: Math.round(zone.zoneSummary.totalSeniorAmount * 100) / 100,
+      };
+
+      return zone;
+    });
+
+    // Sort zones by zone number
+    zones.sort((a, b) => parseInt(a.zone) - parseInt(b.zone));
+
+    // Sort books by book number
+    zones.forEach((zone) => {
+      zone.books.sort((a, b) => parseInt(a.book) - parseInt(b.book));
+    });
+
+    // Calculate grand totals from zone summaries
     let grandTotals = {
       totalCount: 0,
       totalUsage: 0,
@@ -359,26 +385,13 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       totalBooks: 0,
     };
 
-    // Convert map to array and round values
-    const zones: ZoneData[] = Array.from(zoneMap.values()).map((zone) => {
-      zone.zoneSummary = {
-        ...zone.zoneSummary,
-        totalUsage: Math.round(zone.zoneSummary.totalUsage * 100) / 100,
-        totalBillAmount: Math.round(zone.zoneSummary.totalBillAmount * 100) / 100,
-        totalSeniorAmount: Math.round(zone.zoneSummary.totalSeniorAmount * 100) / 100,
-      };
-
+    zones.forEach((zone) => {
       grandTotals.totalCount += zone.zoneSummary.totalCount;
       grandTotals.totalUsage += zone.zoneSummary.totalUsage;
       grandTotals.totalBillAmount += zone.zoneSummary.totalBillAmount;
       grandTotals.totalSeniorAmount += zone.zoneSummary.totalSeniorAmount;
       grandTotals.totalBooks += zone.books.length;
-
-      return zone;
     });
-
-    // Sort zones by zone number
-    zones.sort((a, b) => parseInt(a.zone) - parseInt(b.zone));
 
     // Round grand totals
     grandTotals = {
@@ -389,7 +402,7 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       totalBooks: grandTotals.totalBooks,
     };
 
-    // If grandTotalData exists, use it to override
+    // If grandTotalData exists, use it to override (optional)
     if (grandTotalData) {
       grandTotals = {
         totalCount: grandTotalData.count,
@@ -399,11 +412,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         totalBooks: grandTotals.totalBooks,
       };
     }
-
-    // Sort books by book number
-    zones.forEach((zone) => {
-      zone.books.sort((a, b) => parseInt(a.book) - parseInt(b.book));
-    });
 
     return {
       reportMetadata: {
@@ -436,7 +444,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     };
   };
 
-  // create pages with rows
   const createPages = (reportData: ReportStructure): PageData[] => {
     const pages: PageData[] = [];
 
@@ -501,7 +508,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         currentZoneData = zone;
       }
     };
-
     // Process each zone
     reportData.zones.forEach((zone, zoneIndex) => {
       const isLastZone = zoneIndex === reportData.zones.length - 1;
@@ -529,7 +535,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         addBookRow(book, zone.zone);
       });
 
-      // Add zone total row at the bottom
       addZoneTotalRow(zone);
 
       // Add spacing between zones
@@ -735,7 +740,6 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_MR_BE}/summary/zone-book?readingMonth=${yearMonth}`,
       );
-
       return res.data;
     },
     enabled: !!yearMonth,
