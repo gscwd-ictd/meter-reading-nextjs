@@ -12,16 +12,93 @@ type SummaryOfBillsPdfProps = {
   yearMonth: string;
 };
 
+// Updated type definition for new data structure
 type RawBookRecord = {
-  zone: string; // "01", "02", "05", "08", "12", "15", "22", "35", "45", "55"
-  book: string; // "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+  zone: string;
+  book: string;
+  count: number;
+  totalConsumption: number;
+  totalBilledAmount: number;
+  totalSeniorDiscount: number;
+};
+
+type InputDataType = RawBookRecord[];
+
+// Types for the processed data structure
+type BookRecord = {
+  book: string;
   count: number;
   usage: number;
   billAmount: number;
   seniorAmount: number;
 };
 
-type InputDataType = RawBookRecord[];
+type ZoneSummary = {
+  totalCount: number;
+  totalUsage: number;
+  totalBillAmount: number;
+  totalSeniorAmount: number;
+  bookCount: number;
+};
+
+type ZoneData = {
+  zone: string;
+  books: BookRecord[];
+  zoneSummary: ZoneSummary;
+};
+
+type ReportStructure = {
+  reportMetadata: {
+    generatedAt: string;
+    reportMonth: string;
+    reportPeriod: string;
+    totalZones: number;
+    totalBooks: number;
+  };
+  summary: {
+    totalCount: number;
+    totalUsage: number;
+    totalBillAmount: number;
+    totalSeniorAmount: number;
+  };
+  zones: ZoneData[];
+  analytics: {
+    averagePerZone: {
+      count: number;
+      usage: number;
+      billAmount: number;
+      seniorAmount: number;
+    };
+    averagePerBook: {
+      usage: number;
+      billAmount: number;
+      seniorAmount: number;
+    };
+  };
+};
+
+type PageRow = {
+  type: "book" | "zoneTotal" | "spacer" | "grandTotal" | "continuation";
+  zone?: string;
+  book?: string;
+  count?: number;
+  usage?: number;
+  billAmount?: number;
+  seniorAmount?: number;
+  isBold?: boolean;
+  backgroundColor?: string;
+  borderTop?: boolean;
+  borderBottom?: boolean;
+  borderBottomStyle?: string;
+  height?: number;
+};
+
+type PageData = {
+  rows: PageRow[];
+  zoneSummary?: ZoneSummary;
+  pageNumber: number;
+  hasSignatory: boolean;
+};
 
 // Create styles
 const styles = StyleSheet.create({
@@ -74,10 +151,6 @@ const styles = StyleSheet.create({
   },
   tableCol: {
     width: "20%",
-    // borderStyle: "solid",
-    // borderWidth: 1,
-    // borderLeftWidth: 0,
-    // borderTopWidth: 0,
     padding: 5,
     justifyContent: "center",
   },
@@ -117,6 +190,7 @@ const styles = StyleSheet.create({
   w25: { width: "25%" },
   w23_8: { width: "23.8%" },
   w22_5: { width: "22.5%" },
+  w22: { width: "22%" },
   w20: { width: "20%" },
   w17_5: { width: "17.5%" },
   w18: { width: "18%" },
@@ -188,7 +262,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         gap: 20,
       }}
     >
-      {/* Left side - Prepared by */}
       <View style={{ width: "50%" }}>
         <Text style={{ fontSize: 9, marginBottom: 5 }}>Prepared by:</Text>
         <View style={{ marginTop: 15, flexDirection: "column", justifyContent: "center", width: "100%" }}>
@@ -208,7 +281,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         </View>
       </View>
 
-      {/* Right side - Noted by / Approved by */}
       <View style={{ width: "50%" }}>
         <Text style={{ fontSize: 9, marginBottom: 5 }}>Noted by:</Text>
         <View style={{ marginTop: 15, flexDirection: "column", justifyContent: "center", width: "100%" }}>
@@ -230,12 +302,18 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     </View>
   );
 
-  const generateMonthlyReportWithDetails = (data: InputDataType, reportDate = new Date()) => {
-    // Group by zone first
-    const zoneMap = new Map();
+  const generateMonthlyReportWithDetails = (
+    data: InputDataType,
+    reportDate = new Date(),
+  ): ReportStructure => {
+    // Filter out the grandTotal from zones
+    const zonesData = data.filter((item) => item.zone !== "grandTotal");
+    const grandTotalData = data.find((item) => item.zone === "grandTotal");
 
-    // First pass: group all records by zone
-    data.forEach((record) => {
+    // Group by zone
+    const zoneMap = new Map<string, ZoneData>();
+
+    zonesData.forEach((record) => {
       const zone = record.zone;
       if (!zoneMap.has(zone)) {
         zoneMap.set(zone, {
@@ -251,22 +329,24 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         });
       }
 
-      const zoneData = zoneMap.get(zone);
+      const zoneData = zoneMap.get(zone)!;
 
-      // Add the detailed book record
-      zoneData.books.push({
-        book: record.book,
-        count: record.count,
-        usage: record.usage,
-        billAmount: record.billAmount,
-        seniorAmount: record.seniorAmount,
-      });
+      // Skip adding the "total" book entry as a regular row
+      if (record.book !== "total") {
+        zoneData.books.push({
+          book: record.book,
+          count: record.count,
+          usage: record.totalConsumption,
+          billAmount: record.totalBilledAmount,
+          seniorAmount: record.totalSeniorDiscount,
+        });
+      }
 
-      // Update zone summary
+      // Update zone summary (include total book entries)
       zoneData.zoneSummary.totalCount += record.count;
-      zoneData.zoneSummary.totalUsage += record.usage;
-      zoneData.zoneSummary.totalBillAmount += record.billAmount;
-      zoneData.zoneSummary.totalSeniorAmount += record.seniorAmount;
+      zoneData.zoneSummary.totalUsage += record.totalConsumption;
+      zoneData.zoneSummary.totalBillAmount += record.totalBilledAmount;
+      zoneData.zoneSummary.totalSeniorAmount += record.totalSeniorDiscount;
       zoneData.zoneSummary.bookCount++;
     });
 
@@ -279,9 +359,8 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       totalBooks: 0,
     };
 
-    // Convert map to array and calculate percentages
-    const zones = Array.from(zoneMap.values()).map((zone) => {
-      // Round the summary values
+    // Convert map to array and round values
+    const zones: ZoneData[] = Array.from(zoneMap.values()).map((zone) => {
       zone.zoneSummary = {
         ...zone.zoneSummary,
         totalUsage: Math.round(zone.zoneSummary.totalUsage * 100) / 100,
@@ -289,7 +368,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         totalSeniorAmount: Math.round(zone.zoneSummary.totalSeniorAmount * 100) / 100,
       };
 
-      // Add to grand totals
       grandTotals.totalCount += zone.zoneSummary.totalCount;
       grandTotals.totalUsage += zone.zoneSummary.totalUsage;
       grandTotals.totalBillAmount += zone.zoneSummary.totalBillAmount;
@@ -300,7 +378,7 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     });
 
     // Sort zones by zone number
-    zones.sort((a, b) => a.zone - b.zone);
+    zones.sort((a, b) => parseInt(a.zone) - parseInt(b.zone));
 
     // Round grand totals
     grandTotals = {
@@ -311,18 +389,21 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       totalBooks: grandTotals.totalBooks,
     };
 
-    // // Add percentages to each zone
-    // zones.forEach((zone) => {
-    //   zone.zoneSummary.percentageOfTotal = {
-    //     count: ((zone.zoneSummary.totalCount / grandTotals.totalCount) * 100).toFixed(2) + "%",
-    //     usage: ((zone.zoneSummary.totalUsage / grandTotals.totalUsage) * 100).toFixed(2) + "%",
-    //     bill: ((zone.zoneSummary.totalBillAmount / grandTotals.totalBillAmount) * 100).toFixed(2) + "%",
-    //     senior: ((zone.zoneSummary.totalSeniorAmount / grandTotals.totalSeniorAmount) * 100).toFixed(2) + "%",
-    //   };
+    // If grandTotalData exists, use it to override
+    if (grandTotalData) {
+      grandTotals = {
+        totalCount: grandTotalData.count,
+        totalUsage: grandTotalData.totalConsumption,
+        totalBillAmount: grandTotalData.totalBilledAmount,
+        totalSeniorAmount: grandTotalData.totalSeniorDiscount,
+        totalBooks: grandTotals.totalBooks,
+      };
+    }
 
-    //   // Sort books by book number
-    //   zone.books.sort((a, b) => a.book - b.book);
-    // });
+    // Sort books by book number
+    zones.forEach((zone) => {
+      zone.books.sort((a, b) => parseInt(a.book) - parseInt(b.book));
+    });
 
     return {
       reportMetadata: {
@@ -355,75 +436,55 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     };
   };
 
-  // create pages with row
-  const createPages = (reportData: any) => {
-    const pages: Array<{
-      rows: any[];
-      zoneSummary?: any;
-      pageNumber: number;
-      hasSignatory: boolean;
-    }> = [];
+  // create pages with rows
+  const createPages = (reportData: ReportStructure): PageData[] => {
+    const pages: PageData[] = [];
 
-    let currentPageRows: any[] = [];
-    let currentZoneSummary: any = null;
-    let currentZone: number | null = null;
-    let currentZoneData: any = null;
+    let currentPageRows: PageRow[] = [];
+    let currentZoneSummary: ZoneSummary | undefined;
+    let currentZone: string | null = null;
+    let currentZoneData: ZoneData | null = null;
 
-    // Reserve 5 rows for signatory section on the last page
     const MAX_ROWS_PER_PAGE = 30;
-    const ROWS_RESERVED_FOR_SIGNATORY = 5; // Adjust based on your signatory height
+    const ROWS_RESERVED_FOR_SIGNATORY = 5;
 
-    // Helper to add zone summary row at the BOTTOM with dotted border
-    const addZoneTotalRow = (zone: any) => {
+    const addZoneTotalRow = (zone: ZoneData) => {
       currentPageRows.push({
         type: "zoneTotal",
         zone: zone.zone,
         book: `${zone.zone} - Total`,
-        count: zone.zoneSummary.totalCount
-          ? zone.zoneSummary.totalCount.toLocaleString("en-US")
-          : zone.zoneSummary.totalCount,
-        usage: zone.zoneSummary.totalUsage
-          ? zone.zoneSummary.totalUsage.toLocaleString("en-US")
-          : zone.zoneSummary.totalUsage,
-        billAmount: zone.zoneSummary.totalBillAmount
-          ? zone.zoneSummary.totalBillAmount.toFixed(2).toLocaleString("en-US")
-          : zone.zoneSummary.totalBillAmount,
-        seniorAmount: zone.zoneSummary.totalSeniorAmount
-          ? zone.zoneSummary.totalSeniorAmount.toFixed(2).toLocaleString("en-US")
-          : zone.zoneSummary.totalSeniorAmount,
+        count: zone.zoneSummary.totalCount,
+        usage: zone.zoneSummary.totalUsage,
+        billAmount: zone.zoneSummary.totalBillAmount,
+        seniorAmount: zone.zoneSummary.totalSeniorAmount,
         isBold: false,
         backgroundColor: "#ffffff",
         borderTop: false,
         borderBottom: true,
-        borderBottomStyle: "dotted", // ✅ Dotted border
+        borderBottomStyle: "dotted",
       });
     };
 
-    // Helper to add book row
-    const addBookRow = (book: any, zone: number) => {
+    const addBookRow = (book: BookRecord, zone: string) => {
       currentPageRows.push({
         type: "book",
         zone: zone,
         book: book.book,
-        count: book.count ? book.count.toLocaleString("en-US") : book.count,
-        usage: book.usage ? book.usage.toLocaleString("en-US") : book.usage,
-        billAmount: book.billAmount ? book.billAmount.toFixed(2).toLocaleString("en-US") : book.billAmount,
-        seniorAmount: book.seniorAmount
-          ? book.seniorAmount.toFixed(2).toLocaleString("en-US")
-          : book.seniorAmount,
+        count: book.count,
+        usage: book.usage,
+        billAmount: book.billAmount,
+        seniorAmount: book.seniorAmount,
         isBold: false,
       });
     };
 
-    // Helper to check if we need a new page (considering if this might be the last page)
     const needsNewPage = (isLastZone: boolean, isLastBook: boolean) => {
       const baseMax =
         isLastZone && isLastBook ? MAX_ROWS_PER_PAGE - ROWS_RESERVED_FOR_SIGNATORY : MAX_ROWS_PER_PAGE;
       return currentPageRows.length >= baseMax;
     };
 
-    // Helper to start new page
-    const startNewPage = (zone?: any, isLastPage = false) => {
+    const startNewPage = (zone?: ZoneData, isLastPage = false) => {
       if (currentPageRows.length > 0) {
         pages.push({
           rows: [...currentPageRows],
@@ -442,7 +503,7 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
     };
 
     // Process each zone
-    reportData.zones.forEach((zone: any, zoneIndex: number) => {
+    reportData.zones.forEach((zone, zoneIndex) => {
       const isLastZone = zoneIndex === reportData.zones.length - 1;
 
       if (currentZone !== zone.zone) {
@@ -455,11 +516,10 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
       }
 
       // Add all books for this zone
-      zone.books.forEach((book: any, bookIndex: number) => {
+      zone.books.forEach((book, bookIndex) => {
         const isLastBook = isLastZone && bookIndex === zone.books.length - 1;
 
         if (needsNewPage(isLastZone, isLastBook)) {
-          // Check if this would be the last page
           const wouldBeLastPage =
             isLastZone && isLastBook && pages.length === 0 && currentPageRows.length === 0;
 
@@ -483,16 +543,16 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
 
     // Add grand total row
     if (currentPageRows.length >= MAX_ROWS_PER_PAGE - ROWS_RESERVED_FOR_SIGNATORY) {
-      startNewPage(undefined, true); // This will be the last page
+      startNewPage(undefined, true);
     }
 
     currentPageRows.push({
       type: "grandTotal",
       book: "",
       count: reportData.summary.totalCount,
-      usage: reportData.summary.totalUsage.toFixed(2),
-      billAmount: reportData.summary.totalBillAmount.toFixed(2),
-      seniorAmount: reportData.summary.totalSeniorAmount.toFixed(2),
+      usage: reportData.summary.totalUsage,
+      billAmount: reportData.summary.totalBillAmount,
+      seniorAmount: reportData.summary.totalSeniorAmount,
       isBold: false,
       backgroundColor: "#ffffff",
       borderTop: true,
@@ -505,7 +565,7 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
         rows: [...currentPageRows],
         zoneSummary: currentZoneSummary,
         pageNumber: pages.length + 1,
-        hasSignatory: true, // Last page gets signatory
+        hasSignatory: true,
       });
     }
 
@@ -548,14 +608,15 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
                       backgroundColor: row.backgroundColor || "transparent",
                       borderTopWidth: row.borderTop ? 1 : 0,
                       borderBottomWidth: row.borderBottom ? 1 : 0,
-                      borderBottomStyle: row.borderBottomStyle || "dotted", // ✅ Add border style
+                      borderBottomStyle: "dotted",
+                      //row.borderBottomStyle ||
                     },
                   ]}
                 >
                   <View style={[styles.tableCol, styles.w12_5, { borderLeft: 0, padding: 0 }]}>
                     {row.type === "grandTotal" ? (
                       <Text style={[styles.cellText, { fontWeight: row.isBold ? "bold" : "normal" }]}>
-                        {row.book}
+                        GRAND TOTAL
                       </Text>
                     ) : (
                       <View
@@ -581,13 +642,12 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
                             ? "Total"
                             : row.type === "continuation"
                               ? "(continued)"
-                              : row.book.toString().padStart(2, "0")}
+                              : row.book?.toString().padStart(2, "0")}
                         </Text>
                       </View>
                     )}
                   </View>
 
-                  {/* Count Column - Bold for zoneTotal */}
                   <View style={[styles.tableCol, styles.w17_5]}>
                     <Text
                       style={[
@@ -598,11 +658,10 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
                         },
                       ]}
                     >
-                      {row.count}
+                      {row.count?.toLocaleString("en-US")}
                     </Text>
                   </View>
 
-                  {/* Usage Column - Bold for zoneTotal */}
                   <View style={[styles.tableCol, styles.w25]}>
                     <Text
                       style={[
@@ -613,11 +672,13 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
                         },
                       ]}
                     >
-                      {row.usage}
+                      {row.usage?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
 
-                  {/* Bill Amount Column - Bold for zoneTotal */}
                   <View style={[styles.tableCol, styles.w22_5]}>
                     <Text
                       style={[
@@ -628,24 +689,19 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
                         },
                       ]}
                     >
-                      {typeof row.billAmount === "number"
-                        ? row.billAmount.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })
-                        : row.billAmount}
+                      {row.billAmount?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
 
-                  {/* Senior Amount Column - Keep normal weight */}
                   <View style={[styles.tableCol, styles.w22_5, { borderRight: 0 }]}>
                     <Text style={[styles.cellText, { fontWeight: "bold" }]}>
-                      {typeof row.seniorAmount === "number"
-                        ? row.seniorAmount.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })
-                        : row.seniorAmount}
+                      {row.seniorAmount?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
                 </View>
@@ -653,7 +709,6 @@ const SummaryOfBillsPDF: FunctionComponent<SummaryOfBillsPDFProps> = ({ data, ye
             })}
           </View>
 
-          {/* Signatory section - now part of the page content */}
           {page.hasSignatory && (
             <View style={{ marginTop: 20 }}>
               <SignatorySection />
@@ -677,11 +732,10 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
   const { data, isLoading, isError } = useQuery({
     queryKey: ["summary-of-bills", yearMonth],
     queryFn: async () => {
-      // const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
-      // const res = await axios.get(`https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d`);
-      // https://api.jsonsilo.com/public/574263b5-fbb5-47fe-81ce-d9f26c64223d
-      const res = await axios.get(`https://api.npoint.io/d3e97b78fda05447e380`);
-      console.log(res.data);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_MR_BE}/summary/zone-book?readingMonth=${yearMonth}`,
+      );
+
       return res.data;
     },
     enabled: !!yearMonth,
@@ -698,9 +752,7 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
         URL.revokeObjectURL(pdfUrl);
       }
 
-      // ✅ Pass the raw data directly - the PDF component will transform it
       const blob = await pdf(<SummaryOfBillsPDF data={data} yearMonth={yearMonth} />).toBlob();
-
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
     } catch (error) {
@@ -710,14 +762,12 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
     }
   };
 
-  // Generate PDF when data is loaded
   useEffect(() => {
     if (data && data.length > 0) {
       generatePdfPreview();
     }
   }, [data, yearMonth]);
 
-  // Clean up URL on unmount
   useEffect(() => {
     return () => {
       if (pdfUrl) {
@@ -734,9 +784,9 @@ export const SummaryOfBillsPdf: FunctionComponent<SummaryOfBillsPdfProps> = ({ y
       </div>
     );
   }
+
   return (
     <div className="flex flex-col p-8">
-      {/* PDF Preview Section */}
       <div className="mb-6">
         <div className="h-[44rem] rounded-lg bg-white shadow-lg">
           <div className="h-full bg-gray-50">

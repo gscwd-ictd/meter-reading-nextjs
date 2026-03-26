@@ -114,7 +114,6 @@ export const ManualScheduleAlertDialog: FunctionComponent<ManualScheduleAlertDia
         };
       });
 
-      console.log(formattedFilteredSchedule);
       const res = await axios.post(`${process.env.NEXT_PUBLIC_MR_BE}/schedules`, formattedFilteredSchedule);
       return res.data;
     },
