@@ -1,7 +1,9 @@
 import { Button } from "@mr/components/ui/Button";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -10,8 +12,9 @@ import {
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { SettingsIcon, CheckIcon } from "lucide-react";
 import { Scheduler } from "./useScheduler";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback } from "react";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
+import { CustomDaySelectionSetting } from "@mr/components/ui/dropdowns/CustomDaySelectionSetting";
 
 type CalendarDateSettingDropdownProps = {
   schedule: MeterReadingSchedule[];
@@ -41,46 +44,56 @@ export const CalendarDateSettingDropdown: FunctionComponent<CalendarDateSettingD
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel className="text-primary w-[16rem] text-xs">
+        <div className="text-primary w-[16rem] p-2 text-xs">
           {hasFetchedSchedule && hasSchedule
             ? "Cannot change this setting for this month"
             : " No due dates and disconnection dates shall fall on the following:"}
-        </DropdownMenuLabel>
+        </div>
+
         {hasFetchedSchedule && !hasSchedule && (
           <>
-            <DropdownMenuItem
-              onClick={() => {
-                setNoDueDiscDays([0, 6]);
-                setCurrentSchedule(scheduler.splitDates(datesToSplit));
-              }}
-              className="flex flex-col items-start gap-0 hover:cursor-pointer"
-            >
-              <div className="flex items-center justify-between gap-2 text-sm">
-                Weekends & Holidays
-                {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 6]) && (
-                  <CheckIcon className="h-4 w-4 text-green-600" />
-                )}
-              </div>
-              <span className="w-[16rem] text-xs text-gray-500">Default</span>
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="-mb-2 text-xs text-green-400">Preset</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => {
+                  setNoDueDiscDays([0, 6]);
+                  setCurrentSchedule(scheduler.splitDates(datesToSplit));
+                }}
+                className="flex flex-col items-start gap-0 hover:cursor-pointer"
+              >
+                <div className="flex items-center justify-between gap-2 text-sm">
+                  Weekends & Holidays
+                  {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 6]) && (
+                    <CheckIcon className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
+                <span className="w-[16rem] text-xs text-gray-500">Default</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  setNoDueDiscDays([0, 5, 6]);
+                  setCurrentSchedule(scheduler.splitDates(datesToSplit));
+                }}
+                className="flex flex-col items-start gap-0 hover:cursor-pointer"
+              >
+                <div className="flex items-center justify-between gap-2 text-sm">
+                  Fridays, Weekends, & Holidays
+                  {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 5, 6]) && (
+                    <CheckIcon className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
+                <span className="w-[16rem] text-xs text-gray-500">
+                  Due to four-day workweek arrangement (OGM MEMORANDUM 24, S. 2026)
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                setNoDueDiscDays([0, 5, 6]);
-                setCurrentSchedule(scheduler.splitDates(datesToSplit));
-              }}
-              className="flex flex-col items-start gap-0 hover:cursor-pointer"
-            >
-              <div className="flex items-center justify-between gap-2 text-sm">
-                Fridays, Weekends, & Holidays
-                {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 5, 6]) && (
-                  <CheckIcon className="h-4 w-4 text-green-600" />
-                )}
-              </div>
-              <span className="w-[16rem] text-xs text-gray-500">
-                Due to four-day workweek arrangement (OGM MEMORANDUM 24, S. 2026)
-              </span>
-            </DropdownMenuItem>
+
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="-mb-2 text-xs text-green-400">Custom</DropdownMenuLabel>
+              <CustomDaySelectionSetting scheduler={scheduler} />
+            </DropdownMenuGroup>
           </>
         )}
       </DropdownMenuContent>
