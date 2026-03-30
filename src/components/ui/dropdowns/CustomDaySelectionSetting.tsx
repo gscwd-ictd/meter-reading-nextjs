@@ -1,8 +1,9 @@
 "use client";
-import { CheckIcon, ChevronRightIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -121,54 +122,56 @@ export const CustomDaySelectionSetting: React.FC<CustomDaySelecionSettingProps> 
           </div>
         </div>
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent className="w-[16rem]">
-        <DropdownMenuLabel className="text-muted-foreground text-xs">
-          Select days to exclude
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {DAYS_OF_WEEK.map((day) => (
-          <DropdownMenuCheckboxItem
-            key={day.value}
-            checked={isDaySelected(day.value)}
-            disabled={isDayDisabled(day.value)}
-            onCheckedChange={(checked) => handleDaySelection(day.value, checked)}
-            onSelect={(e) => {
-              // Prevent the dropdown from closing when selecting items
-              e.preventDefault();
-            }}
-          >
-            {day.label}
-            {isDayDisabled(day.value) && (
-              <span className="text-muted-foreground ml-2 text-xs">(would select all)</span>
+      <DropdownMenuPortal>
+        <DropdownMenuSubContent className="w-[16rem]">
+          <DropdownMenuLabel className="text-muted-foreground text-xs">
+            Select days to exclude
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {DAYS_OF_WEEK.map((day) => (
+            <DropdownMenuCheckboxItem
+              key={day.value}
+              checked={isDaySelected(day.value)}
+              disabled={isDayDisabled(day.value)}
+              onCheckedChange={(checked) => handleDaySelection(day.value, checked)}
+              onSelect={(e) => {
+                // Prevent the dropdown from closing when selecting items
+                e.preventDefault();
+              }}
+            >
+              {day.label}
+              {isDayDisabled(day.value) && (
+                <span className="text-muted-foreground ml-2 text-xs">(would select all)</span>
+              )}
+            </DropdownMenuCheckboxItem>
+          ))}
+          <DropdownMenuSeparator />
+          <div className="text-muted-foreground px-2 py-1.5 text-xs">
+            Selected:{" "}
+            {tempSelectedDays.length > 0
+              ? tempSelectedDays.map((d) => DAYS_OF_WEEK.find((day) => day.value === d)?.label).join(", ")
+              : "None"}
+            {tempSelectedDays.length === DAYS_OF_WEEK.length - 1 && (
+              <span className="ml-2 text-amber-600">(max selection reached)</span>
             )}
-          </DropdownMenuCheckboxItem>
-        ))}
-        <DropdownMenuSeparator />
-        <div className="text-muted-foreground px-2 py-1.5 text-xs">
-          Selected:{" "}
-          {tempSelectedDays.length > 0
-            ? tempSelectedDays.map((d) => DAYS_OF_WEEK.find((day) => day.value === d)?.label).join(", ")
-            : "None"}
-          {tempSelectedDays.length === DAYS_OF_WEEK.length - 1 && (
-            <span className="ml-2 text-amber-600">(max selection reached)</span>
-          )}
-        </div>
-        <DropdownMenuSeparator />
-        <div className="flex gap-2 px-2 py-2">
-          <Button variant="outline" size="sm" onClick={handleCancel} className="flex-1 dark:text-white">
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleApply}
-            disabled={!hasChanges}
-            className="flex-1 dark:text-white"
-          >
-            Apply
-          </Button>
-        </div>
-      </DropdownMenuSubContent>
+          </div>
+          <DropdownMenuSeparator />
+          <div className="flex gap-2 px-2 py-2">
+            <Button variant="outline" size="sm" onClick={handleCancel} className="flex-1 dark:text-white">
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleApply}
+              disabled={!hasChanges}
+              className="flex-1 dark:text-white"
+            >
+              Apply
+            </Button>
+          </div>
+        </DropdownMenuSubContent>
+      </DropdownMenuPortal>
     </DropdownMenuSub>
   );
 };
