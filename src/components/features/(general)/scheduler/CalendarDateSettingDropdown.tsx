@@ -56,7 +56,7 @@ export const CalendarDateSettingDropdown: FunctionComponent<CalendarDateSettingD
               className="flex flex-col items-start gap-0 hover:cursor-pointer"
             >
               <div className="flex items-center justify-between gap-2 text-sm">
-                Weekends
+                Weekends & Holidays
                 {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 6]) && (
                   <CheckIcon className="h-4 w-4 text-green-600" />
                 )}
@@ -72,7 +72,7 @@ export const CalendarDateSettingDropdown: FunctionComponent<CalendarDateSettingD
               className="flex flex-col items-start gap-0 hover:cursor-pointer"
             >
               <div className="flex items-center justify-between gap-2 text-sm">
-                Fridays & Weekends
+                Fridays, Weekends, & Holidays
                 {JSON.stringify(noDueDiscDays) === JSON.stringify([0, 5, 6]) && (
                   <CheckIcon className="h-4 w-4 text-green-600" />
                 )}
