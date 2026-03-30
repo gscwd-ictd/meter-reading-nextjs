@@ -34,6 +34,10 @@ export const CustomDaySelectionSetting: React.FC<CustomDaySelecionSettingProps> 
   const datesToSplit = useSchedulesStore((state) => state.datesToSplit);
   const [isSubOpen, setIsSubOpen] = useState(false);
 
+  const isCustomSelection =
+    JSON.stringify(noDueDiscDays) !== JSON.stringify([0, 6]) &&
+    JSON.stringify(noDueDiscDays) !== JSON.stringify([0, 5, 6]);
+
   // Local state for temporary selections
   const [tempSelectedDays, setTempSelectedDays] = useState<number[]>(noDueDiscDays);
 
@@ -113,10 +117,7 @@ export const CustomDaySelectionSetting: React.FC<CustomDaySelecionSettingProps> 
                 : "None"}{" "}
               & Holidays
             </span>
-            {JSON.stringify(noDueDiscDays) !==
-              JSON.stringify([0, 6] || JSON.stringify(noDueDiscDays) !== JSON.stringify([0, 5, 6])) && (
-              <CheckIcon className="h-4 w-4 text-green-600" />
-            )}
+            {isCustomSelection && <CheckIcon className="h-4 w-4 text-green-600" />}
           </div>
         </div>
       </DropdownMenuSubTrigger>
