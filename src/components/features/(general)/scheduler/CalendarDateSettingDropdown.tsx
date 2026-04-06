@@ -47,7 +47,7 @@ export const CalendarDateSettingDropdown: FunctionComponent<CalendarDateSettingD
         <div className="text-primary w-[16rem] p-2 text-xs">
           {hasFetchedSchedule && hasSchedule
             ? "Cannot change this setting for this month"
-            : " No due dates and disconnection dates shall fall on the following:"}
+            : " No due dates shall fall on the following:"}
         </div>
 
         {hasFetchedSchedule && !hasSchedule && (
@@ -73,6 +73,7 @@ export const CalendarDateSettingDropdown: FunctionComponent<CalendarDateSettingD
               <DropdownMenuItem
                 onClick={() => {
                   setNoDueDiscDays([0, 5, 6]);
+
                   setCurrentSchedule(scheduler.splitDates(datesToSplit));
                 }}
                 className="flex flex-col items-start gap-0 hover:cursor-pointer"

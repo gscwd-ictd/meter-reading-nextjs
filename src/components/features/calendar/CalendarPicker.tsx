@@ -121,10 +121,9 @@ const CalendarPicker: React.FC<CalendarPickerProps> = ({
                   </span>
                 ),
                 DayButton: ({ day, modifiers, ...props }) => {
-                  const { displayIndex, ...buttonProps } = props as any;
                   return (
                     <button
-                      {...buttonProps}
+                      {...props}
                       className={`text-sm ${modifiers.selected ? "text-primary font-black" : "font-normal text-gray-700"}`}
                     >
                       {day.date.getDate()}
