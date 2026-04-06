@@ -149,8 +149,11 @@ export const AddCustomScheduleEntryDialog = () => {
 
           {/* Hints for user */}
           <div className="mt-2 text-xs text-gray-500">
-            <p>• Due date defaults to 15 days after the reading date (skips holidays & weekends).</p>
-            <p>• Disconnection date is 3 days after the due date (skips holidays & weekends).</p>
+            <p>
+              • Due date defaults to 15 calendar days after the reading date, if the due date falls on
+              holidays or weekends, it is automatically moved to the next business day.
+            </p>
+            <p>• Disconnection date is 3 working days after the due date (skips holidays & weekends).</p>
           </div>
         </>
 

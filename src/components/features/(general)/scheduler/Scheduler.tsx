@@ -1,11 +1,10 @@
 "use client";
 
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
-import { useScheduler } from "./useScheduler";
 import { HolidayFromHrms } from "./holidays";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Button } from "@mr/components/ui/Button";
-import { ChevronLeft, ChevronRight, SettingsIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ButtonGroup } from "@mr/components/ui/ButtonGroup";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CalendarSettingDropdown } from "./CalendarSettingDropdown";
@@ -26,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@mr/components/ui/Toolt
 import { AddCustomScheduleEntryDialog } from "./entry/AddCustomScheduleEntryDialog";
 import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
 import { CalendarDateSettingDropdown } from "./CalendarDateSettingDropdown";
+import { useNewScheduler } from "./useNewScheduler";
 
 type SchedulerProps = {
   holidaysLoaded: boolean;
@@ -56,7 +56,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
   const [activeContext, setActiveContext] = useState<number | null>(null);
   const [isNavigating, setIsNavigating] = useState(false);
 
-  const scheduler = useScheduler(holidays, noDueDiscDays ?? []);
+  const scheduler = useNewScheduler(holidays, noDueDiscDays ?? []);
 
   const hasValidSchedule = (monthYear: string) => {
     return currentSchedule.some(
