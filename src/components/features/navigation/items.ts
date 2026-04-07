@@ -73,7 +73,7 @@ export const mainNav: NavItem[] = [
 ];
 
 export const reportsNav: NavItem[] = [
-  { title: "Progress", url: "/progress", icon: CircleDashed },
+  { title: "Progress", url: "/progress/zonebooks", icon: CircleDashed },
   {
     title: "Reports",
     icon: FileText,
@@ -81,6 +81,10 @@ export const reportsNav: NavItem[] = [
       {
         title: "Meter Reading Schedule",
         url: "/reports/meter-reading-schedule",
+      },
+      {
+        title: "Meter Reading Report",
+        url: "/reports/meter-reading-report",
       },
       {
         title: "Monthly Billing Summary",

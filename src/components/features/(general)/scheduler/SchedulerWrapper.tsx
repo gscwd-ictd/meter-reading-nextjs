@@ -6,18 +6,17 @@ import { Suspense } from "react";
 import { Scheduler } from "./Scheduler";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { holidays } from "./holidays";
+// import { holidays } from "./holidays";
 
 export default function SchedulerWrapper() {
   const {
     data: allHolidays,
-    isLoading,
+    // isLoading,
     isSuccess: holidaysLoaded,
   } = useQuery({
     queryKey: ["get-all-holidays"],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_HRMS_HOLIDAYS}`);
-
       return res.data;
     },
     staleTime: Infinity,
@@ -53,7 +52,7 @@ export default function SchedulerWrapper() {
           </div>
         }
       >
-        <Scheduler holidays={holidays} holidaysLoaded={holidaysLoaded} />
+        <Scheduler holidays={allHolidays} holidaysLoaded={holidaysLoaded} />
       </Suspense>
     </div>
   );

@@ -65,6 +65,13 @@ const meterReaderRoutes = new Hono()
     const id = c.req.param("id");
     const result = await meterReaderService.deleteMeterReaderById(id);
     return c.json(result);
+  })
+
+  .get("/:id/schedule-reading", async (c) => {
+    const meterReaderId = c.req.param("id");
+    const result = await meterReaderService.getScheduleReadingAccountByMeterReader(meterReaderId);
+
+    return c.json(result);
   });
 
 export const meterReaderHandler = new Hono().route("/meter-readers", meterReaderRoutes);

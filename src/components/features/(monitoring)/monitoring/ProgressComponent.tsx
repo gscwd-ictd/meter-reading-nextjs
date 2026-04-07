@@ -55,17 +55,18 @@ export const ProgressComponent = () => {
         onClick={() => {
           router.push("/progress/zonebooks");
         }}
+        title="Today's Zonebook Completion"
       >
         <TodayPieChart scheduled={daily.scheduled} finished={daily.finished} />
       </ChartCard>
 
-      <ChartCard>
+      <ChartCard title="Monitoring Today: Scheduled vs Finished">
         <ProgressChart scheduled={daily.scheduled} finished={daily.finished} />
       </ChartCard>
-      <ChartCard>
+      <ChartCard title="Intraday Monitoring: Scheduled vs Finished">
         <IntradayProgressChart scheduled={scheduled} finishedByHour={intraday} />
       </ChartCard>
-      <ChartCard>
+      <ChartCard title="Meter Reader Activity">
         <MeterReaderActivityChart />
       </ChartCard>
     </div>

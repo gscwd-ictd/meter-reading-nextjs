@@ -2,12 +2,11 @@ import { ReadingDetailsRepository } from "@mr/lib/repositories/ReadingDetailsRep
 import { ReadingDetailsService } from "@mr/lib/services/ReadingDetailsService";
 import {
   CreateReadingDetailsSchema,
+  UpdateReadingAccountsCompletedSchema,
   UpdateReadingDetailsSchema,
 } from "@mr/lib/validators/reading-details-schema";
 import { zValidator } from "@hono/zod-validator";
-import db from "@mr/server/db/connections";
 import { Hono } from "hono";
-import { format } from "date-fns";
 
 const readingDetailsRepository = new ReadingDetailsRepository();
 const readingDetailsService = new ReadingDetailsService(readingDetailsRepository);
@@ -34,71 +33,81 @@ export const readingDetailsHandler = new Hono()
 
     const readingDetails = await readingDetailsService.update(id, body);
 
-    console.log({ readingDetails });
+    // console.log({ readingDetails });
 
-    if (readingDetails.isRead) {
-      const readingDate = format(readingDetails.readingDate!, "MM/dd/yyyy");
-      const dueDate = format(readingDetails.dueDate!, "MM/dd/yyyy");
-      const disconnectionDate = format(readingDetails.disconnectionDate!, "MM/dd/yyyy");
-      const timeStart = format(readingDetails.timeStart!, "MM/dd/yyyy h:mm a");
-      const timeEnd = format(readingDetails.timeEnd!, "MM/dd/yyyy h:mm a");
-      const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
+    // if (readingDetails.isRead) {
+    //   const readingDate = format(readingDetails.readingDate!, "MM/dd/yyyy");
+    //   const dueDate = format(readingDetails.dueDate!, "MM/dd/yyyy");
+    //   const disconnectionDate = format(readingDetails.disconnectionDate!, "MM/dd/yyyy");
+    //   const timeStart = format(readingDetails.timeStart!, "MM/dd/yyyy h:mm a");
+    //   const timeEnd = format(readingDetails.timeEnd!, "MM/dd/yyyy h:mm a");
+    //   const currentUsage = readingDetails.currentReading ?? 0 - readingDetails.previousReading;
 
-      console.log({
-        accountNo: readingDetails.accountNumber,
-        readingDate,
-        billDate: readingDate,
-        dueDate,
-        disconDate: disconnectionDate,
-        presentReading: readingDetails.currentReading,
-        previousReading: readingDetails.previousReading,
-        presentUsage: currentUsage,
-        billedAmount: readingDetails.billedAmount,
-        penaltyAmount: readingDetails.penaltyAmount,
-        meterReader: body.meterReader,
-        seniorDiscount: readingDetails.seniorDiscount,
-        changeMeterAmount: readingDetails.changeMeterAmount,
-        arrears: readingDetails.arrears,
-        remarks: readingDetails.remarks,
-        timeStart,
-        timeEnd,
-        currentUsage,
-      });
+    //   console.log({
+    //     accountNo: readingDetails.accountNumber,
+    //     readingDate,
+    //     billDate: readingDate,
+    //     dueDate,
+    //     disconDate: disconnectionDate,
+    //     presentReading: readingDetails.currentReading,
+    //     previousReading: readingDetails.previousReading,
+    //     presentUsage: currentUsage,
+    //     billedAmount: readingDetails.billedAmount,
+    //     penaltyAmount: readingDetails.penaltyAmount,
+    //     meterReader: body.meterReader,
+    //     seniorDiscount: readingDetails.seniorDiscount,
+    //     changeMeterAmount: readingDetails.changeMeterAmount,
+    //     arrears: readingDetails.arrears,
+    //     remarks: readingDetails.remarks,
+    //     timeStart,
+    //     timeEnd,
+    //     currentUsage,
+    //   });
 
-      try {
-        //TODO: change meterReader field
-        const res = await db.mssqlConn.query`
-          EXEC post2Ledger
-            @accountNo = ${readingDetails.accountNumber},
-            @readingDate = ${readingDate},
-            @billDate = ${readingDate},
-            @dueDate = ${dueDate},
-            @disconDate = ${disconnectionDate},
-            @presentReading = ${readingDetails.currentReading},
-            @previousReading = ${readingDetails.previousReading},
-            @presentUsage = ${currentUsage},
-            @billedAmount = ${readingDetails.billedAmount},
-            @penaltyAmount = ${readingDetails.penaltyAmount},
-            @meterReader = 'W. Tayo',
-            @seniorDiscount = ${readingDetails.seniorDiscount},
-            @changeMeterAmount = ${readingDetails.changeMeterAmount},
-            @arrears = ${readingDetails.arrears},
-            @remarks = ${readingDetails.remarks},
-            @timeStart = ${timeStart},
-            @timeEnd = ${timeEnd}`;
+    //   try {
+    //     //TODO: change meterReader field
+    //     const res = await db.mssqlConn.query`
+    //       EXEC post2Ledger
+    //         @accountNo = ${readingDetails.accountNumber},
+    //         @readingDate = ${readingDate},
+    //         @billDate = ${readingDate},
+    //         @dueDate = ${dueDate},
+    //         @disconDate = ${disconnectionDate},
+    //         @presentReading = ${readingDetails.currentReading},
+    //         @previousReading = ${readingDetails.previousReading},
+    //         @presentUsage = ${currentUsage},
+    //         @billedAmount = ${readingDetails.billedAmount},
+    //         @penaltyAmount = ${readingDetails.penaltyAmount},
+    //         @meterReader = 'W. Tayo',
+    //         @seniorDiscount = ${readingDetails.seniorDiscount},
+    //         @changeMeterAmount = ${readingDetails.changeMeterAmount},
+    //         @arrears = ${readingDetails.arrears},
+    //         @remarks = ${readingDetails.remarks},
+    //         @timeStart = ${timeStart},
+    //         @timeEnd = ${timeEnd}`;
 
-        console.log(res);
+    //     console.log(res);
 
-        console.log(res.recordsets);
-      } catch (error) {
-        console.error("Error sa mssql stored proc");
-        throw error;
-      }
-    }
+    //     console.log(res.recordsets);
+    //   } catch (error) {
+    //     console.error("Error sa mssql stored proc");
+    //     throw error;
+    //   }
+    // }
 
     return c.json(readingDetails);
   })
   .delete("/:id", async (c) => {
     const id = c.req.param("id");
     return c.json(await readingDetailsService.delete(id));
-  });
+  })
+  .patch(
+    "/mobile/reading-accounts/complete",
+    zValidator("json", UpdateReadingAccountsCompletedSchema),
+    async (c) => {
+      const body = c.req.valid("json");
+
+      const result = await readingDetailsService.updateReadingAccountsCompleted(body);
+      return c.json(result);
+    },
+  );

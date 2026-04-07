@@ -11,6 +11,7 @@ export default function mergeScheduleIntoCalendar(
     return match
       ? {
           ...calendarEntry,
+          day: match.day,
           dueDate: match.dueDate,
           disconnectionDate: match.disconnectionDate,
           meterReaders: match.meterReaders,

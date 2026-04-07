@@ -1,8 +1,9 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ScheduleTable } from "./TestMeterReadingSchedulePdf";
 import { YearMonthPickerWithSubmit } from "@mr/components/features/calendar/YearMonthPickerWithSubmit";
+import { MeterReadingSchedulePdf } from "./MeterReadingSchedulePdf";
+import { MeterReadingSchedulePdfUpdated } from "./MeterReadingSchedulePdfUpdated";
 
 export const MeterReadingSchedulePdfComponent = () => {
   const searchParams = useSearchParams();
@@ -34,7 +35,7 @@ export const MeterReadingSchedulePdfComponent = () => {
         <YearMonthPickerWithSubmit value={yearMonth} onChange={setYearMonth} onSubmit={handleGenerate} />
       </div>
       <div className="mt-4 min-h-0 flex-1 overflow-auto">
-        <ScheduleTable yearMonth={submittedYearMonth} />
+        <MeterReadingSchedulePdfUpdated yearMonth={submittedYearMonth} />
       </div>
     </div>
   );

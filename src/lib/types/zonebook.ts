@@ -1,11 +1,16 @@
-import { MeterReader } from "./personnel";
+import { AccountDetails } from "./accounts";
 
 export type Zonebook = {
   zoneBook: string;
   zone: string;
   book: string;
   area: Area;
-  id?: string;
+  id?: string | undefined;
+  day: number | null;
+};
+
+export type ZonebookReassignment = Zonebook & {
+  meterReader: { name: string; id: string };
 };
 
 export type ZonebookWithDates = Zonebook & {
@@ -19,7 +24,30 @@ export type Area = {
 };
 
 export type Reassignment = {
-  meterReaders: MeterReader[];
-  zonebooks: ZonebookWithDates;
-  remarks: string;
+  zoneBooks: ZonebookReassignment[];
+  remarks: string | null;
 };
+
+export type ZoneBookEntry = {
+  zoneBook: string;
+  zone: string;
+  book: string;
+  area?: { name: string };
+  day?: number | null;
+};
+
+export type ZonebookProgress = {
+  meterReader: { id: string; name: string };
+  zone: string;
+  book: string;
+  totalRead: number;
+  totalAccounts: number;
+  statusProgress: string;
+  readingDate: string;
+  isCommitted: boolean;
+  scheduleDate: string;
+  // isRead: boolean;
+  address: string;
+};
+
+export type ZonebookProgressWithAccounts = ZonebookProgress & { accounts: AccountDetails[] };

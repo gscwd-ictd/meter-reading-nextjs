@@ -1,4 +1,3 @@
-import z from "zod/v3";
 import z4 from "zod/v4";
 
 export const CreateReadingDetailsSchema = z4.object({
@@ -32,6 +31,7 @@ export const CreateReadingDetailsSchema = z4.object({
   classification: z4.string(),
   arrears: z4.number(),
   currentReading: z4.number().nullish(),
+  currentUsage: z4.number().nullish(),
   billedAmount: z4.number().nullish(),
   remarks: z4.string().nullish(),
   additionalRemarks: z4.string().nullish(),
@@ -49,6 +49,23 @@ export const CreateReadingDetailsSchema = z4.object({
   timeEnd: z4.coerce.date().nullish(),
   previousBillDate: z4.coerce.date().nullish(),
   createdAt: z4.coerce.date().nullish(),
+  isPosted: z4.boolean().nullish(),
+  isCompleted: z4.boolean().nullish(),
+  isCommitted: z4.boolean().nullish(),
+  datetimeCompleted: z4.coerce.date().nullish(),
+  datetimeCommitted: z4.coerce.date().nullish(),
+  datetimePosted: z4.coerce.date().nullish(),
+});
+
+export const UpdateReadingAccountsCompletedSchema = z4.object({
+  meterReaderId: z4.uuid(),
+  zoneBooks: z4
+    .object({
+      zone: z4.string(),
+      book: z4.string(),
+    })
+    .array(),
+  readingMonth: z4.string(),
 });
 
 export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
@@ -60,6 +77,8 @@ export const UpdateReadingDetailsSchema = CreateReadingDetailsSchema.partial()
   });
 
 export type ReadingDetails = z4.infer<typeof CreateReadingDetailsSchema>;
+
+export type UpdateReadingAccountsCompleted = z4.infer<typeof UpdateReadingAccountsCompletedSchema>;
 
 // const test: ReadingDetails = {
 //   longlat,

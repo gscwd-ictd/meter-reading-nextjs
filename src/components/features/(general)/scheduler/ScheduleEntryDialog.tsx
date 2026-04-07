@@ -22,6 +22,7 @@ import { SplittedDates } from "./entry/SplittedDates";
 import { NormalDates } from "./entry/NormalDates";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { AddCustomScheduleEntryOptionsDropdown } from "../meter-readers/AddCustomScheduleEntryOptionsDropdown";
+import { Badge } from "@mr/components/ui/Badge";
 
 export const ScheduleEntryDialog: FunctionComponent = () => {
   const selectedScheduleEntry = useSchedulesStore((state) => state.selectedScheduleEntry);
@@ -78,11 +79,14 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const res = await axios(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${transformedReadingDate}`);
+
         return res.data as MeterReadingEntryWithZonebooks;
       } catch (error) {
         console.log(error);
       }
     },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   useEffect(() => {
@@ -110,13 +114,18 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
     >
       <DialogContent className="max-h-full w-[100vw] min-w-[100%] overflow-auto overflow-y-auto sm:max-h-full sm:w-full sm:min-w-full md:max-h-full md:w-[80%] md:min-w-[80%] lg:max-h-[90%] lg:min-w-[65%]">
         <DialogHeader className="space-y-0">
-          <DialogTitle className="flex flex-col gap-0 text-start">
+          <DialogTitle className="flex flex-col items-start gap-0">
             <div className="flex items-center gap-0">
-              <div className="text-lg font-bold text-gray-800 dark:text-white">
+              <div className="text-base font-bold text-gray-800 dark:text-white">
                 Reading Date:{" "}
                 {selectedScheduleEntry && selectedScheduleEntry.readingDate
                   ? format(selectedScheduleEntry?.readingDate!, "MMM dd, yyyy")
-                  : null}
+                  : null}{" "}
+                {selectedScheduleEntry && selectedScheduleEntry.day && (
+                  <Badge className="items-center text-xs dark:text-white">
+                    Day {selectedScheduleEntry?.day}
+                  </Badge>
+                )}
               </div>
 
               <AddCustomScheduleEntryOptionsDropdown />
@@ -161,7 +170,7 @@ export const ScheduleEntryDialog: FunctionComponent = () => {
             meterReaders={selectedScheduleEntry?.meterReaders ? selectedScheduleEntry!.meterReaders : []}
           />
         )}
-        <DialogFooter></DialogFooter>
+        <DialogFooter />
       </DialogContent>
     </Dialog>
   );

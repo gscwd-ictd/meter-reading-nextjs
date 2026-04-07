@@ -1,3 +1,4 @@
+import { ScheduleReadingAccount } from "@mr/server/types/consumer.type";
 import {
   EmployeeDetails,
   MeterReader,
@@ -36,4 +37,6 @@ export interface IMeterReaderService {
   updateMeterReaderById(meterReaderId: string, data: AssignMeterReader): Promise<MeterReader>;
 
   deleteMeterReaderById(meterReaderId: string): Promise<MeterReader>;
+
+  getScheduleReadingAccountByMeterReader(meterReaderId: string): Promise<ScheduleReadingAccount>;
 }

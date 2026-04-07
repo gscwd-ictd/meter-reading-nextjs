@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { MeterReaderRowActions } from "./MeterReaderRowActions";
 import { MeterReader as PersonnelColumn } from "@mr/lib/types/personnel";
 import { Badge } from "@mr/components/ui/Badge";
+import { ZonebookFlatSorter } from "@mr/lib/functions/zonebook-flat-sorter";
 import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 
 export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
@@ -52,16 +53,17 @@ export const useMeterReaderColumns = (data: PersonnelColumn[] | undefined) => {
       {
         accessorKey: "mobileNumber",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Contact No." />,
-        cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.mobileNumber}</span>,
+        cell: ({ row }) => <span className="text-sm">{row.original.mobileNumber}</span>,
         enableColumnFilter: false,
       },
       {
         accessorKey: "zoneBooks",
         accessorFn: (row) => row.zoneBooks.map((zb) => zb.zoneBook),
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Zonebooks" />,
-        cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Default Zonebooks" />,
+        cell: ({ row }) => <ZonebookPreview zonebooks={ZonebookFlatSorter(row.original.zoneBooks)} />,
         enableColumnFilter: false,
       },
+
       {
         accessorKey: "restDay",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Rest Day" />,

@@ -13,9 +13,12 @@ export type MeterReadingEntryWithZonebooks = {
   dueDate: Date | Date[] | undefined;
   disconnectionDate: Date | Date[] | undefined;
   meterReaders?: MeterReaderWithZonebooks[];
+  day?: number | null;
 };
 
 export type BilledMeterReadingSchedule = MeterReadingEntryWithZonebooks & {
   billed: number;
   remarks: string;
 };
+
+export type ScheduleDay = { readingDate: Date; day: number | null | undefined };

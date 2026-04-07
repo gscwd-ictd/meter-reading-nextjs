@@ -3,7 +3,9 @@ import { IScheduleService } from "@mr/server/interfaces/schedule/schedule.interf
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateReassignment,
   CreateScheduleMeterReader,
+  Reassignment,
   ScheduleMeterReaderZoneBook,
   ScheduleReading,
   ZoneBookScheduleReader,
@@ -54,5 +56,12 @@ export class ScheduleService implements IScheduleService {
 
   async getZoneBookScheduleReader(month: number, year: number): Promise<ZoneBookScheduleReader[]> {
     return await this.repository.findZoneBookScheduleReader(month, year);
+  }
+
+  async reassignmentMeterReader(
+    scheduleMeterReaderId: string,
+    data: CreateReassignment,
+  ): Promise<Reassignment> {
+    return await this.repository.reassignmentMeterReader(scheduleMeterReaderId, data);
   }
 }

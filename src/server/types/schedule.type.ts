@@ -3,35 +3,66 @@ import { ZoneBookSchema } from "./zone-book.type";
 
 /* route query */
 export const ScheduleQuerySchema = z.object({
-  date: z.string().refine(
-    (val) =>
-      /^\d{4}-\d{2}$/.test(val) || // Matches YYYY-MM
-      /^\d{4}-\d{2}-\d{2}$/.test(val), // Matches YYYY-MM-DD
-    {
-      message: "Invalid date format. Use YYYY-MM or YYYY-MM-DD.",
-    },
-  ),
+  date: z.string().regex(/^\d{4}-(\d{2})(-\d{2})?$/, "Invalid date format. Use YYYY-MM or YYYY-MM-DD."),
 });
 
 /* single array  */
 export const DateValueSchema = z.union([z.string(), z.string().array()]);
 
+export const ReassignmentSchema = z.object({
+  remarks: z.string().nullish(),
+  zoneBooks: z
+    .object({
+      zone: z.string(),
+      book: z.string(),
+      meterReader: z.object({
+        id: z.string(),
+        name: z.string().optional(),
+        photoUrl: z.string().optional(),
+      }),
+    })
+    .array(),
+});
+
+export const CreateReassignmentSchema = z.object({
+  remarks: z.string(),
+  zoneBooks: z
+    .object({
+      day: z.coerce.number().nullish(),
+      zone: z.string(),
+      book: z.string(),
+      meterReader: z.object({
+        id: z.string(),
+      }),
+    })
+    .array(),
+});
+
 /* partial details of reading schedule */
 export const ScheduleSchema = z.object({
   id: z.string(),
+  day: z.coerce.number().nullish(),
   readingDate: z.string(),
-  dueDate: DateValueSchema,
-  disconnectionDate: DateValueSchema,
+  dueDate: DateValueSchema.nullish(),
+  disconnectionDate: DateValueSchema.nullish(),
   meterReaders: z
     .object({
       scheduleMeterReaderId: z.string(),
       id: z.string(),
+      billed: z.coerce.number(),
       zoneBooks: ZoneBookSchema.pick({
         zone: true,
         book: true,
         zoneBook: true,
         area: true,
-      }).array(),
+      })
+        .extend({
+          day: z.coerce.number().nullish(),
+          dueDate: DateValueSchema.nullish(),
+          disconnectionDate: DateValueSchema.nullish(),
+        })
+        .array(),
+      reassignment: ReassignmentSchema.optional(),
     })
     .array(),
 });
@@ -39,6 +70,7 @@ export const ScheduleSchema = z.object({
 /* full details of reading schedule */
 export const ScheduleReadingSchema = z.object({
   id: z.string(),
+  day: z.coerce.number().nullish(),
   readingDate: z.string(),
   dueDate: DateValueSchema,
   disconnectionDate: DateValueSchema,
@@ -53,12 +85,20 @@ export const ScheduleReadingSchema = z.object({
       mobileNumber: z.string(),
       assignment: z.string(),
       photoUrl: z.string(),
+      billed: z.coerce.number(),
       zoneBooks: ZoneBookSchema.pick({
         zone: true,
         book: true,
         zoneBook: true,
         area: true,
-      }).array(),
+      })
+        .extend({
+          day: z.coerce.number().nullish(),
+          dueDate: DateValueSchema.nullish(),
+          disconnectionDate: DateValueSchema.nullish(),
+        })
+        .array(),
+      reassignment: ReassignmentSchema.optional(),
     })
     .array(),
 });
@@ -69,6 +109,16 @@ export const CreateMonthScheduleSchema = ScheduleSchema.omit({ id: true, meterRe
     meterReaders: z
       .object({
         id: z.string(),
+        zoneBooks: ZoneBookSchema.pick({
+          zone: true,
+          book: true,
+        })
+          .extend({
+            day: z.number().nullish(),
+            dueDate: z.string(),
+            disconnectionDate: z.string(),
+          })
+          .array(),
       })
       .array(),
   })
@@ -82,6 +132,7 @@ export const CreateMeterReaderScheduleReadingSchema = z.object({
     book: true,
   })
     .extend({
+      day: z.number().nullable(),
       dueDate: z.string(),
       disconnectionDate: z.string(),
     })
@@ -90,9 +141,11 @@ export const CreateMeterReaderScheduleReadingSchema = z.object({
 
 export const ScheduleMeterReaderZoneBookSchema = z.object({
   assigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true })
-    .extend({ dueDate: z.string(), disconnectionDate: z.string() })
+    .extend({ day: z.coerce.number().nullish(), dueDate: z.string(), disconnectionDate: z.string() })
     .array(),
-  unassigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true }).array(),
+  unassigned: ZoneBookSchema.pick({ zone: true, book: true, zoneBook: true, area: true })
+    .extend({ day: z.coerce.number().nullish() })
+    .array(),
 });
 
 export const CreateScheduleMeterReaderSchema = z.object({
@@ -114,6 +167,7 @@ export const ZoneBookScheduleReaderSchema = z.object({
       photoUrl: z.coerce.string(),
     })
     .optional(),
+  day: z.coerce.number().nullish(),
   readingDate: z.coerce.string(),
   dueDate: z.coerce.string(),
   disconnectionDate: z.coerce.string(),
@@ -128,3 +182,5 @@ export type ScheduleMeterReaderZoneBook = z.infer<typeof ScheduleMeterReaderZone
 export type CreateScheduleMeterReader = z.infer<typeof CreateScheduleMeterReaderSchema>;
 
 export type ZoneBookScheduleReader = z.infer<typeof ZoneBookScheduleReaderSchema>;
+export type Reassignment = z.infer<typeof ReassignmentSchema>;
+export type CreateReassignment = z.infer<typeof CreateReassignmentSchema>;

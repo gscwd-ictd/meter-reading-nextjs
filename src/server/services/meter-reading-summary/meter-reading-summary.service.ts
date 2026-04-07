@@ -1,0 +1,44 @@
+import { IMeterReadingSummaryRepository } from "@mr/server/interfaces/meter-reading-summary/meter-reading-summary.interface.repository";
+import { IMeterReadingSummaryService } from "@mr/server/interfaces/meter-reading-summary/meter-reading-summary.interface.service";
+import {
+  BilledSummary,
+  MobileSummaryReport,
+  NewMeterSummary,
+  Report,
+  UnbilledSummary,
+  WithRemarksSummary,
+  ZoneBookSummaryRow,
+} from "@mr/server/types/meter-reading-summary.type";
+import { BilledAccountQuery, MobileSummaryQuery } from "@mr/server/types/report.type";
+
+export class MeterReadingSummaryService implements IMeterReadingSummaryService {
+  constructor(private readonly repository: IMeterReadingSummaryRepository) {}
+
+  async getBilledSummary(query: BilledAccountQuery): Promise<BilledSummary[]> {
+    return await this.repository.findBilledSummary(query);
+  }
+
+  async getUnbilledSummary(query: BilledAccountQuery): Promise<UnbilledSummary[]> {
+    return await this.repository.findUnbilledSummary(query);
+  }
+
+  async getWithRemarksSummary(query: BilledAccountQuery): Promise<WithRemarksSummary[]> {
+    return await this.repository.findWithRemarksSummary(query);
+  }
+
+  async getNewMeterSummary(query: BilledAccountQuery): Promise<NewMeterSummary[]> {
+    return await this.repository.findNewMeterSummary(query);
+  }
+
+  async getMonthBillingSummary(readingMonth: string): Promise<Report> {
+    return await this.repository.findMonthBillingSummary(readingMonth);
+  }
+
+  async getZoneBookSummary(readingMonth: string): Promise<ZoneBookSummaryRow[]> {
+    return await this.repository.findZoneBookSummary(readingMonth);
+  }
+
+  async mobileSummaryReport(data: MobileSummaryQuery): Promise<MobileSummaryReport> {
+    return await this.repository.mobileSummaryReport(data);
+  }
+}

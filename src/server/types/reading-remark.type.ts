@@ -3,8 +3,10 @@ import z from "zod";
 export const ReadingRemarkSchema = z.object({
   id: z.string(),
   name: z.string(),
-  isAverage: z.coerce.boolean().nullish(),
-  isActive: z.coerce.boolean().nullish(),
+  isAverage: z.boolean(),
+  isActive: z.boolean(),
+  isZeroConsumption: z.boolean(),
+  isNegativeConsumption: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().nullable(),
 });
@@ -13,6 +15,8 @@ export const CreateReadingRemarkSchema = ReadingRemarkSchema.pick({
   name: true,
   isAverage: true,
   isActive: true,
+  isZeroConsumption: true,
+  isNegativeConsumption: true,
 }).extend({
   name: z.string().min(1, "reading remark name is required"),
 });

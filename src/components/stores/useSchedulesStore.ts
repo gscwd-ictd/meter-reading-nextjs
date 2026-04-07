@@ -1,5 +1,5 @@
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
-import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
+import { MeterReadingEntryWithZonebooks, ScheduleDay } from "@mr/lib/types/schedule";
 import { ZonebookWithDates } from "@mr/lib/types/zonebook";
 import { create } from "zustand";
 
@@ -11,6 +11,12 @@ export type SplitDate = {
 type SchedulesStore = {
   currentSchedule: MeterReadingEntryWithZonebooks[];
   setCurrentSchedule: (currentSchedule: MeterReadingEntryWithZonebooks[]) => void;
+  calendarSchedule: MeterReadingEntryWithZonebooks[];
+  setCalendarSchedule: (calendarSchedule: MeterReadingEntryWithZonebooks[]) => void;
+  noDueDiscDays: Array<number>;
+  setNoDueDiscDays: (noDueDiscDays: Array<number>) => void;
+  scheduleDays: Array<ScheduleDay>;
+  setScheduleDays: (scheduleDays: Array<ScheduleDay>) => void;
   calendarIsSet: boolean;
   setCalendarIsSet: (calendarIsSet: boolean) => void;
   selectedScheduleEntry: MeterReadingEntryWithZonebooks | null;
@@ -35,6 +41,12 @@ type SchedulesStore = {
   setHasFetchedSchedule: (hasFetchedSchedule: boolean) => void;
   entryZonebookSelectorIsOpen: boolean;
   setEntryZonebookSelectorIsOpen: (entryZonebookSelectorIsOpen: boolean) => void;
+  removeMeterReaderEntryIsOpen: boolean;
+  setRemoveMeterReaderEntryIsOpen: (removeMeterReaderEntryIsOpen: boolean) => void;
+  meterReaderZoneBookReassignmentDialogIsOpen: boolean;
+  setMeterReaderZoneBookReassignmentDialogIsOpen: (
+    meterReaderZoneBookReassignmentDialogIsOpen: boolean,
+  ) => void;
   scheduleEntryIsSplitted: boolean;
   setScheduleEntryIsSplitted: (scheduleEntryIsSplitted: boolean) => void;
   scheduleHasSplittedDates: boolean | null;
@@ -49,6 +61,8 @@ type SchedulesStore = {
   setAddCustomMeterReaderDialogIsOpen: (addCustomMeterReaderDialogIsOpen: boolean) => void;
   addCustomScheduleEntryDialogIsOpen: boolean;
   setAddCustomScheduleEntryDialogIsOpen: (addCustomScheduleEntryDialogIsOpen: boolean) => void;
+  reassignmentRemarksDialogIsOpen: boolean;
+  setReassignmentRemarksDialogIsOpen: (reassignmentRemarksDialogIsOpen: boolean) => void;
   refetchData?: () => void;
   setRefetchData: (fn: () => void) => void;
   refetchEntry?: () => void;
@@ -59,6 +73,12 @@ type SchedulesStore = {
 export const useSchedulesStore = create<SchedulesStore>((set) => ({
   currentSchedule: [],
   setCurrentSchedule: (currentSchedule) => set({ currentSchedule }),
+  calendarSchedule: [],
+  setCalendarSchedule: (calendarSchedule) => set({ calendarSchedule }),
+  scheduleDays: [],
+  setScheduleDays: (scheduleDays) => set({ scheduleDays }),
+  noDueDiscDays: [0, 6],
+  setNoDueDiscDays: (noDueDiscDays) => set({ noDueDiscDays }),
   calendarIsSet: false,
   setCalendarIsSet: (calendarIsSet) => set({ calendarIsSet }),
   selectedScheduleEntry: null,
@@ -105,7 +125,16 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   addCustomScheduleEntryDialogIsOpen: false,
   setAddCustomScheduleEntryDialogIsOpen: (addCustomScheduleEntryDialogIsOpen) =>
     set({ addCustomScheduleEntryDialogIsOpen }),
+  removeMeterReaderEntryIsOpen: false,
+  setRemoveMeterReaderEntryIsOpen: (removeMeterReaderEntryIsOpen) => set({ removeMeterReaderEntryIsOpen }),
 
+  meterReaderZoneBookReassignmentDialogIsOpen: false,
+  setMeterReaderZoneBookReassignmentDialogIsOpen: (meterReaderZoneBookReassignmentDialogIsOpen) =>
+    set({ meterReaderZoneBookReassignmentDialogIsOpen }),
+
+  reassignmentRemarksDialogIsOpen: false,
+  setReassignmentRemarksDialogIsOpen: (reassignmentRemarksDialogIsOpen) =>
+    set({ reassignmentRemarksDialogIsOpen }),
   reset: () => {
     set({
       calendarIsSet: false,

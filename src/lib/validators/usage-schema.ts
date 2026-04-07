@@ -4,11 +4,14 @@ export const CreateUsageSchema = z4.object({
   id: z4.uuid(),
   meterReaderId: z4.uuid(),
   accountNumber: z4.string(),
+  zoneCode: z4.string(),
+  bookCode: z4.string(),
   month1Usage: z4.number(),
   month2Usage: z4.number(),
   month3Usage: z4.number(),
   month4Usage: z4.number(),
   createdAt: z4.coerce.date().nullish(),
+  isCommitted: z4.boolean().nullish(),
 });
 
 export const UpdateUsageSchema = CreateUsageSchema.partial().omit({

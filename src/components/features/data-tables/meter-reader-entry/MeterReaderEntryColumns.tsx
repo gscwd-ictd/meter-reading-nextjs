@@ -1,13 +1,15 @@
 "use client";
 
 import { DataTableColumnHeader } from "@mr/components/ui/data-table/data-table-column-header";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { MeterReaderEntryRowActions } from "./MeterReaderEntryRowActions";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 import { useIsMobile } from "@mr/hooks/use-mobile";
+import { MeterReaderEntryRemarkActions } from "./MeterReaderEntryRemarkActions";
+import { ZonebookPreviewV2 } from "../../(general)/zonebook/ZonebookPreviewV2";
 
 export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | undefined) => {
   const [meterReaderEntryColumns, setMeterReaderEntryColumns] = useState<
@@ -16,6 +18,10 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
 
   const isMobile = useIsMobile();
 
+  const filterFn: FilterFn<MeterReaderWithZonebooks> = (row, columnId, filterValue) => {
+    // filterValue is an array of selected options
+    return filterValue.includes(row.getValue(columnId));
+  };
   useEffect(() => {
     let cols: ColumnDef<MeterReaderWithZonebooks>[] = [];
 
@@ -36,9 +42,9 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
                   alt={row.original.name}
                   className="object-cover"
                 />
-                <AvatarFallback>{row.original.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{row.original.name?.charAt(0)}</AvatarFallback>
               </Avatar>
-              {row.original.name}
+              <span className="text-xs">{row.original.name}</span>
             </span>
           ),
           meta: { exportLabel: "Name" },
@@ -49,11 +55,22 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
         {
           accessorKey: "zoneBooks",
           header: ({ column }) => <DataTableColumnHeader column={column} title="Zone Books" />,
-          cell: ({ row }) => <ZonebookPreview zonebooks={row.original.zoneBooks} />,
+          cell: ({ row }) => <ZonebookPreviewV2 zonebooks={row.original.zoneBooks} />,
           enableColumnFilter: false,
           enableSorting: false,
         },
-
+        {
+          accessorKey: "reassignment.remarks",
+          header: ({ column }) => <DataTableColumnHeader column={column} title="Remarks" />,
+          cell: ({ row }) => (
+            <MeterReaderEntryRemarkActions
+              meterReader={row.original ? row.original : ({} as MeterReaderWithZonebooks)}
+            />
+          ),
+          enableColumnFilter: true,
+          meta: { exportLabel: "Remarks" },
+          filterFn: filterFn,
+        },
         {
           id: "actions",
           header: "Actions",
@@ -87,7 +104,7 @@ export const useMeterReaderEntryColumns = (data: MeterReaderWithZonebooks[] | un
         },
         {
           id: "actions",
-          header: "Actions",
+          header: "",
           cell: ({ row }) => <MeterReaderEntryRowActions meterReader={row.original} />,
         },
       ];

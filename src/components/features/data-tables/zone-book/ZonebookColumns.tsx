@@ -46,7 +46,15 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
         accessorKey: "area.name",
         header: ({ column }) => <DataTableColumnHeader column={column} title="Area" />,
         filterFn: filterFn,
-        cell: ({ row }) => <span>{row.original.area?.name ?? "-"}</span>,
+        cell: ({ row }) => (
+          <span>
+            {row.original.id
+              ? row.original.area && row.original.area?.name !== ""
+                ? row.original.area.name
+                : "-"
+              : ""}
+          </span>
+        ),
         meta: {
           exportLabel: "Area",
         },
@@ -62,6 +70,7 @@ export const useZonebookColumns = (data: Zonebook[] | undefined) => {
               zone: row.original.zone,
               zoneBook: row.original.zoneBook,
               id: row.original.id,
+              day: row.original.day ? row.original.day : null,
             }}
           />
         ),

@@ -1,5 +1,16 @@
 import { relations, sql } from "drizzle-orm";
-import { index, jsonb, pgEnum, pgTable, pgView, timestamp, unique, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  index,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  pgView,
+  timestamp,
+  unique,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { scheduleMeterReaders } from "./schedules";
 import { loginAccounts } from "./login-accounts";
 
@@ -49,6 +60,7 @@ export const meterReaderZoneBook = pgTable(
       .notNull(),
     zone: varchar("zone").notNull(),
     book: varchar("book").notNull(),
+    day: integer("day"),
     createdAt: timestamp("created_at", { mode: "date", withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
       .defaultNow()
@@ -76,6 +88,7 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
   mobileNumber: varchar("username").notNull(),
   restDay: varchar("rest_day").notNull(),
   zoneBooks: jsonb("zone_books").$type<{
+    day: number;
     zone: string;
     book: string;
     zoneBook: string;
@@ -90,6 +103,7 @@ export const viewMeterReaderZoneBook = pgView("view_meter_reader_with_zone_book"
     coalesce(  
       jsonb_agg(
         distinct jsonb_build_object(
+          'day', mrzb.day,
           'zone', mrzb.zone,
           'book', mrzb.book,
           'zoneBook', mrzb.zone || '-' || mrzb.book,

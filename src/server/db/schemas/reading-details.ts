@@ -1,4 +1,14 @@
-import { boolean, timestamp, integer, pgTable, real, text, varchar, unique } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  timestamp,
+  integer,
+  pgTable,
+  real,
+  text,
+  varchar,
+  unique,
+  index,
+} from "drizzle-orm/pg-core";
 import { meterReaders } from "./meter-readers";
 
 export const readingDetails = pgTable(
@@ -30,7 +40,7 @@ export const readingDetails = pgTable(
     address: text("address").notNull(),
     dateInstalled: timestamp("date_installed"),
     disconnectionType: varchar("disconnection_type").notNull(),
-    readingDate: timestamp("reading_date"),
+    readingDate: timestamp("reading_date", { mode: "date", withTimezone: true }),
     dueDate: timestamp("due_date"),
     disconnectionDate: timestamp("disconnection_date"),
     reconnectionDate: timestamp("reconnection_date"),
@@ -38,6 +48,7 @@ export const readingDetails = pgTable(
     classification: varchar("classification").notNull(),
     arrears: real("arrears").notNull(),
     currentReading: real("current_reading"),
+    currentUsage: integer("current_usage"),
     billedAmount: real("billed_amount"),
     remarks: varchar("remarks"),
     additionalRemarks: varchar("additional_remarks"),
@@ -49,15 +60,27 @@ export const readingDetails = pgTable(
     timeStart: timestamp("time_start"),
     timeEnd: timestamp("time_end"),
     previousBillDate: timestamp("previous_bill_date"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").notNull(),
+    isPosted: boolean("is_posted").notNull(), //added isPosted field for syncing purposes
+    isCompleted: boolean("is_completed").notNull(), //added isCompleted field for marking reading as completed
+    isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as
+    datetimeCompleted: timestamp("datetime_completed").notNull(),
+    datetimeCommitted: timestamp("datetime_committed").notNull(),
+    datetimePosted: timestamp("datetime_posted").notNull(),
   },
   (t) => {
     return [
-      unique("reading_details_account_name_meter_reader_id_created_at_unique").on(
-        t.accountName,
+      unique("reading_details_account_number_meter_reader_id_created_at_unique").on(
+        t.accountNumber,
         t.meterReaderId,
         t.createdAt,
       ),
+      index("idx_rd_created").on(t.createdAt),
+      index("idx_rd_meter_reader").on(t.meterReaderId),
+      index("idx_rd_account_number").on(t.accountNumber),
+      index("idx_rd_acc_created").on(t.accountNumber, t.createdAt),
+      index("idx_rd_zone_book_reader_date").on(t.zoneCode, t.bookCode, t.meterReaderId, t.readingDate),
+      index("idx_rd_status").on(t.isRead, t.isCompleted),
     ];
   },
 );

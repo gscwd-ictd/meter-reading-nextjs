@@ -19,17 +19,17 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
   const { state, isMobile } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" {...props} variant="inset">
+    <Sidebar collapsible="icon" variant="sidebar" {...props}>
       <SidebarHeader>
         <div
           className={`flex items-center ${state === "collapsed" ? "justify-center" : "justify-start"} gap-2`}
         >
-          {(state === "expanded" || isMobile) && <GaugeCircleIcon className="text-primary size-10" />}
-          <div className="flex flex-col items-start">
+          {(state === "expanded" || isMobile) && <GaugeCircleIcon className="text-primary size-8" />}
+          <div className="flex flex-col items-start -space-y-1">
             {(state === "expanded" || isMobile) && (
-              <div className="flex w-full items-center gap-0">
-                <span className="text-primary flex text-xl font-black">Metra</span>
-                <span className="text-xl font-black text-slate-500">X</span>
+              <div className="flex w-full items-center gap-0 text-lg">
+                <span className="text-primary flex font-black">Metra</span>
+                <span className="font-black text-slate-500">X</span>
               </div>
             )}
 
@@ -39,7 +39,7 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                 <span className="-ml-1 text-gray-500 italic dark:text-gray-300">X</span>
               </div>
             )}
-            {state === "expanded" && <span className="text-xs text-gray-500">Meter Reading Application</span>}
+            {state === "expanded" && <span className="text-xs text-gray-600">Meter Reading Application</span>}
 
             {/* Measures Daily Transactions  */}
           </div>

@@ -19,7 +19,7 @@ const data: ReaderActivity[] = [
 const COLORS = {
   good: "#669ef8", // green
   warning: "#9ec3ff", // yellow
-  bad: "#ef4444", // red
+  bad: "#979797", // red
   top: "#3b82f6", // blue for top performer
 };
 
@@ -39,8 +39,6 @@ export default function MeterReaderActivityChart() {
 
   return (
     <>
-      <h2 className="text-primary mb-4 px-2 text-start text-lg font-semibold">Meter Reader Activity</h2>
-
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
           <BarChart layout="vertical" data={data} margin={{ top: 20, right: 30, left: 100, bottom: 20 }}>

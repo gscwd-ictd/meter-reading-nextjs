@@ -6,6 +6,7 @@ import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { Area } from "@mr/server/types/area.type";
+import { BilledMeterReadingSchedule } from "@mr/lib/types/schedule";
 
 type MeterReader = {
   scheduleMeterReaderId: string;
@@ -30,10 +31,12 @@ type ScheduleTableProps = {
 };
 
 export const ScheduleTable: FC<ScheduleTableProps> = ({ yearMonth }) => {
-  const { data, isLoading, isError } = useQuery<ScheduleEntry[]>({
+  const { data, isLoading, isError } = useQuery<BilledMeterReadingSchedule[]>({
     queryKey: ["schedule", yearMonth],
     queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules/zone-book?date=${yearMonth}`);
+      // const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules/zone-book?date=${yearMonth}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/schedules?date=${yearMonth}`);
+
       return res.data;
     },
     enabled: !!yearMonth,
@@ -66,28 +69,43 @@ export const ScheduleTable: FC<ScheduleTableProps> = ({ yearMonth }) => {
               <th className="border px-2 py-1">DUE</th>
               <th className="border px-2 py-1">DISC</th>
               <th className="border px-2 py-1">METER READER</th>
-              <th className="border px-2 py-1">ZONE/BOOK</th>
-              <th className="border px-2 py-1">AREA</th>
+              {/* <th className="border px-2 py-1">ZONE/BOOK</th> */}
+              {/* <th className="border px-2 py-1">AREA</th> */}
             </tr>
           </thead>
           <tbody>
-            {data.map((entry, idx) => (
-              <tr key={idx}>
-                <td className="border px-2 py-1">{idx + 1}</td>
-                <td className="border px-2 py-1">
-                  {entry.readingDate ? format(parseISO(entry.readingDate), "MMM dd, yyyy") : ""}
-                </td>
-                <td className="border px-2 py-1">
-                  {entry.dueDate ? format(parseISO(entry.dueDate), "MMM dd, yyyy") : ""}
-                </td>
-                <td className="border px-2 py-1">
-                  {entry.disconnectionDate ? format(parseISO(entry.disconnectionDate), "MMM dd, yyyy") : ""}
-                </td>
-                <td className="border px-2 py-1">{entry.meterReader.name}</td>
-                <td className="border px-2 py-1">{entry.zone + "-" + entry.book}</td>
-                <td className="border px-2 py-1">{entry.area.name}</td>
-              </tr>
-            ))}
+            {data
+              .sort((a, b) => (a.readingDate > b.readingDate ? 1 : -1))
+
+              .map((entry, idx) => (
+                <tr key={idx}>
+                  <td className="border px-2 py-1">{idx + 1}</td>
+                  <td className="border px-2 py-1">
+                    {entry.readingDate ? format(entry.readingDate, "MMM dd, yyyy") : ""}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {entry.dueDate
+                      ? format(
+                          Array.isArray(entry.dueDate) ? entry.dueDate[0] : entry.dueDate,
+                          "MMM dd, yyyy",
+                        )
+                      : ""}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {entry.disconnectionDate
+                      ? format(
+                          Array.isArray(entry.disconnectionDate)
+                            ? entry.disconnectionDate[0]
+                            : entry.disconnectionDate,
+                          "MMM dd, yyyy",
+                        )
+                      : ""}
+                  </td>
+                  <td className="border px-2 py-1">{entry.meterReaders ? entry.meterReaders[0].name : ""}</td>
+                  {/* <td className="border px-2 py-1">{entry.zone + "-" + entry.book}</td> */}
+                  {/* <td className="border px-2 py-1">{entry.area?.name}</td> */}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

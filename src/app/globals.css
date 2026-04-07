@@ -62,7 +62,8 @@
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.623 0.214 259.815);
-  --chart-1: oklch(0.646 0.222 41.116);
+  /* --chart-1: oklch(0.646 0.222 41.116); */
+  --chart-1: oklch(0.7 0.1628 245.65);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
@@ -96,7 +97,8 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.488 0.243 264.376);
-  --chart-1: oklch(0.488 0.243 264.376);
+  /* --chart-1: oklch(0.488 0.243 264.376); */
+  --chart-1: oklch(0.7 0.1628 245.65);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
@@ -140,7 +142,7 @@
 }
 
 .group:hover .shine {
-  animation: shine 1s ease infinite;
+  animation: shine 3s ease infinite;
 }
 
 @keyframes shake {
@@ -149,13 +151,13 @@
     transform: translateX(0) rotate(0deg);
   }
   25% {
-    transform: translateX(-3px) rotate(-3deg);
+    transform: translateX(-1px) rotate(-1deg);
   }
   50% {
-    transform: translateX(3px) rotate(3deg);
+    transform: translateX(1px) rotate(1deg);
   }
   75% {
-    transform: translateX(-3px) rotate(-3deg);
+    transform: translateX(-1px) rotate(-1deg);
   }
 }
 
@@ -163,4 +165,75 @@
   .animate-shake {
     animation: shake 0.5s ease-in-out infinite;
   }
+
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+
+  .animate-float-medium {
+    animation: float-medium 6s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-spin-slower {
+    animation: spin-slower 25s linear infinite;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+@keyframes float-medium {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(15px) translateX(-15px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-slower {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* Smooth calendar grid */
+.calendar-grid {
+  @apply grid grid-cols-7 gap-px rounded-lg bg-gray-100 p-1 dark:bg-slate-800;
+}
+
+/* Better responsive design */
+@media (max-width: 768px) {
+  .calendar-grid {
+    @apply gap-0 p-0;
+  }
+}
+
+/* Loading states */
+.calendar-loading {
+  @apply animate-pulse bg-gray-200 dark:bg-slate-700;
 }

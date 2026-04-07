@@ -18,18 +18,20 @@ export const ConsumerSchema = z.object({
   meterCode: z.string(),
   meterSize: z.string(),
   isConnected: z.coerce.boolean(),
-  dateConnected: z.coerce.date(),
-  disconnectionDate: z.coerce.date(),
+  dateConnected: z.coerce.string(),
+  disconnectionDate: z.coerce.string(),
   averageUsage: z.coerce.number(),
   waterBalance: z.coerce.number(),
   otherBalance: z.coerce.number(),
   previousReading: z.coerce.number(),
-  previousBillingDate: z.coerce.date(),
+  previousBillingDate: z.coerce.string(),
   location: z.coerce.string(),
   billingAdjustments: BillingAdjustmentSchema.pick({
     name: true,
     percentage: true,
-  }).array(),
+  })
+    .array()
+    .optional(),
 });
 
 export const ConsumerUsageSchema = z.object({
@@ -69,7 +71,7 @@ export const ScheduleMeterReadingSchema = z.object({
 export const ScheduleReadingAccountSchema = z
   .object({
     meterReaderId: z.string(),
-    readingDate: z.coerce.date(),
+    readingDate: z.coerce.string(),
     zoneBooks: z
       .object({
         zone: z.string(),
@@ -80,12 +82,16 @@ export const ScheduleReadingAccountSchema = z
         }),
         dueDate: z.coerce.date(),
         disconnectionDate: z.coerce.date(),
-        accounts: ConsumerDetailsSchema.array(),
+        accounts: ConsumerDetailsSchema.extend({
+          isExist: z.coerce.boolean(),
+          dateToday: z.coerce.string(),
+        }).array(),
       })
       .array(),
   })
   .nullish();
 
 export type Consumer = z.infer<typeof ConsumerSchema>;
+export type ConsumerDetails = z.infer<typeof ConsumerDetailsSchema>;
 export type ScheduleReadingAccount = z.infer<typeof ScheduleReadingAccountSchema>;
 export type ScheduleMeterReading = z.infer<typeof ScheduleMeterReadingSchema>;

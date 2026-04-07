@@ -6,17 +6,23 @@ import { EyeIcon } from "lucide-react";
 import { MeterReader } from "@mr/lib/types/personnel";
 import axios from "axios";
 import { toast } from "sonner";
+import { Dispatch, SetStateAction } from "react";
+import { ViewAssignedZonebooksDataTable } from "../../data-tables/meter-readers/assigned-zonebooks/ViewAssignedZonebooksDataTable";
 
 interface ViewAssignedZonebooksDialogProps {
   meterReader: MeterReader;
   open: boolean;
   setOpen: (open: boolean) => void;
+  dropdownIsOpen: boolean;
+  setDropdownIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogProps> = ({
   meterReader,
   open,
   setOpen,
+  dropdownIsOpen,
+  setDropdownIsOpen,
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["meterReaderDetails", meterReader.id],
@@ -36,7 +42,13 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setOpen(!open);
+        if (open) setDropdownIsOpen(!dropdownIsOpen);
+      }}
+    >
       <DialogTrigger asChild>
         <button className="flex w-full items-center justify-start gap-2 rounded p-2 text-sm hover:bg-emerald-400">
           <EyeIcon className="size-4" />
@@ -45,7 +57,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
       </DialogTrigger>
       <DialogContent className="flex h-screen w-full max-w-full flex-col overflow-hidden p-0 sm:p-0 md:p-6 lg:h-[90vh] lg:!max-w-3xl lg:p-6">
         <DialogHeader>
-          <DialogTitle>Assigned Zonebooks</DialogTitle>
+          <DialogTitle>Assigned Default Zonebooks</DialogTitle>
           <p className="text-muted-foreground text-sm">
             Meter Reader: <span className="font-medium">{meterReader.name || meterReader.id}</span>
           </p>
@@ -59,28 +71,7 @@ export const ViewAssignedZonebooksDialog: React.FC<ViewAssignedZonebooksDialogPr
               <Skeleton className="h-6 w-full" />
             </div>
           ) : (
-            <div className="h-full overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted text-muted-foreground sticky top-0 z-10">
-                  <tr>
-                    <th className="px-4 py-2 text-left">Zonebook</th>
-                    <th className="px-4 py-2 text-left">Zone</th>
-                    <th className="px-4 py-2 text-left">Book</th>
-                    <th className="px-4 py-2 text-left">Area</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data?.zoneBooks?.map((zb, index) => (
-                    <tr key={index} className="border-t">
-                      <td className="px-4 py-2 font-medium">{zb.zoneBook}</td>
-                      <td className="px-4 py-2">{zb.zone}</td>
-                      <td className="px-4 py-2">{zb.book}</td>
-                      <td className="px-4 py-2">{zb.area.name ?? "N/A"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ViewAssignedZonebooksDataTable data={data?.zoneBooks ? data.zoneBooks : []} />
           )}
         </div>
       </DialogContent>

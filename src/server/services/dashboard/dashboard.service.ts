@@ -1,5 +1,9 @@
 import { IDashboardService } from "@mr/server/interfaces/dashboard/dashboard.interface.service";
-import { ConsumerCount } from "@mr/server/types/dashboard.type";
+import {
+  ConsumerCount,
+  CountReadingsByReaderZoneBook,
+  MonthlyReadingCounts,
+} from "@mr/server/types/dashboard.type";
 import { DashboardRepository } from "./dashboard.repository";
 
 export class DashboardService implements IDashboardService {
@@ -7,5 +11,17 @@ export class DashboardService implements IDashboardService {
 
   async countConsumer(): Promise<ConsumerCount> {
     return this.repository.countConsumer();
+  }
+
+  async getMonthlyReadingCounts(): Promise<MonthlyReadingCounts> {
+    return this.repository.getMonthlyReadingCounts();
+  }
+
+  async getReadingsByReaderZoneBookCounts(
+    meterReaderId: string,
+    zone: string,
+    book: string,
+  ): Promise<CountReadingsByReaderZoneBook> {
+    return this.repository.mobileCountReadingsByReaderZoneBook(meterReaderId, zone, book);
   }
 }

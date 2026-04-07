@@ -50,6 +50,8 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
           <EditMeterReaderDialog
             editMeterReaderDialogIsOpen={editMeterReaderDialogIsOpen}
             setEditMeterReaderDialogIsOpen={setEditMeterReaderDialogIsOpen}
+            dropdownIsOpen={dropdownIsOpen}
+            setDropdownIsOpen={setDropdownIsOpen}
             selectedMeterReader={meterReader}
           />
         </DropdownMenuItem>
@@ -64,6 +66,8 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
             meterReader={meterReader}
             open={viewAssignedZonebooksDialogIsOpen}
             setOpen={setViewAssignedZonebooksDialogIsOpen}
+            dropdownIsOpen={dropdownIsOpen}
+            setDropdownIsOpen={setDropdownIsOpen}
           />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -77,6 +81,8 @@ export const MeterReaderRowActions: FunctionComponent<MeterReaderRowActionsProps
             selectedMeterReader={meterReader}
             open={deleteMeterReaderDialogIsOpen}
             setOpen={setDeleteMeterReaderDialogIsOpen}
+            dropdownIsOpen={dropdownIsOpen}
+            setDropdownIsOpen={setDropdownIsOpen}
           />
         </DropdownMenuItem>
       </DropdownMenuContent>

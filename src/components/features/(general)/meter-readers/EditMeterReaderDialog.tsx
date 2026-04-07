@@ -12,7 +12,7 @@ import {
 } from "@mr/components/ui/Dialog";
 import { Dispatch, FunctionComponent, SetStateAction, useEffect, useState } from "react";
 import { useMeterReadersStore } from "@mr/components/stores/useMeterReadersStore";
-import { SquarePenIcon, Users2Icon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
 import { useZonebookStore } from "@mr/components/stores/useZonebookStore";
@@ -24,6 +24,8 @@ type EditMeterReaderDialogProps = {
   editMeterReaderDialogIsOpen: boolean;
   setEditMeterReaderDialogIsOpen: Dispatch<SetStateAction<boolean>>;
   selectedMeterReader: MeterReader;
+  dropdownIsOpen: boolean;
+  setDropdownIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 import { z } from "zod";
@@ -42,6 +44,7 @@ const meterReaderSchema = z.object({
     z.object({
       zone: z.string(),
       book: z.string(),
+      day: z.number().nullish(),
     }),
   ),
   restDay: z.string().optional(),
@@ -62,6 +65,8 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
   editMeterReaderDialogIsOpen,
   setEditMeterReaderDialogIsOpen,
   selectedMeterReader,
+  dropdownIsOpen,
+  setDropdownIsOpen,
 }) => {
   const setSelectedMeterReader = useMeterReadersStore((state) => state.setSelectedMeterReader);
   const setSelectedRestDay = useMeterReadersStore((state) => state.setSelectedRestDay);
@@ -91,7 +96,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       mobileNumber: meterReader.mobileNumber,
       restDay: meterReader.restDay ? (meterReader.restDay === "sunday" ? "0" : "6") : "",
       zoneBooks: meterReader.zoneBooks.map((zb) => {
-        return { zone: zb.zone, book: zb.book };
+        return { zone: zb.zone, book: zb.book, day: zb.day };
       }),
     };
   };
@@ -111,6 +116,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         toast.error("Error", { description: JSON.stringify(error), position: "top-right" });
       }
     },
+
     onMutate: () => {
       setIsSubmitting(true);
     },
@@ -148,6 +154,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       return res.data as MeterReaderWithZonebooks;
     },
     enabled: !!editMeterReaderDialogIsOpen,
+    retryOnMount: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   // updated filtered zonebooks
@@ -168,6 +177,9 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       }
     },
     enabled: !hasSetInitialZonebookPool && editMeterReaderDialogIsOpen,
+    retryOnMount: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
   const resetToDefaults = () => {
@@ -200,7 +212,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
 
       setValue("zoneBooks", meterReader?.zoneBooks);
 
-      setMeterReaderZonebooks(meterReader?.zoneBooks); // this refers to the meter reader's assigned zonebooks
+      setMeterReaderZonebooks(ZonebookFlatSorter(meterReader?.zoneBooks)); // this refers to the meter reader's assigned zonebooks
 
       setSelectedRestDay(meterReader?.restDay);
     }
@@ -234,6 +246,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       open={editMeterReaderDialogIsOpen}
       onOpenChange={() => {
         setEditMeterReaderDialogIsOpen(!editMeterReaderDialogIsOpen);
+        if (editMeterReaderDialogIsOpen) setDropdownIsOpen(!dropdownIsOpen);
         resetToDefaults();
       }}
     >
@@ -250,7 +263,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
       >
         <DialogHeader className="flex flex-col gap-0">
           <DialogTitle className="text-primary text-xl font-bold dark:text-white">
-            Update Meter Reader
+            Edit Meter Reader
           </DialogTitle>
 
           <DialogDescription className="text-gray-500">Update meter reader information</DialogDescription>
@@ -273,6 +286,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
             onClick={() => {
               setEditMeterReaderDialogIsOpen(false);
               resetToDefaults();
+              if (editMeterReaderDialogIsOpen) setDropdownIsOpen(!dropdownIsOpen);
             }}
           >
             Cancel

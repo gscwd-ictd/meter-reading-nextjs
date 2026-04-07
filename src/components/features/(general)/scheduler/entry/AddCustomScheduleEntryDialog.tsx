@@ -13,18 +13,21 @@ import { format } from "date-fns";
 import CalendarPicker from "../../../calendar/CalendarPicker";
 import { useState } from "react";
 import { Button } from "@mr/components/ui/Button";
-import { holidays, NonBusinessDays } from "../holidays";
+import { NonBusinessDays } from "../holidays";
 import { Input } from "@mr/components/ui/Input";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { toast } from "sonner";
+import { Spinner } from "@mr/components/ui/Spinner";
+import findLatestMonthlyScheduleWithDay from "@mr/lib/functions/findLatestMonthlyScheduleWithDay";
 
 type SubmitMeterReadingEntryWithZonebooks = {
   readingDate: string;
   dueDate: string;
   disconnectionDate: string;
   meterReaders: MeterReaderWithZonebooks[];
+  day: number;
 };
 
 export const AddCustomScheduleEntryDialog = () => {
@@ -34,7 +37,7 @@ export const AddCustomScheduleEntryDialog = () => {
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const refetchEntry = useSchedulesStore((state) => state.refetchEntry);
   const reset = useSchedulesStore((state) => state.reset);
-
+  const scheduleDays = useSchedulesStore((state) => state.scheduleDays);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [disconnectionDate, setDisconnectionDate] = useState<Date | undefined>(undefined);
 
@@ -48,9 +51,12 @@ export const AddCustomScheduleEntryDialog = () => {
         dueDate: format(dueDate!, "yyyy-MM-dd"),
         disconnectionDate: format(disconnectionDate!, "yyyy-MM-dd"),
         readingDate: format(entry?.readingDate!, "yyyy-MM-dd"),
+        day: findLatestMonthlyScheduleWithDay(scheduleDays)?.day! + 1,
       },
     ];
   };
+
+  const isValid = dueDate && disconnectionDate;
 
   const postMutation = useMutation({
     mutationFn: async () => {
@@ -78,6 +84,25 @@ export const AddCustomScheduleEntryDialog = () => {
         toast.error("An unexpected error occurred.", { position: "top-right", duration: 1500 });
       }
     },
+  });
+
+  const {
+    data: allHolidays,
+    isLoading,
+    // isSuccess: holidaysLoaded,
+  } = useQuery({
+    queryKey: ["get-all-holidayss"],
+    queryFn: async () => {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_HRMS_HOLIDAYS}`);
+
+      return res.data;
+    },
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
   });
 
   return (
@@ -108,32 +133,46 @@ export const AddCustomScheduleEntryDialog = () => {
 
         {/* Calendar Picker Section */}
         <>
-          <CalendarPicker
-            startDate={selectedScheduleEntry?.readingDate ?? new Date()}
-            dueDate={dueDate}
-            setDueDate={setDueDate}
-            disconnectionDate={disconnectionDate}
-            setDisconnectionDate={setDisconnectionDate}
-            nonBusinessDays={NonBusinessDays}
-            holidays={holidays}
-          />
+          {isLoading ? (
+            <Spinner>Loading holidays...</Spinner>
+          ) : (
+            <CalendarPicker
+              startDate={selectedScheduleEntry?.readingDate ?? new Date()}
+              dueDate={dueDate}
+              setDueDate={setDueDate}
+              disconnectionDate={disconnectionDate}
+              setDisconnectionDate={setDisconnectionDate}
+              nonBusinessDays={NonBusinessDays}
+              holidays={allHolidays}
+            />
+          )}
 
           {/* Hints for user */}
           <div className="mt-2 text-xs text-gray-500">
-            <p>• Due date defaults to 15 days after the reading date (skips holidays & weekends).</p>
-            <p>• Disconnection date is 3 days after the due date (skips holidays & weekends).</p>
+            <p>
+              • Due date defaults to 15 calendar days after the reading date, if the due date falls on
+              holidays or weekends, it is automatically moved to the next business day.
+            </p>
+            <p>• Disconnection date is 3 working days after the due date (skips holidays & weekends).</p>
           </div>
         </>
 
         {/* Footer */}
         <DialogFooter className="pt-6">
           <Button
-            className="w-full"
+            className="w-full text-white"
+            disabled={!isValid ? true : postMutation.isPending ? true : false}
             onClick={() => {
               postMutation.mutateAsync();
             }}
           >
-            Submit
+            {postMutation.isPending ? (
+              <>
+                Submitting <Spinner />
+              </>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

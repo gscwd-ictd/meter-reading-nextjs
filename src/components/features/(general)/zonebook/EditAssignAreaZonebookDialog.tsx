@@ -155,6 +155,7 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
                 area: selectedArea,
                 // zoneBookId: selectedZonebook?.zoneBookId,
                 id: selectedZonebook?.id,
+                day: selectedZonebook && selectedZonebook.day ? selectedZonebook.day : null,
               });
             }}
           >

@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@mr/components/ui/DropdownMenu";
 import { Ellipsis } from "lucide-react";
@@ -13,6 +12,8 @@ import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
 import { Scheduler } from "./useScheduler";
+import { PopulateSchedByDays } from "./PopulateSchedByDays";
+import { ManualScheduleAlertDialog } from "./ManualScheduleAlertDialog";
 
 type CalendarSettingDropdownProps = {
   scheduler: Scheduler;
@@ -20,6 +21,8 @@ type CalendarSettingDropdownProps = {
 
 export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownProps> = ({ scheduler }) => {
   const calendarScheduleDropdownIsOpen = useSchedulesStore((state) => state.calendarScheduleDropdownIsOpen);
+  const hasPopulatedMeterReaders = useSchedulesStore((state) => state.hasPopulatedMeterReaders);
+
   const currentSchedule = useSchedulesStore((state) => state.currentSchedule);
   const setCalendarScheduleDropdownIsOpen = useSchedulesStore(
     (state) => state.setCalendarScheduleDropdownIsOpen,
@@ -38,12 +41,24 @@ export const CalendarSettingDropdown: FunctionComponent<CalendarSettingDropdownP
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent avoidCollisions alignOffset={2} sideOffset={2} align="end">
-        <DropdownMenuItem asChild>
-          <ResetScheduleAlertDialog />
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        {hasPopulatedMeterReaders && (
+          <DropdownMenuItem asChild>
+            <ResetScheduleAlertDialog />
+          </DropdownMenuItem>
+        )}
+
+        {!hasPopulatedMeterReaders && (
+          <DropdownMenuItem asChild>
+            <ManualScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem asChild>
           <PopulateScheduleAlertDialog schedule={currentSchedule} scheduler={scheduler} />
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <PopulateSchedByDays schedule={currentSchedule} scheduler={scheduler} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

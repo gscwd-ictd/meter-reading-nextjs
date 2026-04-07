@@ -2,7 +2,7 @@ export type Holidays = typeof holidays;
 
 export type Day = { id: string; name: string; date: string };
 export type Holiday = Day & { type: string };
-export type HolidayFromHrms = Omit<Holiday, "date"> & { holidayDate: string };
+export type HolidayFromHrms = Omit<Holiday, "date"> & { date: string }; // changed from holidayDate to date
 
 export const holidays = [
   // {
@@ -159,5 +159,6 @@ export const holidays = [
 
 export const NonBusinessDays: Day[] = [
   { id: "001", date: "01-01", name: "New Year" },
-  { id: "002", date: "12-25", name: "Christmas Day" },
+  { id: "002", date: "03-20", name: "Eid al Fitr" },
+  { id: "003", date: "12-25", name: "Christmas Day" },
 ];

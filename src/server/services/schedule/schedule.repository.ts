@@ -1,5 +1,7 @@
 import { meterReadingContext } from "@mr/server/context";
 import db from "@mr/server/db/connections";
+import { meterReaderZoneBook } from "@mr/server/db/schemas/meter-readers";
+import { reassignment, reassignmentView, reassignmentZoneBook } from "@mr/server/db/schemas/reassignment";
 import {
   scheduleMeterReaders,
   schedules,
@@ -12,7 +14,10 @@ import { IScheduleRepository } from "@mr/server/interfaces/schedule/schedule.int
 import {
   CreateMeterReaderScheduleReading,
   CreateMonthSchedule,
+  CreateReassignment,
   CreateScheduleMeterReader,
+  Reassignment,
+  ReassignmentSchema,
   ScheduleMeterReaderZoneBook,
   ScheduleMeterReaderZoneBookSchema,
   ScheduleReading,
@@ -21,7 +26,7 @@ import {
   ZoneBookScheduleReader,
   ZoneBookScheduleReaderSchema,
 } from "@mr/server/types/schedule.type";
-import { and, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
+import { and, eq, gte, lte, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export class ScheduleRepository implements IScheduleRepository {
@@ -75,6 +80,8 @@ export class ScheduleRepository implements IScheduleRepository {
     }
 
     // Step 3: Parse the first (and expected only) result into a strongly-typed schedule object
+
+    //return stmt[0];
     const schedule = ScheduleSchema.parse(stmt[0]);
 
     // Step 4: For each meter reader in the schedule, fetch their full details
@@ -84,14 +91,40 @@ export class ScheduleRepository implements IScheduleRepository {
           .getMeterReaderService()
           .getMeterReaderDetailsById(reader.id);
 
+        let reassignmentDetails: any[] = [];
+
+        if (reader.reassignment?.zoneBooks?.length) {
+          reassignmentDetails = await Promise.all(
+            reader.reassignment.zoneBooks.map(async (item) => {
+              const reassignedDetails = await meterReadingContext
+                .getMeterReaderService()
+                .getMeterReaderDetailsById(item.meterReader.id);
+
+              return {
+                ...item,
+                meterReader: {
+                  id: reassignedDetails.id,
+                  name: reassignedDetails.name,
+                  photoUrl: reassignedDetails.photoUrl,
+                },
+              };
+            }),
+          );
+        }
+
         return {
           ...reader,
           ...details,
+          reassignment: {
+            ...reader.reassignment,
+            zoneBooks: reassignmentDetails,
+          },
         };
       }),
     );
 
     // Step 6: Replace the original meterReaders with the enriched list and validate the full structure
+
     return ScheduleReadingSchema.parse({ ...schedule, meterReaders: result });
   }
 
@@ -113,20 +146,41 @@ export class ScheduleRepository implements IScheduleRepository {
         const [schedule] = await tx
           .insert(schedules)
           .values({
+            day: item.day,
             readingDate: item.readingDate,
             dueDate: item.dueDate,
             disconnectionDate: item.disconnectionDate,
           })
           .returning(); // Returns the inserted schedule, including scheduleId
-
         // Step 5: If meter readers are assigned to this schedule, insert them
         if (item.meterReaders.length > 0) {
-          await tx.insert(scheduleMeterReaders).values(
-            item.meterReaders.map((reader) => ({
-              scheduleId: schedule.id, // Link to the schedule
-              meterReaderId: reader.id, // Reader assigned
-            })),
-          );
+          // Insert scheduleMeterReaders and get their IDs
+          const insertedSMRs = await tx
+            .insert(scheduleMeterReaders)
+            .values(
+              item.meterReaders.map((reader) => ({
+                scheduleId: schedule.id, // Link to the schedule
+                meterReaderId: reader.id, // Reader assigned
+              })),
+            )
+            .returning();
+          // Now map scheduleMeterReaders to zoneBook inserts
+          const zoneBookInserts = insertedSMRs.flatMap((smr) => {
+            const reader = item.meterReaders.find((r) => r.id === smr.meterReaderId);
+            if (!reader || !reader.zoneBooks) return [];
+            return reader.zoneBooks.map((zb) => ({
+              scheduleMeterReaderId: smr.id,
+              zone: zb.zone,
+              book: zb.book,
+              day: zb.day,
+              dueDate: zb.dueDate,
+              disconnectionDate: zb.disconnectionDate,
+            }));
+          });
+          // Insert new zoneBooks
+          if (zoneBookInserts.length > 0) {
+            await tx.insert(scheduleZoneBooks).values(zoneBookInserts);
+          }
         }
       }
     });
@@ -204,7 +258,7 @@ export class ScheduleRepository implements IScheduleRepository {
     }
 
     const unassigned = await db.pgConn.execute(
-      sql`select zone, book, zone_book as "zoneBook", area from get_schedule_unassigned_zone_books( ${assigned.month},  ${assigned.year}, ${assigned.meterReaderId})`,
+      sql`select day, zone, book, zone_book as "zoneBook", area from get_schedule_unassigned_zone_books( ${assigned.month},  ${assigned.year}, ${assigned.meterReaderId})`,
     );
 
     return ScheduleMeterReaderZoneBookSchema.parse({
@@ -220,10 +274,11 @@ export class ScheduleRepository implements IScheduleRepository {
     const { scheduleMeterReaderId, zoneBooks } = data;
 
     // Step 2: Prepare the zoneBooks data for insertion
-    const insertZoneBook = zoneBooks.map(({ zone, book, dueDate, disconnectionDate }) => ({
+    const insertZoneBook = zoneBooks.map(({ zone, book, day, dueDate, disconnectionDate }) => ({
       scheduleMeterReaderId,
       zone,
       book,
+      day,
       dueDate,
       disconnectionDate,
     }));
@@ -302,59 +357,147 @@ export class ScheduleRepository implements IScheduleRepository {
     return ZoneBookScheduleReaderSchema.array().parse(result);
   }
 
+  async findReassignmentByScheduleMeterReaderId(scheduleMeterReaderId: string): Promise<Reassignment> {
+    const [result] = await db.pgConn
+      .select()
+      .from(reassignmentView)
+      .where(eq(reassignmentView.scheduleMeterReaderId, scheduleMeterReaderId));
+
+    if (!result) {
+      throw new HTTPException(404, {
+        message: `reassignment not found with id ${scheduleMeterReaderId}`,
+      });
+    }
+
+    const mappedZoneBooks = await Promise.all(
+      (result.zoneBooks ?? []).map(async (item) => {
+        const details = await meterReadingContext
+          .getMeterReaderService()
+          .getMeterReaderDetailsById(item.meterReader.id);
+
+        return {
+          ...item,
+          meterReader: {
+            id: details.id,
+            name: details.name,
+            photoUrl: details.photoUrl,
+          },
+        };
+      }),
+    );
+
+    return ReassignmentSchema.parse({ ...result, zoneBooks: mappedZoneBooks });
+  }
+
+  async reassignmentMeterReader(
+    scheduleMeterReaderId: string,
+    data: CreateReassignment,
+  ): Promise<Reassignment> {
+    const { remarks, zoneBooks } = data;
+
+    const result = await db.pgConn.transaction(async (tx) => {
+      // Always delete first, safe even if nothing exists
+      await tx.delete(reassignment).where(eq(reassignment.scheduleMeterReaderId, scheduleMeterReaderId));
+
+      // Insert new reassignment
+      const [insertReassignment] = await tx
+        .insert(reassignment)
+        .values({ scheduleMeterReaderId, remarks })
+        .returning({ id: reassignment.id });
+
+      // Insert zoneBooks if provided
+      if (zoneBooks.length > 0) {
+        await tx.insert(reassignmentZoneBook).values(
+          zoneBooks.map((item) => ({
+            reassignmentId: insertReassignment.id,
+            zone: item.zone,
+            book: item.book,
+            meterReaderId: item.meterReader.id,
+          })),
+        );
+
+        for (const item of zoneBooks) {
+          await tx
+            .delete(meterReaderZoneBook)
+            .where(and(eq(meterReaderZoneBook.zone, item.zone), eq(meterReaderZoneBook.book, item.book)));
+
+          await tx
+            .delete(scheduleZoneBooks)
+            .where(
+              and(
+                eq(scheduleZoneBooks.scheduleMeterReaderId, scheduleMeterReaderId),
+                eq(scheduleZoneBooks.zone, item.zone),
+                eq(scheduleZoneBooks.book, item.book),
+              ),
+            );
+        }
+
+        await tx.insert(meterReaderZoneBook).values(
+          zoneBooks.map((item) => ({
+            zone: item.zone,
+            book: item.book,
+            meterReaderId: item.meterReader.id,
+            day: item.day,
+          })),
+        );
+      }
+
+      return scheduleMeterReaderId;
+    });
+
+    return await this.findReassignmentByScheduleMeterReaderId(result);
+  }
+
   /* 
             sql function do not delete please
 
-create or replace function get_schedule_unassigned_zone_books(
-  input_month int,
-  input_year int,
-  input_meter_reader_id uuid
-)
-returns table(zone varchar, book varchar, zone_book text, area jsonb) as $$
-begin
-  return query
-  with schedule_meter_reader_assigned_zone_books as (
-    select
-      coalesce(szb.zone, '') as zone,
-      coalesce(szb.book, '') as book
-    from schedules s
-    left join schedule_meter_readers smr on s.id = smr.schedule_id
-    left join schedule_zone_books szb on smr.id = szb.schedule_meter_reader_id
-    where
-      extract(month from s.reading_date) = input_month and
-      extract(year from s.reading_date) = input_year and
-      smr.meter_reader_id = input_meter_reader_id
-  ),
-  predefault_meter_reader_zone_book as (
-    select
-      mrzb.zone,
-      mrzb.book,
-      vzbwa.zone_book,
-      vzbwa.area
-    from meter_readers mr
-    inner join meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
-      left join view_zone_book_with_area vzbwa
-    on vzbwa.zone = mrzb.zone and vzbwa.book = mrzb.book
-    where mr.id = input_meter_reader_id
-  )
-  select
-    pmrzb.zone,
-    pmrzb.book,
-    pmrzb.zone_book,
-    pmrzb.area
-  from predefault_meter_reader_zone_book pmrzb
-  left join schedule_meter_reader_assigned_zone_books smrazb
-    on pmrzb.zone = smrazb.zone and pmrzb.book = smrazb.book
-  where smrazb.zone is null;
-end;
-$$ language plpgsql;
+      create or replace function get_schedule_unassigned_zone_books(
+        input_month int,
+        input_year int,
+        input_meter_reader_id uuid
+      )
+      returns table(day int, zone varchar, book varchar, zone_book text, area jsonb) as $$
+      begin
+        return query
+        with schedule_meter_reader_assigned_zone_books as (
+          select
+            coalesce(szb.zone, '') as zone,
+            coalesce(szb.book, '') as book,
+            szb.day
+          from schedules s
+          left join schedule_meter_readers smr on s.id = smr.schedule_id
+          left join schedule_zone_books szb on smr.id = szb.schedule_meter_reader_id
+          where
+            extract(month from s.reading_date) = input_month and
+            extract(year from s.reading_date) = input_year and
+            smr.meter_reader_id = input_meter_reader_id
+        ),
+        predefault_meter_reader_zone_book as (
+          select
+            mrzb.day,
+            mrzb.zone,
+            mrzb.book,
+            vzbwa.zone_book,
+            vzbwa.area
+          from meter_readers mr
+          inner join meter_reader_zone_book mrzb on mr.id = mrzb.meter_reader_id
+            left join view_zone_book_with_area vzbwa
+          on vzbwa.zone = mrzb.zone and vzbwa.book = mrzb.book
+          where mr.id = input_meter_reader_id
+        )
+        select
+          pmrzb.day,
+          pmrzb.zone,
+          pmrzb.book,
+          pmrzb.zone_book,
+          pmrzb.area
+        from predefault_meter_reader_zone_book pmrzb
+        left join schedule_meter_reader_assigned_zone_books smrazb
+          on pmrzb.zone = smrazb.zone and pmrzb.book = smrazb.book
+        where smrazb.zone is null;
+      end;
+      $$ language plpgsql;
 
-select * from get_schedule_unassigned_zone_books(7,2025, 'b0156f0a-282c-4fe4-9e49-a22985a5b962');
-
-select * from view_zone_book_with_area;
-
-
-
-
+      select * from get_schedule_unassigned_zone_books(7,2025, 'b0156f0a-282c-4fe4-9e49-a22985a5b962');
     */
 }
