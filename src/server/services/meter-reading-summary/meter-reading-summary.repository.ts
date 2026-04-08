@@ -133,7 +133,7 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
 
   async findWithRemarksSummary(query: BilledAccountQuery): Promise<WithRemarksSummary[]> {
     const conditions = [
-      eq(viewReadingAccountProgress.isRead, false),
+      eq(viewReadingAccountProgress.isRead, true),
       eq(viewReadingAccountProgress.isCommitted, true),
       ne(viewReadingAccountProgress.remarks, "Normal Reading"),
       ne(viewReadingAccountProgress.remarks, ""),
