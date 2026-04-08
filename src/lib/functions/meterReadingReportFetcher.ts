@@ -73,8 +73,7 @@ export const fetchNewMetersAccounts = async (params: MeterReadingReportParams) =
   if (book) queryParams.book = book;
   if (meterReaderId) queryParams.meterReaderId = meterReaderId;
 
-  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/new-meter`, {
-    //! new-meters
+  const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/summary/new-meters`, {
     params: queryParams,
   });
 
