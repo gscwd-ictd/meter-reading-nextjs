@@ -27,7 +27,10 @@ export const WithRemarksSummarySchema = z.object({
   checkDigit: z.coerce.string(),
   zone: z.string(),
   book: z.string(),
+  usage: z.coerce.number(),
+  billedAmount: z.coerce.number(),
   remarks: z.coerce.string(),
+  additionalRemarks: z.coerce.string(),
   meterReader: z.object({
     id: z.string(),
     name: z.string(),
