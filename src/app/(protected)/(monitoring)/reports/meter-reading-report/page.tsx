@@ -1,4 +1,4 @@
-import { MeterReadingReportComponent } from "@mr/components/features/(monitoring)/reports/meter-reading-report/MeterReaderReportComponent";
+import { MeterReadingReportComponent } from "@mr/components/features/(monitoring)/reports/meter-reading-report/MeterReadingReportComponent";
 import { MeterReadingReportProvider } from "@mr/components/providers/MeterReadingReportProvider";
 import {
   Breadcrumb,
