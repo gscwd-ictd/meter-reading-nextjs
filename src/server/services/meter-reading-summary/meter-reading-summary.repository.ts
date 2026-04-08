@@ -259,10 +259,10 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
           select
               coalesce(zb.zone, 'grandTotal') as zone,
               coalesce(zb.book, 'total') as book,
-              count(*) as count,
+              count(rd.account_number) as count,
               coalesce(sum(rd.current_usage)   filter (where rd.is_committed = true), 0) as total_consumption,
-              coalesce(sum(rd.billed_amount)   filter (where rd.is_committed = true), 0) as total_billed_amount,
-              coalesce(sum(rd.senior_discount) filter (where rd.is_committed = true), 0) as total_senior_discount
+              coalesce(sum(rd.billed_amount::numeric(12,2)) filter (where rd.is_committed = true), 0)   as total_billed_amount,
+              coalesce(sum(rd.senior_discount::numeric(12,2)) filter (where rd.is_committed = true), 0) as total_senior_discount
           from zone_book zb
           left join reading_details rd
               on zb.zone = lpad(rd.zone_code, 2, '0')
