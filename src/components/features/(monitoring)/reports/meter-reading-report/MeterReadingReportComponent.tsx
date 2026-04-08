@@ -23,7 +23,6 @@ import {
   fetchWithRemarksAccounts,
 } from "@mr/lib/functions/meterReadingReportFetcher";
 import useManualQuery from "@mr/hooks/use-manual-query";
-import { Button } from "@mr/components/ui/Button";
 
 const formSchema = z.object({
   monthYear: z.string().nullish(),
@@ -35,8 +34,8 @@ const formSchema = z.object({
       id: z.string(),
     }),
   ),
-  zone: z.string().nullish(),
-  book: z.string().nullish(),
+  zone: z.string().optional(),
+  book: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -44,7 +43,8 @@ type FormValues = z.infer<typeof formSchema>;
 export const MeterReadingReportComponent = () => {
   const searchParams = useSearchParams();
   const date = searchParams.get("date");
-  const { setIsGenerating, setHasFetched, monthYear, setMonthYear } = useMeterReadingReportContext();
+  const { setIsGenerating, setHasFetched, monthYear, setMonthYear, hasFetched } =
+    useMeterReadingReportContext();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -99,6 +99,7 @@ export const MeterReadingReportComponent = () => {
     // Assert the type since we know it matches the structure
     const currentParams = paramsObject as MeterReadingReportParams;
 
+    console.log(currentParams);
     try {
       toast.loading("Generating all reports...", {
         id: "generate-mr-reports",
@@ -140,6 +141,16 @@ export const MeterReadingReportComponent = () => {
       router.replace(`/reports/meter-reading-report?date=${monthYear}`);
     }
   }, [monthYear, router]);
+
+  useEffect(() => {
+    // Reset hasFetched when any filter changes
+    const subscription = form.watch(() => {
+      if (hasFetched) {
+        setHasFetched(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, hasFetched, setHasFetched]);
 
   return (
     <FormProvider {...form}>

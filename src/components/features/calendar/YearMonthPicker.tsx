@@ -11,8 +11,9 @@ interface YearMonthPickerWithSubmitProps {
   value: string;
   onChange: (value: string) => void;
   onClick?: () => void;
+  disabled?: boolean;
 }
-export function YearMonthPicker({ value, onChange, onClick }: YearMonthPickerWithSubmitProps) {
+export function YearMonthPicker({ value, onChange, onClick, disabled }: YearMonthPickerWithSubmitProps) {
   const [open, setOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [isAnimating, setIsAnimating] = useState(false);
@@ -50,8 +51,9 @@ export function YearMonthPicker({ value, onChange, onClick }: YearMonthPickerWit
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="h-[2.5rem] w-[200px] justify-start text-left font-normal sm:w-auto md:w-auto lg:w-[200px]"
+            className="h-[2.5rem] w-[200px] justify-start text-left font-normal disabled:cursor-not-allowed sm:w-auto md:w-auto lg:w-[200px]"
             onClick={onClick}
+            disabled={disabled}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             <span

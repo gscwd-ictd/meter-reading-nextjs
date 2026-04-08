@@ -10,14 +10,14 @@ import {
   useState,
 } from "react";
 
-const TAB_VALUES = {
+export const TAB_VALUES = {
   BILLED: "billed",
   UNBILLED: "unbilled",
   WITH_REMARKS: "with-remarks",
   NEW_METERS: "new-meters",
 } as const;
 
-type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
+export type TabValue = (typeof TAB_VALUES)[keyof typeof TAB_VALUES];
 
 type MeterReadingReportState = {
   isGenerating: boolean;
@@ -36,7 +36,7 @@ export const MeterReadingReportProvider: FunctionComponent<PropsWithChildren> = 
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<TabValue>("billed");
   const [hasFetched, setHasFetched] = useState<boolean>(false);
-  const [monthYear, setMonthYear] = useState<string | null>("");
+  const [monthYear, setMonthYear] = useState<string | null>(null);
 
   return (
     <MeterReadingReportContext.Provider
