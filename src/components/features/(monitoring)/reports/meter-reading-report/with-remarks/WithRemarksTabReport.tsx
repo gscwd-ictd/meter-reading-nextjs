@@ -23,6 +23,10 @@ export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, 
     return data && data.reduce((sum, account) => sum + account.billedAmount, 0);
   }, [data]);
 
+  const totalUsage = useMemo(() => {
+    return data && data.reduce((sum, account) => sum + account.usage, 0);
+  }, [data]);
+
   return (
     <>
       <TabsContent
@@ -33,9 +37,17 @@ export const WithRemarksTabReport: FunctionComponent<TabReportProps> = ({ data, 
           <WithRemarksDataTable
             data={data}
             header={
-              <div className="flex w-full items-center justify-end gap-2 text-right">
-                <span className="font-normal">Total: </span>
-                <span className="font-medium">{totalBilledAmount ? formatToPHP(totalBilledAmount) : ""}</span>
+              <div className="flex w-full flex-col items-end gap-0 text-right text-sm">
+                <div>
+                  <span className="font-normal">Total Usage: </span>
+                  <span className="font-medium">{totalUsage ? `${totalUsage} cu/m` : ""}</span>
+                </div>
+                <div>
+                  <span className="font-normal">Total Billed Amount: </span>
+                  <span className="font-medium">
+                    {totalBilledAmount ? formatToPHP(totalBilledAmount) : ""}
+                  </span>
+                </div>
               </div>
             }
           />

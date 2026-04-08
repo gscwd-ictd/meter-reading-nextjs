@@ -125,8 +125,6 @@ export const MeterReadingReportComponent = () => {
     // Assert the type since we know it matches the structure
     const currentParams = paramsObject as MeterReadingReportParams;
 
-    console.log(currentParams);
-
     let toastId = "generate-mr-reports";
 
     try {
@@ -140,7 +138,7 @@ export const MeterReadingReportComponent = () => {
         billedQuery.execute(currentParams),
         unbilledQuery.execute(currentParams),
         withRemarksQuery.execute(currentParams),
-        // newMetersQuery.execute(currentParams),
+        newMetersQuery.execute(currentParams),
       ]);
 
       setIsGenerating(false);
