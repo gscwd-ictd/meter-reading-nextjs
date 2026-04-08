@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import z from "zod";
 import { MeterReadingReportHeader } from "./MeterReadingReportHeader";
 import { MeterReadingReportBody } from "./MeterReadingReportBody";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMeterReadingReportContext } from "@mr/components/providers/MeterReadingReportProvider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -57,6 +57,8 @@ export const MeterReadingReportComponent = () => {
   });
 
   const router = useRouter();
+  const isGeneratingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Initialize queries with the fetcher functions
   const billedQuery = useManualQuery<BilledAccount[], MeterReadingReportParams>({
@@ -83,8 +85,32 @@ export const MeterReadingReportComponent = () => {
     retry: 1,
   });
 
+  // Cancel all ongoing requests
+  const cancelAllRequests = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
+
   const handleGenerateAll = async (data: FormValues) => {
+    // Prevent multiple simultaneous submissions
+    if (isGeneratingRef.current) {
+      toast.warning("Already generating reports. Please wait...", {
+        id: "generate-mr-reports",
+        position: "top-right",
+      });
+      return;
+    }
+
+    // Cancel any ongoing requests
+    cancelAllRequests();
+
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+    isGeneratingRef.current = true;
     setIsGenerating(true);
+
     const selectedMonthYear = data.monthYear !== undefined ? data.monthYear : "";
     setMonthYear(selectedMonthYear);
 
@@ -100,9 +126,12 @@ export const MeterReadingReportComponent = () => {
     const currentParams = paramsObject as MeterReadingReportParams;
 
     console.log(currentParams);
+
+    let toastId = "generate-mr-reports";
+
     try {
       toast.loading("Generating all reports...", {
-        id: "generate-mr-reports",
+        id: toastId,
         position: "top-right",
       });
 
@@ -118,17 +147,40 @@ export const MeterReadingReportComponent = () => {
       setHasFetched(true);
 
       toast.success("All reports generated successfully!", {
-        id: "generate-mr-reports",
+        id: toastId,
         position: "top-right",
       });
-    } catch (error) {
+    } catch (error: any) {
+      // Don't show error if it was aborted
+      if (error?.name === "AbortError" || error?.message?.includes("aborted")) {
+        console.log("Request was cancelled");
+        return;
+      }
+
       console.error("Generation error:", error);
-      setIsGenerating(false);
       toast.error("Failed to generate reports", {
-        id: "generate-mr-reports",
+        id: toastId,
         position: "top-right",
       });
+    } finally {
+      isGeneratingRef.current = false;
+      setIsGenerating(false);
+      abortControllerRef.current = null;
     }
+  };
+
+  // Debounced version of handleGenerateAll to prevent rapid clicks
+  const debouncedGenerate = useRef<NodeJS.Timeout | null>(null);
+  const onGenerateClick = (data: FormValues) => {
+    // Clear any pending debounced call
+    if (debouncedGenerate.current) {
+      clearTimeout(debouncedGenerate.current);
+    }
+
+    // Debounce the actual generation
+    debouncedGenerate.current = setTimeout(() => {
+      handleGenerateAll(data);
+    }, 300); // 300ms debounce
   };
 
   useEffect(() => {
@@ -152,10 +204,20 @@ export const MeterReadingReportComponent = () => {
     return () => subscription.unsubscribe();
   }, [form, hasFetched, setHasFetched]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cancelAllRequests();
+      if (debouncedGenerate.current) {
+        clearTimeout(debouncedGenerate.current);
+      }
+    };
+  }, []);
+
   return (
     <FormProvider {...form}>
       <form
-        onSubmit={form.handleSubmit(handleGenerateAll)}
+        onSubmit={form.handleSubmit(onGenerateClick)}
         className="flex h-full flex-col space-y-4"
         id="meter-reading-report-form"
       >

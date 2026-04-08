@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Check, UserRoundSearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { Employee, MeterReader } from "@mr/lib/types/personnel";
+import { MeterReader } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
 import { useFormContext } from "react-hook-form";
