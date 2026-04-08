@@ -39,7 +39,6 @@ export function MeterReadingReportHeader() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-xl font-bold">Meter Reading Report</h3>
-          <div className="mt-1 h-1 w-12 bg-blue-500"></div>
         </div>
 
         <div className="flex items-center gap-2">
