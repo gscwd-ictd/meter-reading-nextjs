@@ -8,11 +8,7 @@ import {
   UpdateReadingProgress,
 } from "@mr/server/types/report.type";
 import db from "@mr/server/db/connections";
-import {
-  viewMeterReadingScheduleSummary,
-  viewReadingAccountProgress,
-  viewReadingZoneBookProgress,
-} from "@mr/server/db/schemas/reports";
+import { viewReadingAccountProgress, viewReadingZoneBookProgress } from "@mr/server/db/schemas/reports";
 import { meterReadingContext } from "@mr/server/context";
 import { and, eq, sql } from "drizzle-orm";
 import { readingDetails } from "@mr/server/db/schemas/reading-details";

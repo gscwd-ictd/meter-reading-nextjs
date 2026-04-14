@@ -393,4 +393,26 @@ export class MeterReadingSummaryRepository implements IMeterReadingSummaryReposi
       },
     });
   }
+
+  async validatePosting() {
+    try {
+      /* 
+        select 
+          c.zone_code, 
+          c.book_code, 
+          count(l.account_no) as number_of_accounts, 
+          sum(coalesce(l.debit,0) - sum(coalesce(l.credit,0)) as amount, sum(l.usage) as usage
+        from ledger as l 
+        left outer join
+        lib_consumers as c on c.account_no = l.account_no
+        where (month(l.timestamp) = '4') and (year(l.timestamp)= '2026') and (c.book_code = '11') and (l.ledger_code = '001')
+      
+      */
+      const res = await db.mssqlConn.query``;
+      return "";
+    } catch (error) {
+      console.error("error in validation", error);
+      throw error;
+    }
+  }
 }
