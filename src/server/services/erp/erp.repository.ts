@@ -1,13 +1,12 @@
 import { IERPRepository } from "@mr/server/interfaces/erp/erp.interface.repository";
-import { ReadingAccount, ReadingAccountSchema } from "@mr/server/types/erp.type";
+import { ErqQuery, ReadingAccount, ReadingAccountSchema } from "@mr/server/types/erp.type";
 import db from "@mr/server/db/connections";
 import { viewReadingAccountProgress } from "@mr/server/db/schemas/reports";
 import { and, eq, sql } from "drizzle-orm";
-import { ReadingAccountQuery } from "@mr/server/types/report.type";
 import { meterReadingContext } from "@mr/server/context";
 
 export class ERPRepository implements IERPRepository {
-  async findAllReadingAccount(query: ReadingAccountQuery): Promise<ReadingAccount[]> {
+  async findAllReadingAccount(query: ErqQuery): Promise<ReadingAccount[]> {
     const [year, month] = query.readingMonth.split("-").map(Number);
     const start = `${year}-${month.toString().padStart(2, "0")}-01`;
     const endMonth = month === 12 ? 1 : month + 1;
