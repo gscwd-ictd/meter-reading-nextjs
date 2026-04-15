@@ -44,9 +44,9 @@ const currentMonthYear = () => {
 };
 
 export const ReadingAccountQuerySchema = z.object({
-  meterReaderId: z.string(),
-  zone: z.coerce.string(),
-  book: z.coerce.string(),
+  meterReaderId: z.string().optional(),
+  zone: z.coerce.string().optional(),
+  book: z.coerce.string().optional(),
   readingMonth: z.coerce.string(),
 });
 
