@@ -1,6 +1,5 @@
-import { ReadingAccount } from "@mr/server/types/erp.type";
-import { ReadingAccountQuery } from "@mr/server/types/report.type";
+import { ErqQuery, ReadingAccount } from "@mr/server/types/erp.type";
 
 export interface IERPRepository {
-  findAllReadingAccount(query: ReadingAccountQuery): Promise<ReadingAccount[]>;
+  findAllReadingAccount(query: ErqQuery): Promise<ReadingAccount[]>;
 }
