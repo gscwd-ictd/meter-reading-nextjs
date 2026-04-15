@@ -31,6 +31,9 @@ import { UploadImageRepository } from "./services/upload-image/upload-image.repo
 import { UploadImageService } from "./services/upload-image/upload-image.service";
 import { ZoneBookRepository } from "./services/zone-book/zone-book.repository";
 import { ZoneBookService } from "./services/zone-book/zone-book.service";
+import { IERPRepository } from "./interfaces/erp/erp.interface.repository";
+import { ERPService } from "./services/erp/erp.service";
+import { ERPRepository } from "./services/erp/erp.repository";
 
 export class MeterReadingContext {
   private static instance: MeterReadingContext;
@@ -47,6 +50,7 @@ export class MeterReadingContext {
   private _uploadImageRepository?: IUploadImageRepository;
   private _reportsRepository?: IReportsRepository;
   private _meterReadingSummaryRepository?: IMeterReadingSummaryRepository;
+  private _erpRepository?: IERPRepository;
 
   // Services
   private _meterReaderService?: MeterReaderService;
@@ -60,6 +64,7 @@ export class MeterReadingContext {
   private _uploadImageService?: UploadImageService;
   private _reportsService?: ReportsService;
   private _meterReadingSummaryService?: MeterReadingSummaryService;
+  private _erpService?: ERPService;
 
   private constructor() {}
 
@@ -147,12 +152,20 @@ export class MeterReadingContext {
     return this._reportsRepository;
   }
 
-  public getMeterReadingSummary(): IMeterReadingSummaryRepository {
+  public getMeterReadingSummaryRepository(): IMeterReadingSummaryRepository {
     if (!this._meterReadingSummaryRepository) {
       this._meterReadingSummaryRepository = new MeterReadingSummaryRepository();
     }
 
     return this._meterReadingSummaryRepository;
+  }
+
+  public getErpRepository(): IERPRepository {
+    if (!this._erpRepository) {
+      this._erpRepository = new ERPRepository();
+    }
+
+    return this._erpRepository;
   }
 
   // Services
@@ -232,10 +245,20 @@ export class MeterReadingContext {
 
   public getMeterReadingSummaryService(): MeterReadingSummaryService {
     if (!this._meterReadingSummaryService) {
-      this._meterReadingSummaryService = new MeterReadingSummaryService(this.getMeterReadingSummary());
+      this._meterReadingSummaryService = new MeterReadingSummaryService(
+        this.getMeterReadingSummaryRepository(),
+      );
     }
 
     return this._meterReadingSummaryService;
+  }
+
+  public getErpService(): ERPService {
+    if (!this._erpService) {
+      this._erpService = new ERPService(this.getErpRepository());
+    }
+
+    return this._erpService;
   }
 }
 

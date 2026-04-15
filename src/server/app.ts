@@ -23,6 +23,7 @@ import { uploadImageHandler } from "./routes/upload-image";
 import { meterReadingSummaryHandler } from "./routes/meter-reading-summary";
 import { reportsHandler } from "./routes/reports";
 import { summaryHandler } from "./routes/summary";
+import { erpHandler } from "./routes/erp";
 
 function createApp() {
   const app = new Hono().basePath("/api");
@@ -67,6 +68,7 @@ function createApp() {
     reportsHandler,
     meterReadingSummaryHandler,
     summaryHandler,
+    erpHandler,
   ] as const;
 
   routes.forEach((route) => app.route("/", route));
