@@ -60,6 +60,7 @@ export const ZonebookProgressDataTable: FunctionComponent<ZonebookProgressDataTa
           setSelectedZonebookEntry(row.original);
           setZonebookProgressEntryDialogIsOpen(true);
         }}
+        enableColumnFilters={true}
       />
     </Suspense>
   );
