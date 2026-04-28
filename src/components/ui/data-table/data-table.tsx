@@ -21,7 +21,9 @@ import { Input } from "@mr/components/ui/Input";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { LoadingSpinner } from "@mr/components/ui/LoadingSpinner";
-import { FileX2 } from "lucide-react";
+import { FileX2, ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react";
+import { cn } from "@mr/lib/utils";
+import { DataTableFilters } from "./data-table-filters";
 
 type DataTableProps<T> = {
   columns: Array<ColumnDef<T, unknown>>;
@@ -34,6 +36,16 @@ type DataTableProps<T> = {
   actionBtn?: ReactNode | ReactNode[];
   title: string;
   onRowClick?: (row: Row<T>) => void;
+  emptyStateMessage?: string;
+  rowClassName?: string | ((row: Row<T>) => string);
+
+  // new filtering props
+  enableColumnFilters?: boolean;
+  columnFilterOptions?: {
+    id: string;
+    title: string;
+    options: Array<{ label: string; value: string }>;
+  }[];
 };
 
 type ColumnVisibilityToggleContextState = {
@@ -55,6 +67,10 @@ export function DataTable<T>({
   actionBtn,
   onRowClick,
   title = "",
+  emptyStateMessage = "No results found",
+  rowClassName,
+  enableColumnFilters = false,
+  columnFilterOptions = [],
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -95,61 +111,83 @@ export function DataTable<T>({
   }, [debounceValue, setGlobalFilter]);
 
   return (
-    <div className="flex h-full min-h-[22rem] flex-col space-y-4">
+    <div className="flex h-full min-h-[24rem] flex-col space-y-4">
       <ColumnVisibilityToggleContext.Provider value={{ enableColumnVisibilityToggle }}>
-        {/* Right-aligned: Search + Actions (flexible for mobile) */}
-        <div className="grid grid-cols-1 items-start gap-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
-          <h3 className="order-1 text-xl font-bold">{title}</h3>
-
-          {/* Search Input (full width on mobile, fixed width on desktop) */}
-          <div className="order-2 flex flex-col justify-end gap-2 sm:flex-col md:flex-col lg:flex-row">
-            {enableGlobalFilter && (
-              <Input
-                placeholder="Search..."
-                value={debounceValue ?? ""}
-                onChange={(event) => setDebounceValue(event.target.value)}
-                className="order-2 sm:order-2 sm:w-full md:order-2 md:w-full lg:order-1 lg:w-64" // Fixed width on desktop
-              />
-            )}
-
-            {actionBtn && (
-              <div className="order-1 flex justify-end sm:order-1 md:order-1 lg:order-2">{actionBtn}</div>
+        {/* Header Section with improved spacing */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+            {!loading && data.length > 0 && (
+              <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs font-medium">
+                {data.length} items
+              </span>
             )}
           </div>
 
-          <div className="order-3" />
-
-          <div className="order-4 col-span-full">
-            <DataTableToolbar table={table} />
+          {/* Search and Actions - improved responsive layout */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            {enableGlobalFilter && (
+              <div className="relative">
+                <Input
+                  placeholder="Search..."
+                  value={debounceValue ?? ""}
+                  onChange={(event) => setDebounceValue(event.target.value)}
+                  className="h-9 w-full sm:w-64 lg:w-80"
+                />
+              </div>
+            )}
+            {actionBtn && <div className="flex items-center gap-2">{actionBtn}</div>}
           </div>
         </div>
+
+        {/* Toolbar Section */}
+        <DataTableToolbar table={table} />
       </ColumnVisibilityToggleContext.Provider>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-auto rounded-md border">
+      {/* Main Table Container with improved scrolling */}
+      <div className="bg-background relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
         {loading || !table.getRowModel().rows?.length ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
             {loading ? (
-              <LoadingSpinner className="text-primary size-20" />
+              <>
+                <LoadingSpinner className="text-primary h-12 w-12" />
+                <p className="text-muted-foreground text-sm">Loading data...</p>
+              </>
             ) : (
-              <div className="flex items-center justify-center gap-2">
-                <FileX2 className="text-muted-foreground h-7 w-7 dark:text-white" />
-                <span className="text-muted-foreground text-2xl font-extrabold tracking-wide dark:text-white">
-                  No Results
-                </span>
-              </div>
+              <>
+                <div className="bg-muted rounded-full p-4">
+                  <FileX2 className="text-muted-foreground h-8 w-8" />
+                </div>
+                <div className="text-center">
+                  <p className="text-foreground text-lg font-medium">{emptyStateMessage}</p>
+                  {debounceValue && (
+                    <p className="text-muted-foreground mt-1 text-sm">Try adjusting your search or filters</p>
+                  )}
+                </div>
+              </>
             )}
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <Table className="min-w-full [&_td]:px-4 [&_th]:px-4">
-              <TableHeader>
+          <div className="w-full overflow-auto">
+            <Table className="min-w-full">
+              <TableHeader className="bg-background sticky top-0 z-10">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow key={headerGroup.id} className="border-b hover:bg-transparent">
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      <TableHead
+                        key={header.id}
+                        className={cn(
+                          "h-10 px-4 py-1 text-xs font-medium tracking-wide text-gray-800",
+                          header.column.getCanSort() && "hover:text-foreground cursor-pointer select-none",
+                          header.column.getIsSorted() && "text-foreground",
+                        )}
+                      >
+                        <div className="flex items-center">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                          {/* {header.column.getCanSort() && getSortIcon(header.column.getIsSorted())} */}
+                        </div>
                       </TableHead>
                     ))}
                   </TableRow>
@@ -160,10 +198,19 @@ export function DataTable<T>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={onRowClick ? () => onRowClick(row) : () => null}
+                    onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    className={cn(
+                      "border-b transition-colors",
+                      onRowClick && "hover:bg-muted/50 cursor-pointer",
+                      rowClassName && typeof rowClassName === "string"
+                        ? rowClassName
+                        : typeof rowClassName === "function"
+                          ? rowClassName(row)
+                          : "",
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="max-w-[30rem] truncate">
+                      <TableCell key={cell.id} className="px-4 py-2 text-sm">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -175,7 +222,8 @@ export function DataTable<T>({
         )}
       </div>
 
-      {enablePagination && (
+      {/* Pagination Section with improved styling */}
+      {enablePagination && data.length > 0 && (
         <div className="pt-4">
           <DataTablePagination table={table} />
         </div>
