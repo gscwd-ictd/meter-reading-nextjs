@@ -44,7 +44,7 @@ const renderSubmenuItems = (children: NavItem[], router: any, showSplash: any, p
           className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
         >
           {child.icon && <child.icon />}
-          <span className="text-sm font-medium">{child.title}</span>
+          <span className="text-sm">{child.title}</span>
         </Link>
       </SidebarMenuButton>
     ))}
@@ -116,12 +116,12 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                                   onClick={(e) => e.preventDefault()}
                                 >
                                   {item.icon && <item.icon />}
-                                  <span className="flex-1 font-sans font-medium">{item.title}</span>
+                                  <span className="flex-1 font-sans">{item.title}</span>
                                 </Link>
                               ) : (
                                 <a href={item.url}>
                                   {item.icon && <item.icon />}
-                                  <span className="flex-1 font-sans font-medium">{item.title}</span>
+                                  <span className="flex-1 font-sans">{item.title}</span>
                                   {isSubmenuOpen ? (
                                     <ChevronDownIcon className="h-4 w-4 opacity-70" />
                                   ) : (
@@ -188,7 +188,7 @@ export const NavMain: FunctionComponent<NavProps & ComponentPropsWithoutRef<type
                       className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm">{item.title}</span>
                       {item.count && (
                         <SidebarMenuBadge className="bg-destructive text-white">
                           {item.count}
@@ -263,7 +263,7 @@ export const NavMonitoringAndReports: FunctionComponent<
                               onClick={() => !isCollapsed && toggleSubmenu(item.title)}
                             >
                               {item.icon && <item.icon />}
-                              <span className="flex-1 font-sans font-medium">{item.title}</span>
+                              <span className="flex-1 font-sans">{item.title}</span>
                               {!isCollapsed &&
                                 (isSubmenuOpen ? (
                                   <ChevronDownIcon className="h-4 w-4 opacity-70" />
@@ -317,7 +317,7 @@ export const NavMonitoringAndReports: FunctionComponent<
                       className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm">{item.title}</span>
                       {item.count && (
                         <SidebarMenuBadge className="bg-destructive text-white">
                           {item.count}
@@ -445,7 +445,7 @@ export const NavMaintenance: FunctionComponent<NavProps & ComponentPropsWithoutR
                       className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm">{item.title}</span>
                       {item.count && (
                         <SidebarMenuBadge className="bg-destructive text-white">
                           {item.count}
@@ -520,7 +520,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                               onClick={() => !isCollapsed && toggleSubmenu(item.title)}
                             >
                               {item.icon && <item.icon />}
-                              <span className="flex-1 font-medium">{item.title}</span>
+                              <span className="flex-1">{item.title}</span>
                               {!isCollapsed &&
                                 (isSubmenuOpen ? (
                                   <ChevronDownIcon className="h-4 w-4 opacity-70" />
@@ -575,7 +575,7 @@ export const NavSecondary: FunctionComponent<NavProps & ComponentPropsWithoutRef
                       className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm">{item.title}</span>
                       {item.count && (
                         <SidebarMenuBadge className="bg-destructive text-white">
                           {item.count}
@@ -702,7 +702,7 @@ export const NavDashboard: FunctionComponent<NavProps & ComponentPropsWithoutRef
                       className="flex w-full items-center gap-2 text-gray-900 dark:text-gray-200"
                     >
                       {item.icon && <item.icon className="size-4" />}
-                      <span className="text-sm font-medium">{item.title}</span>
+                      <span className="text-sm">{item.title}</span>
                       {item.count && (
                         <SidebarMenuBadge className="bg-destructive text-white">
                           {item.count}
