@@ -116,9 +116,9 @@ export function DataTable<T>({
         {/* Header Section with improved spacing */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+            <h3 className="text-lg font-semibold tracking-tight dark:text-white">{title}</h3>
             {!loading && data.length > 0 && (
-              <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs font-medium">
+              <span className="bg-muted text-muted-foreground rounded-full px-2.5 py-0.5 text-xs font-medium dark:bg-gray-800 dark:text-gray-300">
                 {data.length} items
               </span>
             )}
@@ -132,7 +132,7 @@ export function DataTable<T>({
                   placeholder="Search..."
                   value={debounceValue ?? ""}
                   onChange={(event) => setDebounceValue(event.target.value)}
-                  className="h-9 w-full sm:w-64 lg:w-80"
+                  className="h-9 w-full sm:w-64 lg:w-80 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-400"
                 />
               </div>
             )}
@@ -145,23 +145,25 @@ export function DataTable<T>({
       </ColumnVisibilityToggleContext.Provider>
 
       {/* Main Table Container with improved scrolling */}
-      <div className="bg-background relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
+      <div className="bg-background relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border dark:border-gray-700 dark:bg-gray-900">
         {loading || !table.getRowModel().rows?.length ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
             {loading ? (
               <>
                 <LoadingSpinner className="text-primary h-12 w-12" />
-                <p className="text-muted-foreground text-sm">Loading data...</p>
+                <p className="text-muted-foreground text-sm dark:text-gray-400">Loading data...</p>
               </>
             ) : (
               <>
-                <div className="bg-muted rounded-full p-4">
-                  <FileX2 className="text-muted-foreground h-8 w-8" />
+                <div className="bg-muted rounded-full p-4 dark:bg-gray-800">
+                  <FileX2 className="text-muted-foreground h-8 w-8 dark:text-gray-400" />
                 </div>
                 <div className="text-center">
-                  <p className="text-foreground text-lg font-medium">{emptyStateMessage}</p>
+                  <p className="text-foreground text-lg font-medium dark:text-white">{emptyStateMessage}</p>
                   {debounceValue && (
-                    <p className="text-muted-foreground mt-1 text-sm">Try adjusting your search or filters</p>
+                    <p className="text-muted-foreground mt-1 text-sm dark:text-gray-400">
+                      Try adjusting your search or filters
+                    </p>
                   )}
                 </div>
               </>
@@ -170,23 +172,27 @@ export function DataTable<T>({
         ) : (
           <div className="w-full overflow-auto">
             <Table className="min-w-full">
-              <TableHeader className="bg-background sticky top-0 z-10">
+              <TableHeader className="bg-background sticky top-0 z-10 dark:bg-gray-900">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b hover:bg-transparent">
+                  <TableRow
+                    key={headerGroup.id}
+                    className="border-b hover:bg-transparent dark:border-gray-700"
+                  >
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
                         className={cn(
-                          "h-10 px-4 py-1 text-xs font-medium tracking-wide text-gray-800",
-                          header.column.getCanSort() && "hover:text-foreground cursor-pointer select-none",
-                          header.column.getIsSorted() && "text-foreground",
+                          "h-10 px-4 py-1 text-xs font-medium tracking-wide",
+                          "text-gray-600 dark:text-gray-300",
+                          header.column.getCanSort() &&
+                            "cursor-pointer select-none hover:text-gray-900 dark:hover:text-white",
+                          header.column.getIsSorted() && "text-gray-900 dark:text-white",
                         )}
                       >
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                           {header.isPlaceholder
                             ? null
                             : flexRender(header.column.columnDef.header, header.getContext())}
-                          {/* {header.column.getCanSort() && getSortIcon(header.column.getIsSorted())} */}
                         </div>
                       </TableHead>
                     ))}
@@ -200,8 +206,8 @@ export function DataTable<T>({
                     data-state={row.getIsSelected() && "selected"}
                     onClick={onRowClick ? () => onRowClick(row) : undefined}
                     className={cn(
-                      "border-b transition-colors",
-                      onRowClick && "hover:bg-muted/50 cursor-pointer",
+                      "border-b transition-colors dark:border-gray-700",
+                      onRowClick && "hover:bg-muted/50 cursor-pointer dark:hover:bg-gray-800/50",
                       rowClassName && typeof rowClassName === "string"
                         ? rowClassName
                         : typeof rowClassName === "function"
@@ -210,7 +216,7 @@ export function DataTable<T>({
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-2 text-sm">
+                      <TableCell key={cell.id} className="px-4 py-2 text-sm dark:text-gray-300">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
