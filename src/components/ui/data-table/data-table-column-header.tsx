@@ -31,7 +31,7 @@ export function DataTableColumnHeader<T, K>({ column, title, className }: DataTa
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-2.5 h-10 px-4 py-1 text-xs font-medium tracking-wide text-gray-800"
+            className="-ml-2.5 h-10 px-4 py-1 text-xs font-medium tracking-wide text-gray-800 dark:text-gray-300"
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (
