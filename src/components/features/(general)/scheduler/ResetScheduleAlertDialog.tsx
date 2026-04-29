@@ -14,7 +14,7 @@ import {
 } from "@mr/components/ui/AlertDialog";
 
 import { RotateCcwIcon } from "lucide-react";
-import { Dispatch, FunctionComponent, SetStateAction } from "react";
+import { FunctionComponent } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
@@ -30,6 +30,7 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const setHasSchedule = useSchedulesStore((state) => state.setHasSchedule);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const setLastFetchedMonthYear = useSchedulesStore((state) => state.setLastFetchedMonthYear);
+  const noDueDiscDays = useSchedulesStore((state) => state.noDueDiscDays);
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
@@ -57,7 +58,7 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
 
     setLastFetchedMonthYear(null);
 
-    setNoDueDiscDays([0, 6]);
+    setNoDueDiscDays(noDueDiscDays);
   };
 
   const removeMonthlySchedule = async () => {

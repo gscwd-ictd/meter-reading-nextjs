@@ -29,6 +29,8 @@ export function MonthYearPicker({
   const [open, setOpen] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
+  const noDueDiscDays = useSchedulesStore((state) => state.noDueDiscDays);
+  const setNoDueDiscDays = useSchedulesStore((state) => state.setNoDueDiscDays);
   const reset = useSchedulesStore((state) => state.reset);
   const refetchData = useSchedulesStore((state) => state.refetchData);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -56,6 +58,8 @@ export function MonthYearPicker({
     reset();
     refetchData?.();
     setCurrentMonthYear(formatted);
+    console.log(noDueDiscDays);
+    setNoDueDiscDays(noDueDiscDays);
     updateUrl(formatted);
     setOpen(false);
   };
