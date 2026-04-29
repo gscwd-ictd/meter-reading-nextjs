@@ -12,7 +12,7 @@ import {
 import { Button } from "../Button";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { useCallback, useState, useEffect } from "react";
-import { Scheduler } from "@mr/components/features/(general)/scheduler/useScheduler";
+import { Scheduler } from "@mr/components/features/(general)/scheduler/useNewScheduler";
 
 type CustomDaySelecionSettingProps = {
   scheduler: Scheduler;
