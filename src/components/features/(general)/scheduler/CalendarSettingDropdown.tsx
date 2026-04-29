@@ -11,9 +11,9 @@ import { FunctionComponent } from "react";
 import { ResetScheduleAlertDialog } from "./ResetScheduleAlertDialog";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { PopulateScheduleAlertDialog } from "./PopulateScheduleAlertDialog";
-import { Scheduler } from "./useScheduler";
 import { PopulateSchedByDays } from "./PopulateSchedByDays";
 import { ManualScheduleAlertDialog } from "./ManualScheduleAlertDialog";
+import { Scheduler } from "./useNewScheduler";
 
 type CalendarSettingDropdownProps = {
   scheduler: Scheduler;

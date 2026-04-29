@@ -15,7 +15,6 @@ import {
 
 import { RotateCcwIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
-import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";

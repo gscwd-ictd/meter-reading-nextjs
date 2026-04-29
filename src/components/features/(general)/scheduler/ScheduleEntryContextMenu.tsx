@@ -9,9 +9,9 @@ import { isSameDay, isSameMonth, isSaturday, isSunday, startOfMonth } from "date
 import { SquareSplitHorizontalIcon } from "lucide-react";
 import { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { toast } from "sonner";
-import { Scheduler } from "./useScheduler";
 import { MeterReadingEntryWithZonebooks } from "@mr/lib/types/schedule";
 import { ScheduleEntryTile } from "./ScheduleEntryTile";
+import { Scheduler } from "./useNewScheduler";
 
 type ScheduleEntryContextMenuProps = {
   idx: number;
