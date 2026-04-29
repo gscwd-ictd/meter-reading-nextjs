@@ -223,7 +223,7 @@ export const Scheduler: FunctionComponent<SchedulerProps> = ({ holidays, holiday
 
     setLastFetchedMonthYear(null);
 
-    setNoDueDiscDays([0, 6]);
+    setNoDueDiscDays(noDueDiscDays);
   };
 
   // update the state of currentSchedule based on the fetched schedule

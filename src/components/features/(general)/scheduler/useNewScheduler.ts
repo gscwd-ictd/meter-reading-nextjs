@@ -30,6 +30,7 @@ import { normalizeToYyyyMmDd } from "@mr/lib/functions/normalizeToYyyyMmDd";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { MeterReader, MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import formatAndSortDates from "@mr/lib/functions/dateArraySorter";
+import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 
 const MAXIMUM_READING_DAYS_COUNT = 21; // minus 1
 
@@ -50,6 +51,9 @@ export const useNewScheduler = (holidays: HolidayFromHrms[], noDueDays: number[]
 
   const [currentMonthYear, setCurrentMonthYear] = useState<string | null>(monthYear);
   const router = useRouter();
+
+  const noDueDiscDays = useSchedulesStore((state) => state.noDueDiscDays);
+  const setNoDueDiscDays = useSchedulesStore((state) => state.setNoDueDiscDays);
 
   useEffect(() => {
     router.replace(`/schedules?date=${currentMonthYear}`);
@@ -970,16 +974,19 @@ export const useNewScheduler = (holidays: HolidayFromHrms[], noDueDays: number[]
   const goToPreviousMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
     setCurrentMonthYear(format(subMonths(currentDate, 1), "yyyy-MM"));
+    setNoDueDiscDays(noDueDiscDays);
   };
 
   const goToNextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
     setCurrentMonthYear(format(addMonths(currentDate, 1), "yyyy-MM"));
+    setNoDueDiscDays(noDueDiscDays);
   };
 
   const today = () => {
     setCurrentDate(new Date());
     setCurrentMonthYear(format(new Date(), "yyyy-MM"));
+    setNoDueDiscDays(noDueDiscDays);
   };
 
   return {
