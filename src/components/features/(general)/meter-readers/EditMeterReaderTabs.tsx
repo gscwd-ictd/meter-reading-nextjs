@@ -30,87 +30,110 @@ export const EditMeterReaderTabs: FunctionComponent<EditMeterReaderTabsProps> = 
     formState: { errors },
   } = useFormContext();
 
+  const hasSelectedReader = selectedMeterReader !== undefined;
+  const isLoading = meterReaderIsLoading || zonebookIsLoading;
+
+  const formatZonebooks = () => {
+    if (!meterReaderZonebooks || meterReaderZonebooks.length === 0) return "No zone books assigned";
+    if (meterReaderZonebooks.length === 1) return meterReaderZonebooks[0].zoneBook;
+    return `${meterReaderZonebooks.length} Zonebooks`;
+  };
+
+  if (meterReaderIsLoading) {
+    return (
+      <div className="flex min-h-[300px] w-full items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {meterReaderIsLoading && (
-        <div className="flex w-full justify-center">
-          <LoadingSpinner />
-        </div>
-      )}
-      <div className="grid gap-4 py-4">
-        <div className="flex flex-col items-start gap-0">
-          <Label htmlFor="name" className="text-left text-sm font-medium text-gray-700">
-            Name
+    <div className="space-y-5 py-2">
+      {/* Full Name */}
+      <div className="space-y-1.5">
+        <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+          Full Name
+        </Label>
+        <Input
+          id="name"
+          disabled
+          defaultValue={hasSelectedReader ? selectedMeterReader.name : ""}
+          className="bg-gray-50"
+          placeholder="No meter reader selected"
+        />
+      </div>
+
+      {/* Company ID and Contact Number - Two columns */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="companyId" className="text-sm font-medium text-gray-700">
+            Company ID
           </Label>
           <Input
-            id="name"
-            className="col-span-3"
+            id="companyId"
             disabled
-            defaultValue={selectedMeterReader !== undefined ? selectedMeterReader.name : ""}
+            defaultValue={hasSelectedReader ? selectedMeterReader.companyId : ""}
+            className="bg-gray-50 font-mono text-sm"
+            placeholder="—"
           />
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          <div className="col-span-2 flex flex-col items-start gap-0">
-            <Label htmlFor="companyId" className="text-left text-sm font-medium text-gray-700">
-              ID No
-            </Label>
-            <Input
-              id="companyId"
-              className="col-span-3"
-              disabled
-              defaultValue={selectedMeterReader !== undefined ? selectedMeterReader.companyId : ""}
-            />
-          </div>
-
-          <div className="col-span-2 flex flex-col items-start gap-0">
-            <ContactNumberInput
-              id="mobileNumber"
-              label="Contact Number"
-              minLength={11}
-              maxLength={11}
-              disabled={meterReaderIsLoading ? true : false}
-              controller={{
-                ...register("mobileNumber", {
-                  value: mobileNumber,
-                  onChange: (e) => setMobileNumber(e.target.value),
-                }),
-              }}
-              isError={errors.mobileNumber ? true : false}
-              errorMessage={errors.mobileNumber?.message?.toString()}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start gap-0">
-          <Label htmlFor="positionTitle" className="text-left text-sm font-medium text-gray-700">
-            Position Title
-          </Label>
-          <Input
-            id="positionTitle"
-            className="col-span-3"
-            disabled
-            defaultValue={selectedMeterReader !== undefined ? selectedMeterReader.positionTitle : ""}
+        <div className="space-y-1.5">
+          <ContactNumberInput
+            id="mobileNumber"
+            label="Contact Number"
+            minLength={11}
+            maxLength={11}
+            disabled={!hasSelectedReader || isLoading}
+            controller={{
+              ...register("mobileNumber", {
+                value: mobileNumber,
+                onChange: (e) => setMobileNumber(e.target.value),
+              }),
+            }}
+            isError={!!errors.mobileNumber}
+            errorMessage={errors.mobileNumber?.message?.toString()}
           />
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col items-start gap-0">
-            <EditZonebookSelector loading={zonebookIsLoading} />
+      {/* Position Title */}
+      <div className="space-y-1.5">
+        <Label htmlFor="positionTitle" className="text-sm font-medium text-gray-700">
+          Position Title
+        </Label>
+        <Input
+          id="positionTitle"
+          disabled
+          defaultValue={hasSelectedReader ? selectedMeterReader.positionTitle : ""}
+          className="bg-gray-50"
+          placeholder="—"
+        />
+      </div>
 
-            <Input
-              id="meterReaderZonebooks"
-              className="w-full cursor-default truncate hover:cursor-pointer"
-              readOnly
-              disabled={meterReaderIsLoading ? true : false}
-              onClick={() => setZonebookSelectorIsOpen(true)}
-              value={
-                meterReaderZonebooks !== undefined
-                  ? meterReaderZonebooks.map((mrzb) => mrzb.zoneBook)
-                  : "Empty"
-              }
-            />
+      {/* Zone Books and Rest Days - Two columns */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <EditZonebookSelector loading={zonebookIsLoading} />
+          <div
+            className={`border-input bg-background ring-offset-background relative flex h-10 w-full rounded-md border px-3 py-2 text-sm ${
+              hasSelectedReader && !isLoading
+                ? "cursor-pointer hover:bg-gray-50"
+                : "cursor-not-allowed opacity-50"
+            }`}
+            onClick={() => hasSelectedReader && !isLoading && setZonebookSelectorIsOpen(true)}
+          >
+            <span className="truncate">
+              {!hasSelectedReader
+                ? "Select a meter reader first"
+                : isLoading
+                  ? "Loading..."
+                  : formatZonebooks()}
+            </span>
           </div>
+        </div>
+
+        <div className="space-y-1.5">
           <EditSelectRestDayCombobox />
         </div>
       </div>

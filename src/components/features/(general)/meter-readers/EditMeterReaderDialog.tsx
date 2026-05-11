@@ -262,7 +262,7 @@ export const EditMeterReaderDialog: FunctionComponent<EditMeterReaderDialogProps
         }}
       >
         <DialogHeader className="flex flex-col gap-0">
-          <DialogTitle className="text-primary text-xl font-bold dark:text-white">
+          <DialogTitle className="text-lg font-semibold text-gray-700 dark:text-white">
             Edit Meter Reader
           </DialogTitle>
 
