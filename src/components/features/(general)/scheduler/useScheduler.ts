@@ -32,7 +32,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { HolidayFromHrms, NonBusinessDays } from "./holidays";
 import { normalizeToYyyyMmDd } from "@mr/lib/functions/normalizeToYyyyMmDd";
 import formatAndSortDates from "@mr/lib/functions/dateArraySorter";
-import { log } from "console";
 
 type MeterReadingDate = { readingDate: Date };
 type DueDate = { readingDate: Date; dueDate: Date };
@@ -963,8 +962,9 @@ export const useScheduler = (
       const uniqueDates = removeDuplicateDates(selectedDates);
       const sortedSelectedDates = [...uniqueDates].sort(compareAsc);
 
-      let split = [...schedule];
+      let sched = [...schedule];
 
+      // This normalizes the date, if a date's type is an array it returns the first index
       const normalizeDate = (value: Date | Date[] | undefined): Date | undefined => {
         if (!value) return undefined;
         return Array.isArray(value) ? value[0] : value;
@@ -978,9 +978,11 @@ export const useScheduler = (
         while (daysAdded < daysToAdd) {
           result = addDays(result, 1);
 
-          // Check if the next day is a valid working day
-          const isValidWorkingDay = !isHoliday(result) && !isNoDutyDay(result) && !isWeekend(result);
+          // Check if the next day is a valid working day - if it is not a holiday, not a duty day, not a weekend, and not a no due disc day
+          const isValidWorkingDay =
+            !isHoliday(result) && !isNoDutyDay(result) && !isWeekend(result) && !isNoDueDiscDay(result);
 
+          // Increment the daysAdded if it is a valid working day
           if (isValidWorkingDay) {
             daysAdded++;
           }
@@ -989,14 +991,15 @@ export const useScheduler = (
         return result;
       };
 
-      const findPreviousValidReading = (
-        readings: MeterReadingSchedule[],
+      // finds the previous valid entry from the schedule
+      const findPreviousValidEntry = (
+        schedule: MeterReadingSchedule[],
         idx: number,
         condition?: (r: MeterReadingSchedule) => boolean,
       ) => {
         let lookBack = 1;
         while (idx - lookBack >= 0) {
-          const candidate = readings[idx - lookBack];
+          const candidate = schedule[idx - lookBack];
           if (
             candidate &&
             (condition ? condition(candidate) : candidate.dueDate || candidate.disconnectionDate)
@@ -1009,21 +1012,26 @@ export const useScheduler = (
       };
 
       for (let i = 0; i < sortedSelectedDates.length; i++) {
-        const result: MeterReadingSchedule[] = [];
+        const newSched: MeterReadingSchedule[] = [];
         let startIndex = 0;
 
         const currentSelectedDate = sortedSelectedDates[i]!;
 
-        for (let j = startIndex; j < split.length; j++) {
-          if (isBefore(split[j]!.readingDate, currentSelectedDate)) {
-            result.push(split[j]!);
+        // Push elements inside the result array if the inner current index reading-date is before the outer current index selected-splitted-date
+        for (let j = startIndex; j < sched.length; j++) {
+          if (isBefore(sched[j]!.readingDate, currentSelectedDate)) {
+            newSched.push(sched[j]!);
           }
 
-          if (isSameDay(currentSelectedDate, split[j]?.readingDate as Date)) {
-            const curr = split[j];
-            let prev = findPreviousValidReading(split, j);
+          // if the outer current index splitted-date is the same day with the inner index reading-date
+          if (isSameDay(currentSelectedDate, sched[j]?.readingDate as Date)) {
+            const curr = sched[j];
 
-            const currentReading: MeterReadingSchedule = {
+            // gets the previous valid entry based on the outer current index of schedule
+            let prev = findPreviousValidEntry(sched, j);
+
+            // assign the splitted due and disconnection dates to the current entry then push it
+            const currentEntry: MeterReadingSchedule = {
               readingDate: curr.readingDate,
               dueDate: [curr.dueDate, prev?.dueDate].filter(Boolean).slice(0, 2) as Date[],
               disconnectionDate: [curr.disconnectionDate, prev?.disconnectionDate]
@@ -1031,15 +1039,17 @@ export const useScheduler = (
                 .slice(0, 2) as Date[],
             };
 
-            result.push(currentReading);
+            newSched.push(currentEntry);
 
+            // increment the inner current index by 1 and assign it to the startIndex
             startIndex = j + 1;
 
-            for (let k = startIndex; k < split.length; k++) {
-              const curr = split[k];
+            // move to another index
+            for (let k = startIndex; k < sched.length; k++) {
+              const currEntry = sched[k];
 
-              if (!curr?.dueDate && !curr?.disconnectionDate) {
-                result.push(curr!);
+              if (!currEntry?.dueDate && !currEntry?.disconnectionDate) {
+                newSched.push(currEntry!);
                 continue;
               }
 
@@ -1048,14 +1058,14 @@ export const useScheduler = (
 
               const prevDue = normalizeDate(prev?.dueDate);
               const prevDisc = normalizeDate(prev?.disconnectionDate);
-              const currDue = normalizeDate(curr?.dueDate);
-              const currDisc = normalizeDate(curr?.disconnectionDate);
+              const currEntryDue = normalizeDate(currEntry?.dueDate);
+              const currEntryDisc = normalizeDate(currEntry?.disconnectionDate);
 
               if (isSunday(curr.readingDate)) {
-                // Sunday → Copy last Saturday's dates if available
-                const lastSaturday = findPreviousValidReading(
-                  result,
-                  result.length,
+                // Sunday → Copy last Saturday's dates if.0 available
+                const lastSaturday = findPreviousValidEntry(
+                  newSched,
+                  newSched.length,
                   (d) => getDay(d.readingDate) === 6,
                 );
                 if (lastSaturday) {
@@ -1080,25 +1090,29 @@ export const useScheduler = (
                   while (
                     isHoliday(newDisconnectionDate) ||
                     isNoDutyDay(newDisconnectionDate) ||
-                    isWeekend(newDisconnectionDate)
+                    isWeekend(newDisconnectionDate) ||
+                    isNoDueDiscDay(newDisconnectionDate)
                   ) {
                     newDisconnectionDate = addWorkingDaysForDisconnection(newDisconnectionDate, 1);
                   }
                 } else {
                   // Fallback to original schedule
-                  newDueDate = currDue ? adjustForHolidayOrWeekend(currDue) : undefined;
+                  newDueDate = currEntryDue ? adjustForHolidayOrWeekend(currEntryDue) : undefined;
                   if (newDueDate) {
                     newDisconnectionDate = addWorkingDaysForDisconnection(newDueDate, 3);
 
                     while (
                       isHoliday(newDisconnectionDate) ||
                       isNoDutyDay(newDisconnectionDate) ||
-                      isWeekend(newDisconnectionDate)
+                      isWeekend(newDisconnectionDate) ||
+                      isNoDueDiscDay(newDisconnectionDate)
                     ) {
                       newDisconnectionDate = addWorkingDaysForDisconnection(newDisconnectionDate, 1);
                     }
                   } else {
-                    newDisconnectionDate = currDisc ? adjustForHolidayOrWeekend(currDisc) : undefined;
+                    newDisconnectionDate = currEntryDisc
+                      ? adjustForHolidayOrWeekend(currEntryDisc)
+                      : undefined;
                   }
                 }
               }
@@ -1109,7 +1123,7 @@ export const useScheduler = (
                 disconnectionDate: newDisconnectionDate,
               };
 
-              result.push(nextReadingDate);
+              newSched.push(nextReadingDate);
 
               // Update prev so subsequent days shift correctly
               prev = nextReadingDate;
@@ -1117,10 +1131,10 @@ export const useScheduler = (
           }
         }
 
-        split = [...result];
+        sched = [...newSched];
       }
 
-      return split;
+      return sched;
     },
     [calculateSchedule, removeDuplicateDates, adjustForHolidayOrWeekend, isHoliday, isNoDutyDay],
   );

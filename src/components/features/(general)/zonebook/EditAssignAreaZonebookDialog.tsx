@@ -30,7 +30,6 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
     queryFn: async () => {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${selectedZonebook?.id}`);
-
         return res.data;
       } catch (error) {
         console.log(error);
@@ -59,12 +58,11 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
       const res = await axios.patch(`${process.env.NEXT_PUBLIC_MR_BE}/zone-book/${zonebook.id}`, {
         area: zonebook.area.id ? zonebook.area : { ...zonebook.area, id: null },
       });
-
       return res.data;
     },
     onSuccess: () => {
       toast.success("Success", {
-        description: `You have successfully reassigned the area to ${selectedArea.name ? `${selectedArea.name}` : "an empty area"} on zone book ${selectedZonebook?.zoneBook}`,
+        description: `Successfully reassigned ${selectedArea.name ? `"${selectedArea.name}"` : "no area"} to zone book ${selectedZonebook?.zoneBook}`,
         position: "top-right",
       });
 
@@ -84,9 +82,12 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    if (zonebook && editAssignAreaZonebookDialogIsOpen)
+    if (zonebook && editAssignAreaZonebookDialogIsOpen) {
       setSelectedArea({ name: zonebook.area.name, id: zonebook.area.id });
+    }
   }, [zonebook, editAssignAreaZonebookDialogIsOpen, setSelectedArea]);
+
+  const isSubmitting = patchAreaToZonebookMutation.isPending;
 
   return (
     <Dialog
@@ -97,50 +98,71 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
         setSelectedZonebook(null);
       }}
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-primary dark:text-white">Reassign Area to Zonebook</DialogTitle>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="-space-y-2">
+          <DialogTitle className="text-lg font-semibold text-gray-700 dark:text-white">
+            Reassign Area to Zonebook
+          </DialogTitle>
+          <p className="text-muted-foreground text-sm">Change the area assignment for this zone book.</p>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="zoneBook" className="text-right">
-              Zone Book
-            </Label>
-            <Input id="zoneBook" defaultValue={selectedZonebook?.zoneBook} disabled className="col-span-3" />
-          </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="zone" className="text-right">
+        <div className="space-y-5 py-2">
+          {/* Zone */}
+          <div className="space-y-1.5">
+            <Label htmlFor="zone" className="text-sm font-medium text-gray-700">
               Zone
             </Label>
-            <Input id="zone" defaultValue={selectedZonebook?.zone} disabled className="col-span-3" />
+            <Input
+              id="zone"
+              defaultValue={selectedZonebook?.zone}
+              disabled
+              className="bg-gray-50"
+              placeholder="—"
+            />
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="book" className="text-right">
+          {/* Book */}
+          <div className="space-y-1.5">
+            <Label htmlFor="book" className="text-sm font-medium text-gray-700">
               Book
             </Label>
-            <Input id="book" defaultValue={selectedZonebook?.book} disabled className="col-span-3" />
+            <Input
+              id="book"
+              defaultValue={selectedZonebook?.book}
+              disabled
+              className="bg-gray-50"
+              placeholder="—"
+            />
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="area" className="text-right">
-              Area
-            </Label>
-            <div className="col-span-3">
-              {areaList && (
-                <SearchAreaCombobox areaList={areaList} isLoading={isLoading} isPending={isPending} />
-              )}
+          {/* Current Area (optional - shows existing assignment) */}
+          {zonebook?.area?.name && (
+            <div className="rounded-md bg-blue-50 p-3 dark:bg-blue-950/20">
+              <p className="text-xs font-medium text-blue-700 dark:text-blue-300">Current Assignment</p>
+              <p className="text-sm text-blue-900 dark:text-blue-200">{zonebook.area.name}</p>
             </div>
+          )}
+
+          {/* Area Selection */}
+          <div className="space-y-1.5">
+            <Label htmlFor="area" className="text-sm font-medium text-gray-700">
+              New Area
+            </Label>
+            {areaList && (
+              <SearchAreaCombobox areaList={areaList} isLoading={isLoading} isPending={isPending} />
+            )}
+            <p className="text-xs text-gray-400">Select an area to assign to this zone book</p>
           </div>
         </div>
-        <DialogFooter>
+
+        <DialogFooter className="gap-2 sm:gap-2">
           <Button
             variant="outline"
             onClick={() => {
               setSelectedArea({} as Area);
               setEditAssignAreaZonebookDialogIsOpen(false);
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
@@ -150,16 +172,15 @@ export const EditAssignAreaZonebookDialog: FunctionComponent = () => {
               await patchAreaToZonebookMutation.mutateAsync({
                 zone: selectedZonebook!.zone!,
                 book: selectedZonebook!.book!,
-                // areaId: selectedArea.areaId,
                 zoneBook: selectedZonebook!.zoneBook!,
                 area: selectedArea,
-                // zoneBookId: selectedZonebook?.zoneBookId,
                 id: selectedZonebook?.id,
                 day: selectedZonebook && selectedZonebook.day ? selectedZonebook.day : null,
               });
             }}
+            disabled={isSubmitting}
           >
-            Assign area
+            {isSubmitting ? "Reassigning..." : "Reassign"}
           </Button>
         </DialogFooter>
       </DialogContent>
