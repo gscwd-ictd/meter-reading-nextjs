@@ -77,7 +77,7 @@ export const useSchedulesStore = create<SchedulesStore>((set) => ({
   setCalendarSchedule: (calendarSchedule) => set({ calendarSchedule }),
   scheduleDays: [],
   setScheduleDays: (scheduleDays) => set({ scheduleDays }),
-  noDueDiscDays: [0, 5, 6],
+  noDueDiscDays: [0, 6],
   setNoDueDiscDays: (noDueDiscDays) => set({ noDueDiscDays }),
   calendarIsSet: false,
   setCalendarIsSet: (calendarIsSet) => set({ calendarIsSet }),
