@@ -1,5 +1,7 @@
 import { DashboardCard } from "@mr/components/ui/cards/DashboardCard";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@mr/components/ui/Chart";
+import { Construction, PlusCircleIcon } from "lucide-react";
+import { FunctionComponent } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const chartData = [
@@ -18,7 +20,27 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const ConsumptionCard = () => {
+type ConsumptionCardProps = {
+  isBlank?: boolean;
+};
+
+export const ConsumptionCard: FunctionComponent<ConsumptionCardProps> = ({ isBlank = false }) => {
+  if (isBlank)
+    return (
+      <DashboardCard
+        className="col-span-3"
+        size="sm"
+        title="Consumption Pattern"
+        subtitle="Annual water consumption"
+      >
+        <div className="border-muted-foreground/20 flex h-[240px] w-full items-center justify-center rounded border-2 border-dashed">
+          <span className="text-muted-foreground text-xs">
+            <PlusCircleIcon />
+          </span>
+        </div>
+      </DashboardCard>
+    );
+
   return (
     <DashboardCard
       className="col-span-3"

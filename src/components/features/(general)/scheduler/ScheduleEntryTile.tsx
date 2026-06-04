@@ -6,7 +6,7 @@ import { ZonebookStatusIndicator } from "../zonebook/ZonebookStatusIndicator";
 import { getDayFromDate } from "@mr/lib/functions/handleDateArrayOrObject";
 import { StackedAvatars } from "@mr/components/ui/StackedAvatars";
 import { Badge } from "@mr/components/ui/Badge";
-import { isSameDay, isToday, parseISO } from "date-fns";
+import { isSameDay, isSunday, isToday, parseISO } from "date-fns";
 import { ShortSplittedDates } from "./entry/ShortSplittedDates";
 import { ShortNormalDates } from "./entry/ShortNormalDates";
 
@@ -92,7 +92,9 @@ export const ScheduleEntryTile: FunctionComponent<ScheduleEntryTileProps> = ({
               isWithinMonth ? "" : "text-gray-300"
             } group-hover:text-primary items-center text-center`}
           >
-            {getDayFromDate(entry.readingDate)}
+            <span className={`${isSunday(entry.readingDate) && "text-red-500"}`}>
+              {getDayFromDate(entry.readingDate)}
+            </span>
           </div>
           {/* Meter Readers */}
           <div className="col-span-1 flex justify-center">

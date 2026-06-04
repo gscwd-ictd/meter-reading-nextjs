@@ -60,7 +60,7 @@ export const DashboardComponent: FunctionComponent = () => {
       {/* Consumption and Consumer Cards */}
       <div className="grid grid-cols-5 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-5">
         {/* Consumption */}
-        <ConsumptionCard />
+        <ConsumptionCard isBlank={true} />
 
         {/* Total Consumers */}
         <ConsumersByCategory />
@@ -69,10 +69,10 @@ export const DashboardComponent: FunctionComponent = () => {
       {/* Consumption and Consumer Cards */}
       <div className="grid grid-cols-5 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-5">
         {/* Monthly Progress */}
-        <MonthlyProgressCard />
+        <MonthlyProgressCard isBlank={true} />
 
         {/* With Remarks Details - Fixed scrolling */}
-        <WithRemarksProgressCard />
+        <WithRemarksProgressCard isBlank={true} />
       </div>
     </div>
   );
