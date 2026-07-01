@@ -21,11 +21,11 @@ export function createFormData(files: File | File[], filePath: string): FormData
 }
 
 const minioClient = new Minio.Client({
-  endPoint: "172.20.110.45",
+  endPoint: "172.20.110.85",
   port: 9000,
   useSSL: false,
-  accessKey: "q2eEYT1szv9sdKl0dssp",
-  secretKey: "VllsO3HsuFGrw8ObD8wg684d5bwuCBDdgYjdkI7H",
+  accessKey: "minioadmin",
+  secretKey: "minioadmin123",
 });
 
 //MINIO_USER=ictd2022
