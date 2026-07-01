@@ -23,13 +23,13 @@ export const EditSelectRestDayCombobox: FunctionComponent = () => {
   const { setValue } = useFormContext();
 
   return (
-    <div className="w-full items-center">
+    <div className="w-full items-center space-y-1.5">
       <Label id="select-rest-day" className="gap-1 text-sm font-medium text-gray-700">
         Rest Day <span className="text-red-600">*</span>
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button role="combobox" variant="outline" className="w-full justify-between">
+          <Button role="combobox" variant="outline" className="h-10 w-full justify-between">
             {selectedRestDay ? (
               <div className="flex items-center justify-between gap-2">
                 {restDays.find((restDay) => restDay.value === selectedRestDay)?.label}

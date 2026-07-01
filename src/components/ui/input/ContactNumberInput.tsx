@@ -24,7 +24,7 @@ export const ContactNumberInput: FunctionComponent<FormInputProps> = ({
   ...props
 }) => {
   return (
-    <div className="col-span-2 flex flex-col items-start gap-0">
+    <div className="col-span-2 flex flex-col items-start gap-1.5">
       <Label htmlFor={id} className="text-left text-sm font-medium text-gray-700">
         <div
           className={`flex w-fit gap-1 rounded py-0 text-sm font-medium tracking-wide ${

@@ -217,11 +217,11 @@ export const AddMeterReaderDialog: FunctionComponent<AddMeterReaderDialogProps> 
         }}
       >
         <DialogHeader className="flex flex-col gap-0">
-          <DialogTitle className="text-primary flex items-center gap-1 text-xl font-bold dark:text-white">
+          <DialogTitle className="flex items-center gap-1 text-lg font-bold text-gray-700 dark:text-white">
             New Meter Reader
           </DialogTitle>
 
-          <DialogDescription className="text-gray-500">
+          <DialogDescription className="font-medium text-gray-500">
             Assign meter reader role to an employee
           </DialogDescription>
         </DialogHeader>

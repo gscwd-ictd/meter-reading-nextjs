@@ -16,10 +16,10 @@ import { Calendar } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { FunctionComponent } from "react";
 import { toast } from "sonner";
-import { Scheduler } from "./useScheduler";
 import { toDateString } from "@mr/lib/functions/handleDateArrayOrObject";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { isSameMonth, isValid, parse } from "date-fns";
+import { Scheduler } from "./useNewScheduler";
 
 type ManualScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];

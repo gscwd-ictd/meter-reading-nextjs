@@ -11,10 +11,10 @@ import {
 } from "@mr/components/ui/DropdownMenu";
 import { MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { SettingsIcon, CheckIcon } from "lucide-react";
-import { Scheduler } from "./useScheduler";
 import { FunctionComponent, useCallback } from "react";
 import { useSchedulesStore } from "@mr/components/stores/useSchedulesStore";
 import { CustomDaySelectionSetting } from "@mr/components/ui/dropdowns/CustomDaySelectionSetting";
+import { Scheduler } from "./useNewScheduler";
 
 type CalendarDateSettingDropdownProps = {
   schedule: MeterReadingSchedule[];

@@ -43,12 +43,15 @@ export type NavItemUser = {
 const dateToday = new Date();
 const currentYearMonth = format(dateToday, "yyyy-MM");
 
-export const mainNav: NavItem[] = [
+export const homeNav: NavItem[] = [
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: SquaresSubtract,
   },
+];
+
+export const mainNav: NavItem[] = [
   {
     title: "Meter Readers",
     url: "/meter-readers",

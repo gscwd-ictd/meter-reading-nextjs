@@ -13,12 +13,12 @@ import {
 import { CalendarCheck2, CalendarPlus } from "lucide-react";
 import { FunctionComponent, useEffect } from "react";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
-import { Scheduler } from "./useScheduler";
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { toDatesOrDateOnly, toDateString } from "@mr/lib/functions/handleDateArrayOrObject";
+import { Scheduler } from "./useNewScheduler";
 
 type PopulateScheduleAlertDialogProps = {
   schedule: MeterReadingSchedule[];

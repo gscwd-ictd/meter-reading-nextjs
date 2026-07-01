@@ -11,7 +11,6 @@ import {
 } from "@mr/components/ui/AlertDialog";
 import { MeterReadingEntryWithZonebooks, MeterReadingSchedule } from "@mr/lib/types/schedule";
 import { CalendarCheck2, CalendarDaysIcon } from "lucide-react";
-import { Scheduler } from "./useScheduler";
 import { FunctionComponent, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,6 +20,7 @@ import { toDatesOrDateOnly, toDateString } from "@mr/lib/functions/handleDateArr
 import { toast } from "sonner";
 import extractScheduleByDay from "@mr/lib/functions/extractScheduleByDay";
 import mergeScheduleIntoCalendar from "@mr/lib/functions/merge-schedule-into-calendar";
+import { Scheduler } from "./useNewScheduler";
 
 type PopulateSchedByDaysAlertDialogProps = {
   schedule: MeterReadingSchedule[];
