@@ -35,7 +35,13 @@ export const MeterReaderDetailsSchema = z.object({
 
 export const MeterReaderSchema = MeterReaderDetailsSchema.extend({
   restDay: z.enum(RestDayType).transform((val) => (val === "0" ? "sunday" : "saturday")),
-  zoneBooks: ZoneBookSchema.extend({ day: z.number().nullish() }).omit({ id: true }).array(),
+  zoneBooks: ZoneBookSchema.extend({
+    day: z.number().nullish(),
+    area: z.object({ id: z.string(), name: z.string() }).nullish(),
+  })
+    .omit({ id: true })
+    .array(),
+  //zoneBooks: ZoneBookSchema.extend({ day: z.number().nullish() }).omit({ id: true }).array(),
 });
 
 export const PaginatedSchema = z.object({
