@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@date-fns/tz':
+        specifier: ^1.5.0
+        version: 1.5.0
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.11.3)(zod@4.3.5)
@@ -463,8 +466,8 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
-  '@date-fns/tz@1.4.1':
-    resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
+  '@date-fns/tz@1.5.0':
+    resolution: {integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==}
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
@@ -5343,7 +5346,7 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@date-fns/tz@1.4.1': {}
+  '@date-fns/tz@1.5.0': {}
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -9001,7 +9004,7 @@ snapshots:
 
   react-day-picker@9.8.1(react@19.2.3):
     dependencies:
-      '@date-fns/tz': 1.4.1
+      '@date-fns/tz': 1.5.0
       date-fns: 4.1.0
       date-fns-jalali: 4.1.0-0
       react: 19.2.3
