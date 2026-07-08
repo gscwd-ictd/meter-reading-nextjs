@@ -336,15 +336,21 @@ const SchedulePDF: FC<{
   // Render a data row
   const DataRow = ({ item, rowIndex }: { item: any; rowIndex: number }) => {
     const readingDate = new Date(item.entry.readingDate);
+    const isRemarksNotNull = item.meterReader?.reassignment?.remarks! == null;
 
     return (
       <View style={[styles.tableRow, styles.w100]} key={`data-${rowIndex}`}>
+        {/* Day Number */}
         <View style={[styles.tableCol, styles.w5]}>
           <Text style={styles.cellText}>{item.dayNumber}</Text>
         </View>
+
+        {/* Reading Date */}
         <View style={[styles.tableCol, styles.w5]}>
           <Text style={styles.cellText}>{item.entry.readingDate ? format(readingDate, "MM/dd") : "N/A"}</Text>
         </View>
+
+        {/* Due Date */}
         <View style={[styles.tableCol, styles.w5]}>
           <Text style={styles.cellText}>
             {item.entry.dueDate
@@ -355,6 +361,8 @@ const SchedulePDF: FC<{
               : "N/A"}
           </Text>
         </View>
+
+        {/* DC Date */}
         <View style={[styles.tableCol, styles.w5]}>
           <Text style={styles.cellText}>
             {item.entry.disconnectionDate
@@ -367,55 +375,93 @@ const SchedulePDF: FC<{
               : "N/A"}
           </Text>
         </View>
+
+        {/* Meter Reader */}
         <View style={[styles.tableCol, styles.w15]}>
           <Text style={[styles.cellText, { textAlign: "left" }]}>
             {item.isNoMeterReader ? "-" : item.meterReader?.name || "N/A"}
           </Text>
         </View>
-        <View style={[styles.tableCol, styles.w15]}>
-          <Text style={styles.cellText}>
-            {item.isNoMeterReader
-              ? "-"
-              : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
-                ? item.meterReader.zoneBooks.map(
-                    (zb: ZonebookWithDates, zbIdx: number) =>
-                      `${zb.zone}-${zb.book}${item.meterReader!.zoneBooks!.length > zbIdx + 1 ? ", " : ""}`,
-                  )
-                : "-"}
-          </Text>
-        </View>
-        <View style={[styles.tableCol, styles.w35]}>
-          <Text style={[styles.cellText, { fontSize: 6 }]}>
-            {item.isNoMeterReader
-              ? "-"
-              : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
-                ? item.meterReader.zoneBooks
-                    .map((zb: ZonebookWithDates) => zb.area?.name) // Extract area names
-                    .filter((areaName: string) => areaName && areaName.trim() !== "") // Remove empty/null area names
-                    .join("/  ") // Join with commas only for non-empty values
-                : "-"}
-          </Text>
-        </View>
-        <View style={[styles.tableCol, styles.w10]}>
-          <Text style={styles.cellText}>
-            {item.isNoMeterReader
-              ? "-"
-              : !item.isNoMeterReader && item.meterReader?.billed
-                ? item.meterReader?.billed
-                : "-"}
-          </Text>
-          {/* <Text style={styles.cellText}>Billed test</Text> */}
-        </View>
-        <View style={[styles.tableCol, styles.w10]}>
-          <Text style={styles.cellText}>
-            {item.isNoMeterReader
-              ? "-"
-              : !item.isNoMeterReader && item.meterReader?.remarks
-                ? item.meterReader?.remarks
-                : "N/A"}
-          </Text>
-          {/* <Text style={styles.cellText}>Remarks test</Text> */}
-        </View>
+
+        {isRemarksNotNull ? (
+          <>
+            {/* Zonebooks */}
+            <View style={[styles.tableCol, styles.w15]}>
+              <Text style={styles.cellText}>
+                {item.isNoMeterReader
+                  ? "-"
+                  : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
+                    ? item.meterReader.zoneBooks.map(
+                        (zb: ZonebookWithDates, zbIdx: number) =>
+                          `${zb.zone}-${zb.book}${item.meterReader!.zoneBooks!.length > zbIdx + 1 ? ", " : ""}`,
+                      )
+                    : "-"}
+              </Text>
+            </View>
+
+            {/* Area */}
+            <View style={[styles.tableCol, styles.w35]}>
+              <Text style={[styles.cellText, { fontSize: 6 }]}>
+                {item.isNoMeterReader
+                  ? "-"
+                  : item.meterReader?.zoneBooks && item.meterReader.zoneBooks.length > 0
+                    ? item.meterReader.zoneBooks
+                        .map((zb: ZonebookWithDates) => zb.area?.name) // Extract area names
+                        .filter((areaName: string) => areaName && areaName.trim() !== "") // Remove empty/null area names
+                        .join("/  ") // Join with commas only for non-empty values
+                    : "-"}
+              </Text>
+            </View>
+
+            {/* Billed Count */}
+            <View style={[styles.tableCol, styles.w10]}>
+              <Text style={styles.cellText}>
+                {item.isNoMeterReader
+                  ? "-"
+                  : !item.isNoMeterReader && item.meterReader?.billed
+                    ? item.meterReader?.billed
+                    : "-"}
+              </Text>
+              {/* <Text style={styles.cellText}>Billed test</Text> */}
+            </View>
+
+            {/* Remarks */}
+            <View style={[styles.tableCol, styles.w10]}>
+              <Text style={styles.cellText}>
+                {item.isNoMeterReader
+                  ? "-"
+                  : !item.isNoMeterReader && item.meterReader?.reassignment?.remarks
+                    ? item.meterReader?.reassignment?.remarks
+                    : "N/A"}
+              </Text>
+              {/* <Text style={styles.cellText}>Remarks test</Text> */}
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={[styles.tableCol, styles.w15]}>
+              <Text style={styles.cellText}>
+                {item.meterReader?.reassignment?.zoneBooks &&
+                item.meterReader?.reassignment?.zoneBooks.length > 0
+                  ? item.meterReader?.reassignment?.zoneBooks.map(
+                      (zb: ZonebookWithDates, zbIdx: number) =>
+                        `${zb.zone}-${zb.book}${item.meterReader!.zoneBooks!.length > zbIdx + 1 ? ", " : ""}`,
+                    )
+                  : "-"}
+              </Text>
+            </View>
+            <View style={[styles.tableCol, styles.w55]}>
+              <Text
+                style={[
+                  { textAlign: "center", textTransform: "uppercase", fontStyle: "italic", fontSize: 4 },
+                  styles.cellText,
+                ]}
+              >
+                Transferred due to {item.meterReader?.reassignment?.remarks}
+              </Text>
+            </View>
+          </>
+        )}
       </View>
     );
   };
@@ -482,6 +528,7 @@ export const MeterReadingSchedulePdfUpdated: FC<ScheduleTableProps> = ({ yearMon
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_MR_BE}/summary/meter-reading/schedule?date=${yearMonth}`,
       );
+      console.log(res.data);
       return res.data;
     },
     enabled: !!yearMonth,

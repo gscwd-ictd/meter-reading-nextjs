@@ -12,12 +12,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@mr/components/ui/AlertDialog";
+import { TZDate } from "@date-fns/tz";
 
-import { RotateCcwIcon } from "lucide-react";
+import { RotateCcwIcon, RotateCwIcon } from "lucide-react";
 import { FunctionComponent } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import { isAfter, parse, startOfMonth, format } from "date-fns";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@mr/components/ui/Tooltip";
 
 export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const setCurrentSchedule = useSchedulesStore((state) => state.setCurrentSchedule);
@@ -34,6 +37,13 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
   const hasSchedule = useSchedulesStore((state) => state.hasSchedule);
   const searchParams = useSearchParams();
   const monthYear = searchParams.get("date");
+  const nowInUTC8 = new TZDate(Date.now(), "Asia/Manila");
+  const selectedDate = parse(monthYear!, "yyyy-MM", new Date());
+  const selectedFirstDay = startOfMonth(selectedDate);
+  const isResetDisabled = isAfter(nowInUTC8, selectedFirstDay);
+
+  // Format the selected month for display in tooltip
+  const formattedSelectedMonth = format(selectedDate, "MMMM yyyy");
 
   const resetStates = () => {
     // set the calendar populate state to false
@@ -99,9 +109,34 @@ export const ResetScheduleAlertDialog: FunctionComponent = () => {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger className="flex w-full gap-2 px-2 py-1 text-sm">
-        <RotateCcwIcon className="size-5 text-green-500" /> <span>Reset</span>
-      </AlertDialogTrigger>
+      <TooltipProvider>
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <AlertDialogTrigger
+              className={`flex w-full gap-2 px-2 py-1 text-sm ${
+                isResetDisabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+              }`}
+              disabled={isResetDisabled}
+            >
+              {isResetDisabled ? (
+                <RotateCwIcon className="size-5 text-gray-400" />
+              ) : (
+                <RotateCcwIcon className="size-5 text-green-500" />
+              )}
+              <span className={isResetDisabled ? "text-gray-400" : ""}>Reset</span>
+            </AlertDialogTrigger>
+          </TooltipTrigger>
+          {isResetDisabled && (
+            <TooltipContent side="right" className="max-w-xs">
+              <p>
+                Cannot reset {formattedSelectedMonth} because the current date (
+                {format(nowInUTC8, "MMM d, yyyy")}) is after the first day of the month.
+              </p>
+              <p className="mt-1 text-xs text-gray-400">You can only reset the current or future months.</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Reset Schedule</AlertDialogTitle>

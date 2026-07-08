@@ -33,7 +33,6 @@ export const ZonebookProgressDataTable: FunctionComponent<ZonebookProgressDataTa
     queryKey: ["get-zonebook-progress", monthYear],
     queryFn: async () => {
       const res = await axios.get(`${process.env.NEXT_PUBLIC_MR_BE}/progress/zonebooks?date=${monthYear}`); // should be areas
-
       return res.data as ZonebookProgress[];
     },
     enabled: !!monthYear,
