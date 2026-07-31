@@ -160,5 +160,6 @@ export const holidays = [
 export const NonBusinessDays: Day[] = [
   { id: "001", date: "01-01", name: "New Year" },
   { id: "002", date: "03-20", name: "Eid al Fitr" },
-  { id: "003", date: "12-25", name: "Christmas Day" },
+  { id: "003", date: "08-26", name: "Maulid un-Nabi" }, // Muslim Holiday
+  { id: "004", date: "12-25", name: "Christmas Day" },
 ];
