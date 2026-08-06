@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { MeterReaderEntryRowActions } from "./MeterReaderEntryRowActions";
 import { MeterReaderWithZonebooks } from "@mr/lib/types/personnel";
 import { Avatar, AvatarFallback, AvatarImage } from "@mr/components/ui/Avatar";
-import { ZonebookPreview } from "../../(general)/zonebook/ZonebookPreview";
 import { useIsMobile } from "@mr/hooks/use-mobile";
 import { MeterReaderEntryRemarkActions } from "./MeterReaderEntryRemarkActions";
 import { ZonebookPreviewV2 } from "../../(general)/zonebook/ZonebookPreviewV2";
