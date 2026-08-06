@@ -34,7 +34,7 @@ export class TokenService {
       .setProtectedHeader({ alg: "RS256", kid })
       .setAudience(["powersync", "powersync-dev"])
       .setIssuedAt()
-      .setExpirationTime("60m")
+      .setExpirationTime("5h")
       .sign(privateKey);
 
     return { token: jwt };
