@@ -20,6 +20,7 @@ import {
 } from "@mr/components/ui/DropdownMenu";
 import { differenceInMonths, parse } from "date-fns";
 import { MeterReaderZonebookReassignmentDialog } from "../../(general)/scheduler/entry/MeterReaderZonebookReassignmentDialog";
+import { useIsBeforeToday } from "@mr/lib/functions/isBeforeToday";
 
 type MeterReaderEntryRowActionsProps = {
   meterReader: MeterReaderWithZonebooks;
@@ -36,6 +37,10 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
   const [monthDifference, setMonthDifference] = useState<number>(0);
   const [, setCurrentDate] = useState("");
   const lastFetchedMonthYear = useSchedulesStore((state) => state.lastFetchedMonthYear);
+  const readingDate = useSchedulesStore((state) => state.selectedScheduleEntry?.readingDate);
+
+  // check if the reading date is before the date tody
+  const isReadingDateBeforeToday = useIsBeforeToday(readingDate!);
 
   const setSelectedMeterReader = useSchedulesStore((state) => state.setSelectedMeterReader);
   const setEntryZonebookSelectorIsOpen = useSchedulesStore((state) => state.setEntryZonebookSelectorIsOpen);
@@ -159,18 +164,19 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
                   className="w-full px-2"
                   variant="default"
                   size="sm"
-                  disabled={
-                    meterReader.zoneBooks.length === 0
-                      ? true
-                      : meterReader.reassignment?.remarks === null &&
-                          meterReader.zoneBooks.length > 0 &&
-                          monthDifference < 1
-                        ? false
-                        : true
-                  }
+                  // disabled={
+                  //   meterReader.zoneBooks.length === 0
+                  //     ? true
+                  //     : meterReader.reassignment?.remarks === null &&
+                  //         meterReader.zoneBooks.length > 0 &&
+                  //         monthDifference < 1
+                  //       ? false
+                  //       : true
+                  // }
                   onClick={() => openReassignment(meterReader)}
                   onMouseEnter={() => setReassignPopoverOpen(true)}
                   onMouseLeave={() => setReassignPopoverOpen(false)}
+                  disabled={isReadingDateBeforeToday}
                 >
                   <ArrowRightLeftIcon className="size-4 dark:text-white" />
                 </Button>
@@ -192,6 +198,7 @@ export const MeterReaderEntryRowActions: FunctionComponent<MeterReaderEntryRowAc
                   onClick={() => openRemoveMeterReaderEntry(meterReader)}
                   onMouseEnter={() => setRemovePopoverOpen(true)}
                   onMouseLeave={() => setRemovePopoverOpen(false)}
+                  disabled={isReadingDateBeforeToday}
                 >
                   <Trash2 className="size-4 dark:text-white" />
                 </Button>
