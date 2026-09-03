@@ -11,7 +11,7 @@ export const CreateAccountHistorySchema = z4.object({
   thirdService: z4.string().nullish(),
   dateTime: z4.coerce.date(),
   isCommitted: z4.coerce.boolean().nullish(),
-  //createdAt: z4.date(),
+  createdAt: z4.string(),
 });
 
 export const UpdateAccountHistorySchema = CreateAccountHistorySchema.partial().omit({

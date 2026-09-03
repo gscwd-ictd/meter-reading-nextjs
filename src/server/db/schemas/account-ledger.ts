@@ -19,7 +19,7 @@ export const accountHistory = pgTable("account_history", {
   thirdService: text("third_service"),
   isCommitted: boolean("is_committed"),
   dateTime: timestamp("date_time").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull(),
 });
 
 export const usage = pgTable("usage", {
@@ -39,5 +39,5 @@ export const usage = pgTable("usage", {
   month3Usage: real("month_3_usage").notNull(),
   month4Usage: real("month_4_usage").notNull(),
   isCommitted: boolean("is_committed"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string" }).notNull(),
 });

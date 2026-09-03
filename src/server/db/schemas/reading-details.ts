@@ -60,7 +60,7 @@ export const readingDetails = pgTable(
     timeStart: timestamp("time_start"),
     timeEnd: timestamp("time_end"),
     previousBillDate: timestamp("previous_bill_date"),
-    createdAt: timestamp("created_at").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
     isPosted: boolean("is_posted").notNull(), //added isPosted field for syncing purposes
     isCompleted: boolean("is_completed").notNull(), //added isCompleted field for marking reading as completed
     isCommitted: boolean("is_committed").notNull(), //added isCommitted field for marking reading as
