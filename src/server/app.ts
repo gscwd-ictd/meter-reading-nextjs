@@ -33,9 +33,12 @@ function createApp() {
     cors({
       origin: [
         "http://localhost:3000",
+        "http://localhost:3001",
         "http://172.20.10.57:3000",
         "http://172.20.10.53:3000",
         "http://172.20.10.63:3000",
+        "http://localhost:3000",
+        "http://172.20.110.85:3001",
       ],
       allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       allowHeaders: ["Content-Type", "Authorization"],

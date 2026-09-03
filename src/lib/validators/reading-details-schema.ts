@@ -48,7 +48,7 @@ export const CreateReadingDetailsSchema = z4.object({
   timeStart: z4.coerce.date().nullish(),
   timeEnd: z4.coerce.date().nullish(),
   previousBillDate: z4.coerce.date().nullish(),
-  createdAt: z4.coerce.date().nullish(),
+  createdAt: z4.string(),
   isPosted: z4.boolean().nullish(),
   isCompleted: z4.boolean().nullish(),
   isCommitted: z4.boolean().nullish(),
