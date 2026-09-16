@@ -215,7 +215,7 @@ export class ReportsRepository implements IReportsRepository {
   }
 
   async postedAccounts(data: AccountReadingDetails, meterReaderName: string): Promise<void> {
-    const readingDate = data.readingDate ? format(data.readingDate, "MM/dd/yyyy") : "";
+    const readingDate = data.readingDate ? format(data.readingDate, "MM/dd/yyyy h:mm a") : "";
     const dueDate = data.dueDate ? format(data.dueDate, "MM/dd/yyyy") : "";
     const disconnectionDate = data.disconnectionDate ? format(data.disconnectionDate, "MM/dd/yyyy") : "";
     const timeStart = data.timeStart ? format(data.timeStart, "MM/dd/yyyy h:mm a") : "";
