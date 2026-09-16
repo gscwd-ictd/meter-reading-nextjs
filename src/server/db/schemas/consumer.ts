@@ -105,41 +105,41 @@ export const scheduleReadingAccountView = pgView("view_schedule_reading_account"
             'accounts', (
               select json_agg(
                 jsonb_build_object(
-                  'accountNumber', vmr.account_no,
-                  'checkDigit', vmr.check_digit,
-                  'consumerName', vmr.consumer_name,
-                  'isSenior', (vmr."isSenior" = 'True')::boolean,
-                  'contactNumber', vmr.contact_no,
-                  'address', vmr.address,
-                  'classification', vmr.classification,
-                  'consumerType', vmr.consumer_type,
-                  'zone', vmr.zone_code,
-                  'book', vmr.book_code,
-                  'sequenceNumber', vmr."SeqNo",
-                  'meterNumber', vmr.meter_no,
-                  'meterCode', vmr.meter_code,
-                  'meterSize', vmr.meter_size,
-                  'isConnected', vmr.is_connected,
-                  'dateConnected', vmr.date_connected,
-                  'disconnectionDate', vmr.disconnect_date,
-                  'averageUsage', vmr."AverageUsage",
-                  'waterBalance', vmr.water_balance,
-                  'otherBalance', vmr.other_balance,
-                  'previousReading', vmr.previous_reading,
-                  'previousBillingDate', vmr.previous_bill_date,
+                  'accountNumber', a.account_no,
+                  'checkDigit', a.check_digit,
+                  'consumerName', a.consumer_name,
+                  'isSenior', (a."isSenior" = 'True')::boolean,
+                  'contactNumber', a.contact_no,
+                  'address', a.address,
+                  'classification', a.classification,
+                  'consumerType', a.consumer_type,
+                  'zone', a.zone_code,
+                  'book', a.book_code,
+                  'sequenceNumber', a.final_seq_no,
+                  'meterNumber', a.meter_no,
+                  'meterCode', a.meter_code,
+                  'meterSize', a.meter_size,
+                  'isConnected', a.is_connected,
+                  'dateConnected', a.date_connected,
+                  'disconnectionDate', a.disconnect_date,
+                  'averageUsage', a."AverageUsage",
+                  'waterBalance', a.water_balance,
+                  'otherBalance', a.other_balance,
+                  'previousReading', a.previous_reading,
+                  'previousBillingDate', a.previous_bill_date,
                   'location',
-                  (st_x(st_transform(st_setsrid(st_geomfromwkb(mll.wkb_geometry), 32651), 4326))::text || ',' ||
-                  st_y(st_transform(st_setsrid(st_geomfromwkb(mll.wkb_geometry), 32651), 4326))::text),
+                  (st_x(st_transform(st_setsrid(st_geomfromwkb(a.wkb_geometry), 32651), 4326))::text || ',' ||
+                  st_y(st_transform(st_setsrid(st_geomfromwkb(a.wkb_geometry), 32651), 4326))::text),
                   'usage', jsonb_build_object(
-                    'firstMonth', vcu.month1_usage,
-                    'secondMonth', vcu.month2_usage,
-                    'thirdMonth', vcu.month3_usage,
-                    'fourthMonth', vcu.month4_usage
+                    'firstMonth', a.month1_usage,
+                    'secondMonth', a.month2_usage,
+                    'thirdMonth', a.month3_usage,
+                    'fourthMonth', a.month4_usage
                   ),
                   'history', jsonb_build_object(
-                    'firstService', vls.services1,
-                    'secondService', vls.services2,
-                    'thirdService', vls.services3
+                    'firstService', a.services1,
+                    'secondService', a.services2,
+                    'thirdService', a.services3
                   ),
                   'billingAdjustments', (
                     select coalesce(
@@ -153,23 +153,49 @@ export const scheduleReadingAccountView = pgView("view_schedule_reading_account"
                     )
                     from billing_adjustments ba
                   ),
-                  'isExist', exists( 
-                   select 1 from reading_details rd where rd.account_number = vmr.account_no 
-                   and date_trunc('month', rd.created_at::timestamptz at time zone 'Asia/Manila') = date_trunc('month', now() at time zone 'Asia/Manila')
-                  ),
-                  'dateToday', now()
+                  'isExist', a.is_exist,
+                  'dateToday', now() AT TIME ZONE 'Asia/Manila'
                 )
+                order by a.final_seq_no::numeric
               )
-              from "viewMeterReading" vmr
-              left join "viewConsumer_previous_4_months" vcu on vmr.account_no = vcu.account_no
-              left join "viewCustomer_ledger_services" vls on vmr.account_no = vls.account_no
-              left join (
-                  select distinct on (accountno)
-                      *
-                  from "meter_lat_long"
-                  order by accountno, ogc_fid desc
-              ) mll on vmr.account_no = mll.accountno
-              where vmr.zone_code::text = szb.zone and vmr.book_code::text = szb.book
+              from (
+                select
+                  vmr.*,
+                  mll.wkb_geometry,
+                  vcu.month1_usage, vcu.month2_usage, vcu.month3_usage, vcu.month4_usage,
+                  vls.services1, vls.services2, vls.services3,
+                  rd.seq_no,
+                  exists(
+                    select 1 from reading_details rd2 where rd2.account_number = vmr.account_no
+                    and DATE_TRUNC('month', rd2.created_at) = date_trunc('month', now() at time zone 'Asia/Manila')
+                  ) as is_exist,
+                  coalesce(rd.seq_no::text, vmr."SeqNo"::text) as final_seq_no
+                from "viewMeterReading" vmr
+                left join "viewConsumer_previous_4_months" vcu on vmr.account_no = vcu.account_no
+                left join "viewCustomer_ledger_services" vls on vmr.account_no = vls.account_no
+                left join (
+                    select distinct on (accountno) *
+                    from "meter_lat_long"
+                    order by accountno, ogc_fid desc
+                ) mll on vmr.account_no = mll.accountno
+                left join lateral (
+                    select rdx.seq_no
+                    from (
+                        select
+                            account_number,
+                            zone_code,
+                            book_code,
+                            ROW_NUMBER() OVER (PARTITION BY zone_code, book_code ORDER BY reading_date) AS seq_no
+                        from reading_details
+                        WHERE created_at >= (date_trunc('month', now() AT TIME ZONE 'Asia/Manila') - interval '1 month')
+                          AND created_at <  date_trunc('month', now() AT TIME ZONE 'Asia/Manila')
+                    ) rdx
+                    where rdx.account_number = vmr.account_no
+                      and lpad(rdx.zone_code, 2, '0') = vmr.zone_code::text
+                      and rdx.book_code = vmr.book_code::text
+                ) rd on true
+                where vmr.zone_code::text = szb.zone and vmr.book_code::text = szb.book
+              ) a
             )
           )
         )
