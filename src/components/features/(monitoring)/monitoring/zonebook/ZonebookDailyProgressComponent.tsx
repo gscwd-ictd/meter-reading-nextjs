@@ -151,6 +151,16 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
     );
   };
 
+  // negative consumption
+  const countPostedAccounts = () => {
+    return (
+      selectedZonebookWithAccounts &&
+      selectedZonebookWithAccounts.reduce((count, item) => {
+        return item.isPosted === true ? count + 1 : count;
+      }, 0)
+    );
+  };
+
   // with remarks
   const withRemarksCount = () => {
     return (
@@ -210,7 +220,7 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
               {/* Cards Section */}
               {!isLoading && selectedZonebookWithAccounts && selectedZonebookWithAccounts.length > 0 ? (
                 <>
-                  <div className="mt-0 grid grid-cols-1 gap-4 sm:grid-cols-4">
+                  <div className="mt-0 grid grid-cols-1 gap-4 sm:grid-cols-5">
                     {/* Summary Card */}
                     <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                       <div className="mb-3 flex items-center justify-between">
@@ -291,6 +301,18 @@ export const ZonebookDailyProgressComponent: FunctionComponent = () => {
                             .toLocaleString()}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Cubic Meters</p>
+                      </div>
+                    </div>
+
+                    {/* Consumption Card */}
+                    <div className="rounded-lg border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                      <h3 className="mb-4 font-semibold text-emerald-700 dark:text-emerald-300">Posted</h3>
+                      <div className="space-y-2">
+                        <p className="text-3xl font-bold text-emerald-900 dark:text-emerald-400">
+                          {countPostedAccounts()} <span className="font-medium text-gray-500">/</span>{" "}
+                          {selectedZonebookWithAccounts && selectedZonebookWithAccounts.length}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Accounts</p>
                       </div>
                     </div>
                   </div>
